@@ -246,6 +246,10 @@ public:
     }
 };
 
+// Multi_index tag names
+struct descendant_score {};
+struct entry_time {};
+struct mining_score {};
 
 class CBlockPolicyEstimator;
 
@@ -379,18 +383,21 @@ public:
             boost::multi_index::hashed_unique<mempoolentry_txid, SaltedTxidHasher>,
             // sorted by fee rate
             boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<descendant_score>,
                 boost::multi_index::identity<CTxMemPoolEntry>,
                 CompareTxMemPoolEntryByFee
             >,
             // sorted by entry time
             boost::multi_index::ordered_non_unique<
+                boost::multi_index::tag<entry_time>,
                 boost::multi_index::identity<CTxMemPoolEntry>,
                 CompareTxMemPoolEntryByEntryTime
             >,
             // sorted by score (for mining prioritization)
             boost::multi_index::ordered_unique<
-                    boost::multi_index::identity<CTxMemPoolEntry>,
-                    CompareTxMemPoolEntryByScore
+                boost::multi_index::tag<mining_score>,
+                boost::multi_index::identity<CTxMemPoolEntry>,
+                CompareTxMemPoolEntryByScore
             >
         >
     > indexed_transaction_set;
