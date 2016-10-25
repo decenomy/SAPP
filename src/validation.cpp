@@ -1935,7 +1935,7 @@ struct ConnectTrace {
  * Connect a new block to chainActive. pblock is either NULL or a pointer to a CBlock
  * corresponding to pindexNew, to bypass loading it again from disk.
  */
-bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
+bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const std::shared_ptr<const CBlock>& pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
 {
     assert(pindexNew->pprev == chainActive.Tip());
 
@@ -1949,11 +1949,10 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
         connectTrace.blocksConnected.emplace_back(pindexNew, pblockNew);
         if (!ReadBlockFromDisk(*pblockNew, pindexNew))
             return AbortNode(state, "Failed to read block");
-        pblock = pblockNew.get();
     } else {
-        //TODO: This copy is a major performance regression, but ProcessNewBlock callers need updated to fix this
-        connectTrace.blocksConnected.emplace_back(pindexNew, std::make_shared<const CBlock>(*pblock));
+        connectTrace.blocksConnected.emplace_back(pindexNew, pblock);
     }
+    const CBlock& blockConnecting = *connectTrace.blocksConnected.back().second;
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros();
     nTimeReadFromDisk += nTime2 - nTime1;
@@ -1961,8 +1960,8 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CCoinsViewCache view(pcoinsTip);
-        bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
-        GetMainSignals().BlockChecked(*pblock, state);
+        bool rv = ConnectBlock(blockConnecting, state, pindexNew, view, false, fAlreadyChecked);
+        GetMainSignals().BlockChecked(blockConnecting, state);
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
@@ -1988,7 +1987,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs]\n", (nTime5 - nTime4) * 0.001, nTimeChainState * 0.000001);
 
     // Remove conflicting transactions from the mempool.
-    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, connectTrace.txConflicted, !IsInitialBlockDownload());
+    mempool.removeForBlock(blockConnecting.vtx, pindexNew->nHeight, connectTrace.txConflicted, !IsInitialBlockDownload());
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
 
@@ -2156,7 +2155,8 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
 
         // Connect new blocks.
         BOOST_REVERSE_FOREACH (CBlockIndex* pindexConnect, vpindexToConnect) {
-            if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked, connectTrace)) {
+            //TODO: The pblock copy is a major performance regression, but callers need updated to fix this
+            if (!ConnectTip(state, pindexConnect, (pblock && pindexConnect == pindexMostWork) ? std::make_shared<const CBlock>(*pblock) : std::shared_ptr<const CBlock>(), fAlreadyChecked, connectTrace)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible())
