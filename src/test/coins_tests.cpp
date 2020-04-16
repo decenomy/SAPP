@@ -11,6 +11,8 @@
 #include "undo.h"
 #include "utilstrencodings.h"
 
+#include "sapling/incrementalmerkletree.hpp"
+
 #include <vector>
 #include <map>
 
@@ -36,7 +38,16 @@ class CCoinsViewTest : public CCoinsView
     uint256 hashBestBlock_;
     std::map<COutPoint, Coin> map_;
 
+    // Sapling
+    uint256 hashBestSaplingAnchor_;
+    std::map<uint256, SaplingMerkleTree> mapSaplingAnchors_;
+    std::map<uint256, bool> mapSaplingNullifiers_;
+
 public:
+    CCoinsViewTest() {
+        hashBestSaplingAnchor_ = SaplingMerkleTree::empty_root();
+    }
+
     bool GetCoin(const COutPoint& outpoint, Coin& coin) const
     {
         std::map<COutPoint, Coin>::const_iterator it = map_.find(outpoint);
@@ -59,7 +70,80 @@ public:
 
     uint256 GetBestBlock() const { return hashBestBlock_; }
 
-    bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
+    // Sapling
+
+    bool GetSaplingAnchorAt(const uint256& rt, SaplingMerkleTree &tree) const {
+        if (rt == SaplingMerkleTree::empty_root()) {
+            SaplingMerkleTree new_tree;
+            tree = new_tree;
+            return true;
+        }
+
+        std::map<uint256, SaplingMerkleTree>::const_iterator it = mapSaplingAnchors_.find(rt);
+        if (it == mapSaplingAnchors_.end()) {
+            return false;
+        } else {
+            tree = it->second;
+            return true;
+        }
+    }
+
+    bool GetNullifier(const uint256 &nf) const
+    {
+        const std::map<uint256, bool>* mapToUse = &mapSaplingNullifiers_;
+        std::map<uint256, bool>::const_iterator it = mapToUse->find(nf);
+        if (it == mapToUse->end()) {
+            return false;
+        } else {
+            // The map shouldn't contain any false entries.
+            assert(it->second);
+            return true;
+        }
+    }
+
+    uint256 GetBestAnchor() const {
+        return hashBestSaplingAnchor_;
+    }
+
+    void BatchWriteNullifiers(CNullifiersMap& mapNullifiers, std::map<uint256, bool>& cacheNullifiers)
+    {
+        for (CNullifiersMap::iterator it = mapNullifiers.begin(); it != mapNullifiers.end(); ) {
+            if (it->second.flags & CNullifiersCacheEntry::DIRTY) {
+                // Same optimization used in CCoinsViewDB is to only write dirty entries.
+                if (it->second.entered) {
+                    cacheNullifiers[it->first] = true;
+                } else {
+                    cacheNullifiers.erase(it->first);
+                }
+            }
+            mapNullifiers.erase(it++);
+        }
+    }
+
+    template<typename Tree, typename Map, typename MapEntry>
+    void BatchWriteAnchors(Map& mapAnchors, std::map<uint256, Tree>& cacheAnchors)
+    {
+        for (auto it = mapAnchors.begin(); it != mapAnchors.end(); ) {
+            if (it->second.flags & MapEntry::DIRTY) {
+                // Same optimization used in CCoinsViewDB is to only write dirty entries.
+                if (it->second.entered) {
+                    if (it->first != Tree::empty_root()) {
+                        auto ret = cacheAnchors.insert(std::make_pair(it->first, Tree())).first;
+                        ret->second = it->second.tree;
+                    }
+                } else {
+                    cacheAnchors.erase(it->first);
+                }
+            }
+            mapAnchors.erase(it++);
+        }
+    }
+
+    bool BatchWrite(CCoinsMap& mapCoins,
+                    const uint256& hashBlock,
+                    const uint256& hashSaplingAnchor,
+                    CAnchorsSaplingMap& mapSaplingAnchors,
+                    CNullifiersMap& mapSaplingNullifiers)
     {
         for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end(); ) {
             if (it->second.flags & CCoinsCacheEntry::DIRTY) {
@@ -72,8 +156,14 @@ public:
             }
             mapCoins.erase(it++);
         }
+
+        BatchWriteAnchors<SaplingMerkleTree, CAnchorsSaplingMap, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, mapSaplingAnchors_);
+        BatchWriteNullifiers(mapSaplingNullifiers, mapSaplingNullifiers_);
+
         if (!hashBlock.IsNull())
             hashBestBlock_ = hashBlock;
+        if (!hashSaplingAnchor.IsNull())
+            hashBestSaplingAnchor_ = hashSaplingAnchor;
         return true;
     }
 };
@@ -551,7 +641,9 @@ void WriteCoinsViewEntry(CCoinsView& view, CAmount value, char flags)
 {
     CCoinsMap map;
     InsertCoinsMapEntry(map, value, flags);
-    view.BatchWrite(map, {});
+    CAnchorsSaplingMap mapSaplingAnchors;
+    CNullifiersMap mapSaplingNullifiers;
+    view.BatchWrite(map, {}, {}, mapSaplingAnchors, mapSaplingNullifiers);
 }
 
 class SingleEntryCacheTest

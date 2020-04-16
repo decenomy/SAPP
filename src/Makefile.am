@@ -336,6 +336,7 @@ libbitcoin_server_a_SOURCES = \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
+  sapling/sapling_txdb.cpp \
   txmempool.cpp \
   validation.cpp \
   validationinterface.cpp \

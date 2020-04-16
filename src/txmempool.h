@@ -38,20 +38,6 @@ inline bool AllowFree(double dPriority)
 /** Fake height value used in Coin to signify they are only in the memory pool (since 0.8) */
 static const uint32_t MEMPOOL_HEIGHT = 0x7FFFFFFF;
 
-class SaltedTxidHasher
-{
-private:
-    /** Salt */
-    const uint64_t k0, k1;
-
-public:
-    SaltedTxidHasher();
-
-    size_t operator()(const uint256& txid) const {
-        return SipHashUint256(k0, k1, txid);
-    }
-};
-
 class CTxMemPool;
 
 /** \class CTxMemPoolEntry
@@ -376,7 +362,7 @@ public:
         CTxMemPoolEntry,
         boost::multi_index::indexed_by<
             // sorted by txid
-            boost::multi_index::hashed_unique<mempoolentry_txid, SaltedTxidHasher>,
+            boost::multi_index::hashed_unique<mempoolentry_txid, SaltedIdHasher>,
             // sorted by fee rate
             boost::multi_index::ordered_non_unique<
                 boost::multi_index::identity<CTxMemPoolEntry>,
