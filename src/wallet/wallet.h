@@ -101,6 +101,7 @@ class CScript;
 class CWalletTx;
 class ScriptPubKeyMan;
 class SaplingScriptPubKeyMan;
+class SaplingNoteData;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature {
@@ -917,6 +918,9 @@ public:
     void setAbandoned() { hashBlock = ABANDON_HASH; }
 };
 
+// Sapling map
+typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
+
 /**
  * A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
@@ -928,6 +932,7 @@ private:
 
 public:
     mapValue_t mapValue;
+    mapSaplingNoteData_t mapSaplingNoteData;
     std::vector<std::pair<std::string, std::string> > vOrderForm;
     unsigned int fTimeReceivedIsTxTime;
     unsigned int nTimeReceived; //! time received by this node
@@ -982,6 +987,10 @@ public:
         READWRITE(fFromMe);
         READWRITE(fSpent);
 
+        if (this->nVersion >= CTransaction::SAPLING_VERSION) {
+            READWRITE(mapSaplingNoteData);
+        }
+
         if (ser_action.ForRead()) {
             ReadOrderPos(nOrderPos, mapValue);
 
@@ -999,6 +1008,9 @@ public:
     void MarkDirty();
 
     void BindWallet(CWallet* pwalletIn);
+
+    void SetSaplingNoteData(mapSaplingNoteData_t &noteData);
+
     //! checks whether a tx has P2CS inputs or not
     bool HasP2CSInputs() const;
 

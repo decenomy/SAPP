@@ -4292,6 +4292,7 @@ void CWalletTx::Init(const CWallet* pwalletIn)
 {
     pwallet = pwalletIn;
     mapValue.clear();
+    mapSaplingNoteData.clear();
     vOrderForm.clear();
     fTimeReceivedIsTxTime = false;
     nTimeReceived = 0;
@@ -4372,6 +4373,17 @@ void CWalletTx::BindWallet(CWallet* pwalletIn)
     MarkDirty();
 }
 
+void CWalletTx::SetSaplingNoteData(mapSaplingNoteData_t &noteData)
+{
+    mapSaplingNoteData.clear();
+    for (const std::pair<SaplingOutPoint, SaplingNoteData> nd : noteData) {
+        if (nd.first.n < sapData->vShieldedOutput.size()) {
+            mapSaplingNoteData[nd.first] = nd.second;
+        } else {
+            throw std::logic_error("CWalletTx::SetSaplingNoteData(): Invalid note");
+        }
+    }
+}
 
 bool CWalletTx::HasP2CSInputs() const
 {
