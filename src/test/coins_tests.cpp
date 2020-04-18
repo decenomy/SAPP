@@ -10,6 +10,7 @@
 #include "uint256.h"
 #include "undo.h"
 #include "utilstrencodings.h"
+#include "random.h"
 
 #include "sapling/incrementalmerkletree.hpp"
 
@@ -168,6 +169,25 @@ public:
     }
 };
 
+class TxWithNullifiers
+{
+public:
+    CTransaction tx;
+    uint256 saplingNullifier;
+
+    TxWithNullifiers()
+    {
+        CMutableTransaction mutableTx;
+
+        saplingNullifier = GetRandHash();
+        SpendDescription sd;
+        sd.nullifier = saplingNullifier;
+        mutableTx.sapData->vShieldedSpend.push_back(sd);
+        tx = CTransaction(mutableTx);
+    }
+};
+
+
 class CCoinsViewCacheTest : public CCoinsViewCache
 {
 public:
@@ -192,7 +212,402 @@ public:
 
 }
 
+template<typename Tree> bool GetAnchorAt(const CCoinsViewCache &cache, const uint256 &rt, Tree &tree);
+template<> bool GetAnchorAt(const CCoinsViewCache &cache, const uint256 &rt, SaplingMerkleTree &tree) { return cache.GetSaplingAnchorAt(rt, tree); }
+
 BOOST_FIXTURE_TEST_SUITE(coins_tests, BasicTestingSetup)
+
+void checkNullifierCache(const CCoinsViewCache &cache, const TxWithNullifiers &txWithNullifiers, bool shouldBeInCache) {
+    // Check if the nullifiers either are or are not in the cache
+    bool containsSaplingNullifier = cache.GetNullifier(txWithNullifiers.saplingNullifier);
+    BOOST_CHECK(containsSaplingNullifier == shouldBeInCache);
+}
+
+BOOST_AUTO_TEST_CASE(nullifier_regression_test)
+{
+    // Correct behavior:
+    {
+    CCoinsViewTest base;
+    CCoinsViewCache cache1(&base);
+
+    TxWithNullifiers txWithNullifiers;
+
+    // Insert a nullifier into the base.
+    cache1.SetNullifiers(txWithNullifiers.tx, true);
+    checkNullifierCache(cache1, txWithNullifiers, true);
+    cache1.Flush(); // Flush to base.
+
+    // Remove the nullifier from cache
+    cache1.SetNullifiers(txWithNullifiers.tx, false);
+
+    // The nullifier now should be `false`.
+    checkNullifierCache(cache1, txWithNullifiers, false);
+    }
+
+    // Also correct behavior:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        TxWithNullifiers txWithNullifiers;
+
+        // Insert a nullifier into the base.
+        cache1.SetNullifiers(txWithNullifiers.tx, true);
+        checkNullifierCache(cache1, txWithNullifiers, true);
+        cache1.Flush(); // Flush to base.
+
+        // Remove the nullifier from cache
+        cache1.SetNullifiers(txWithNullifiers.tx, false);
+        cache1.Flush(); // Flush to base.
+
+        // The nullifier now should be `false`.
+        checkNullifierCache(cache1, txWithNullifiers, false);
+    }
+
+    // Works because we bring it from the parent cache:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert a nullifier into the base.
+        TxWithNullifiers txWithNullifiers;
+        cache1.SetNullifiers(txWithNullifiers.tx, true);
+        checkNullifierCache(cache1, txWithNullifiers, true);
+        cache1.Flush(); // Empties cache.
+
+        // Create cache on top.
+        {
+            // Remove the nullifier.
+            CCoinsViewCache cache2(&cache1);
+            checkNullifierCache(cache2, txWithNullifiers, true);
+            cache1.SetNullifiers(txWithNullifiers.tx, false);
+            cache2.Flush(); // Empties cache, flushes to cache1.
+        }
+
+        // The nullifier now should be `false`.
+        checkNullifierCache(cache1, txWithNullifiers, false);
+    }
+
+    // Was broken:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert a nullifier into the base.
+        TxWithNullifiers txWithNullifiers;
+        cache1.SetNullifiers(txWithNullifiers.tx, true);
+        cache1.Flush(); // Empties cache.
+
+        // Create cache on top.
+        {
+            // Remove the nullifier.
+            CCoinsViewCache cache2(&cache1);
+            cache2.SetNullifiers(txWithNullifiers.tx, false);
+            cache2.Flush(); // Empties cache, flushes to cache1.
+        }
+
+        // The nullifier now should be `false`.
+        checkNullifierCache(cache1, txWithNullifiers, false);
+    }
+}
+
+template<typename Tree> void anchorPopRegressionTestImpl()
+{
+    // Correct behavior:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Create dummy anchor/commitment
+        Tree tree;
+        tree.append(GetRandHash());
+
+        // Add the anchor
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        // Remove the anchor
+        cache1.PopAnchor(Tree::empty_root());
+        cache1.Flush();
+
+        // Add the anchor back
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        // The base contains the anchor, of course!
+        {
+            Tree checkTree;
+            BOOST_CHECK(GetAnchorAt(cache1, tree.root(), checkTree));
+            BOOST_CHECK(checkTree.root() == tree.root());
+        }
+    }
+
+    // Previously incorrect behavior
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Create dummy anchor/commitment
+        Tree tree;
+        tree.append(GetRandHash());
+
+        // Add the anchor and flush to disk
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        // Remove the anchor, but don't flush yet!
+        cache1.PopAnchor(Tree::empty_root());
+
+        {
+            CCoinsViewCache cache2(&cache1); // Build cache on top
+            cache2.PushAnchor(tree); // Put the same anchor back!
+            cache2.Flush(); // Flush to cache1
+        }
+
+        // cache2's flush kinda worked, i.e. cache1 thinks the
+        // tree is there, but it didn't bring down the correct
+        // treestate...
+        {
+            Tree checktree;
+            BOOST_CHECK(GetAnchorAt(cache1, tree.root(), checktree));
+            BOOST_CHECK(checktree.root() == tree.root()); // Oh, shucks.
+        }
+
+        // Flushing cache won't help either, just makes the inconsistency
+        // permanent.
+        cache1.Flush();
+        {
+            Tree checktree;
+            BOOST_CHECK(GetAnchorAt(cache1, tree.root(), checktree));
+            BOOST_CHECK(checktree.root() == tree.root()); // Oh, shucks.
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(anchor_pop_regression_test)
+{
+    anchorPopRegressionTestImpl<SaplingMerkleTree>();
+}
+
+template<typename Tree> void anchorRegressionTestImpl()
+{
+    // Correct behavior:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert anchor into base.
+        Tree tree;
+        tree.append(GetRandHash());
+
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        cache1.PopAnchor(Tree::empty_root());
+        BOOST_CHECK(cache1.GetBestAnchor() == Tree::empty_root());
+        BOOST_CHECK(!GetAnchorAt(cache1, tree.root(), tree));
+    }
+
+    // Also correct behavior:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert anchor into base.
+        Tree tree;
+        tree.append(GetRandHash());
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        cache1.PopAnchor(Tree::empty_root());
+        cache1.Flush();
+        BOOST_CHECK(cache1.GetBestAnchor() == Tree::empty_root());
+        BOOST_CHECK(!GetAnchorAt(cache1, tree.root(), tree));
+    }
+
+    // Works because we bring the anchor in from parent cache.
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert anchor into base.
+        Tree tree;
+        tree.append(GetRandHash());
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        {
+            // Pop anchor.
+            CCoinsViewCache cache2(&cache1);
+            BOOST_CHECK(GetAnchorAt(cache2, tree.root(), tree));
+            cache2.PopAnchor(Tree::empty_root());
+            cache2.Flush();
+        }
+
+        BOOST_CHECK(cache1.GetBestAnchor() == Tree::empty_root());
+        BOOST_CHECK(!GetAnchorAt(cache1, tree.root(), tree));
+    }
+
+    // Was broken:
+    {
+        CCoinsViewTest base;
+        CCoinsViewCache cache1(&base);
+
+        // Insert anchor into base.
+        Tree tree;
+        tree.append(GetRandHash());
+        cache1.PushAnchor(tree);
+        cache1.Flush();
+
+        {
+            // Pop anchor.
+            CCoinsViewCache cache2(&cache1);
+            cache2.PopAnchor(Tree::empty_root());
+            cache2.Flush();
+        }
+
+        BOOST_CHECK(cache1.GetBestAnchor() == Tree::empty_root());
+        BOOST_CHECK(!GetAnchorAt(cache1, tree.root(), tree));
+    }
+}
+
+BOOST_AUTO_TEST_CASE(anchor_regression_test)
+{
+    anchorRegressionTestImpl<SaplingMerkleTree>();
+}
+
+BOOST_AUTO_TEST_CASE(nullifiers_test)
+{
+    CCoinsViewTest base;
+    CCoinsViewCache cache(&base);
+
+    TxWithNullifiers txWithNullifiers;
+    checkNullifierCache(cache, txWithNullifiers, false);
+    cache.SetNullifiers(txWithNullifiers.tx, true);
+    checkNullifierCache(cache, txWithNullifiers, true);
+    cache.Flush();
+
+    CCoinsViewCache cache2(&base);
+
+    checkNullifierCache(cache2, txWithNullifiers, true);
+    cache2.SetNullifiers(txWithNullifiers.tx, false);
+    checkNullifierCache(cache2, txWithNullifiers, false);
+    cache2.Flush();
+
+    CCoinsViewCache cache3(&base);
+
+    checkNullifierCache(cache3, txWithNullifiers, false);
+}
+
+template<typename Tree> void anchorsFlushImpl()
+{
+    CCoinsViewTest base;
+    uint256 newrt;
+    {
+        CCoinsViewCache cache(&base);
+        Tree tree;
+        BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), tree));
+        tree.append(GetRandHash());
+
+        newrt = tree.root();
+
+        cache.PushAnchor(tree);
+        cache.Flush();
+    }
+
+    {
+        CCoinsViewCache cache(&base);
+        Tree tree;
+        BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), tree));
+
+        // Get the cached entry.
+        BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), tree));
+
+        uint256 check_rt = tree.root();
+
+        BOOST_CHECK(check_rt == newrt);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(anchors_flush_test)
+{
+    anchorsFlushImpl<SaplingMerkleTree>();
+}
+
+template<typename Tree> void anchorsTestImpl()
+{
+    // TODO: These tests should be more methodical.
+    //       Or, integrate with Bitcoin's tests later.
+
+    CCoinsViewTest base;
+    CCoinsViewCache cache(&base);
+
+    BOOST_CHECK(cache.GetBestAnchor() == Tree::empty_root());
+
+    {
+        Tree tree;
+
+        BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), tree));
+        BOOST_CHECK(cache.GetBestAnchor() == tree.root());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+
+        Tree save_tree_for_later;
+        save_tree_for_later = tree;
+
+        uint256 newrt = tree.root();
+        uint256 newrt2;
+
+        cache.PushAnchor(tree);
+        BOOST_CHECK(cache.GetBestAnchor() == newrt);
+
+        {
+            Tree confirm_same;
+            BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), confirm_same));
+
+            BOOST_CHECK(confirm_same.root() == newrt);
+        }
+
+        tree.append(GetRandHash());
+        tree.append(GetRandHash());
+
+        newrt2 = tree.root();
+
+        cache.PushAnchor(tree);
+        BOOST_CHECK(cache.GetBestAnchor() == newrt2);
+
+        Tree test_tree;
+        BOOST_CHECK(GetAnchorAt(cache, cache.GetBestAnchor(), test_tree));
+
+        BOOST_CHECK(tree.root() == test_tree.root());
+
+        {
+            Tree test_tree2;
+            GetAnchorAt(cache, newrt, test_tree2);
+
+            BOOST_CHECK(test_tree2.root() == newrt);
+        }
+
+        {
+            cache.PopAnchor(newrt);
+            Tree obtain_tree;
+            assert(!GetAnchorAt(cache, newrt2, obtain_tree)); // should have been popped off
+            assert(GetAnchorAt(cache, newrt, obtain_tree));
+
+            assert(obtain_tree.root() == newrt);
+        }
+    }
+}
+
+BOOST_AUTO_TEST_CASE(anchors_test)
+{
+    anchorsTestImpl<SaplingMerkleTree>();
+}
 
 static const unsigned int NUM_SIMULATION_ITERATIONS = 40000;
 
