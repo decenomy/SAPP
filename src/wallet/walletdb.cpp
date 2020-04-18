@@ -149,6 +149,12 @@ bool CWalletDB::WriteCryptedSaplingZKey(
     return true;
 }
 
+bool CWalletDB::WriteWitnessCacheSize(int64_t nWitnessCacheSize)
+{
+    nWalletDBUpdateCounter++;
+    return Write(std::string("witnesscachesize"), nWitnessCacheSize);
+}
+
 bool CWalletDB::WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
 {
     nWalletDBUpdateCounter++;
@@ -687,6 +693,8 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 strErr = "Error reading wallet database: LoadSaplingPaymentAddress failed";
                 return false;
             }
+        } else if (strType == "witnesscachesize") {
+            ssValue >> pwallet->GetSaplingScriptPubKeyMan()->nWitnessCacheSize;
         }
     } catch (...) {
         return false;

@@ -104,6 +104,7 @@ void SaplingScriptPubKeyMan::IncrementNoteWitnesses(const CBlockIndex* pindex,
 
     if (nWitnessCacheSize < WITNESS_CACHE_SIZE) {
         nWitnessCacheSize += 1;
+        nWitnessCacheNeedsUpdate = true;
     }
 
     const CBlock* pblock {pblockIn};
@@ -193,12 +194,26 @@ void SaplingScriptPubKeyMan::DecrementNoteWitnesses(const CBlockIndex* pindex)
         ::DecrementNoteWitnesses(wtxItem.second.mapSaplingNoteData, pindex->nHeight, nWitnessCacheSize);
     }
     nWitnessCacheSize -= 1;
+    nWitnessCacheNeedsUpdate = true;
     // TODO: If nWitnessCache is zero, we need to regenerate the caches (#1302)
     assert(nWitnessCacheSize > 0);
 
     // For performance reasons, we write out the witness cache in
     // CWallet::SetBestChain() (which also ensures that overall consistency
     // of the wallet.dat is maintained).
+}
+
+void SaplingScriptPubKeyMan::ClearNoteWitnessCache()
+{
+    LOCK(wallet->cs_wallet);
+    for (std::pair<const uint256, CWalletTx>& wtxItem : wallet->mapWallet) {
+        for (mapSaplingNoteData_t::value_type& item : wtxItem.second.mapSaplingNoteData) {
+            item.second.witnesses.clear();
+            item.second.witnessHeight = -1;
+        }
+    }
+    nWitnessCacheSize = 0;
+    nWitnessCacheNeedsUpdate = true;
 }
 
 Optional<libzcash::SaplingExtendedSpendingKey> SaplingScriptPubKeyMan::GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const

@@ -171,6 +171,9 @@ public:
     //! Return the spending key for the payment address (nullopt if the wallet has no spending key for such address)
     Optional<libzcash::SaplingExtendedSpendingKey> GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const;
 
+    //! Clear every notesData from every wallet tx and reset the witness cache size
+    void ClearNoteWitnessCache();
+
     // Sapling metadata
     std::map<libzcash::SaplingIncomingViewingKey, CKeyMetadata> mapSaplingZKeyMetadata;
 
@@ -179,7 +182,8 @@ public:
      * This will always be greater than or equal to the size of the largest
      * incremental witness cache in any transaction in mapWallet.
      */
-    int64_t nWitnessCacheSize;
+    int64_t nWitnessCacheSize{0};
+    bool nWitnessCacheNeedsUpdate{false};
 
 private:
     /* Parent wallet */

@@ -164,6 +164,8 @@ public:
                                  const std::vector<unsigned char>& vchCryptedSecret,
                                  const CKeyMetadata &keyMeta);
 
+    bool WriteWitnessCacheSize(int64_t nWitnessCacheSize);
+
     /// Write destination data key,value tuple to database
     bool WriteDestData(const std::string& address, const std::string& key, const std::string& value);
     /// Erase destination data tuple from wallet database
