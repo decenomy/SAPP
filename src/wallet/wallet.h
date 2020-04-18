@@ -476,6 +476,16 @@ public:
 
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
+
+    //! pindex is the new tip being connected.
+    void IncrementNoteWitnesses(const CBlockIndex* pindex,
+                                const CBlock* pblock,
+                                SaplingMerkleTree& saplingTree);
+
+    //! pindex is the old tip being disconnected.
+    void DecrementNoteWitnesses(const CBlockIndex* pindex);
+
+
     //! Adds Sapling spending key to the store, and saves it to disk
     bool AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key);
     bool AddSaplingIncomingViewingKeyW(

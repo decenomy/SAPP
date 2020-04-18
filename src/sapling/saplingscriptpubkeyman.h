@@ -5,10 +5,19 @@
 #ifndef PIVX_SAPLINGSCRIPTPUBKEYMAN_H
 #define PIVX_SAPLINGSCRIPTPUBKEYMAN_H
 
+#include "consensus/consensus.h"
 #include "wallet/hdchain.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 #include "sapling/incrementalmerkletree.hpp"
+
+//! Size of witness cache
+//  Should be large enough that we can expect not to reorg beyond our cache
+//  unless there is some exceptional network disruption.
+static const unsigned int WITNESS_CACHE_SIZE = DEFAULT_MAX_REORG_DEPTH + 1;
+
+class CBlock;
+class CBlockIndex;
 
 class SaplingNoteData
 {
@@ -88,6 +97,20 @@ public:
 
     ~SaplingScriptPubKeyMan() {};
 
+    /**
+     * pindex is the new tip being connected.
+     */
+    void IncrementNoteWitnesses(const CBlockIndex* pindex,
+                                const CBlock* pblock,
+                                SaplingMerkleTree& saplingTree);
+    /**
+     * pindex is the old tip being disconnected.
+     */
+    void DecrementNoteWitnesses(const CBlockIndex* pindex);
+
+    /**
+     * Set and initialize the Sapling HD chain.
+     */
     bool SetupGeneration(const CKeyID& keyID, bool force = false);
     bool IsEnabled() const { return !hdChain.IsNull(); };
 
@@ -150,6 +173,13 @@ public:
 
     // Sapling metadata
     std::map<libzcash::SaplingIncomingViewingKey, CKeyMetadata> mapSaplingZKeyMetadata;
+
+    /*
+     * Size of the incremental witness cache for the notes in our wallet.
+     * This will always be greater than or equal to the size of the largest
+     * incremental witness cache in any transaction in mapWallet.
+     */
+    int64_t nWitnessCacheSize;
 
 private:
     /* Parent wallet */
