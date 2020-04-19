@@ -970,7 +970,22 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
 
         bool fExisted = mapWallet.count(tx.GetHash()) != 0;
         if (fExisted && !fUpdate) return false;
-        if (fExisted || IsMine(tx) || IsFromMe(tx)) {
+
+        // Check tx for Sapling notes
+        mapSaplingNoteData_t saplingNoteData;
+        if (HasSaplingSPKM()) {
+            auto saplingNoteDataAndAddressesToAdd = m_sspk_man->FindMySaplingNotes(tx);
+            saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
+            auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
+            // Add my addresses
+            for (const auto &addressToAdd : addressesToAdd) {
+                if (!m_sspk_man->AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
+                    return false;
+                }
+            }
+        }
+
+        if (fExisted || IsMine(tx) || IsFromMe(tx) || saplingNoteData.size() > 0) {
 
             /* Check if any keys in the wallet keypool that were supposed to be unused
              * have appeared in a new transaction. If so, remove those keys from the keypool.
@@ -984,6 +999,11 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
             }
 
             CWalletTx wtx(this, tx);
+
+            if (saplingNoteData.size() > 0) {
+                wtx.SetSaplingNoteData(saplingNoteData);
+            }
+
             // Get merkle branch if transaction was found in a block
             if (posInBlock != -1)
                 wtx.SetMerkleBranch(pIndex, posInBlock);

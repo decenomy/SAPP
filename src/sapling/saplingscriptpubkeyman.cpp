@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "sapling/saplingscriptpubkeyman.h"
+#include "sapling/note.hpp"
 #include "chain.h" // for CBlockIndex
 #include "validation.h" // for ReadBlockFromDisk()
 
@@ -210,6 +211,55 @@ void SaplingScriptPubKeyMan::DecrementNoteWitnesses(const CBlockIndex* pindex)
     // For performance reasons, we write out the witness cache in
     // CWallet::SetBestChain() (which also ensures that overall consistency
     // of the wallet.dat is maintained).
+}
+
+/**
+ * Finds all output notes in the given transaction that have been sent to
+ * SaplingPaymentAddresses in this wallet.
+ *
+ * It should never be necessary to call this method with a CWalletTx, because
+ * the result of FindMySaplingNotes (for the addresses available at the time) will
+ * already have been cached in CWalletTx.mapSaplingNoteData.
+ */
+std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> SaplingScriptPubKeyMan::FindMySaplingNotes(const CTransaction &tx) const
+{
+    // First check that this tx is a Sapling tx.
+    if (!tx.isSapling() || !tx.hasSaplingData()) {
+        return {};
+    }
+
+    LOCK(wallet->cs_KeyStore);
+    const uint256& hash = tx.GetHash();
+
+    mapSaplingNoteData_t noteData;
+    SaplingIncomingViewingKeyMap viewingKeysToAdd;
+
+    // Protocol Spec: 4.19 Block Chain Scanning (Sapling)
+    for (uint32_t i = 0; i < tx.sapData->vShieldedOutput.size(); ++i) {
+        const OutputDescription output = tx.sapData->vShieldedOutput[i];
+        for (auto it = wallet->mapSaplingFullViewingKeys.begin(); it != wallet->mapSaplingFullViewingKeys.end(); ++it) {
+            libzcash::SaplingIncomingViewingKey ivk = it->first;
+            auto result = libzcash::SaplingNotePlaintext::decrypt(output.encCiphertext, ivk, output.ephemeralKey, output.cmu);
+            if (!result) {
+                continue;
+            }
+
+            // Check if we already have it.
+            auto address = ivk.address(result.get().d);
+            if (address && wallet->mapSaplingIncomingViewingKeys.count(address.get()) == 0) {
+                viewingKeysToAdd[address.get()] = ivk;
+            }
+            // We don't cache the nullifier here as computing it requires knowledge of the note position
+            // in the commitment tree, which can only be determined when the transaction has been mined.
+            SaplingOutPoint op {hash, i};
+            SaplingNoteData nd;
+            nd.ivk = ivk;
+            noteData.insert(std::make_pair(op, nd));
+            break;
+        }
+    }
+
+    return std::make_pair(noteData, viewingKeysToAdd);
 }
 
 bool SaplingScriptPubKeyMan::UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx)

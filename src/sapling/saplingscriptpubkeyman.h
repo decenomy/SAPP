@@ -86,6 +86,8 @@ enum KeyAddResult {
     KeyNotAdded,
 };
 
+typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
+
 /*
  * Sapling keys manager
  * todo: add real description..
@@ -175,6 +177,10 @@ public:
 
     //! Return the spending key for the payment address (nullopt if the wallet has no spending key for such address)
     Optional<libzcash::SaplingExtendedSpendingKey> GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const;
+
+    //! Finds all output notes in the given tx that have been sent to a
+    //! SaplingPaymentAddress in this wallet
+    std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> FindMySaplingNotes(const CTransaction& tx) const;
 
     //! Update note data if is needed
     bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
