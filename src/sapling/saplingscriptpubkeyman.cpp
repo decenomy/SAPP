@@ -7,6 +7,15 @@
 #include "chain.h" // for CBlockIndex
 #include "validation.h" // for ReadBlockFromDisk()
 
+void SaplingScriptPubKeyMan::AddToSaplingSpends(const uint256& nullifier, const uint256& wtxid)
+{
+    mapTxSaplingNullifiers.emplace(nullifier, wtxid);
+
+    std::pair<TxNullifiers::iterator, TxNullifiers::iterator> range;
+    range = mapTxSaplingNullifiers.equal_range(nullifier);
+    wallet->SyncMetaDataN(range);
+}
+
 template<typename NoteDataMap>
 void CopyPreviousWitnesses(NoteDataMap& noteDataMap, int indexHeight, int64_t nWitnessCacheSize)
 {

@@ -532,7 +532,13 @@ std::set<uint256> CWallet::GetConflicts(const uint256& txid) const
     return result;
 }
 
-void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> range)
+void CWallet::SyncMetaDataN(std::pair<TxSpendMap<uint256>::iterator, TxSpendMap<uint256>::iterator> range)
+{
+    SyncMetaData<uint256>(range);
+}
+
+template <class T>
+void CWallet::SyncMetaData(std::pair<typename TxSpendMap<T>::iterator, typename TxSpendMap<T>::iterator> range)
 {
     // We want all the wallet transactions in range to have the same metadata as
     // the oldest (smallest nOrderPos).
@@ -540,7 +546,7 @@ void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> ran
 
     int nMinOrderPos = std::numeric_limits<int>::max();
     const CWalletTx* copyFrom = nullptr;
-    for (TxSpends::iterator it = range.first; it != range.second; ++it) {
+    for (typename TxSpendMap<T>::iterator it = range.first; it != range.second; ++it) {
         const CWalletTx* wtx = &mapWallet.at(it->second);
         int n = wtx->nOrderPos;
         if (n < nMinOrderPos) {
@@ -554,7 +560,7 @@ void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> ran
     }
 
     // Now copy data from copyFrom to rest:
-    for (TxSpends::iterator it = range.first; it != range.second; ++it) {
+    for (auto it = range.first; it != range.second; ++it) {
         const uint256& hash = it->second;
         CWalletTx* copyTo = &mapWallet[hash];
         if (copyFrom == copyTo) continue;
@@ -674,9 +680,8 @@ void CWallet::AddToSpends(const COutPoint& outpoint, const uint256& wtxid)
 
     std::pair<TxSpends::iterator, TxSpends::iterator> range;
     range = mapTxSpends.equal_range(outpoint);
-    SyncMetaData(range);
+    SyncMetaData<COutPoint>(range);
 }
-
 
 void CWallet::AddToSpends(const uint256& wtxid)
 {
@@ -687,6 +692,12 @@ void CWallet::AddToSpends(const uint256& wtxid)
 
     for (const CTxIn& txin : thisTx.vin)
         AddToSpends(txin.prevout, wtxid);
+
+    if (CanSupportFeature(FEATURE_SAPLING) && thisTx.sapData) {
+        for (const SpendDescription &spend : thisTx.sapData->vShieldedSpend) {
+            GetSaplingScriptPubKeyMan()->AddToSaplingSpends(spend.nullifier, wtxid);
+        }
+    }
 }
 
 bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, bool fColdStake)

@@ -277,6 +277,9 @@ private:
     std::map<CTxDestination, AddressBook::CAddressBookData>::iterator itEnd;
 };
 
+template <class T>
+using TxSpendMap = std::multimap<T, uint256>;
+
 /**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
@@ -307,7 +310,7 @@ private:
      * detect and report conflicts (double-spends or
      * mutated transactions where the mutant gets mined).
      */
-    typedef std::multimap<COutPoint, uint256> TxSpends;
+    typedef TxSpendMap<COutPoint> TxSpends;
     TxSpends mapTxSpends;
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
     void AddToSpends(const uint256& wtxid);
@@ -315,7 +318,8 @@ private:
     /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
     void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
 
-    void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
+    template <class T>
+    void SyncMetaData(std::pair<typename TxSpendMap<T>::iterator, typename TxSpendMap<T>::iterator> range);
 
     bool IsKeyUsed(const CPubKey& vchPubKey);
 
@@ -422,6 +426,9 @@ public:
     std::set<COutPoint> setLockedCoins;
 
     int64_t nTimeFirstKey;
+
+    // Public SyncMetadata interface used for the sapling spent nullifier map.
+    void SyncMetaDataN(std::pair<TxSpendMap<uint256>::iterator, TxSpendMap<uint256>::iterator> range);
 
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 

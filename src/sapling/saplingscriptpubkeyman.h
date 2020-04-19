@@ -98,6 +98,11 @@ public:
     ~SaplingScriptPubKeyMan() {};
 
     /**
+     * Keep track of the used nullifier.
+     */
+    void AddToSaplingSpends(const uint256& nullifier, const uint256& wtxid);
+
+    /**
      * pindex is the new tip being connected.
      */
     void IncrementNoteWitnesses(const CBlockIndex* pindex,
@@ -190,6 +195,14 @@ private:
     CWallet* wallet{nullptr};
     /* the HD chain data model (external/internal chain counters) */
     CHDChain hdChain;
+
+
+    /**
+     * Used to keep track of spent Notes, and
+     * detect and report conflicts (double-spends).
+     */
+    typedef std::multimap<uint256, uint256> TxNullifiers;
+    TxNullifiers mapTxSaplingNullifiers;
 };
 
 #endif //PIVX_SAPLINGSCRIPTPUBKEYMAN_H
