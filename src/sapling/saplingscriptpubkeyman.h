@@ -176,6 +176,9 @@ public:
     //! Return the spending key for the payment address (nullopt if the wallet has no spending key for such address)
     Optional<libzcash::SaplingExtendedSpendingKey> GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const;
 
+    //! Update note data if is needed
+    bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
+
     //! Clear every notesData from every wallet tx and reset the witness cache size
     void ClearNoteWitnessCache();
 

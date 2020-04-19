@@ -892,6 +892,9 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFlushOnClose)
             wtx.nIndex = wtxIn.nIndex;
             fUpdated = true;
         }
+        if (HasSaplingSPKM() && m_sspk_man->UpdatedNoteData(wtxIn, wtx)) {
+            fUpdated = true;
+        }
         if (wtxIn.fFromMe && wtxIn.fFromMe != wtx.fFromMe) {
             wtx.fFromMe = wtxIn.fFromMe;
             fUpdated = true;

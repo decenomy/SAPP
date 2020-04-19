@@ -212,6 +212,28 @@ void SaplingScriptPubKeyMan::DecrementNoteWitnesses(const CBlockIndex* pindex)
     // of the wallet.dat is maintained).
 }
 
+bool SaplingScriptPubKeyMan::UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx)
+{
+    bool unchangedSaplingFlag = (wtxIn.mapSaplingNoteData.empty() || wtxIn.mapSaplingNoteData == wtx.mapSaplingNoteData);
+    if (!unchangedSaplingFlag) {
+        auto tmp = wtxIn.mapSaplingNoteData;
+        // Ensure we keep any cached witnesses we may already have
+
+        for (const std::pair <SaplingOutPoint, SaplingNoteData> nd : wtx.mapSaplingNoteData) {
+            if (tmp.count(nd.first) && nd.second.witnesses.size() > 0) {
+                tmp.at(nd.first).witnesses.assign(
+                        nd.second.witnesses.cbegin(), nd.second.witnesses.cend());
+            }
+            tmp.at(nd.first).witnessHeight = nd.second.witnessHeight;
+        }
+
+        // Now copy over the updated note data
+        wtx.mapSaplingNoteData = tmp;
+    }
+
+    return !unchangedSaplingFlag;
+}
+
 void SaplingScriptPubKeyMan::ClearNoteWitnessCache()
 {
     LOCK(wallet->cs_wallet);
