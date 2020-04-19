@@ -339,6 +339,9 @@ private:
                                                      const bool fIncludeColdStaking,
                                                      const bool fIncludeDelegated) const;
 
+    // Force balance recomputation if any transaction got conflicted
+    void MarkAffectedTransactionsDirty(const CTransaction& tx);
+
     // Zerocoin wallet
     CzPIVWallet* zwallet{nullptr};
 

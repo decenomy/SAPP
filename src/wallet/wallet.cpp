@@ -1114,12 +1114,28 @@ void CWallet::SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex,
     if (!AddToWalletIfInvolvingMe(tx, pindex, posInBlock, true))
         return; // Not one of ours
 
+    MarkAffectedTransactionsDirty(tx);
+}
+
+void CWallet::MarkAffectedTransactionsDirty(const CTransaction& tx)
+{
     // If a transaction changes 'conflicted' state, that changes the balance
     // available of the outputs it spends. So force those to be
     // recomputed, also:
     for (const CTxIn& txin : tx.vin) {
         if (!txin.IsZerocoinSpend() && mapWallet.count(txin.prevout.hash))
             mapWallet[txin.prevout.hash].MarkDirty();
+    }
+
+    // Sapling
+    if (HasSaplingSPKM() && tx.isSapling() && tx.hasSaplingData()) {
+        for (const SpendDescription &spend : tx.sapData->vShieldedSpend) {
+            uint256 nullifier = spend.nullifier;
+            if (m_sspk_man->mapSaplingNullifiersToNotes.count(nullifier) &&
+                mapWallet.count(m_sspk_man->mapSaplingNullifiersToNotes[nullifier].hash)) {
+                mapWallet[m_sspk_man->mapSaplingNullifiersToNotes[nullifier].hash].MarkDirty();
+            }
+        }
     }
 }
 
