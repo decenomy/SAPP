@@ -1449,11 +1449,24 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
 
     // Compute fee:
     CAmount nDebit = GetDebit(filter);
-    if (nDebit > 0) // debit>0 means we signed/sent this transaction
-    {
+    bool isFromMyTaddr = nDebit > 0; // debit>0 means we signed/sent this transaction
+
+    if (isFromMyTaddr) {// debit>0 means we signed/sent this transaction
         CAmount nValueOut = GetValueOut(); // transasparent outputs plus the negative Sapling valueBalance
         CAmount nValueIn = GetShieldedValueIn();
         nFee = nDebit - nValueOut + nValueIn;
+
+        // If we sent utxos from this transaction, create output for value taken from (negative valueBalance)
+        // or added (positive valueBalance) to the transparent value pool by Sapling shielding and unshielding.
+        if (sapData) {
+            if (sapData->valueBalance < 0) {
+                COutputEntry output = {CNoDestination(), -sapData->valueBalance, (int) vout.size()};
+                listSent.push_back(output);
+            } else if (sapData->valueBalance > 0) {
+                COutputEntry output = {CNoDestination(), sapData->valueBalance, (int) vout.size()};
+                listReceived.push_back(output);
+            }
+        }
     }
 
     // Sent/received.
