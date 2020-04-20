@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(testVectors) {
 
     // Test commitment
     SaplingNote note = SaplingNote(diversifier, pk_d, v, r);
-    BOOST_CHECK(note.cm().get() == cm);
+    BOOST_CHECK(note.cmu().get() == cm);
 
     // Test nullifier
     SaplingSpendingKey spendingKey(sk);

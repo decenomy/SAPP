@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(note_plain_text)
     }
 
     SaplingNote note(addr, 39393);
-    auto cmu_opt = note.cm();
+    auto cmu_opt = note.cmu();
     if (!cmu_opt) {
         BOOST_ERROR("SaplingNote cm failed");
     }
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(note_plain_text)
     BOOST_CHECK(note.d == new_note.d);
     BOOST_CHECK(note.pk_d == new_note.pk_d);
     BOOST_CHECK(note.r == new_note.r);
-    BOOST_CHECK(note.cm() == new_note.cm());
+    BOOST_CHECK(note.cmu() == new_note.cmu());
 
     SaplingOutgoingPlaintext out_pt;
     out_pt.pk_d = note.pk_d;
