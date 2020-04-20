@@ -1451,8 +1451,9 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
     CAmount nDebit = GetDebit(filter);
     if (nDebit > 0) // debit>0 means we signed/sent this transaction
     {
-        CAmount nValueOut = GetValueOut();
-        nFee = nDebit - nValueOut;
+        CAmount nValueOut = GetValueOut(); // transasparent outputs plus the negative Sapling valueBalance
+        CAmount nValueIn = GetShieldedValueIn();
+        nFee = nDebit - nValueOut + nValueIn;
     }
 
     // Sent/received.
