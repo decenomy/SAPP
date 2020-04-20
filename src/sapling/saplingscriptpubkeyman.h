@@ -182,6 +182,9 @@ public:
     //! SaplingPaymentAddress in this wallet
     std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> FindMySaplingNotes(const CTransaction& tx) const;
 
+    //! Whether the nullifier is from this wallet
+    bool IsSaplingNullifierFromMe(const uint256& nullifier) const;
+
     //! Update note data if is needed
     bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
 

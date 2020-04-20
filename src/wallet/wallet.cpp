@@ -4274,7 +4274,19 @@ bool CWallet::IsMine(const CTransaction& tx) const
 
 bool CWallet::IsFromMe(const CTransaction& tx) const
 {
-    return (GetDebit(tx, ISMINE_ALL) > 0);
+    if (GetDebit(tx, ISMINE_ALL) > 0) {
+        return true;
+    }
+
+    if (tx.hasSaplingData()) {
+        for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
+            if (m_sspk_man->IsSaplingNullifierFromMe(spend.nullifier)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 CAmount CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) const
