@@ -333,6 +333,9 @@ CAmount CCoinsViewCache::GetValueIn(const CTransaction& tx) const
     for (unsigned int i = 0; i < tx.vin.size(); i++)
         nResult += AccessCoin(tx.vin[i].prevout).out.nValue;
 
+    // Sapling
+    nResult += tx.GetShieldedValueIn();
+
     return nResult;
 }
 
