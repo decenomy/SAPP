@@ -1915,6 +1915,12 @@ bool static DisconnectTip(CValidationState& state, const CChainParams& chainpara
     for (const auto& tx : block.vtx) {
         GetMainSignals().SyncTransaction(*tx, pindexDelete->pprev, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
     }
+
+    if (chainparams.GetConsensus().NetworkUpgradeActive(pindexDelete->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // Update Sapling cached incremental witnesses
+        GetMainSignals().ChainTip(pindexDelete, &block, nullopt);
+    }
+
     return true;
 }
 
@@ -1959,6 +1965,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const st
         connectTrace.blocksConnected.emplace_back(pindexNew, pblock);
     }
     const CBlock& blockConnecting = *connectTrace.blocksConnected.back().second;
+
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros();
     nTimeReadFromDisk += nTime2 - nTime1;
@@ -2257,6 +2264,22 @@ bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pb
                 for (unsigned int i = 0; i < block.vtx.size(); i++) {
                     GetMainSignals().SyncTransaction(*block.vtx[i], pair.first, i);
                 }
+
+                // Sapling: notify wallet about the connected blocks ordered
+                // Get prev block tree anchor
+                CBlockIndex* pprev = pair.first->pprev;
+                SaplingMerkleTree oldSaplingTree;
+                bool isSaplingActive = (pprev) != nullptr &&
+                                       Params().GetConsensus().NetworkUpgradeActive(pprev->nHeight,
+                                                                                    Consensus::UPGRADE_V5_DUMMY);
+                if (isSaplingActive) {
+                    assert(pcoinsTip->GetSaplingAnchorAt(pprev->hashFinalSaplingRoot, oldSaplingTree));
+                } else {
+                    assert(pcoinsTip->GetSaplingAnchorAt(SaplingMerkleTree::empty_root(), oldSaplingTree));
+                }
+
+                // Sapling: Update cached incremental witnesses
+                GetMainSignals().ChainTip(pair.first, &block, oldSaplingTree);
             }
 
             break;
