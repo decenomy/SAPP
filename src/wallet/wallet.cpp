@@ -885,6 +885,8 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFlushOnClose)
     std::pair<std::map<uint256, CWalletTx>::iterator, bool> ret = mapWallet.emplace(hash, wtxIn);
     CWalletTx& wtx = (*ret.first).second;
     wtx.BindWallet(this);
+    // Sapling
+    m_sspk_man->UpdateNullifierNoteMapWithTx(wtx);
     bool fInsertedNew = ret.second;
     if (fInsertedNew) {
         wtx.nTimeReceived = GetAdjustedTime();
@@ -952,6 +954,8 @@ bool CWallet::LoadToWallet(const CWalletTx& wtxIn)
     mapWallet[hash] = wtxIn;
     CWalletTx& wtx = mapWallet[hash];
     wtx.BindWallet(this);
+    // Sapling
+    m_sspk_man->UpdateNullifierNoteMapWithTx(mapWallet[hash]);
     wtxOrdered.emplace(wtx.nOrderPos, &wtx);
     AddToSpends(hash);
     for (const CTxIn& txin : wtx.vin) {

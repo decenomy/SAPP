@@ -72,6 +72,21 @@ void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapWithTx(CWalletTx& wtx)
     }
 }
 
+/**
+ * Update mapSaplingNullifiersToNotes with the cached nullifiers in this tx.
+ */
+void SaplingScriptPubKeyMan::UpdateNullifierNoteMapWithTx(const CWalletTx& wtx)
+{
+    {
+        LOCK(wallet->cs_wallet);
+        for (const mapSaplingNoteData_t::value_type& item : wtx.mapSaplingNoteData) {
+            if (item.second.nullifier) {
+                mapSaplingNullifiersToNotes[*item.second.nullifier] = item.first;
+            }
+        }
+    }
+}
+
 template<typename NoteDataMap>
 void CopyPreviousWitnesses(NoteDataMap& noteDataMap, int indexHeight, int64_t nWitnessCacheSize)
 {

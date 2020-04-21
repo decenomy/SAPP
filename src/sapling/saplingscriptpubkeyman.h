@@ -116,6 +116,12 @@ public:
     void DecrementNoteWitnesses(const CBlockIndex* pindex);
 
     /**
+     * Update mapSaplingNullifiersToNotes
+     * with the cached nullifiers in this tx.
+     */
+    void UpdateNullifierNoteMapWithTx(const CWalletTx& wtx);
+
+    /**
      *  Update mapSaplingNullifiersToNotes, computing the nullifier
      *  from a cached witness if necessary.
      */
