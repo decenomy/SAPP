@@ -15,6 +15,13 @@
 // In script_tests.cpp
 extern UniValue read_json(const std::string& jsondata);
 
+// todo: Move to a sapling tests utils in the future
+libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey() {
+    std::vector<unsigned char, secure_allocator<unsigned char>> rawSeed(32);
+    HDSeed seed(rawSeed);
+    return libzcash::SaplingExtendedSpendingKey::Master(seed);
+}
+
 BOOST_FIXTURE_TEST_SUITE(sapling_keystore_tests, BasicTestingSetup)
 
 
@@ -107,6 +114,53 @@ BOOST_AUTO_TEST_CASE(StoreAndRetrieveSaplingSpendingKey) {
     BOOST_CHECK(sk == skOut);
     BOOST_CHECK(extfvk == extfvkOut);
     BOOST_CHECK(ivk == ivkOut);
+}
+
+BOOST_AUTO_TEST_CASE(StoreAndRetrieveSaplingFullViewingKey) {
+    CBasicKeyStore keyStore;
+    libzcash::SaplingExtendedSpendingKey skOut;
+    libzcash::SaplingExtendedFullViewingKey extfvkOut;
+    libzcash::SaplingIncomingViewingKey ivkOut;
+
+    auto sk = GetTestMasterSaplingSpendingKey();
+    auto extfvk = sk.ToXFVK();
+    auto ivk = extfvk.fvk.in_viewing_key();
+    auto addr = sk.DefaultAddress();
+
+    // Sanity-check: we can't get a full viewing key we haven't added
+    BOOST_CHECK(!keyStore.HaveSaplingFullViewingKey(ivk));
+    BOOST_CHECK(!keyStore.GetSaplingFullViewingKey(ivk, extfvkOut));
+
+    // and we shouldn't have a spending key or incoming viewing key either
+    BOOST_CHECK(!keyStore.HaveSaplingSpendingKey(extfvk));
+    BOOST_CHECK(!keyStore.GetSaplingSpendingKey(extfvk, skOut));
+    BOOST_CHECK(!keyStore.HaveSaplingIncomingViewingKey(addr));
+    BOOST_CHECK(!keyStore.GetSaplingIncomingViewingKey(addr, ivkOut));
+
+    // and we can't find the default address in our list of addresses
+    std::set<libzcash::SaplingPaymentAddress> addresses;
+    keyStore.GetSaplingPaymentAddresses(addresses);
+    BOOST_CHECK(!addresses.count(addr));
+
+    // When we add the full viewing key, we should have it
+    keyStore.AddSaplingFullViewingKey(extfvk);
+    BOOST_CHECK(keyStore.HaveSaplingFullViewingKey(ivk));
+    BOOST_CHECK(keyStore.GetSaplingFullViewingKey(ivk, extfvkOut));
+    BOOST_CHECK(extfvk == extfvkOut);
+
+    // We should still not have the spending key...
+    BOOST_CHECK(!keyStore.HaveSaplingSpendingKey(extfvk));
+    BOOST_CHECK(!keyStore.GetSaplingSpendingKey(extfvk, skOut));
+
+    // ... but we should have an incoming viewing key
+    BOOST_CHECK(keyStore.HaveSaplingIncomingViewingKey(addr));
+    BOOST_CHECK(keyStore.GetSaplingIncomingViewingKey(addr, ivkOut));
+    BOOST_CHECK(ivk == ivkOut);
+
+    // ... and we should find the default address in our list of addresses
+    addresses.clear();
+    keyStore.GetSaplingPaymentAddresses(addresses);
+    BOOST_CHECK(addresses.count(addr));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
