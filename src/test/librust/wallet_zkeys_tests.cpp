@@ -63,12 +63,12 @@ BOOST_AUTO_TEST_CASE(StoreAndLoadSaplingZkeys) {
     BOOST_CHECK(wallet.AddSaplingZKey(sk, sk.DefaultAddress()));
 
     // verify wallet did add it
-    auto fvk = sk.expsk.full_viewing_key();
-    BOOST_CHECK(wallet.HaveSaplingSpendingKey(fvk));
+    auto extfvk = sk.ToXFVK();
+    BOOST_CHECK(wallet.HaveSaplingSpendingKey(extfvk));
 
     // verify spending key stored correctly
     libzcash::SaplingExtendedSpendingKey keyOut;
-    wallet.GetSaplingSpendingKey(fvk, keyOut);
+    wallet.GetSaplingSpendingKey(extfvk, keyOut);
     BOOST_CHECK(sk == keyOut);
 
     // verify there are two keys
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(StoreAndLoadSaplingZkeys) {
     BOOST_CHECK(!wallet.HaveSaplingIncomingViewingKey(dpa));
 
     // manually add a diversified address
-    auto ivk = fvk.in_viewing_key();
+    auto ivk = extfvk.fvk.in_viewing_key();
     BOOST_CHECK(wallet.AddSaplingIncomingViewingKeyW(ivk, dpa));
 
     // verify wallet did add it

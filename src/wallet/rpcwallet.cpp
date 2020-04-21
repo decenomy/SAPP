@@ -705,12 +705,12 @@ UniValue listshieldedaddresses(const JSONRPCRequest& request)
     std::set<libzcash::SaplingPaymentAddress> addresses;
     pwalletMain->GetSaplingPaymentAddresses(addresses);
     libzcash::SaplingIncomingViewingKey ivk;
-    libzcash::SaplingFullViewingKey fvk;
+    libzcash::SaplingExtendedFullViewingKey extfvk;
     for (libzcash::SaplingPaymentAddress addr : addresses) {
         if (fIncludeWatchonly || (
                 pwalletMain->GetSaplingIncomingViewingKey(addr, ivk) &&
-                pwalletMain->GetSaplingFullViewingKey(ivk, fvk) &&
-                pwalletMain->HaveSaplingSpendingKey(fvk)
+                pwalletMain->GetSaplingFullViewingKey(ivk, extfvk) &&
+                pwalletMain->HaveSaplingSpendingKey(extfvk)
         )) {
             ret.push_back(KeyIO::EncodePaymentAddress(addr));
         }

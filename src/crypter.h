@@ -208,8 +208,8 @@ public:
             const libzcash::SaplingExtendedFullViewingKey &extfvk,
             const std::vector<unsigned char> &vchCryptedSecret,
             const libzcash::SaplingPaymentAddress &defaultAddr);
-    bool HaveSaplingSpendingKey(const libzcash::SaplingFullViewingKey &fvk) const;
-    bool GetSaplingSpendingKey(const libzcash::SaplingFullViewingKey &fvk, libzcash::SaplingExtendedSpendingKey &skOut) const;
+    bool HaveSaplingSpendingKey(const libzcash::SaplingExtendedFullViewingKey &extfvk) const;
+    bool GetSaplingSpendingKey(const libzcash::SaplingExtendedFullViewingKey &extfvk, libzcash::SaplingExtendedSpendingKey &skOut) const;
 
     /**
      * Wallet status (encrypted, locked) changed.

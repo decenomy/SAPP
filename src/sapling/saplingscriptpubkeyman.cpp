@@ -31,7 +31,7 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     do {
         xsk = m_32h_cth.Derive(hdChain.nExternalChainCounter | ZIP32_HARDENED_KEY_LIMIT);
         hdChain.nExternalChainCounter++; // Increment childkey index
-    } while (wallet->HaveSaplingSpendingKey(xsk.expsk.full_viewing_key()));
+    } while (wallet->HaveSaplingSpendingKey(xsk.ToXFVK()));
 
     // Update the chain model in the database
     if (wallet->fFileBacked && !CWalletDB(wallet->strWalletFile).WriteHDChain(hdChain))
@@ -179,11 +179,11 @@ bool SaplingScriptPubKeyMan::AddCryptedSaplingSpendingKeyDB(const libzcash::Sapl
 bool SaplingScriptPubKeyMan::HaveSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &zaddr) const
 {
     libzcash::SaplingIncomingViewingKey ivk;
-    libzcash::SaplingFullViewingKey fvk;
+    libzcash::SaplingExtendedFullViewingKey extfvk;
 
     return wallet->GetSaplingIncomingViewingKey(zaddr, ivk) &&
-           wallet->GetSaplingFullViewingKey(ivk, fvk) &&
-           wallet->HaveSaplingSpendingKey(fvk);
+           wallet->GetSaplingFullViewingKey(ivk, extfvk) &&
+           wallet->HaveSaplingSpendingKey(extfvk);
 }
 
 ///////////////////// Load ////////////////////////////////////////
