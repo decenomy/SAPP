@@ -116,6 +116,18 @@ public:
     void DecrementNoteWitnesses(const CBlockIndex* pindex);
 
     /**
+     *  Update mapSaplingNullifiersToNotes, computing the nullifier
+     *  from a cached witness if necessary.
+     */
+    void UpdateSaplingNullifierNoteMapWithTx(CWalletTx& wtx);
+
+    /**
+     * Iterate over transactions in a block and update the cached Sapling nullifiers
+     * for transactions which belong to the wallet.
+     */
+    void UpdateSaplingNullifierNoteMapForBlock(const CBlock* pblock);
+
+    /**
      * Set and initialize the Sapling HD chain.
      */
     bool SetupGeneration(const CKeyID& keyID, bool force = false);

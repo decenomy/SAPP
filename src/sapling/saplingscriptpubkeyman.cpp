@@ -17,6 +17,61 @@ void SaplingScriptPubKeyMan::AddToSaplingSpends(const uint256& nullifier, const 
     wallet->SyncMetaDataN(range);
 }
 
+void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapForBlock(const CBlock *pblock) {
+    LOCK(wallet->cs_wallet);
+
+    for (const auto& tx : pblock->vtx) {
+        const uint256& hash = tx->GetHash();
+        bool txIsOurs = wallet->mapWallet.count(hash);
+        if (txIsOurs) {
+            UpdateSaplingNullifierNoteMapWithTx(wallet->mapWallet[hash]);
+        }
+    }
+}
+
+/**
+ * Update mapSaplingNullifiersToNotes, computing the nullifier from a cached witness if necessary.
+ */
+void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapWithTx(CWalletTx& wtx) {
+    LOCK(wallet->cs_wallet);
+
+    for (mapSaplingNoteData_t::value_type &item : wtx.mapSaplingNoteData) {
+        SaplingOutPoint op = item.first;
+        SaplingNoteData nd = item.second;
+
+        if (nd.witnesses.empty()) {
+            // If there are no witnesses, erase the nullifier and associated mapping.
+            if (item.second.nullifier) {
+                mapSaplingNullifiersToNotes.erase(item.second.nullifier.get());
+            }
+            item.second.nullifier = boost::none;
+        }
+        else {
+            uint64_t position = nd.witnesses.front().position();
+            auto extfvk = wallet->mapSaplingFullViewingKeys.at(nd.ivk);
+            OutputDescription output = wtx.sapData->vShieldedOutput[op.n];
+            auto optPlaintext = libzcash::SaplingNotePlaintext::decrypt(output.encCiphertext, nd.ivk, output.ephemeralKey, output.cmu);
+            if (!optPlaintext) {
+                // An item in mapSaplingNoteData must have already been successfully decrypted,
+                // otherwise the item would not exist in the first place.
+                assert(false);
+            }
+            auto optNote = optPlaintext.get().note(nd.ivk);
+            if (!optNote) {
+                assert(false);
+            }
+            auto optNullifier = optNote.get().nullifier(extfvk.fvk, position);
+            if (!optNullifier) {
+                // This should not happen.  If it does, maybe the position has been corrupted or miscalculated?
+                assert(false);
+            }
+            uint256 nullifier = optNullifier.get();
+            mapSaplingNullifiersToNotes[nullifier] = op;
+            item.second.nullifier = nullifier;
+        }
+    }
+}
+
 template<typename NoteDataMap>
 void CopyPreviousWitnesses(NoteDataMap& noteDataMap, int indexHeight, int64_t nWitnessCacheSize)
 {
