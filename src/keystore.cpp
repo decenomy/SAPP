@@ -153,14 +153,13 @@ bool CBasicKeyStore::GetKey(const CKeyID& address, CKey& keyOut) const
 
 //! Sapling
 bool CBasicKeyStore::AddSaplingSpendingKey(
-    const libzcash::SaplingExtendedSpendingKey &sk,
-    const libzcash::SaplingPaymentAddress &defaultAddr)
+    const libzcash::SaplingExtendedSpendingKey &sk)
 {
     LOCK(cs_KeyStore);
     auto extfvk = sk.ToXFVK();
 
     // if extfvk is not in SaplingFullViewingKeyMap, add it
-    if (!AddSaplingFullViewingKey(extfvk, defaultAddr)) {
+    if (!AddSaplingFullViewingKey(extfvk)) {
         return false;
     }
 
@@ -170,14 +169,13 @@ bool CBasicKeyStore::AddSaplingSpendingKey(
 }
 
 bool CBasicKeyStore::AddSaplingFullViewingKey(
-    const libzcash::SaplingExtendedFullViewingKey &extfvk,
-    const libzcash::SaplingPaymentAddress &defaultAddr)
+    const libzcash::SaplingExtendedFullViewingKey &extfvk)
 {
     LOCK(cs_KeyStore);
     auto ivk = extfvk.fvk.in_viewing_key();
     mapSaplingFullViewingKeys[ivk] = extfvk;
 
-    return CBasicKeyStore::AddSaplingIncomingViewingKey(ivk, defaultAddr);
+    return CBasicKeyStore::AddSaplingIncomingViewingKey(ivk, extfvk.DefaultAddress());
 }
 
 // This function updates the wallet's internal address->ivk map.

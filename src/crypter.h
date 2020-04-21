@@ -206,8 +206,7 @@ public:
     //! Sapling
     virtual bool AddCryptedSaplingSpendingKey(
             const libzcash::SaplingExtendedFullViewingKey &extfvk,
-            const std::vector<unsigned char> &vchCryptedSecret,
-            const libzcash::SaplingPaymentAddress &defaultAddr);
+            const std::vector<unsigned char> &vchCryptedSecret);
     bool HaveSaplingSpendingKey(const libzcash::SaplingExtendedFullViewingKey &extfvk) const;
     bool GetSaplingSpendingKey(const libzcash::SaplingExtendedFullViewingKey &extfvk, libzcash::SaplingExtendedSpendingKey &skOut) const;
 

@@ -16,8 +16,7 @@
 
 bool CCryptoKeyStore::AddCryptedSaplingSpendingKey(
         const libzcash::SaplingExtendedFullViewingKey &extfvk,
-        const std::vector<unsigned char> &vchCryptedSecret,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const std::vector<unsigned char> &vchCryptedSecret)
 {
     LOCK(cs_KeyStore);
     if (!SetCrypted()) {
@@ -25,7 +24,7 @@ bool CCryptoKeyStore::AddCryptedSaplingSpendingKey(
     }
 
     // if extfvk is not in SaplingFullViewingKeyMap, add it
-    if (!AddSaplingFullViewingKey(extfvk, defaultAddr)) {
+    if (!AddSaplingFullViewingKey(extfvk)) {
         return false;
     }
 

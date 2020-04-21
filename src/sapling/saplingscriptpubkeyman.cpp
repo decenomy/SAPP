@@ -47,22 +47,20 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     metadata.hd_seed_id = hdChain.GetID();
     mapSaplingZKeyMetadata[ivk] = metadata;
 
-    auto addr = xsk.DefaultAddress();
-    if (!AddSaplingZKey(xsk, addr)) {
+    if (!AddSaplingZKey(xsk)) {
         throw std::runtime_error(std::string(__func__) + ": AddSaplingZKey failed");
     }
     // return default sapling payment address.
-    return addr;
+    return xsk.DefaultAddress();
 }
 
 // Add spending key to keystore
 bool SaplingScriptPubKeyMan::AddSaplingZKey(
-        const libzcash::SaplingExtendedSpendingKey &sk,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const libzcash::SaplingExtendedSpendingKey &sk)
 {
     AssertLockHeld(wallet->cs_wallet); // mapSaplingZKeyMetadata
 
-    if (!AddSaplingSpendingKey(sk, defaultAddr)) {
+    if (!AddSaplingSpendingKey(sk)) {
         return false;
     }
 
@@ -79,13 +77,12 @@ bool SaplingScriptPubKeyMan::AddSaplingZKey(
 }
 
 bool SaplingScriptPubKeyMan::AddSaplingSpendingKey(
-        const libzcash::SaplingExtendedSpendingKey &sk,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const libzcash::SaplingExtendedSpendingKey &sk)
 {
     {
         LOCK(wallet->cs_KeyStore);
         if (!wallet->IsCrypted()) {
-            return wallet->AddSaplingSpendingKey(sk, defaultAddr); // keystore
+            return wallet->AddSaplingSpendingKey(sk); // keystore
         }
 
         if (wallet->IsLocked()) {
@@ -102,7 +99,7 @@ bool SaplingScriptPubKeyMan::AddSaplingSpendingKey(
             return false;
         }
 
-        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret, defaultAddr)) {
+        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret)) {
             return false;
         }
     }
@@ -145,7 +142,7 @@ bool SaplingScriptPubKeyMan::EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn)
         if (!EncryptSecret(vMasterKeyIn, vchSecret, extfvk.fvk.GetFingerprint(), vchCryptedSecret)) {
             return false;
         }
-        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret, sk.DefaultAddress())) {
+        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret)) {
             return false;
         }
     }
@@ -154,10 +151,9 @@ bool SaplingScriptPubKeyMan::EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn)
 }
 
 bool SaplingScriptPubKeyMan::AddCryptedSaplingSpendingKeyDB(const libzcash::SaplingExtendedFullViewingKey &extfvk,
-                                           const std::vector<unsigned char> &vchCryptedSecret,
-                                           const libzcash::SaplingPaymentAddress &defaultAddr)
+                                           const std::vector<unsigned char> &vchCryptedSecret)
 {
-    if (!wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret, defaultAddr))
+    if (!wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret))
         return false;
     if (!wallet->fFileBacked)
         return true;
@@ -192,7 +188,7 @@ bool SaplingScriptPubKeyMan::LoadCryptedSaplingZKey(
         const libzcash::SaplingExtendedFullViewingKey &extfvk,
         const std::vector<unsigned char> &vchCryptedSecret)
 {
-    return wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret, extfvk.DefaultAddress());
+    return wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret);
 }
 
 bool SaplingScriptPubKeyMan::LoadSaplingZKeyMetadata(const libzcash::SaplingIncomingViewingKey &ivk, const CKeyMetadata &meta)
@@ -204,7 +200,7 @@ bool SaplingScriptPubKeyMan::LoadSaplingZKeyMetadata(const libzcash::SaplingInco
 
 bool SaplingScriptPubKeyMan::LoadSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key)
 {
-    return wallet->AddSaplingSpendingKey(key, key.DefaultAddress());
+    return wallet->AddSaplingSpendingKey(key);
 }
 
 bool SaplingScriptPubKeyMan::LoadSaplingPaymentAddress(

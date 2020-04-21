@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(StoreAndLoadSaplingZkeys) {
     HDSeed seed1(seed.GetPrivKey());
     auto m = libzcash::SaplingExtendedSpendingKey::Master(seed1);
     auto sk = m.Derive(0);
-    BOOST_CHECK(wallet.AddSaplingZKey(sk, sk.DefaultAddress()));
+    BOOST_CHECK(wallet.AddSaplingZKey(sk));
 
     // verify wallet did add it
     auto extfvk = sk.ToXFVK();
