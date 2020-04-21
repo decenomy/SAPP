@@ -320,6 +320,7 @@ private:
 
     template <class T>
     void SyncMetaData(std::pair<typename TxSpendMap<T>::iterator, typename TxSpendMap<T>::iterator> range);
+    void ChainTipAdded(const CBlockIndex *pindex, const CBlock *pblock, SaplingMerkleTree saplingTree);
 
     bool IsKeyUsed(const CPubKey& vchPubKey);
 
@@ -686,6 +687,12 @@ public:
     CAmount GetDebit(const CTransaction& tx, const isminefilter& filter) const;
     CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const;
     CAmount GetChange(const CTransaction& tx) const;
+
+    //! Sapling merkle tree update
+    void ChainTip(const CBlockIndex *pindex,
+            const CBlock *pblock,
+            Optional<SaplingMerkleTree> added);
+
     void SetBestChain(const CBlockLocator& loc);
 
     DBErrors LoadWallet(bool& fFirstRunRet);
