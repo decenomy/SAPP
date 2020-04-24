@@ -74,6 +74,22 @@ BOOST_AUTO_TEST_CASE(EncodeAndDecodeSapling)
             auto sk2 = boost::get<libzcash::SaplingExtendedSpendingKey>(spendingkey2);
             BOOST_CHECK(sk == sk2);
         }
+
+        {
+            auto extfvk = sk.ToXFVK();
+            std::string vk_string = KeyIO::EncodeViewingKey(extfvk);
+            BOOST_CHECK(
+                vk_string.substr(0, 7) ==
+                Params().Bech32HRP(CChainParams::SAPLING_EXTENDED_FVK));
+
+            auto viewingkey2 = KeyIO::DecodeViewingKey(vk_string);
+            BOOST_CHECK(IsValidViewingKey(viewingkey2));
+
+            BOOST_CHECK(boost::get<libzcash::SaplingExtendedFullViewingKey>(&viewingkey2) != nullptr);
+            auto extfvk2 = boost::get<libzcash::SaplingExtendedFullViewingKey>(viewingkey2);
+            BOOST_CHECK(extfvk == extfvk2);
+        }
+
         {
             auto addr = sk.DefaultAddress();
 

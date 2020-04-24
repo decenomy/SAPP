@@ -141,3 +141,7 @@ libzcash::SaplingPaymentAddress SaplingExtendedSpendingKey::DefaultAddress() con
 bool IsValidSpendingKey(const libzcash::SpendingKey& zkey) {
     return zkey.which() != 0;
 }
+
+bool IsValidViewingKey(const libzcash::ViewingKey& vk) {
+    return vk.which() != 0;
+}
