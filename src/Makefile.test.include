@@ -33,7 +33,9 @@ BITCOIN_TEST_SUITE = \
   test/test_pivx.cpp \
   test/librust/json_test_vectors.h \
   test/librust/sapling_test_fixture.h \
-  test/librust/sapling_test_fixture.cpp
+  test/librust/sapling_test_fixture.cpp \
+  test/librust/utiltest.h \
+  test/librust/utiltest.cpp
 
 if ENABLE_WALLET
 BITCOIN_TEST_SUITE += \
