@@ -447,6 +447,25 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     return xsk.DefaultAddress();
 }
 
+void SaplingScriptPubKeyMan::GetConflicts(const CWalletTx& wtx, std::set<uint256>& result) const
+{
+    AssertLockHeld(wallet->cs_wallet);
+    std::pair<TxNullifiers::const_iterator, TxNullifiers::const_iterator> range_o;
+
+    if (wtx.hasSaplingData()) {
+        for (const SpendDescription& spend : wtx.sapData->vShieldedSpend) {
+            const uint256& nullifier = spend.nullifier;
+            if (mapTxSaplingNullifiers.count(nullifier) <= 1) {
+                continue;  // No conflict if zero or one spends
+            }
+            range_o = mapTxSaplingNullifiers.equal_range(nullifier);
+            for (TxNullifiers::const_iterator it = range_o.first; it != range_o.second; ++it) {
+                result.insert(it->second);
+            }
+        }
+    }
+}
+
 KeyAddResult SaplingScriptPubKeyMan::AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const {
     if (wallet->HaveSaplingSpendingKey(extfvk)) {
         return SpendingKeyExists;

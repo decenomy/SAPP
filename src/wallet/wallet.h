@@ -366,7 +366,7 @@ public:
     ScriptPubKeyMan* GetScriptPubKeyMan() const;
     SaplingScriptPubKeyMan* GetSaplingScriptPubKeyMan() const { return m_sspk_man.get(); }
 
-    bool HasSaplingSPKM();
+    bool HasSaplingSPKM() const;
 
     /*
      * Main wallet lock.

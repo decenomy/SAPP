@@ -153,6 +153,8 @@ public:
     /* Encrypt Sapling keys */
     bool EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn);
 
+    void GetConflicts(const CWalletTx& wtx, std::set<uint256>& result) const;
+
     // Add full viewing key if it's not already in the wallet
     KeyAddResult AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const;
 

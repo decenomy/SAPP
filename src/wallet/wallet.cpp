@@ -549,6 +549,12 @@ std::set<uint256> CWallet::GetConflicts(const uint256& txid) const
         for (TxSpends::const_iterator it = range.first; it != range.second; ++it)
             result.insert(it->second);
     }
+
+    // Sapling
+    if (HasSaplingSPKM()) {
+        m_sspk_man->GetConflicts(wtx, result);
+    }
+
     return result;
 }
 
@@ -664,7 +670,7 @@ ScriptPubKeyMan* CWallet::GetScriptPubKeyMan() const
     return m_spk_man.get();
 }
 
-bool CWallet::HasSaplingSPKM()
+bool CWallet::HasSaplingSPKM() const
 {
     return GetSaplingScriptPubKeyMan()->IsEnabled();
 }
