@@ -221,6 +221,7 @@ set(SERVER_SOURCES
         ./src/torcontrol.cpp
         ./src/txdb.cpp
         ./src/txmempool.cpp
+        ./src/sapling/sapling_validation.cpp
         ./src/validation.cpp
         ./src/validationinterface.cpp
         ./src/zpivchain.cpp
