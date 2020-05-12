@@ -80,6 +80,7 @@ set(BITCOIN_TESTS
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/zip32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/wallet_zkeys_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/merkletree_tests.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/transaction_builder_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base58_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base64_tests.cpp
