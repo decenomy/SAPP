@@ -137,7 +137,8 @@ LIBSAPLING_H = \
   sapling/saplingscriptpubkeyman.h \
   sapling/proof.hpp \
   sapling/sapling_transaction.h \
-  sapling/incrementalmerkletree.hpp
+  sapling/incrementalmerkletree.hpp \
+  sapling/transaction_builder.h
 
 .PHONY: FORCE cargo-build check-symbols check-security
 # pivx core #
@@ -551,7 +552,8 @@ libsapling_a_SOURCES = \
   sapling/crypter_sapling.cpp \
   sapling/saplingscriptpubkeyman.cpp \
   sapling/proof.cpp \
-  sapling/incrementalmerkletree.cpp
+  sapling/incrementalmerkletree.cpp \
+  sapling/transaction_builder.cpp
 
 if GLIBC_BACK_COMPAT
 libsapling_a_SOURCES += compat/glibc_compat.cpp

@@ -453,6 +453,7 @@ set(SAPLING_SOURCES
         ./src/sapling/zip32.cpp
         ./src/sapling/crypter_sapling.cpp
         ./src/sapling/incrementalmerkletree.cpp
+        ./src/sapling/transaction_builder.cpp
         ./src/sapling/saplingscriptpubkeyman.cpp
         )
 
