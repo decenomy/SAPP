@@ -103,6 +103,7 @@ public:
      * Keep track of the used nullifier.
      */
     void AddToSaplingSpends(const uint256& nullifier, const uint256& wtxid);
+    bool IsSaplingSpent(const uint256& nullifier) const;
 
     /**
      * pindex is the new tip being connected.

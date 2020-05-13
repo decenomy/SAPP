@@ -17,6 +17,21 @@ void SaplingScriptPubKeyMan::AddToSaplingSpends(const uint256& nullifier, const 
     wallet->SyncMetaDataN(range);
 }
 
+bool SaplingScriptPubKeyMan::IsSaplingSpent(const uint256& nullifier) const {
+    LOCK(cs_main);
+    std::pair<TxNullifiers::const_iterator, TxNullifiers::const_iterator> range;
+    range = mapTxSaplingNullifiers.equal_range(nullifier);
+
+    for (TxNullifiers::const_iterator it = range.first; it != range.second; ++it) {
+        const uint256& wtxid = it->second;
+        std::map<uint256, CWalletTx>::const_iterator mit = wallet->mapWallet.find(wtxid);
+        if (mit != wallet->mapWallet.end() && mit->second.GetDepthInMainChain() >= 0) {
+            return true; // Spent
+        }
+    }
+    return false;
+}
+
 void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapForBlock(const CBlock *pblock) {
     LOCK(wallet->cs_wallet);
 
