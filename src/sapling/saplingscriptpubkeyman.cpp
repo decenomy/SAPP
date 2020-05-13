@@ -60,6 +60,10 @@ bool SaplingScriptPubKeyMan::AddSaplingZKey(
 {
     AssertLockHeld(wallet->cs_wallet); // mapSaplingZKeyMetadata
 
+    if (!IsEnabled()) {
+        return error("%s: Sapling spkm not enabled", __func__ );
+    }
+
     if (!AddSaplingSpendingKey(sk)) {
         return false;
     }
