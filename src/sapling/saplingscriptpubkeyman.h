@@ -206,6 +206,12 @@ public:
     //! Whether the nullifier is from this wallet
     bool IsSaplingNullifierFromMe(const uint256& nullifier) const;
 
+    //! Return all of the witnesses for the input notes
+    void GetSaplingNoteWitnesses(
+            const std::vector<SaplingOutPoint>& notes,
+            std::vector<Optional<SaplingWitness>>& witnesses,
+            uint256& final_anchor);
+
     //! Update note data if is needed
     bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
 

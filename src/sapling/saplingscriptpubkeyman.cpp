@@ -354,6 +354,33 @@ bool SaplingScriptPubKeyMan::IsSaplingNullifierFromMe(const uint256& nullifier) 
         wallet->mapWallet.count(mapSaplingNullifiersToNotes.at(nullifier).hash);
 }
 
+void SaplingScriptPubKeyMan::GetSaplingNoteWitnesses(const std::vector<SaplingOutPoint>& notes,
+                                      std::vector<Optional<SaplingWitness>>& witnesses,
+                                      uint256& final_anchor)
+{
+    LOCK(wallet->cs_wallet);
+    witnesses.resize(notes.size());
+    Optional<uint256> rt;
+    int i = 0;
+    for (SaplingOutPoint note : notes) {
+        if (wallet->mapWallet.count(note.hash) &&
+            wallet->mapWallet[note.hash].mapSaplingNoteData.count(note) &&
+            wallet->mapWallet[note.hash].mapSaplingNoteData[note].witnesses.size() > 0) {
+            witnesses[i] = wallet->mapWallet[note.hash].mapSaplingNoteData[note].witnesses.front();
+            if (!rt) {
+                rt = witnesses[i]->root();
+            } else {
+                assert(*rt == witnesses[i]->root());
+            }
+        }
+        i++;
+    }
+    // All returned witnesses have the same anchor
+    if (rt) {
+        final_anchor = *rt;
+    }
+}
+
 bool SaplingScriptPubKeyMan::UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx)
 {
     bool unchangedSaplingFlag = (wtxIn.mapSaplingNoteData.empty() || wtxIn.mapSaplingNoteData == wtx.mapSaplingNoteData);
