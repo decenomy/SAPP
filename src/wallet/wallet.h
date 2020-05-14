@@ -340,9 +340,6 @@ private:
                                                      const bool fIncludeColdStaking,
                                                      const bool fIncludeDelegated) const;
 
-    // Force balance recomputation if any transaction got conflicted
-    void MarkAffectedTransactionsDirty(const CTransaction& tx);
-
     // Zerocoin wallet
     CzPIVWallet* zwallet{nullptr};
 
@@ -694,6 +691,9 @@ public:
             Optional<SaplingMerkleTree> added);
 
     void SetBestChain(const CBlockLocator& loc);
+    void SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc); // only public for testing purposes, must never be called directly in any other situation
+    // Force balance recomputation if any transaction got conflicted
+    void MarkAffectedTransactionsDirty(const CTransaction& tx); // only public for testing purposes, must never be called directly in any other situation
 
     DBErrors LoadWallet(bool& fFirstRunRet);
     DBErrors ZapWalletTx(std::vector<CWalletTx>& vWtx);

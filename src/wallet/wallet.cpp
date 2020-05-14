@@ -457,7 +457,11 @@ void CWallet::ChainTip(const CBlockIndex *pindex,
 void CWallet::SetBestChain(const CBlockLocator& loc)
 {
     CWalletDB walletdb(strWalletFile);
+    SetBestChainInternal(walletdb, loc);
+}
 
+void CWallet::SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc)
+{
     if (!walletdb.TxnBegin()) {
         // This needs to be done atomically, so don't do it at all
         LogPrintf("%s: Couldn't start atomic write\n", __func__);

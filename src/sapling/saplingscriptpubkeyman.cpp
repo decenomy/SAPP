@@ -291,7 +291,9 @@ void SaplingScriptPubKeyMan::DecrementNoteWitnesses(const CBlockIndex* pindex)
     nWitnessCacheSize -= 1;
     nWitnessCacheNeedsUpdate = true;
     // TODO: If nWitnessCache is zero, we need to regenerate the caches (#1302)
-    assert(nWitnessCacheSize > 0);
+    if (Params().IsRegTestNet()) { // throw an error in regtest to be able to catch it from the sapling_wallet_tests.cpp unit test.
+        if (nWitnessCacheSize <= 0) throw std::runtime_error("nWitnessCacheSize > 0");
+    } else assert(nWitnessCacheSize > 0);
 
     // For performance reasons, we write out the witness cache in
     // CWallet::SetBestChain() (which also ensures that overall consistency
