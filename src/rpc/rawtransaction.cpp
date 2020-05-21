@@ -23,6 +23,8 @@
 #include "utilmoneystr.h"
 #include "zpivchain.h"
 #ifdef ENABLE_WALLET
+#include "sapling/key_io_sapling.h"
+#include "sapling/address.hpp"
 #include "wallet/wallet.h"
 #endif
 
@@ -65,6 +67,20 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
     // available to code in bitcoin-common, so we query them here and push the
     // data into the returned UniValue.
     TxToUniv(tx, uint256(), entry);
+
+    // Sapling
+    if (pwalletMain && tx.nVersion >= CTransaction::SAPLING_VERSION && tx.hasSaplingData()) {
+        // Add information that only this wallet knows about the transaction if is possible
+        if (pwalletMain->HasSaplingSPKM()) {
+            std::vector<libzcash::SaplingPaymentAddress> addresses =
+                    pwalletMain->GetSaplingScriptPubKeyMan()->FindMySaplingAddresses(tx);
+            UniValue addrs(UniValue::VARR);
+            for (const auto& addr : addresses) {
+                addrs.push_back(KeyIO::EncodePaymentAddress(addr));
+            }
+            entry.pushKV("shielded_addresses", addrs);
+        }
+    }
 
     if (!hashBlock.IsNull()) {
         entry.pushKV("blockhash", hashBlock.GetHex());
@@ -141,6 +157,7 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
             "     }\n"
             "     ,...\n"
             "  ],\n"
+            "  \"shielded_addresses\"      (json array of string) the shielded addresses involved in this transaction if possible (only for shielded transactions and the tx owner/viewer)\n"
             "  \"blockhash\" : \"hash\",   (string) the block hash\n"
             "  \"confirmations\" : n,      (numeric) The confirmations\n"
             "  \"time\" : ttt,             (numeric) The transaction time in seconds since epoch (Jan 1 1970 GMT)\n"

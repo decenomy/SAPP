@@ -9,6 +9,7 @@
 #include "primitives/transaction.h"
 #include "script/script.h"
 #include "script/standard.h"
+#include "sapling/sapling_core_write.h"
 #include "serialize.h"
 #include "streams.h"
 #include <univalue.h>
@@ -195,6 +196,9 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry)
         vout.push_back(out);
     }
     entry.pushKV("vout", vout);
+
+    // Sapling
+    TxSaplingToJSON(tx, entry);
 
     if (!hashBlock.IsNull())
         entry.pushKV("blockhash", hashBlock.GetHex());
