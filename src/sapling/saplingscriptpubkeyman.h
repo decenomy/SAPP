@@ -203,6 +203,9 @@ public:
     //! SaplingPaymentAddress in this wallet
     std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> FindMySaplingNotes(const CTransaction& tx) const;
 
+    //! Find all of the addresses in the given tx that have been sent to a SaplingPaymentAddress in this wallet.
+    std::vector<libzcash::SaplingPaymentAddress> FindMySaplingAddresses(const CTransaction& tx) const;
+
     //! Whether the nullifier is from this wallet
     bool IsSaplingNullifierFromMe(const uint256& nullifier) const;
 
