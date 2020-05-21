@@ -128,6 +128,7 @@ LIBSAPLING_H = \
   sapling/sapling.h \
   bech32.h \
   sapling/key_io_sapling.h \
+  sapling/sapling_core_write.h \
   sapling/sapling_util.h \
   sapling/prf.h \
   sapling/noteencryption.hpp \
@@ -552,6 +553,7 @@ libsapling_a_SOURCES = \
   bech32.cpp \
   sapling/sapling_util.cpp \
   sapling/key_io_sapling.cpp \
+  sapling/sapling_core_write.cpp \
   sapling/prf.cpp \
   sapling/noteencryption.cpp \
   sapling/address.cpp \

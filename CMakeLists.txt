@@ -384,6 +384,7 @@ set(COMMON_SOURCES
         ./src/zpiv/zerocoin.cpp
         ./src/core_read.cpp
         ./src/core_write.cpp
+        ./src/sapling/sapling_core_write.cpp
         ./src/hash.cpp
         ./src/invalid.cpp
         ./src/key.cpp
