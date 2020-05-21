@@ -6,6 +6,7 @@
 #define PIVX_SAPLINGSCRIPTPUBKEYMAN_H
 
 #include "consensus/consensus.h"
+#include "sapling/note.hpp"
 #include "wallet/hdchain.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
@@ -18,6 +19,23 @@ static const unsigned int WITNESS_CACHE_SIZE = DEFAULT_MAX_REORG_DEPTH + 1;
 
 class CBlock;
 class CBlockIndex;
+
+/** Sapling note, its location in a transaction, and number of confirmations. */
+struct SaplingNoteEntry
+{
+    explicit SaplingNoteEntry(const SaplingOutPoint& _op,
+                              const libzcash::SaplingPaymentAddress& _addr,
+                              const libzcash::SaplingNote& _note,
+                              const std::array<unsigned char, ZC_MEMO_SIZE>& _memo,
+                              const int _conf) :
+                              op(_op), address(_addr), note(_note), memo(_memo),
+                              confirmations(_conf) { }
+    SaplingOutPoint op;
+    libzcash::SaplingPaymentAddress address;
+    libzcash::SaplingNote note;
+    std::array<unsigned char, ZC_MEMO_SIZE> memo;
+    int confirmations;
+};
 
 class SaplingNoteData
 {
@@ -205,6 +223,23 @@ public:
 
     //! Find all of the addresses in the given tx that have been sent to a SaplingPaymentAddress in this wallet.
     std::vector<libzcash::SaplingPaymentAddress> FindMySaplingAddresses(const CTransaction& tx) const;
+
+    /* Find notes filtered by payment address, min depth, ability to spend */
+    void GetFilteredNotes(std::vector<SaplingNoteEntry>& saplingEntries,
+                          libzcash::PaymentAddress& address,
+                          int minDepth=1,
+                          bool ignoreSpent=true,
+                          bool requireSpendingKey=true);
+
+    /* Find notes filtered by payment addresses, min depth, max depth, if they are spent,
+       if a spending key is required, and if they are locked */
+    void GetFilteredNotes(std::vector<SaplingNoteEntry>& saplingEntries,
+                          std::set<libzcash::PaymentAddress>& filterAddresses,
+                          int minDepth=1,
+                          int maxDepth=INT_MAX,
+                          bool ignoreSpent=true,
+                          bool requireSpendingKey=true,
+                          bool ignoreLocked=true);
 
     //! Whether the nullifier is from this wallet
     bool IsSaplingNullifierFromMe(const uint256& nullifier) const;

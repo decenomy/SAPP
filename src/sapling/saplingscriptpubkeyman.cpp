@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "sapling/saplingscriptpubkeyman.h"
-#include "sapling/note.hpp"
 #include "chain.h" // for CBlockIndex
 #include "validation.h" // for ReadBlockFromDisk()
 
@@ -372,6 +371,98 @@ std::vector<libzcash::SaplingPaymentAddress> SaplingScriptPubKeyMan::FindMySapli
         }
     }
     return ret;
+}
+
+/**
+ * Find notes in the wallet filtered by payment address, min depth and ability to spend.
+ * These notes are decrypted and added to the output parameter vector, saplingEntries.
+ */
+void SaplingScriptPubKeyMan::GetFilteredNotes(
+        std::vector<SaplingNoteEntry>& saplingEntries,
+        libzcash::PaymentAddress& address,
+        int minDepth,
+        bool ignoreSpent,
+        bool requireSpendingKey)
+{
+    std::set<libzcash::PaymentAddress> filterAddresses;
+
+    if (IsValidPaymentAddress(address)) {
+        filterAddresses.insert(address);
+    }
+
+    GetFilteredNotes(saplingEntries, filterAddresses, minDepth, INT_MAX, ignoreSpent, requireSpendingKey);
+}
+
+/**
+ * Find notes in the wallet filtered by payment addresses, min depth, max depth,
+ * if the note is spent, if a spending key is required, and if the notes are locked.
+ * These notes are decrypted and added to the output parameter vector, saplingEntries.
+ */
+void SaplingScriptPubKeyMan::GetFilteredNotes(
+        std::vector<SaplingNoteEntry>& saplingEntries,
+        std::set<libzcash::PaymentAddress>& filterAddresses,
+        int minDepth,
+        int maxDepth,
+        bool ignoreSpent,
+        bool requireSpendingKey,
+        bool ignoreLocked)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    for (auto& p : wallet->mapWallet) {
+        const CWalletTx& wtx = p.second;
+
+        // Filter coinbase/coinstakes transactions that don't have Sapling outputs
+        if ((wtx.IsCoinBase() || wtx.IsCoinStake()) && wtx.mapSaplingNoteData.empty()) {
+            continue;
+        }
+
+        // Filter the transactions before checking for notes
+        if (!CheckFinalTx(wtx) ||
+            wtx.GetDepthInMainChain() < minDepth ||
+            wtx.GetDepthInMainChain() > maxDepth) {
+            continue;
+        }
+
+        for (const auto& it : wtx.mapSaplingNoteData) {
+            const SaplingOutPoint& op = it.first;
+            const SaplingNoteData& nd = it.second;
+
+            auto maybe_pt = libzcash::SaplingNotePlaintext::decrypt(
+                    wtx.sapData->vShieldedOutput[op.n].encCiphertext,
+                    nd.ivk,
+                    wtx.sapData->vShieldedOutput[op.n].ephemeralKey,
+                    wtx.sapData->vShieldedOutput[op.n].cmu);
+            assert(static_cast<bool>(maybe_pt));
+            auto notePt = maybe_pt.get();
+
+            auto maybe_pa = nd.ivk.address(notePt.d);
+            assert(static_cast<bool>(maybe_pa));
+            auto pa = maybe_pa.get();
+
+            // skip notes which belong to a different payment address in the wallet
+            if (!(filterAddresses.empty() || filterAddresses.count(pa))) {
+                continue;
+            }
+
+            if (ignoreSpent && nd.nullifier && IsSaplingSpent(*nd.nullifier)) {
+                continue;
+            }
+
+            // skip notes which cannot be spent
+            if (requireSpendingKey && !HaveSpendingKeyForPaymentAddress(pa)) {
+                continue;
+            }
+
+            // skip locked notes. todo: Implement locked notes..
+            //if (ignoreLocked && IsLockedNote(op)) {
+            //    continue;
+            //}
+
+            auto note = notePt.note(nd.ivk).get();
+            saplingEntries.emplace_back(op, pa, note, notePt.memo(), wtx.GetDepthInMainChain());
+        }
+    }
 }
 
 bool SaplingScriptPubKeyMan::IsSaplingNullifierFromMe(const uint256& nullifier) const
