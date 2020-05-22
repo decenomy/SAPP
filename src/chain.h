@@ -11,6 +11,7 @@
 #define BITCOIN_CHAIN_H
 
 #include "chainparams.h"
+#include "optional.h"
 #include "pow.h"
 #include "primitives/block.h"
 #include "timedata.h"
@@ -217,6 +218,15 @@ public:
     std::vector<unsigned char> vStakeModifier{};
     unsigned int nFlags{0};
 
+    //! Change in value held by the Sapling circuit over this block.
+    //! Not a Optional because this was added before Sapling activated, so we can
+    //! rely on the invariant that every block before this was added had nSaplingValue = 0.
+    CAmount nSaplingValue{0};
+
+    //! (memory only) Total value held by the Sapling circuit up to and including this block.
+    //! Will be nullopt if nChainTx is zero.
+   Optional<CAmount> nChainSaplingValue{nullopt};
+
     //! block header
     int nVersion{0};
     uint256 hashMerkleRoot{};
@@ -258,6 +268,9 @@ public:
     uint64_t GetStakeModifierV1() const;
     uint256 GetStakeModifierV2() const;
 
+    // Update Sapling chain value
+    void SetChainSaplingValue();
+
     //! Check whether this block index entry is valid up to the passed validity level.
     bool IsValid(enum BlockStatus nUpTo = BLOCK_VALID_TRANSACTIONS) const;
     //! Raise the validity level of this block index entry.
@@ -275,6 +288,7 @@ public:
 // New serialization introduced with 4.0.99
 static const int DBI_OLD_SER_VERSION = 4009900;
 static const int DBI_SER_VERSION_NO_ZC = 4009902;   // removes mapZerocoinSupply, nMoneySupply
+static const int DBI_SER_VERSION_SAPLING = 4009903;   // adds Sapling block values: nSaplingValue
 
 class CDiskBlockIndex : public CBlockIndex
 {
@@ -322,6 +336,13 @@ public:
             READWRITE(nNonce);
             if(this->nVersion > 3 && this->nVersion < 7)
                 READWRITE(nAccumulatorCheckpoint);
+
+
+            // Only read/write nSaplingValue if the client version used to create
+            // this index was storing them.
+            if (nSerVersion >= DBI_SER_VERSION_SAPLING) {
+                READWRITE(nSaplingValue);
+            }
 
         } else if (nSerVersion > DBI_OLD_SER_VERSION && ser_action.ForRead()) {
             // Serialization with CLIENT_VERSION = 4009901

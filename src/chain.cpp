@@ -239,6 +239,20 @@ uint256 CBlockIndex::GetStakeModifierV2() const
     return nStakeModifier;
 }
 
+void CBlockIndex::SetChainSaplingValue()
+{
+    // Sapling, update chain value
+    if (pprev) {
+        if (pprev->nChainSaplingValue) {
+            nChainSaplingValue = *pprev->nChainSaplingValue + nSaplingValue;
+        } else {
+            nChainSaplingValue = nullopt;
+        }
+    } else {
+        nChainSaplingValue = nSaplingValue;
+    }
+}
+
 //! Check whether this block index entry is valid up to the passed validity level.
 bool CBlockIndex::IsValid(enum BlockStatus nUpTo) const
 {
