@@ -1434,6 +1434,22 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return state.DoS(100, error("ConnectBlock() : PoW period ended"),
             REJECT_INVALID, "PoW-ended");
 
+    // Sapling
+    // Reject a block that results in a negative shielded value pool balance.
+    // Description under ZIP209 turnstile violation.
+
+    // If we've reached ConnectBlock, we have all transactions of
+    // parents and can expect nChainSaplingValue not to be boost::none.
+    // However, the miner and mining RPCs may not have populated this
+    // value and will call `TestBlockValidity`. So, we act
+    // conditionally.
+    if (pindex->nChainSaplingValue) {
+        if (*pindex->nChainSaplingValue < 0) {
+            return state.DoS(100, error("ConnectBlock(): turnstile violation in Sapling shielded value pool"),
+                             REJECT_INVALID, "turnstile-violation-sapling-shielded-pool");
+        }
+    }
+
     bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate();
 
     // If scripts won't be checked anyways, don't bother seeing if CLTV is activated
