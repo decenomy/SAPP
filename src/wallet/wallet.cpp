@@ -475,6 +475,33 @@ void CWallet::SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc
         return;
     }
 
+    // For performance reasons, we update the witnesses data here and not when each transaction arrives
+    for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
+        auto wtx = wtxItem.second;
+        // We skip transactions for which mapSaplingNoteData is empty.
+        // This covers transactions that have no Sapling data
+        // (i.e. are purely transparent), as well as shielding and unshielding
+        // transactions in which we only have transparent addresses involved.
+        if (!wtx.mapSaplingNoteData.empty()) {
+            // Sanity check
+            if (wtx.nVersion < CTransaction::SAPLING_VERSION) {
+                LogPrintf("SetBestChain(): ERROR, Invalid tx version found with sapling data\n");
+                walletdb.TxnAbort();
+                uiInterface.ThreadSafeMessageBox(
+                        _("A fatal internal error occurred, see debug.log for details"),
+                        "Error", CClientUIInterface::MSG_ERROR);
+                StartShutdown();
+                return;
+            }
+
+            if (!walletdb.WriteTx(wtx)) {
+                LogPrintf("SetBestChain(): Failed to write CWalletTx, aborting atomic write\n");
+                walletdb.TxnAbort();
+                return;
+            }
+        }
+    }
+
     // Store sapling witness cache size
     if (m_sspk_man->nWitnessCacheNeedsUpdate) {
         if (!walletdb.WriteWitnessCacheSize(m_sspk_man->nWitnessCacheSize)) {
