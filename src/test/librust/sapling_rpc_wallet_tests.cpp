@@ -86,4 +86,65 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_getnewshieldedaddress) {
     BOOST_CHECK_THROW(CallRPC("getnewshieldedaddress many args"), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_CASE(rpc_wallet_encrypted_wallet_sapzkeys)
+{
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    UniValue retValue;
+    int n = 100;
+
+    if(!pwalletMain->HasSaplingSPKM()) {
+        pwalletMain->SetupSPKM(false);
+    }
+
+    // wallet should currently be empty
+    std::set<libzcash::SaplingPaymentAddress> addrs;
+    pwalletMain->GetSaplingPaymentAddresses(addrs);
+    BOOST_CHECK(addrs.empty());
+
+    // create keys
+    for (int i = 0; i < n; i++) {
+        CallRPC("getnewshieldedaddress");
+    }
+
+    // Verify we can list the keys imported
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedaddresses"));
+    UniValue arr = retValue.get_array();
+    BOOST_CHECK((int) arr.size() == n);
+
+    // Verify that the wallet encryption RPC is disabled
+    // TODO: We don't have the experimental mode to disable the encryptwallet disable.
+    //BOOST_CHECK_THROW(CallRPC("encryptwallet passphrase"), std::runtime_error);
+
+    // Encrypt the wallet (we can't call RPC encryptwallet as that shuts down node)
+    SecureString strWalletPass;
+    strWalletPass.reserve(100);
+    strWalletPass = "hello";
+
+    boost::filesystem::current_path(GetArg("-datadir","/tmp/thisshouldnothappen"));
+    BOOST_CHECK(pwalletMain->EncryptWallet(strWalletPass));
+
+    // Verify we can still list the keys imported
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedaddresses"));
+    arr = retValue.get_array();
+    BOOST_CHECK((int) arr.size() == n);
+
+    // Try to add a new key, but we can't as the wallet is locked
+    BOOST_CHECK_THROW(CallRPC("getnewshieldedaddress"), std::runtime_error);
+
+    // We can't call RPC walletpassphrase as that invokes RPCRunLater which breaks tests.
+    // So we manually unlock.
+    BOOST_CHECK(pwalletMain->Unlock(strWalletPass));
+
+    // Now add a key
+    BOOST_CHECK_NO_THROW(CallRPC("getnewshieldedaddress"));
+
+    // Verify the key has been added
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedaddresses"));
+    arr = retValue.get_array();
+    BOOST_CHECK((int) arr.size() == n+1);
+
+    // We can't simulate over RPC the wallet closing and being reloaded
+    // but there are tests for this in gtest.
+}
+
 BOOST_AUTO_TEST_SUITE_END()
