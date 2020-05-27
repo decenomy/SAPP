@@ -67,6 +67,7 @@ const CBlockIndex* CChain::FindFork(const CBlockIndex* pindex) const
 CBlockIndex::CBlockIndex(const CBlock& block):
         nVersion{block.nVersion},
         hashMerkleRoot{block.hashMerkleRoot},
+        hashFinalSaplingRoot(block.hashFinalSaplingRoot),
         nTime{block.nTime},
         nBits{block.nBits},
         nNonce{block.nNonce}
@@ -115,6 +116,7 @@ CBlockHeader CBlockIndex::GetBlockHeader() const
     block.nBits = nBits;
     block.nNonce = nNonce;
     if (nVersion > 3 && nVersion < 7) block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+    if (nVersion >= 8) block.hashFinalSaplingRoot = hashFinalSaplingRoot;
     return block;
 }
 

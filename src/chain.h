@@ -230,6 +230,7 @@ public:
     //! block header
     int nVersion{0};
     uint256 hashMerkleRoot{};
+    uint256 hashFinalSaplingRoot{};
     unsigned int nTime{0};
     unsigned int nBits{0};
     unsigned int nNonce{0};
@@ -288,7 +289,6 @@ public:
 // New serialization introduced with 4.0.99
 static const int DBI_OLD_SER_VERSION = 4009900;
 static const int DBI_SER_VERSION_NO_ZC = 4009902;   // removes mapZerocoinSupply, nMoneySupply
-static const int DBI_SER_VERSION_SAPLING = 4009903;   // adds Sapling block values: nSaplingValue
 
 class CDiskBlockIndex : public CBlockIndex
 {
@@ -337,10 +337,9 @@ public:
             if(this->nVersion > 3 && this->nVersion < 7)
                 READWRITE(nAccumulatorCheckpoint);
 
-
-            // Only read/write nSaplingValue if the client version used to create
-            // this index was storing them.
-            if (nSerVersion >= DBI_SER_VERSION_SAPLING) {
+            // Sapling blocks
+            if (this->nVersion >= 8) {
+                READWRITE(hashFinalSaplingRoot);
                 READWRITE(nSaplingValue);
             }
 
@@ -414,6 +413,8 @@ public:
         block.nNonce = nNonce;
         if (nVersion > 3 && nVersion < 7)
             block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        if (nVersion >= 8)
+            block.hashFinalSaplingRoot = hashFinalSaplingRoot;
         return block.GetHash();
     }
 

@@ -31,6 +31,7 @@ public:
     uint32_t nBits;
     uint32_t nNonce;
     uint256 nAccumulatorCheckpoint;             // only for version 4, 5 and 6.
+    uint256 hashFinalSaplingRoot;               // only for version 8
 
     CBlockHeader()
     {
@@ -51,6 +52,10 @@ public:
         //zerocoin active, header changes to include accumulator checksum
         if(nVersion > 3 && nVersion < 7)
             READWRITE(nAccumulatorCheckpoint);
+
+        // Sapling active
+        if (nVersion >= 8)
+            READWRITE(hashFinalSaplingRoot);
     }
 
     void SetNull()
@@ -62,6 +67,7 @@ public:
         nBits = 0;
         nNonce = 0;
         nAccumulatorCheckpoint.SetNull();
+        hashFinalSaplingRoot.SetNull();
     }
 
     bool IsNull() const
@@ -130,6 +136,8 @@ public:
         block.nNonce         = nNonce;
         if(nVersion > 3 && nVersion < 7)
             block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        if (nVersion >= 8)
+            block.hashFinalSaplingRoot   = hashFinalSaplingRoot;
         return block;
     }
 
