@@ -379,7 +379,7 @@ std::vector<libzcash::SaplingPaymentAddress> SaplingScriptPubKeyMan::FindMySapli
  */
 void SaplingScriptPubKeyMan::GetFilteredNotes(
         std::vector<SaplingNoteEntry>& saplingEntries,
-        libzcash::PaymentAddress& address,
+        const libzcash::PaymentAddress& address,
         int minDepth,
         bool ignoreSpent,
         bool requireSpendingKey)

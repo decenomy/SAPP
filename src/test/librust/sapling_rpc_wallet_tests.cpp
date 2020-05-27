@@ -82,6 +82,25 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_validateaddress)
     BOOST_CHECK_EQUAL(find_value(resultObj, "diversifiedtransmissionkey").get_str(), "d35e0d0897edbd3cf02b3d2327622a14c685534dbd2d3f4f4fa3e0e56cc2f008");
 }
 
+BOOST_AUTO_TEST_CASE(rpc_wallet_getbalance)
+{
+    SelectParams(CBaseChainParams::TESTNET);
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance too many args"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance invalidaddress"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance tmC6YZnCUhm19dEXxh3Jb7srdBJxDawaCab"), std::runtime_error);
+    BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh"));
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh -1"), std::runtime_error);
+    BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance ptestsapling1nrn6exksuqtpld9gu6fwdz4hwg54h2x37gutdds89pfyg6mtjf63km45a8eare5qla45cj75vs8 0"));
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance tnRZ8bPq2pff3xBWhTJhNkVUkm2uhzksDeW5PvEa7aFKGT9Qi3YgTALZfjaY4jU3HLVKBtHdSXxoPoLA3naMPcHBcY88FcF 1"), std::runtime_error);
+    BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance *"));
+    BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance * 6"));
+    BOOST_CHECK_THROW(CallRPC("getshieldedbalance * -1"), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importkey_paymentaddress) {
     SelectParams(CBaseChainParams::MAIN);
     {

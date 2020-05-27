@@ -1119,11 +1119,10 @@ UniValue sendtoaddressix(const JSONRPCRequest& request)
     return wtx.GetHash().GetHex();
 }
 
-CAmount getBalanceShieldedAddr(std::string address, int minDepth = 1, bool ignoreUnspendable=true) {
+CAmount getBalanceShieldedAddr(const libzcash::PaymentAddress& filterAddress, int minDepth = 1, bool ignoreUnspendable=true) {
     CAmount balance = 0;
     std::vector<SaplingNoteEntry> saplingEntries;
     LOCK2(cs_main, pwalletMain->cs_wallet);
-    libzcash::PaymentAddress filterAddress = KeyIO::DecodePaymentAddress(address);
     pwalletMain->GetSaplingScriptPubKeyMan()->GetFilteredNotes(saplingEntries, filterAddress, minDepth, true, ignoreUnspendable);
     for (auto & entry : saplingEntries) {
         balance += CAmount(entry.note.value());
@@ -1136,36 +1135,50 @@ UniValue getshieldedbalance(const JSONRPCRequest& request)
     if (!pwalletMain)
         return NullUniValue;
 
-    if (request.fHelp || request.params.size() > 2)
+    if (request.fHelp || request.params.size() > 3)
         throw std::runtime_error(
-                "getshieldedbalance ( minconf includeWatchonly )\n"
-                "\nReturn the total shielded value of funds stored in the node's wallet.\n"
+                "getshieldedbalance \"address\" ( minconf includeWatchonly )\n"
+                "\nReturn the total shielded value of funds stored in the node's wallet or if an address was given,"
+                "\nreturns the balance of the shielded addr belonging to the node's wallet.\n"
                 "\nCAUTION: If the wallet contains any addresses for which it only has incoming viewing keys,"
                 "\nthe returned private balance may be larger than the actual balance, because spends cannot"
                 "\nbe detected with incoming viewing keys.\n"
                 "\nArguments:\n"
-                "1. minconf          (numeric, optional, default=1) Only include private and transparent transactions confirmed at least this many times.\n"
-                "2. includeWatchonly (bool, optional, default=false) Also include balance in watchonly addresses (see 'importaddress' and 'z_importviewingkey')\n"
+                "1. \"address\"      (string, optional) The selected address. If non empty nor \"*\", it must be a Sapling address\n"
+                "2. minconf          (numeric, optional, default=1) Only include private and transparent transactions confirmed at least this many times.\n"
+                "3. includeWatchonly (bool, optional, default=false) Also include balance in watchonly addresses (see 'importaddress' and 'z_importviewingkey')\n"
                 "\nResult:\n"
                 "amount              (numeric) the total balance of shielded funds (in Sapling addresses)\n"
                 "\nExamples:\n"
                 "\nThe total amount in the wallet\n"
-                + HelpExampleCli("getshieldedbalance", "") +
+                + HelpExampleCli("getshieldedbalance", "")
+                + HelpExampleCli("getshieldedbalance", "ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh") +
                 "\nThe total amount in the wallet at least 5 blocks confirmed\n"
-                + HelpExampleCli("getshieldedbalance", "5") +
+                + HelpExampleCli("getshieldedbalance", "\"*\" \"5\"") +
                 "\nAs a json rpc call\n"
-                + HelpExampleRpc("getshieldedbalance", "5")
+                + HelpExampleRpc("getshieldedbalance", "\"*\" \"5\"")
         );
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    const int nMinDepth = request.params.size() > 0 ? request.params[0].get_int() : 1;
+    libzcash::PaymentAddress address{libzcash::InvalidEncoding()};
+    if (request.params.size() > 0) {
+        std::string addressStr = request.params[0].get_str();
+        if (addressStr.empty() || addressStr != "*") {
+            address = KeyIO::DecodePaymentAddress(addressStr);
+            if (!IsValidPaymentAddress(address)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid shielded address");
+            }
+        }
+    }
+
+    const int nMinDepth = request.params.size() > 1 ? request.params[1].get_int() : 1;
     if (nMinDepth < 0) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Minimum number of confirmations cannot be less than 0");
     }
 
-    const bool fIncludeWatchonly = (request.params.size() > 1) && request.params[1].get_bool();
-    CAmount nBalance = getBalanceShieldedAddr("", nMinDepth, !fIncludeWatchonly);
+    const bool fIncludeWatchonly = request.params.size() > 2 && request.params[2].get_bool();
+    CAmount nBalance = getBalanceShieldedAddr(address, nMinDepth, !fIncludeWatchonly);
     return ValueFromAmount(nBalance);
 }
 
