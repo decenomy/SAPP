@@ -14,6 +14,9 @@
 static const unsigned int MAX_BLOCK_SIZE_CURRENT = 2000000;
 static const unsigned int MAX_BLOCK_SIZE_LEGACY = 1000000;
 
+/** The maximum size of a transaction after Sapling activation (network rule) */
+static const unsigned int MAX_TX_SIZE_AFTER_SAPLING = MAX_BLOCK_SIZE_LEGACY;
+
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS_CURRENT = MAX_BLOCK_SIZE_CURRENT / 50;
 static const unsigned int MAX_BLOCK_SIGOPS_LEGACY = MAX_BLOCK_SIZE_LEGACY / 50;

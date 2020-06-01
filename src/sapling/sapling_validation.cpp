@@ -16,6 +16,111 @@
 
 namespace SaplingValidation {
 
+// Verifies that Shielded txs are properly formed and performs content-independent checks
+bool CheckTransaction(const CTransaction& tx, CValidationState& state, CAmount& nValueOut, bool fIsSaplingActive)
+{
+    bool hasSaplingData = tx.hasSaplingData();
+
+    // v1 must not have shielded data.
+    if (tx.nVersion < CTransaction::SAPLING_VERSION && hasSaplingData) {
+        return state.DoS(100, error("%s: Not Sapling version with Sapling data", __func__ ),
+                         REJECT_INVALID, "bad-txns-form-not-sapling");
+    }
+
+    // if the tx has no shielded data, return true. No check needed.
+    if (!hasSaplingData) {
+        return true;
+    }
+
+    // From here, all of the checks are done in +v2 transactions.
+
+    // if the tx has shielded data, cannot be a coinstake, coinbase, zcspend, p2csOut and zcmint
+    if (tx.IsCoinStake() || tx.IsCoinBase() || tx.HasZerocoinSpendInputs() || tx.HasP2CSOutputs() ||
+        tx.HasZerocoinMintOutputs())
+        return state.DoS(100, error("%s: Sapling version with invalid data", __func__),
+                         REJECT_INVALID, "bad-txns-invalid-sapling");
+
+    // If the v5 upgrade was not enforced, then let's not perform any check
+    if (!fIsSaplingActive) {
+        return state.DoS(100, error("%s: Sapling not activated", __func__),
+                         REJECT_INVALID, "bad-txns-invalid-sapling-act");
+    }
+
+    // Upgrade enforced, basic version rules passing, let's check it
+    return CheckTransactionWithoutProofVerification(tx, state, nValueOut);
+}
+
+bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidationState& state, CAmount& nValueOut)
+{
+    // Basic checks that don't depend on any context
+    const Consensus::Params& consensus = Params().GetConsensus();
+    // If the tx got to this point, must be +v2.
+    assert(tx.nVersion >= CTransaction::SAPLING_VERSION);
+
+    // Transactions containing empty `vin` must have non-empty `vShieldedSpend`.
+    if (tx.vin.empty() && tx.sapData->vShieldedSpend.empty())
+        return state.DoS(10, error("%s: vin empty", __func__ ),
+                         REJECT_INVALID, "bad-txns-vin-empty");
+    // Transactions containing empty `vout` must have non-empty `vShieldedOutput`.
+    if (tx.vout.empty() && tx.sapData->vShieldedOutput.empty())
+        return state.DoS(10, error("%s: vout empty", __func__ ),
+                         REJECT_INVALID, "bad-txns-vout-empty");
+
+    // Size limits
+    BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT >= MAX_TX_SIZE_AFTER_SAPLING); // sanity
+    BOOST_STATIC_ASSERT(MAX_TX_SIZE_AFTER_SAPLING > MAX_ZEROCOIN_TX_SIZE); // sanity
+    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_TX_SIZE_AFTER_SAPLING)
+        return state.DoS(100, error("%s: size limits failed", __func__ ),
+                         REJECT_INVALID, "bad-txns-oversize");
+
+    // Check for non-zero valueBalance when there are no Sapling inputs or outputs
+    if (tx.sapData->vShieldedSpend.empty() && tx.sapData->vShieldedOutput.empty() && tx.sapData->valueBalance != 0) {
+        return state.DoS(100, error("%s: tx.sapData->valueBalance has no sources or sinks", __func__ ),
+                         REJECT_INVALID, "bad-txns-valuebalance-nonzero");
+    }
+
+    // Check for overflow valueBalance
+    if (tx.sapData->valueBalance > consensus.nMaxMoneyOut || tx.sapData->valueBalance < -consensus.nMaxMoneyOut) {
+        return state.DoS(100, error("%s: abs(tx.sapData->valueBalance) too large", __func__),
+                         REJECT_INVALID, "bad-txns-valuebalance-toolarge");
+    }
+
+    if (tx.sapData->valueBalance < 0) {
+        // NB: negative valueBalance "takes" money from the transparent value pool just as outputs do
+        nValueOut += -tx.sapData->valueBalance;
+
+        if (!consensus.MoneyRange(nValueOut)) {
+            return state.DoS(100, error("%s: txout total out of range", __func__ ),
+                             REJECT_INVALID, "bad-txns-txouttotal-toolarge");
+        }
+    }
+
+    // Ensure input values do not exceed consensus.nMaxMoneyOut
+    // We have not resolved the txin values at this stage,
+    // but we do know what the shielded tx claim to add
+    // to the value pool.
+
+    // NB: positive valueBalance "adds" money to the transparent value pool, just as inputs do
+    if (tx.sapData->valueBalance > 0 && !consensus.MoneyRange(tx.sapData->valueBalance)) {
+        return state.DoS(100, error("%s: txin total out of range", __func__ ),
+                         REJECT_INVALID, "bad-txns-txintotal-toolarge");
+    }
+
+    // Check for duplicate sapling nullifiers in this transaction
+    {
+        std::set<uint256> vSaplingNullifiers;
+        for (const SpendDescription& spend_desc : tx.sapData->vShieldedSpend) {
+            if (vSaplingNullifiers.count(spend_desc.nullifier))
+                return state.DoS(100, error("%s: duplicate nullifiers", __func__ ),
+                                 REJECT_INVALID, "bad-spend-description-nullifiers-duplicate");
+
+            vSaplingNullifiers.insert(spend_desc.nullifier);
+        }
+    }
+
+    return true;
+}
+
 /**
 * Check a transaction contextually against a set of consensus rules valid at a given block height.
 *
@@ -74,8 +179,8 @@ bool ContextualCheckTransaction(
     }
 
     // Size limits
-    BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT > MAX_ZEROCOIN_TX_SIZE); // sanity
-    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_ZEROCOIN_TX_SIZE)
+    BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT > MAX_TX_SIZE_AFTER_SAPLING); // sanity
+    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_TX_SIZE_AFTER_SAPLING)
         return state.DoS(
                 dosLevelPotentiallyRelaxing,
                 error("%s: size limits failed", __func__ ),

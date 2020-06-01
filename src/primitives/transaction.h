@@ -305,7 +305,9 @@ public:
     {
         return sapData != nullopt &&
             (!sapData->vShieldedOutput.empty() ||
-            !sapData->vShieldedSpend.empty());
+            !sapData->vShieldedSpend.empty() ||
+            sapData->valueBalance != 0 ||
+            sapData->hasBindingSig());
     };
 
     bool isSapling() const
