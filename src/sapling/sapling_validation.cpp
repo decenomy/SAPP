@@ -57,15 +57,6 @@ bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidatio
     // If the tx got to this point, must be +v2.
     assert(tx.nVersion >= CTransaction::SAPLING_VERSION);
 
-    // Transactions containing empty `vin` must have non-empty `vShieldedSpend`.
-    if (tx.vin.empty() && tx.sapData->vShieldedSpend.empty())
-        return state.DoS(10, error("%s: vin empty", __func__ ),
-                         REJECT_INVALID, "bad-txns-vin-empty");
-    // Transactions containing empty `vout` must have non-empty `vShieldedOutput`.
-    if (tx.vout.empty() && tx.sapData->vShieldedOutput.empty())
-        return state.DoS(10, error("%s: vout empty", __func__ ),
-                         REJECT_INVALID, "bad-txns-vout-empty");
-
     // Size limits
     BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT >= MAX_TX_SIZE_AFTER_SAPLING); // sanity
     BOOST_STATIC_ASSERT(MAX_TX_SIZE_AFTER_SAPLING > MAX_ZEROCOIN_TX_SIZE); // sanity
