@@ -13,6 +13,8 @@
 #include "amount.h"
 #include "consensus/merkle.h"
 #include "consensus/tx_verify.h" // needed in case of no ENABLE_WALLET
+#include "consensus/params.h"
+#include "consensus/upgrades.h"
 #include "hash.h"
 #include "masternode-sync.h"
 #include "net.h"
@@ -440,6 +442,24 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
         LogPrintf("%s : total size %u\n", __func__, nBlockSize);
+
+        // Sapling
+        if (NetworkUpgradeActive(nHeight, consensus, Consensus::UPGRADE_V5_DUMMY)) {
+            pblock->nVersion = 8;
+            SaplingMerkleTree sapling_tree;
+            assert(view.GetSaplingAnchorAt(view.GetBestAnchor(), sapling_tree));
+
+            // Update the Sapling commitment tree.
+            for (const auto &tx : pblock->vtx) {
+                if (tx->isSapling() && tx->hasSaplingData()) {
+                    for (const OutputDescription &odesc : tx->sapData->vShieldedOutput) {
+                        sapling_tree.append(odesc.cmu);
+                    }
+                }
+            }
+            // Update header
+            pblock->hashFinalSaplingRoot = sapling_tree.root();
+        }
 
         // Fill in header
         pblock->hashPrevBlock = pindexPrev->GetBlockHash();
