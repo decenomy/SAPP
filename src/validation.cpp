@@ -375,6 +375,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
         }
     }
 
+    // TODO check sapling nullifiers
 
     {
         CCoinsView dummy;
@@ -946,6 +947,10 @@ void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, CTxUndo& txund
             inputs.SpendCoin(txin.prevout, &txundo.vprevout.back());
         }
     }
+
+    // update spent nullifiers
+    inputs.SetNullifiers(tx, true);
+
     // add outputs
     AddCoins(inputs, tx, nHeight);
 }
@@ -1325,6 +1330,9 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         if (tx.IsCoinBase() || tx.HasZerocoinSpendInputs())
             continue;
 
+        // Sapling, update unspent nullifiers
+        view.SetNullifiers(tx, false);
+
         // restore inputs
         CTxUndo& txundo = blockUndo.vtxundo[i - 1];
         if (txundo.vprevout.size() != tx.vin.size()) {
@@ -1344,10 +1352,22 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
             nValueIn += view.GetValueIn(tx);
     }
 
+    const Consensus::Params& consensus = Params().GetConsensus();
+
+    // set the old best Sapling anchor back
+    // We can get this from the `hashFinalSaplingRoot` of the last block
+    // However, this is only reliable if the last block was on or after
+    // the Sapling activation height. Otherwise, the last anchor was the
+    // empty root.
+    if (consensus.NetworkUpgradeActive(pindex->pprev->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        view.PopAnchor(pindex->pprev->hashFinalSaplingRoot);
+    } else {
+        view.PopAnchor(SaplingMerkleTree::empty_root());
+    }
+
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 
-    const Consensus::Params& consensus = Params().GetConsensus();
     if (consensus.NetworkUpgradeActive(pindex->nHeight, Consensus::UPGRADE_ZC_V2) &&
             pindex->nHeight <= consensus.height_last_ZC_AccumCheckpoint) {
         // Legacy Zerocoin DB: If Accumulators Checkpoint is changed, remove changed checksums
@@ -1478,6 +1498,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     std::vector<uint256> vSpendsInBlock;
     uint256 hashBlock = block.GetHash();
 
+    // Sapling
+    SaplingMerkleTree sapling_tree;
+    assert(view.GetSaplingAnchorAt(view.GetBestAnchor(), sapling_tree));
+
     std::vector<PrecomputedTransactionData> precomTxData;
     precomTxData.reserve(block.vtx.size()); // Required so that pointers to individual precomTxData don't get invalidated
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
@@ -1600,8 +1624,27 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
         UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
+        // Sapling update tree
+        for(const OutputDescription &outputDescription : tx.sapData->vShieldedOutput) {
+            sapling_tree.append(outputDescription.cmu);
+        }
+
         vPos.emplace_back(tx.GetHash(), pos);
         pos.nTxOffset += ::GetSerializeSize(tx, SER_DISK, CLIENT_VERSION);
+    }
+
+    // Push new tree anchor
+    view.PushAnchor(sapling_tree);
+
+    // Verify header correctness
+    if (consensus.NetworkUpgradeActive(pindex->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // If Sapling is active, block.hashFinalSaplingRoot must be the
+        // same as the root of the Sapling tree
+        if (block.hashFinalSaplingRoot != sapling_tree.root()) {
+            return state.DoS(100,
+                             error("ConnectBlock(): block's hashFinalSaplingRoot is incorrect (should be Sapling tree root)"),
+                             REJECT_INVALID, "bad-sapling-root-in-block");
+        }
     }
 
     // track mint amount info
