@@ -460,6 +460,8 @@ set(SAPLING_SOURCES
         ./src/sapling/incrementalmerkletree.cpp
         ./src/sapling/transaction_builder.cpp
         ./src/sapling/saplingscriptpubkeyman.cpp
+        ./src/sapling/proof.cpp
+        ./src/sapling/sapling_operation.cpp
         )
 
 add_library(SAPLING_A STATIC ${BitcoinHeaders} ${SAPLING_SOURCES})
