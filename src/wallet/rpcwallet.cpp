@@ -2723,6 +2723,7 @@ UniValue listunspent(const JSONRPCRequest& request)
                 "[                   (array of json object)\n"
                 "  {\n"
                 "    \"txid\" : \"txid\",        (string) the transaction id\n"
+                "    \"generated\" : true|false  (boolean) true if txout is a coinstake transaction output\n"
                 "    \"vout\" : n,               (numeric) the vout value\n"
                 "    \"address\" : \"address\",  (string) the pivx address\n"
                 "    \"label\" : \"label\",      (string) The associated label, or \"\" for the default label\n"
@@ -2804,6 +2805,7 @@ UniValue listunspent(const JSONRPCRequest& request)
         UniValue entry(UniValue::VOBJ);
         entry.pushKV("txid", out.tx->GetHash().GetHex());
         entry.pushKV("vout", out.i);
+        entry.pushKV("generated", out.tx->IsCoinStake() || out.tx->IsCoinBase());
         CTxDestination address;
         if (ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
             entry.pushKV("address", EncodeDestination(address));
