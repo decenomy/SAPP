@@ -521,6 +521,128 @@ UniValue getnewshieldedaddress(const JSONRPCRequest& request)
     return KeyIO::EncodePaymentAddress(pwalletMain->GenerateNewSaplingZKey());
 }
 
+UniValue listshieldedunspent(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() > 4)
+        throw std::runtime_error(
+                "listshieldedunspent ( minconf maxconf includeWatchonly [\"shield_addr\",...] )\n"
+                "\nReturns array of unspent shielded notes with between minconf and maxconf (inclusive) confirmations.\n"
+                "Optionally filter to only include notes sent to specified addresses.\n"
+                "When minconf is 0, unspent notes with zero confirmations are returned, even though they are not immediately spendable.\n"
+                "\nArguments:\n"
+                "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
+                "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
+                "3. includeWatchonly (bool, optional, default=false) Also include watchonly addresses (see 'importsaplingviewingkey')\n"
+                "4. \"addresses\"      (string) A json array of shielded addrs to filter on.  Duplicate addresses not allowed.\n"
+                "    [\n"
+                "      \"address\"     (string) shielded addr\n"
+                "      ,...\n"
+                "    ]\n"
+                "\nResult:\n"
+                "[                             (array of json object)\n"
+                "  {\n"
+                "    \"txid\" : \"txid\",          (string) the transaction id \n"
+                "    \"outindex\" (sapling) : n,       (numeric) the output index\n"
+                "    \"confirmations\" : n,       (numeric) the number of confirmations\n"
+                "    \"spendable\" : true|false,  (boolean) true if note can be spent by wallet, false if address is watchonly\n"
+                "    \"address\" : \"address\",    (string) the shielded address\n"
+                "    \"amount\": xxxxx,          (numeric) the amount of value in the note\n"
+                "    \"memo\": xxxxx,            (string) hexademical string representation of memo field\n"
+                "    \"change\": true|false,     (boolean) true if the address that received the note is also one of the sending addresses\n"
+                "  }\n"
+                "  ,...\n"
+                "]\n"
+
+                "\nExamples\n"
+                + HelpExampleCli("listshieldedunspent", "")
+                + HelpExampleCli("listshieldedunspent", "6 9999999 false \"[\\\"ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh\\\",\\\"ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh\\\"]\"")
+                + HelpExampleRpc("listshieldedunspent", "6 9999999 false \"[\\\"ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh\\\",\\\"ptestsapling1h0w73csah2aq0a32h42kr7tq4htlt5wfn4ejxfnm56f6ehjvek7k4e244g6v8v3pgylmz5ea8jh\\\"]\"")
+        );
+
+    EnsureWallet();
+
+    RPCTypeCheck(request.params, boost::assign::list_of(UniValue::VNUM)(UniValue::VNUM)(UniValue::VBOOL)(UniValue::VARR));
+
+    int nMinDepth = request.params.size() > 0 ? request.params[0].get_int() : 1;
+    if (nMinDepth < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Minimum number of confirmations cannot be less than 0");
+    }
+
+    int nMaxDepth = request.params.size() > 1 ? request.params[1].get_int() : 9999999;
+    if (nMaxDepth < nMinDepth) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Maximum number of confirmations must be greater or equal to the minimum number of confirmations");
+    }
+
+    std::set<libzcash::PaymentAddress> shieldAddrs = {};
+    bool fIncludeWatchonly = request.params.size() > 2 && request.params[2].get_bool();
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    // User has supplied shielded addrs to filter on
+    if (request.params.size() > 3) {
+        UniValue addresses = request.params[3].get_array();
+        if (addresses.size()==0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, addresses array is empty.");
+
+        // Keep track of addresses to spot duplicates
+        std::set<std::string> setAddress;
+
+        // Sources
+        for (const UniValue& o : addresses.getValues()) {
+            if (!o.isStr()) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected string");
+            }
+            std::string address = o.get_str();
+            auto shieldAddr = KeyIO::DecodePaymentAddress(address);
+            if (!IsValidPaymentAddress(shieldAddr)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, address is not a valid shield address: ") + address);
+            }
+            libzcash::SaplingPaymentAddress paymentAddress = *boost::get<libzcash::SaplingPaymentAddress>(&shieldAddr);
+            bool hasSpendingKey = pwalletMain->HaveSpendingKeyForPaymentAddress(paymentAddress);
+            if (!fIncludeWatchonly && !hasSpendingKey) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, spending key for address does not belong to wallet: ") + address);
+            }
+            shieldAddrs.insert(shieldAddr);
+
+            if (setAddress.count(address)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ") + address);
+            }
+            setAddress.insert(address);
+        }
+    } else {
+        // User did not provide shielded addrs, so use default i.e. all addresses
+        std::set<libzcash::SaplingPaymentAddress> saplingzaddrs = {};
+        pwalletMain->GetSaplingPaymentAddresses(saplingzaddrs);
+        shieldAddrs.insert(saplingzaddrs.begin(), saplingzaddrs.end());
+    }
+
+    UniValue results(UniValue::VARR);
+
+    if (shieldAddrs.size() > 0) {
+        std::vector<SaplingNoteEntry> saplingEntries;
+        pwalletMain->GetSaplingScriptPubKeyMan()->GetFilteredNotes(saplingEntries, shieldAddrs, nMinDepth, nMaxDepth, true, !fIncludeWatchonly, false);
+        std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet = pwalletMain->GetSaplingScriptPubKeyMan()->GetNullifiersForAddresses(shieldAddrs);
+
+        for (const auto& entry : saplingEntries) {
+            UniValue obj(UniValue::VOBJ);
+            obj.pushKV("txid", entry.op.hash.ToString());
+            obj.pushKV("outindex", (int)entry.op.n);
+            obj.pushKV("confirmations", entry.confirmations);
+            bool hasSaplingSpendingKey = pwalletMain->HaveSpendingKeyForPaymentAddress(entry.address);
+            obj.pushKV("spendable", hasSaplingSpendingKey);
+            obj.pushKV("address", KeyIO::EncodePaymentAddress(entry.address));
+            obj.pushKV("amount", ValueFromAmount(CAmount(entry.note.value()))); // note.value() is equivalent to plaintext.value()
+            obj.pushKV("memo", HexStr(entry.memo));
+            if (hasSaplingSpendingKey) {
+                obj.pushKV("change", pwalletMain->GetSaplingScriptPubKeyMan()->IsNoteSaplingChange(nullifierSet, entry.address, entry.op));
+            }
+            results.push_back(obj);
+        }
+    }
+
+    return results;
+}
+
 UniValue delegatoradd(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
@@ -1146,7 +1268,7 @@ UniValue getshieldedbalance(const JSONRPCRequest& request)
                 "\nArguments:\n"
                 "1. \"address\"      (string, optional) The selected address. If non empty nor \"*\", it must be a Sapling address\n"
                 "2. minconf          (numeric, optional, default=1) Only include private and transparent transactions confirmed at least this many times.\n"
-                "3. includeWatchonly (bool, optional, default=false) Also include balance in watchonly addresses (see 'importaddress' and 'z_importviewingkey')\n"
+                "3. includeWatchonly (bool, optional, default=false) Also include balance in watchonly addresses (see 'importaddress' and 'importsaplingviewingkey')\n"
                 "\nResult:\n"
                 "amount              (numeric) the total balance of shielded funds (in Sapling addresses)\n"
                 "\nExamples:\n"
@@ -3422,6 +3544,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "importsaplingviewingkey",  &importsaplingviewingkey,  true  },
     { "wallet",             "exportsaplingviewingkey",  &exportsaplingviewingkey,  true  },
     { "wallet",             "getshieldedbalance",       &getshieldedbalance,       false },
+    { "wallet",             "listshieldedunspent",      &listshieldedunspent,      false },
 
     /** Label functions (to replace non-balance account functions) */
     { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },

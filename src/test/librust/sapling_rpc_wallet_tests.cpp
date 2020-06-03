@@ -301,4 +301,53 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_encrypted_wallet_sapzkeys)
     // but there are tests for this in gtest.
 }
 
+BOOST_AUTO_TEST_CASE(rpc_listshieldedunspent_parameters)
+{
+    SelectParams(CBaseChainParams::TESTNET);
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    pwalletMain->SetupSPKM(false);
+
+    UniValue retValue;
+
+    // too many args
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 2 3 4 5"), std::runtime_error);
+
+    // minconf must be >= 0
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent -1"), std::runtime_error);
+
+    // maxconf must be > minconf
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 2 1"), std::runtime_error);
+
+    // maxconf must not be out of range
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 9999999999"), std::runtime_error);
+
+    // must be an array of addresses
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 999 false ptestsapling1wpurflqllgkcs48m46yu9ktlfe3ahndely20dpaanqq3lw9l5xw7yfehst68yclvlpz7x8cltxe"), std::runtime_error);
+
+    // address must be string
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 999 false [123456]"), std::runtime_error);
+
+    // no spending key
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 999 false [\"ptestsapling1wpurflqllgkcs48m46yu9ktlfe3ahndely20dpaanqq3lw9l5xw7yfehst68yclvlpz7x8cltxe\"]"), std::runtime_error);
+
+    // allow watch only
+    BOOST_CHECK_NO_THROW(CallRPC("listshieldedunspent 1 999 true [\"ptestsapling1wpurflqllgkcs48m46yu9ktlfe3ahndely20dpaanqq3lw9l5xw7yfehst68yclvlpz7x8cltxe\"]"));
+
+    // wrong network, mainnet instead of testnet
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 999 true [\"ps1qenk9kapr0crx7lmdl4yclx78spc36wh7d5hm9hglp85f43k9dupyf0c5836h42wq2ejv0ef2v3\"]"), std::runtime_error);
+
+    // create shielded address so we have the spending key
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("getnewshieldedaddress"));
+    std::string myzaddr = retValue.get_str();
+
+    // return empty array for this address
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedunspent 1 999 false [\"" + myzaddr + "\"]"));
+    UniValue arr = retValue.get_array();
+    BOOST_CHECK_EQUAL(0, arr.size());
+
+    // duplicate address error
+    BOOST_CHECK_THROW(CallRPC("listshieldedunspent 1 999 false [\"" + myzaddr + "\", \"" + myzaddr + "\"]"), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
