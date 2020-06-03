@@ -472,6 +472,37 @@ bool SaplingScriptPubKeyMan::IsSaplingNullifierFromMe(const uint256& nullifier) 
         wallet->mapWallet.count(mapSaplingNullifiersToNotes.at(nullifier).hash);
 }
 
+std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::GetNullifiersForAddresses(
+        const std::set<libzcash::PaymentAddress> & addresses)
+{
+    AssertLockHeld(wallet->cs_wallet);
+    std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet;
+    // Sapling ivk -> list of addrs map
+    // (There may be more than one diversified address for a given ivk.)
+    std::map<libzcash::SaplingIncomingViewingKey, std::vector<libzcash::SaplingPaymentAddress>> ivkMap;
+    for (const auto& addr : addresses) {
+        auto saplingAddr = boost::get<libzcash::SaplingPaymentAddress>(&addr);
+        if (saplingAddr != nullptr) {
+            libzcash::SaplingIncomingViewingKey ivk;
+            if (wallet->GetSaplingIncomingViewingKey(*saplingAddr, ivk))
+                ivkMap[ivk].push_back(*saplingAddr);
+        }
+    }
+    for (const auto& txPair : wallet->mapWallet) {
+        for (const auto & noteDataPair : txPair.second.mapSaplingNoteData) {
+            auto & noteData = noteDataPair.second;
+            auto & nullifier = noteData.nullifier;
+            auto & ivk = noteData.ivk;
+            if (nullifier && ivkMap.count(ivk)) {
+                for (const auto & addr : ivkMap[ivk]) {
+                    nullifierSet.insert(std::make_pair(addr, nullifier.get()));
+                }
+            }
+        }
+    }
+    return nullifierSet;
+}
+
 void SaplingScriptPubKeyMan::GetSaplingNoteWitnesses(const std::vector<SaplingOutPoint>& notes,
                                       std::vector<Optional<SaplingWitness>>& witnesses,
                                       uint256& final_anchor)
