@@ -22,6 +22,8 @@
 #include "walletdb.h"
 #include "zpivchain.h"
 
+#include "sapling/sapling_operation.h"
+#include "sapling/transaction_builder.h"
 #include "sapling/key_io_sapling.h"
 
 #include <stdint.h>
@@ -1302,6 +1304,226 @@ UniValue getshieldedbalance(const JSONRPCRequest& request)
     const bool fIncludeWatchonly = request.params.size() > 2 && request.params[2].get_bool();
     CAmount nBalance = getBalanceShieldedAddr(address, nMinDepth, !fIncludeWatchonly);
     return ValueFromAmount(nBalance);
+}
+
+// transaction.h comment: spending taddr output requires CTxIn >= 148 bytes and typical taddr txout is 34 bytes
+#define CTXIN_SPEND_DUST_SIZE   148
+#define CTXOUT_REGULAR_SIZE     34
+
+UniValue shielded_sendmany(const JSONRPCRequest& request) {
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
+        throw std::runtime_error(
+                "shielded_sendmany \"fromaddress\" [{\"address\":... ,\"amount\":...},...] ( minconf ) ( fee )\n"
+                "\nSend multiple times. Amounts are decimal numbers with at most 8 digits of precision."
+                "\nChange generated from a transparent addr flows to a new  transparent addr address, while change generated from a shielded addr returns to itself."
+                "\nWhen sending coinbase UTXOs to a shielded addr, change is not allowed. The entire value of the UTXO(s) must be consumed."
+                + HelpRequiringPassphrase() + "\n"
+                "\nArguments:\n"
+                "1. \"fromaddress\"         (string, required) The transparent addr or shielded addr to send the funds from.\n"
+                "2. \"amounts\"             (array, required) An array of json objects representing the amounts to send.\n"
+                "    [{\n"
+                "      \"address\":address  (string, required) The address is a transparent addr or shielded addr\n"
+                "      \"amount\":amount    (numeric, required) The numeric amount in " + "PIV" + " is the value\n"
+                "      \"memo\":memo        (string, optional) If the address is a shielded addr, raw data represented in hexadecimal string format\n"
+                "    }, ... ]\n"
+                "3. minconf               (numeric, optional, default=1) Only use funds confirmed at least this many times.\n"
+                "4. fee                   (numeric, optional, default=" + strprintf("%s", FormatMoney(COIN)) +
+                ") The fee amount to attach to this transaction.\n"
+                "\nResult:\n"
+                "\"id\"          (string) transaction hash in the network\n"
+                "\nExamples:\n"
+                + HelpExampleCli("shielded_sendmany",
+                                 "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" '[{\"address\": \"ps1ra969yfhvhp73rw5ak2xvtcm9fkuqsnmad7qln79mphhdrst3lwu9vvv03yuyqlh42p42st47qd\" ,\"amount\": 5.0}]'")
+                + HelpExampleRpc("shielded_sendmany",
+                                 "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", [{\"address\": \"ps1ra969yfhvhp73rw5ak2xvtcm9fkuqsnmad7qln79mphhdrst3lwu9vvv03yuyqlh42p42st47qd\" ,\"amount\": 5.0}]")
+        );
+    EnsureWalletIsUnlocked();
+
+    // Check that the from address is valid.
+    auto fromaddress = request.params[0].get_str();
+    // Whether is from a shielded addr or a transparent addr
+    CTxDestination fromTAddressDest = DecodeDestination(fromaddress);
+    bool fromSapling = !IsValidDestination(fromTAddressDest);
+    libzcash::SaplingPaymentAddress fromShieldedAddress;
+    if (fromSapling) {
+        auto res = KeyIO::DecodePaymentAddress(fromaddress);
+        if (!IsValidPaymentAddress(res)) {
+            // invalid
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid from address, should be a taddr or shielded addr.");
+        }
+
+        fromShieldedAddress = *boost::get<libzcash::SaplingPaymentAddress>(&res);
+        // Check that we have the spending key
+        if (!pwalletMain->HaveSpendingKeyForPaymentAddress(fromShieldedAddress)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "From address does not belong to this node, shielded addr spending key not found.");
+        }
+    }
+
+    UniValue outputs = request.params[1].get_array();
+    if (outputs.empty())
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, amounts array is empty.");
+
+    // Keep track of addresses to spot duplicates
+    std::set<std::string> setAddress;
+    // Recipients
+    std::vector<SendManyRecipient> taddrRecipients;
+    std::vector<SendManyRecipient> shieldAddrRecipients;
+    CAmount nTotalOut = 0;
+    bool containsSaplingOutput = false;
+
+    for (const UniValue& o : outputs.getValues()) {
+        if (!o.isObject())
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected object");
+
+        // sanity check, report error if unknown key-value pairs
+        for (const std::string& name_ : o.getKeys()) {
+            if (name_ != "address" && name_ != "amount" && name_!="memo")
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, unknown key: ")+name_);
+        }
+
+        std::string address = find_value(o, "address").get_str();
+        bool isShieldAddr = false;
+        CTxDestination taddr = DecodeDestination(address);
+
+        if (!IsValidDestination(taddr)) {
+            auto res = KeyIO::DecodePaymentAddress(address);
+            if (IsValidPaymentAddress(res)) {
+                isShieldAddr = true;
+                containsSaplingOutput |= isShieldAddr;
+            } else {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, unknown address format: ")+address );
+            }
+        }
+
+        if (setAddress.count(address))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ")+address);
+        setAddress.insert(address);
+
+        UniValue memoValue = find_value(o, "memo");
+        std::string memo;
+        if (!memoValue.isNull()) {
+            memo = memoValue.get_str();
+            if (!isShieldAddr) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Memo cannot be used with a taddr. It can only be used with a shielded addr.");
+            } else if (!IsHex(memo)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected memo data in hexadecimal format.");
+            }
+            if (memo.length() > ZC_MEMO_SIZE*2) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", ZC_MEMO_SIZE ));
+            }
+        }
+
+        UniValue av = find_value(o, "amount");
+        CAmount nAmount = AmountFromValue(av);
+        if (nAmount < 0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, amount must be positive");
+
+        if (isShieldAddr) {
+            shieldAddrRecipients.emplace_back(address, nAmount, memo);
+        } else {
+            taddrRecipients.emplace_back(address, nAmount, memo);
+        }
+
+        nTotalOut += nAmount;
+    }
+
+    // Check network status
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    int nextBlockHeight = chainActive.Height() + 1;
+    if (!Params().GetConsensus().NetworkUpgradeActive(nextBlockHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // If Sapling is not active, do not allow sending from or sending to Sapling addresses.
+        if (fromSapling || containsSaplingOutput) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
+        }
+    }
+
+    // Now check the transaction
+    CMutableTransaction mtx;
+    mtx.nVersion = CTransaction::SAPLING_VERSION;
+    unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
+
+    // As a sanity check, estimate and verify that the size of the transaction will be valid.
+    // Depending on the input notes, the actual tx size may turn out to be larger and perhaps invalid.
+    size_t txsize = 0;
+    for (const auto& shieldAddrRecipient : shieldAddrRecipients) {
+        auto res = KeyIO::DecodePaymentAddress(shieldAddrRecipient.address);
+        if (IsValidPaymentAddress(res)) {
+            mtx.sapData->vShieldedOutput.emplace_back();
+        } else {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("invalid recipient shielded address %s", shieldAddrRecipient.address));
+        }
+    }
+    CTransaction tx(mtx);
+    txsize += GetSerializeSize(tx, SER_NETWORK, tx.nVersion);
+    if (!fromSapling) {
+        txsize += CTXIN_SPEND_DUST_SIZE;
+        txsize += CTXOUT_REGULAR_SIZE;      // There will probably be taddr change
+    }
+    txsize += CTXOUT_REGULAR_SIZE * taddrRecipients.size();
+    if (txsize > max_tx_size) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Too many outputs, size of raw transaction would be larger than limit of %d bytes", max_tx_size ));
+    }
+
+    // Minimum confirmations
+    int nMinDepth = request.params.size() > 2 ? request.params[2].get_int() : 1;
+    if (nMinDepth < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Minimum number of confirmations cannot be less than 0");
+    }
+
+    // Fee
+    CAmount nFee        = DEFAULT_SAPLING_FEE; // Default fee hardcoded for now to 10000 sats. Change it in a future focused PR.
+    CAmount nDefaultFee = nFee;
+    if (request.params.size() > 3) {
+        if (request.params[3].get_real() == 0.0) {
+            nFee = 0;
+        } else {
+            nFee = AmountFromValue(request.params[3]);
+        }
+
+        if (nFee <= nDefaultFee) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid fee, needs to be greater than %s", FormatMoney(nDefaultFee)));
+        }
+
+        // Check that the user specified fee is not absurd.
+        // This allows amount=0 (and all amount < nDefaultFee) transactions to use the default network fee
+        // or anything less than nDefaultFee instead of being forced to use a custom fee and leak metadata
+        if (nTotalOut < nDefaultFee) {
+            if (nFee > nDefaultFee) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Small transaction amount %s has fee %s that is greater than the default fee %s", FormatMoney(nTotalOut), FormatMoney(nFee), FormatMoney(nDefaultFee)));
+            }
+        } else {
+            // Check that the user specified fee is not absurd.
+            if (nFee > nTotalOut) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Fee %s is greater than the sum of outputs %s and also greater than the default fee", FormatMoney(nFee), FormatMoney(nTotalOut)));
+            }
+        }
+    }
+
+    if (fromSapling && nMinDepth == 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Minconf cannot be zero when sending from shielded addr");
+    }
+
+    if (nMinDepth < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Minconf cannot be negative");
+    }
+
+    // Create the operation and process it
+    TransactionBuilder txBuilder = TransactionBuilder(Params().GetConsensus(), nextBlockHeight, pwalletMain);
+    SaplingOperation operation(txBuilder);
+
+    if (!fromSapling) {
+        operation.setFromAddress(fromTAddressDest);
+    } else {
+        operation.setFromAddress(fromShieldedAddress);
+    }
+
+    std::string txHash;
+    OperationResult res = operation.setFee(nFee)
+            ->setMinDepth(nMinDepth)
+            ->setShieldedRecipients(shieldAddrRecipients)
+            ->setTransparentRecipients(taddrRecipients)
+            ->send(txHash);
+    return res ? txHash : res.m_error;
 }
 
 UniValue listaddressgroupings(const JSONRPCRequest& request)
@@ -3547,6 +3769,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "exportsaplingviewingkey",  &exportsaplingviewingkey,  true  },
     { "wallet",             "getshieldedbalance",       &getshieldedbalance,       false },
     { "wallet",             "listshieldedunspent",      &listshieldedunspent,      false },
+    { "wallet",             "shielded_sendmany",        &shielded_sendmany,        false },
 
     /** Label functions (to replace non-balance account functions) */
     { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },

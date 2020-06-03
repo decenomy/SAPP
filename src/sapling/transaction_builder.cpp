@@ -11,6 +11,9 @@
 
 #include <librustzcash.h>
 
+// Hardcoded for now.
+CAmount DEFAULT_SAPLING_FEE = 10000;
+
 SpendDescriptionInfo::SpendDescriptionInfo(
     libzcash::SaplingExpandedSpendingKey expsk,
     libzcash::SaplingNote note,
