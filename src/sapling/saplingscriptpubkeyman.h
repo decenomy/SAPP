@@ -253,6 +253,7 @@ public:
             uint256& final_anchor);
 
     std::set<std::pair<libzcash::PaymentAddress, uint256>> GetNullifiersForAddresses(const std::set<libzcash::PaymentAddress> & addresses);
+    bool IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>>& nullifierSet, const libzcash::PaymentAddress& address, const SaplingOutPoint& entry);
 
     //! Update note data if is needed
     bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
