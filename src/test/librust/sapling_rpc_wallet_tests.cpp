@@ -12,6 +12,8 @@
 #include "sapling/key_io_sapling.h"
 #include "sapling/address.hpp"
 
+#include <unordered_set>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/format.hpp>
@@ -20,6 +22,9 @@
 #include <univalue.h>
 
 extern UniValue CallRPC(std::string args); // Implemented in rpc_tests.cpp
+
+// Remember: this method will be moved to an utility file in the short future. For now, it's in sapling_keystore_tests.cpp
+extern libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey();
 
 BOOST_FIXTURE_TEST_SUITE(sapling_rpc_wallet_tests, WalletTestingSetup)
 
@@ -61,6 +66,91 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_validateaddress)
     BOOST_CHECK_EQUAL(find_value(resultObj, "diversifiedtransmissionkey").get_str(), "d35e0d0897edbd3cf02b3d2327622a14c685534dbd2d3f4f4fa3e0e56cc2f008");
 }
 
+
+/*
+ * This test covers RPC commands listsaplingaddresses, importsaplingkey, exportsaplingkey
+ */
+BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importexport)
+{
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    pwalletMain->SetupSPKM(false);
+    UniValue retValue;
+    int n1 = 1000; // number of times to import/export
+    int n2 = 1000; // number of addresses to create and list
+
+    // error if no args
+    BOOST_CHECK_THROW(CallRPC("importsaplingkey"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("exportsaplingkey"), std::runtime_error);
+
+    // error if too many args
+    BOOST_CHECK_THROW(CallRPC("importsaplingkey way too many args"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC("exportsaplingkey toomany args"), std::runtime_error);
+
+    // error if invalid args
+    auto sk = libzcash::SproutSpendingKey::random();
+    std::string prefix = std::string("importsaplingkey ") + KeyIO::EncodeSpendingKey(sk) + " yes ";
+    BOOST_CHECK_THROW(CallRPC(prefix + "-1"), std::runtime_error);
+    BOOST_CHECK_THROW(CallRPC(prefix + "2147483647"), std::runtime_error); // allowed, but > height of active chain tip
+    BOOST_CHECK_THROW(CallRPC(prefix + "2147483648"), std::runtime_error); // not allowed, > int32 used for nHeight
+    BOOST_CHECK_THROW(CallRPC(prefix + "100badchars"), std::runtime_error);
+
+    // wallet should currently be empty
+    std::set<libzcash::SaplingPaymentAddress> saplingAddrs;
+    pwalletMain->GetSaplingPaymentAddresses(saplingAddrs);
+    BOOST_CHECK(saplingAddrs.empty());
+
+    auto m = GetTestMasterSaplingSpendingKey();
+
+    // verify import and export key
+    for (int i = 0; i < n1; i++) {
+        // create a random Sapling key locally
+        auto testSaplingSpendingKey = m.Derive(i);
+        auto testSaplingPaymentAddress = testSaplingSpendingKey.DefaultAddress();
+        std::string testSaplingAddr = KeyIO::EncodePaymentAddress(testSaplingPaymentAddress);
+        std::string testSaplingKey = KeyIO::EncodeSpendingKey(testSaplingSpendingKey);
+        BOOST_CHECK_NO_THROW(CallRPC(std::string("importsaplingkey ") + testSaplingKey));
+        BOOST_CHECK_NO_THROW(retValue = CallRPC(std::string("exportsaplingkey ") + testSaplingAddr));
+        BOOST_CHECK_EQUAL(retValue.get_str(), testSaplingKey);
+    }
+
+    // Verify we can list the keys imported
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedaddresses"));
+    UniValue arr = retValue.get_array();
+    BOOST_CHECK((int) arr.size() == n1);
+
+    // Put addresses into a set
+    std::unordered_set<std::string> myaddrs;
+    for (const UniValue& element : arr.getValues()) {
+        myaddrs.insert(element.get_str());
+    }
+
+    // Make new addresses for the set
+    for (int i=0; i<n2; i++) {
+        myaddrs.insert(KeyIO::EncodePaymentAddress(pwalletMain->GenerateNewSaplingZKey()));
+    }
+
+    // Verify number of addresses stored in wallet is n1+n2
+    int numAddrs = myaddrs.size();
+    BOOST_CHECK(numAddrs == n1 + n2);
+    pwalletMain->GetSaplingPaymentAddresses(saplingAddrs);
+    BOOST_CHECK((int) saplingAddrs.size() == numAddrs);
+
+    // Ask wallet to list addresses
+    BOOST_CHECK_NO_THROW(retValue = CallRPC("listshieldedaddresses"));
+    arr = retValue.get_array();
+    BOOST_CHECK((int) arr.size() == numAddrs);
+
+    // Create a set from them
+    std::unordered_set<std::string> listaddrs;
+    for (const UniValue& element : arr.getValues()) {
+        listaddrs.insert(element.get_str());
+    }
+
+    // Verify the two sets of addresses are the same
+    BOOST_CHECK((int) listaddrs.size() == numAddrs);
+    BOOST_CHECK(myaddrs == listaddrs);
+
+}
 
 // Check if address is of given type and spendable from our wallet.
 void CheckHaveAddr(const libzcash::PaymentAddress& addr) {
