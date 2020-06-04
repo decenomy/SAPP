@@ -648,6 +648,95 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
 
 // Sapling
 
+UniValue importsaplingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
+        throw std::runtime_error(
+                "importsaplingkey \"key\" ( rescan startHeight )\n"
+                "\nAdds a key (as returned by exportsaplingkey) to your wallet.\n"
+                "\nArguments:\n"
+                "1. \"key\"             (string, required) The zkey (see exportsaplingkey)\n"
+                "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
+                "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
+                "\nNote: This call can take minutes to complete if rescan is true.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"address\" : \"address|DefaultAddress\",    (string) The address corresponding to the spending key (the default address).\n"
+                "}\n"
+                "\nExamples:\n"
+                "\nExport a zkey\n"
+                + HelpExampleCli("exportsaplingkey", "\"myaddress\"") +
+                "\nImport the key with rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\"") +
+                "\nImport the key with partial rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\" whenkeyisnew 30000") +
+                "\nRe-import the key with longer partial rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\" yes 20000") +
+                "\nAs a JSON-RPC call\n"
+                + HelpExampleRpc("importsaplingkey", "\"mykey\", \"no\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    EnsureWalletIsUnlocked();
+
+    // Whether to perform rescan after import
+    bool fRescan = true;
+    bool fIgnoreExistingKey = true;
+    if (request.params.size() > 1) {
+        auto rescan = request.params[1].get_str();
+        if (rescan.compare("whenkeyisnew") != 0) {
+            fIgnoreExistingKey = false;
+            if (rescan.compare("yes") == 0) {
+                fRescan = true;
+            } else if (rescan.compare("no") == 0) {
+                fRescan = false;
+            } else {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "rescan must be \"yes\", \"no\" or \"whenkeyisnew\"");
+            }
+        }
+    }
+
+    // Height to rescan from
+    int nRescanHeight = 0;
+    if (request.params.size() > 2)
+        nRescanHeight = request.params[2].get_int();
+    if (nRescanHeight < 0 || nRescanHeight > chainActive.Height()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+    }
+
+    std::string strSecret = request.params[0].get_str();
+    auto spendingkey = KeyIO::DecodeSpendingKey(strSecret);
+    if (!IsValidSpendingKey(spendingkey)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid spending key");
+    }
+
+    libzcash::SaplingExtendedSpendingKey saplingSpendingKey = *boost::get<libzcash::SaplingExtendedSpendingKey>(&spendingkey);
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("address", KeyIO::EncodePaymentAddress( saplingSpendingKey.DefaultAddress()));
+
+    // Sapling support
+    auto addResult = pwalletMain->GetSaplingScriptPubKeyMan()->AddSpendingKeyToWallet(Params().GetConsensus(), saplingSpendingKey, -1);
+    if (addResult == KeyAlreadyExists && fIgnoreExistingKey) {
+        return result;
+    }
+    pwalletMain->MarkDirty();
+    if (addResult == KeyNotAdded) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error adding spending key to wallet");
+    }
+
+    // whenever a key is imported, we need to scan the whole chain
+    pwalletMain->nTimeFirstKey = 1; // 0 would be considered 'no value'
+
+    // We want to scan for transactions and notes
+    if (fRescan) {
+        pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight], true);
+    }
+
+    return result;
+}
+
+
 UniValue exportsaplingkey(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 1)

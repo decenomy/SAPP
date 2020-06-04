@@ -120,6 +120,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"importaddress", 3},
         {"importpubkey", 2},
         { "exportsaplingkey", 1 },
+        { "importsaplingkey", 2 },
         {"verifychain", 0},
         {"verifychain", 1},
         {"keypoolrefill", 0},
