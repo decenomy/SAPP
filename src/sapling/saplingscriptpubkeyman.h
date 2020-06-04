@@ -64,6 +64,9 @@ public:
             const libzcash::SaplingIncomingViewingKey &ivk);
     bool AddSaplingSpendingKey(const libzcash::SaplingExtendedSpendingKey &sk);
 
+    //! Return the spending key for the payment address (nullopt if the wallet has no spending key for such address)
+    Optional<libzcash::SaplingExtendedSpendingKey> GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const;
+
     // Sapling metadata
     std::map<libzcash::SaplingIncomingViewingKey, CKeyMetadata> mapSaplingZKeyMetadata;
 

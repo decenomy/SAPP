@@ -6,6 +6,16 @@
 #include "sapling/saplingscriptpubkeyman.h"
 
 
+Optional<libzcash::SaplingExtendedSpendingKey> SaplingScriptPubKeyMan::GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const
+{
+    libzcash::SaplingExtendedSpendingKey extsk;
+    if (wallet->GetSaplingExtendedSpendingKey(addr, extsk)) {
+        return extsk;
+    } else {
+        return nullopt;
+    }
+}
+
 //! TODO: Should be Sapling address format, SaplingPaymentAddress
 // Generate a new Sapling spending key and return its public payment address
 libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
