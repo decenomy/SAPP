@@ -5039,6 +5039,8 @@ extern UniValue importpubkey(const JSONRPCRequest& request);
 extern UniValue dumpwallet(const JSONRPCRequest& request);
 extern UniValue importwallet(const JSONRPCRequest& request);
 
+extern UniValue exportsaplingkey(const JSONRPCRequest& request);
+
 const CRPCCommand vWalletRPCCommands[] =
 {       //  category              name                        actor (function)           okSafeMode
         //  --------------------- ------------------------    -----------------------    ----------
@@ -5095,6 +5097,7 @@ const CRPCCommand vWalletRPCCommands[] =
         /** Sapling functions */
         { "wallet",             "getnewshieldedaddress",     &getnewshieldedaddress,     true  },
         { "wallet",             "listshieldedaddresses",     &listshieldedaddresses,     false },
+        { "wallet",             "exportsaplingkey",          &exportsaplingkey,          true  },
 
         /** Account functions (deprecated) */
         { "wallet",             "getaccountaddress",        &getaccountaddress,        true  },

@@ -9,6 +9,7 @@
 #include "key_io.h"
 #include "main.h"
 #include "rpc/server.h"
+#include "sapling/key_io_sapling.h"
 #include "script/script.h"
 #include "script/standard.h"
 #include "sync.h"
@@ -643,4 +644,44 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
     }
 
     return result;
+}
+
+// Sapling
+
+UniValue exportsaplingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+                "exportsaplingkey \"shielded addr\"\n"
+                "\nReveals the key corresponding to the 'shielded addr'.\n"
+                "Then the importsaplingkey can be used with this output\n"
+                "\nArguments:\n"
+                "1. \"addr\"   (string, required) The shielded addr for the private key\n"
+                "\nResult:\n"
+                "\"key\"                  (string) The private key\n"
+                "\nExamples:\n"
+                + HelpExampleCli("exportsaplingkey", "\"myaddress\"")
+                + HelpExampleRpc("exportsaplingkey", "\"myaddress\"")
+        );
+
+    EnsureWallet();
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    std::string strAddress = request.params[0].get_str();
+
+    auto address = KeyIO::DecodePaymentAddress(strAddress);
+    if (!IsValidPaymentAddress(address)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid shielded addr");
+    }
+    libzcash::SaplingPaymentAddress addr = *boost::get<libzcash::SaplingPaymentAddress>(&address);
+
+    // Sapling support
+    Optional<libzcash::SaplingExtendedSpendingKey> sk = pwalletMain->GetSaplingScriptPubKeyMan()->GetSpendingKeyForPaymentAddress(addr);
+    if (!sk) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet does not hold private key for this shielded addr");
+    }
+    return KeyIO::EncodeSpendingKey(libzcash::SpendingKey(sk.get()));
 }
