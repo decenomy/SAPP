@@ -64,6 +64,36 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     return xsk.DefaultAddress();
 }
 
+KeyAddResult SaplingScriptPubKeyMan::AddSpendingKeyToWallet(const Consensus::Params &params, const libzcash::SaplingExtendedSpendingKey &sk, int64_t nTime)
+{
+    auto extfvk = sk.ToXFVK();
+    auto ivk = extfvk.fvk.in_viewing_key();
+    {
+        //LogPrint(BCLog::SAPLING, "Importing shielded addr %s...\n", KeyIO::EncodePaymentAddress(sk.DefaultAddress()));
+        // Don't throw error in case a key is already there
+        if (wallet->HaveSaplingSpendingKey(extfvk)) {
+            return KeyAlreadyExists;
+        } else {
+            if (!wallet-> AddSaplingZKey(sk)) {
+                return KeyNotAdded;
+            }
+
+            int64_t nTimeToSet;
+            // Sapling addresses can't have been used in transactions prior to activation.
+            if (params.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight == Consensus::NetworkUpgrade::ALWAYS_ACTIVE) {
+                nTimeToSet = nTime;
+            } else {
+                // TODO: Update epoch before release v5.
+                // 154051200 seconds from epoch is Friday, 26 October 2018 00:00:00 GMT - definitely before Sapling activates
+                nTimeToSet = std::max((int64_t) 154051200, nTime);
+            }
+
+            mapSaplingZKeyMetadata[ivk] = CKeyMetadata(nTimeToSet);
+            return KeyAdded;
+        }
+    }
+}
+
 // Add spending key to keystore
 bool SaplingScriptPubKeyMan::AddSaplingZKey(
         const libzcash::SaplingExtendedSpendingKey &sk)
