@@ -66,6 +66,28 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_validateaddress)
     BOOST_CHECK_EQUAL(find_value(resultObj, "diversifiedtransmissionkey").get_str(), "d35e0d0897edbd3cf02b3d2327622a14c685534dbd2d3f4f4fa3e0e56cc2f008");
 }
 
+BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importkey_paymentaddress) {
+    SelectParams(CBaseChainParams::MAIN);
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    pwalletMain->SetupSPKM(false);
+
+    auto testAddress = [](const std::string& key) {
+        UniValue ret;
+        BOOST_CHECK_NO_THROW(ret = CallRPC("importsaplingkey " + key));
+        auto defaultAddr = find_value(ret, "address").get_str();
+        BOOST_CHECK_NO_THROW(ret = CallRPC("validateaddress " + defaultAddr));
+        ret = ret.get_obj();
+        BOOST_CHECK_EQUAL(true, find_value(ret, "isvalid").get_bool());
+        BOOST_CHECK_EQUAL(true, find_value(ret, "ismine").get_bool());
+    };
+
+    testAddress("p-secret-spending-key-main1qv09u0wlqqqqpqp75kpmat6l3ce29k"
+                "g9half9epsm80wya5n92j4d8mtmesrukzxlsmm2f74v3nvvx2shxy4z5v5x39p"
+                "eelsy5y2uxmvadaku8crd20q6vt8cvd68wp08cjyec6cku0dcf5lc9c2kykg5c"
+                "8uqmqlx8ccxpsw7ae243quhwr0zyekrrc520gs9z0j8pm954c3cev2yvp29vrc"
+                "0zweu7stxkwhp593p6drheps9uhz9pvkrfgvpxzte8d60uzw0qxadnsc77tcd");
+
+}
 
 /*
  * This test covers RPC commands listsaplingaddresses, importsaplingkey, exportsaplingkey
