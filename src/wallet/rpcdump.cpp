@@ -523,6 +523,29 @@ UniValue dumpwallet(const JSONRPCRequest& request)
             file << strprintf(" # addr=%s%s\n", strAddr, (metadata.HasKeyOrigin() ? " hdkeypath="+metadata.key_origin.pathToString() : ""));
         }
     }
+
+    // Sapling
+    file << "# Sapling keys\n";
+    file << "\n";
+    std::set<libzcash::SaplingPaymentAddress> saplingAddresses;
+    pwalletMain->GetSaplingPaymentAddresses(saplingAddresses);
+    file << "\n";
+    for (const auto& addr : saplingAddresses) {
+        libzcash::SaplingExtendedSpendingKey extsk;
+        if (pwalletMain->GetSaplingExtendedSpendingKey(addr, extsk)) {
+            auto ivk = extsk.expsk.full_viewing_key().in_viewing_key();
+            CKeyMetadata keyMeta = pwalletMain->GetSaplingScriptPubKeyMan()->mapSaplingZKeyMetadata[ivk];
+            std::string strTime = EncodeDumpTime(keyMeta.nCreateTime);
+            // Keys imported with importsaplingkey do not have key origin metadata
+            file << strprintf("%s %s # shielded_addr=%s%s\n",
+                    KeyIO::EncodeSpendingKey(extsk),
+                    strTime,
+                    KeyIO::EncodePaymentAddress(addr),
+                    (keyMeta.HasKeyOrigin() ? " hdkeypath=" + keyMeta.key_origin.pathToString() : "")
+                    );
+        }
+    }
+
     file << "\n";
     file << "# End of dump\n";
     file.close();
