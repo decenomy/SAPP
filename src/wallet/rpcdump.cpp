@@ -779,6 +779,94 @@ UniValue importsaplingkey(const JSONRPCRequest& request)
     return result;
 }
 
+UniValue importsaplingviewingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
+        throw std::runtime_error(
+                "importsaplingviewingkey \"vkey\" ( rescan startHeight )\n"
+                "\nAdds a viewing key (as returned by z_exportviewingkey) to your wallet.\n"
+                "\nArguments:\n"
+                "1. \"vkey\"             (string, required) The viewing key (see z_exportviewingkey)\n"
+                "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
+                "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
+                "\nNote: This call can take minutes to complete if rescan is true.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"address\" : \"address|DefaultAddress\",    (string) The address corresponding to the viewing key (for Sapling, this is the default address).\n"
+                "}\n"
+                "\nExamples:\n"
+                "\nImport a viewing key\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\"") +
+                "\nImport the viewing key without rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\", no") +
+                "\nImport the viewing key with partial rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\" whenkeyisnew 30000") +
+                "\nRe-import the viewing key with longer partial rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\" yes 20000") +
+                "\nAs a JSON-RPC call\n"
+                + HelpExampleRpc("importsaplingviewingkey", "\"vkey\", \"no\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    // Whether to perform rescan after import
+    bool fRescan = true;
+    bool fIgnoreExistingKey = true;
+    if (request.params.size() > 1) {
+        auto rescan = request.params[1].get_str();
+        if (rescan.compare("whenkeyisnew") != 0) {
+            fIgnoreExistingKey = false;
+            if (rescan.compare("no") == 0) {
+                fRescan = false;
+            } else if (rescan.compare("yes") != 0) {
+                throw JSONRPCError(
+                        RPC_INVALID_PARAMETER,
+                        "rescan must be \"yes\", \"no\" or \"whenkeyisnew\"");
+            }
+        }
+    }
+
+    // Height to rescan from
+    int nRescanHeight = 0;
+    if (request.params.size() > 2) {
+        nRescanHeight = request.params[2].get_int();
+    }
+    if (nRescanHeight < 0 || nRescanHeight > chainActive.Height()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+    }
+
+    std::string strVKey = request.params[0].get_str();
+    libzcash::ViewingKey viewingkey = KeyIO::DecodeViewingKey(strVKey);
+    if (!IsValidViewingKey(viewingkey)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid viewing key");
+    }
+    libzcash::SaplingExtendedFullViewingKey efvk = *boost::get<libzcash::SaplingExtendedFullViewingKey>(&viewingkey);
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("address", KeyIO::EncodePaymentAddress(efvk.DefaultAddress()));
+
+    auto addResult = pwalletMain->GetSaplingScriptPubKeyMan()->AddViewingKeyToWallet(efvk);
+    if (addResult == SpendingKeyExists) {
+        throw JSONRPCError(
+                RPC_WALLET_ERROR,
+                "The wallet already contains the private key for this viewing key");
+    } else if (addResult == KeyAlreadyExists && fIgnoreExistingKey) {
+        return result;
+    }
+    pwalletMain->MarkDirty();
+    if (addResult == KeyNotAdded) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error adding viewing key to wallet");
+    }
+
+    // We want to scan for transactions and notes
+    if (fRescan) {
+        pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight], true);
+    }
+
+    return result;
+}
 
 UniValue exportsaplingkey(const JSONRPCRequest& request)
 {

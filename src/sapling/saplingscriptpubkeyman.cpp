@@ -64,7 +64,22 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     return xsk.DefaultAddress();
 }
 
-KeyAddResult SaplingScriptPubKeyMan::AddSpendingKeyToWallet(const Consensus::Params &params, const libzcash::SaplingExtendedSpendingKey &sk, int64_t nTime)
+KeyAddResult SaplingScriptPubKeyMan::AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const {
+    if (wallet->HaveSaplingSpendingKey(extfvk)) {
+        return SpendingKeyExists;
+    } else if (wallet->HaveSaplingFullViewingKey(extfvk.fvk.in_viewing_key())) {
+        return KeyAlreadyExists;
+    } else if (wallet->AddSaplingFullViewingKey(extfvk)) {
+        return KeyAdded;
+    } else {
+        return KeyNotAdded;
+    }
+}
+
+KeyAddResult SaplingScriptPubKeyMan::AddSpendingKeyToWallet(
+        const Consensus::Params &params,
+        const libzcash::SaplingExtendedSpendingKey &sk,
+        int64_t nTime)
 {
     auto extfvk = sk.ToXFVK();
     auto ivk = extfvk.fvk.in_viewing_key();

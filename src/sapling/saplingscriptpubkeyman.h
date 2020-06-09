@@ -10,6 +10,7 @@
 #include "wallet/walletdb.h"
 
 enum KeyAddResult {
+    SpendingKeyExists,
     KeyAlreadyExists,
     KeyAdded,
     KeyNotAdded,
@@ -43,8 +44,14 @@ public:
     /* Encrypt Sapling keys */
     bool EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn);
 
+    // Add full viewing key if it's not already in the wallet
+    KeyAddResult AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const;
+
     // Add spending key if it's not already in the wallet
-    KeyAddResult AddSpendingKeyToWallet(const Consensus::Params &params, const libzcash::SaplingExtendedSpendingKey &sk, int64_t nTime);
+    KeyAddResult AddSpendingKeyToWallet(
+            const Consensus::Params &params,
+            const libzcash::SaplingExtendedSpendingKey &sk,
+            int64_t nTime);
 
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
