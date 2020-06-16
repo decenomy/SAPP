@@ -119,7 +119,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
                         LogPrintf("%s : Found Existing Complete IX Lock\n", __func__);
 
                         //reprocess the last 15 blocks
-                        ReprocessBlocks(15);
+                        ReprocessBlocks(15, Params());
                         mapTxLockReq.emplace(tx.GetHash(), tx);
                     }
                 }
@@ -391,7 +391,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
                 //if this tx lock was rejected, we need to remove the conflicting blocks
                 if (mapTxLockReqRejected.count((*i).second.txHash)) {
                     //reprocess the last 15 blocks
-                    ReprocessBlocks(15);
+                    ReprocessBlocks(15, Params());
                 }
             }
         }

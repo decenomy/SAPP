@@ -1827,6 +1827,7 @@ void FlushStateToDisk()
 /** Update chainActive and related internal data structures. */
 void static UpdateTip(CBlockIndex* pindexNew)
 {
+    AssertLockHeld(cs_main);
     chainActive.SetTip(pindexNew);
     g_IsSaplingActive = Params().GetConsensus().NetworkUpgradeActive(pindexNew->nHeight, Consensus::UPGRADE_V5_DUMMY);
 
@@ -1868,8 +1869,9 @@ void static UpdateTip(CBlockIndex* pindexNew)
 }
 
 /** Disconnect chainActive's tip. You probably want to call mempool.removeForReorg and manually re-limit mempool size after this, with cs_main held. */
-bool static DisconnectTip(CValidationState& state)
+bool static DisconnectTip(CValidationState& state, const CChainParams& chainparams)
 {
+    AssertLockHeld(cs_main);
     CBlockIndex* pindexDelete = chainActive.Tip();
     assert(pindexDelete);
     // Read block from disk.
@@ -2003,7 +2005,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const st
     return true;
 }
 
-bool DisconnectBlocks(int nBlocks)
+bool DisconnectBlocks(int nBlocks, const CChainParams& chainparams)
 {
     LOCK(cs_main);
 
@@ -2011,12 +2013,12 @@ bool DisconnectBlocks(int nBlocks)
 
     LogPrintf("%s: Got command to replay %d blocks\n", __func__, nBlocks);
     for (int i = 0; i <= nBlocks; i++)
-        DisconnectTip(state);
+        DisconnectTip(state, chainparams);
 
     return true;
 }
 
-void ReprocessBlocks(int nBlocks)
+void ReprocessBlocks(int nBlocks, const CChainParams& chainparams)
 {
     std::map<uint256, int64_t>::iterator it = mapRejectedBlocks.begin();
     while (it != mapRejectedBlocks.end()) {
@@ -2039,7 +2041,7 @@ void ReprocessBlocks(int nBlocks)
     CValidationState state;
     {
         LOCK(cs_main);
-        DisconnectBlocks(nBlocks);
+        DisconnectBlocks(nBlocks, chainparams);
     }
 
     if (state.IsValid()) {
@@ -2135,7 +2137,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     // Disconnect active blocks which are no longer in the best chain.
     bool fBlocksDisconnected = false;
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
-        if (!DisconnectTip(state))
+        if (!DisconnectTip(state, Params()))
             return false;
         fBlocksDisconnected = true;
     }
@@ -2290,10 +2292,9 @@ bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pb
     return true;
 }
 
-bool InvalidateBlock(CValidationState& state, CBlockIndex* pindex)
+bool InvalidateBlock(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindex)
 {
     AssertLockHeld(cs_main);
-
     // Mark the block itself as invalid.
     pindex->nStatus |= BLOCK_FAILED_VALID;
     setDirtyBlockIndex.insert(pindex);
@@ -2306,7 +2307,7 @@ bool InvalidateBlock(CValidationState& state, CBlockIndex* pindex)
         setBlockIndexCandidates.erase(pindexWalk);
         // ActivateBestChain considers blocks already in chainActive
         // unconditionally valid already, so force disconnect away from it.
-        if (!DisconnectTip(state)) {
+        if (!DisconnectTip(state, chainparams)) {
             mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1, STANDARD_LOCKTIME_VERIFY_FLAGS);
             return false;
         }
