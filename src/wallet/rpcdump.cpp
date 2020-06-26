@@ -784,9 +784,9 @@ UniValue importsaplingviewingkey(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
         throw std::runtime_error(
                 "importsaplingviewingkey \"vkey\" ( rescan startHeight )\n"
-                "\nAdds a viewing key (as returned by z_exportviewingkey) to your wallet.\n"
+                "\nAdds a viewing key (as returned by exportsaplingviewingkey) to your wallet.\n"
                 "\nArguments:\n"
-                "1. \"vkey\"             (string, required) The viewing key (see z_exportviewingkey)\n"
+                "1. \"vkey\"             (string, required) The viewing key (see exportsaplingviewingkey)\n"
                 "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
                 "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
                 "\nNote: This call can take minutes to complete if rescan is true.\n"
@@ -866,6 +866,41 @@ UniValue importsaplingviewingkey(const JSONRPCRequest& request)
     }
 
     return result;
+}
+
+UniValue exportsaplingviewingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+                "exportsaplingviewingkey \"shielded_addr\"\n"
+                "\nReveals the viewing key corresponding to 'shielded addr'.\n"
+                "Then the importsaplingviewingkey can be used with this output\n"
+                "\nArguments:\n"
+                "1. \"shielded_addr\"   (string, required) The shielded addr for the viewing key\n"
+                "\nResult:\n"
+                "\"vkey\"                  (string) The viewing key\n"
+                "\nExamples:\n"
+                + HelpExampleCli("exportsaplingviewingkey", "\"myaddress\"")
+                + HelpExampleRpc("exportsaplingviewingkey", "\"myaddress\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    std::string strAddress = request.params[0].get_str();
+    auto address = KeyIO::DecodePaymentAddress(strAddress);
+    if (!IsValidPaymentAddress(address)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid shielded addr");
+    }
+    const libzcash::SaplingPaymentAddress &sapAddr = *boost::get<libzcash::SaplingPaymentAddress>(&address);
+    auto vk = pwalletMain->GetSaplingScriptPubKeyMan()->GetViewingKeyForPaymentAddress(sapAddr);
+    if (vk) {
+        return KeyIO::EncodeViewingKey(vk.get());
+    } else {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet does not hold private key or viewing key for this shielded addr");
+    }
 }
 
 UniValue exportsaplingkey(const JSONRPCRequest& request)

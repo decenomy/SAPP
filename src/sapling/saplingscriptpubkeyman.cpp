@@ -16,6 +16,21 @@ Optional<libzcash::SaplingExtendedSpendingKey> SaplingScriptPubKeyMan::GetSpendi
     }
 }
 
+Optional<libzcash::SaplingExtendedFullViewingKey> SaplingScriptPubKeyMan::GetViewingKeyForPaymentAddress(
+        const libzcash::SaplingPaymentAddress &addr) const
+{
+    libzcash::SaplingIncomingViewingKey ivk;
+    libzcash::SaplingExtendedFullViewingKey extfvk;
+
+    if (wallet->GetSaplingIncomingViewingKey(addr, ivk) &&
+        wallet->GetSaplingFullViewingKey(ivk, extfvk))
+    {
+        return extfvk;
+    } else {
+        return nullopt;
+    }
+}
+
 //! TODO: Should be Sapling address format, SaplingPaymentAddress
 // Generate a new Sapling spending key and return its public payment address
 libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
