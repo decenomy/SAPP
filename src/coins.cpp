@@ -6,6 +6,7 @@
 #include "coins.h"
 
 #include "consensus/consensus.h"
+#include "policy/fees.h"
 #include "invalid.h"
 #include "memusage.h"
 #include "random.h"
@@ -356,6 +357,16 @@ double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight, CAmount
     inChainInputValue = 0;
     if (tx.IsCoinBase() || tx.IsCoinStake())
         return 0.0;
+
+
+    // Shielded transfers do not reveal any information about the value or age of a note, so we
+    // cannot apply the priority algorithm used for transparent utxos.  Instead, we just
+    // use the maximum priority for all (partially or fully) shielded transactions.
+    // (Note that coinbase/coinstakes transactions cannot contain Sapling shielded Spends or Outputs.)
+    if (tx.hasSaplingData()) {
+        return INF_PRIORITY;
+    }
+
     double dResult = 0.0;
     for (const CTxIn& txin : tx.vin) {
         const Coin& coin = AccessCoin(txin.prevout);
