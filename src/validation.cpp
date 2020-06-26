@@ -425,6 +425,11 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
                 return state.Invalid(error("%s : tried to include zPIV mint output in tx %s",
                         __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-zc-spend-mint");
 
+            // Sapling: are the sapling spends' requirements met in tx(valid anchors/nullifiers)?
+            if (!view.HaveShieldedRequirements(tx))
+                return state.Invalid(error("AcceptToMemoryPool: shielded requirements not met"),
+                                     REJECT_DUPLICATE, "bad-txns-shielded-requirements-not-met");
+
             // Bring the best block into scope
             view.GetBestBlock();
 
@@ -1050,6 +1055,10 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
     if (!inputs.HaveInputs(tx))
         return state.Invalid(false, 0, "", "Inputs unavailable");
 
+    // are the Sapling's requirements met?
+    if (!inputs.HaveShieldedRequirements(tx))
+        return state.Invalid(error("CheckInputs(): %s Sapling requirements not met", tx.GetHash().ToString()));
+
     const Consensus::Params& consensus = ::Params().GetConsensus();
     CAmount nValueIn = 0;
     CAmount nFees = 0;
@@ -1070,6 +1079,9 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
         if (!consensus.MoneyRange(coin.out.nValue) || !consensus.MoneyRange(nValueIn))
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
     }
+
+    // Sapling
+    nValueIn += tx.GetShieldedValueIn();
 
     if (!tx.IsCoinStake()) {
         if (nValueIn < tx.GetValueOut())
@@ -1466,7 +1478,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // conditionally.
     if (pindex->nChainSaplingValue) {
         if (*pindex->nChainSaplingValue < 0) {
-            return state.DoS(100, error("ConnectBlock(): turnstile violation in Sapling shielded value pool"),
+            return state.DoS(100, error("%s: turnstile violation in Sapling shielded value pool: val: %d", __func__, *pindex->nChainSaplingValue),
                              REJECT_INVALID, "turnstile-violation-sapling-shielded-pool");
         }
     }
@@ -1580,6 +1592,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if (!view.HaveInputs(tx))
                 return state.DoS(100, error("ConnectBlock() : inputs missing/spent"),
                     REJECT_INVALID, "bad-txns-inputs-missingorspent");
+
+            // Sapling: are the sapling spends' requirements met in tx(valid anchors/nullifiers)?
+            if (!view.HaveShieldedRequirements(tx))
+                return state.DoS(100, error("%s: spends requirements not met", __func__),
+                                 REJECT_INVALID, "bad-txns-sapling-requirements-not-met");
 
             // Check that the inputs are not marked as invalid/fraudulent
             for (const CTxIn& in : tx.vin) {
