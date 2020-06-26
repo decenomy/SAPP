@@ -94,6 +94,9 @@ static bool MatchMultisig(const CScript& script, unsigned int& required, std::ve
  */
 bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet)
 {
+    if (scriptPubKey.empty())
+        return false;
+
     vSolutionsRet.clear();
 
     // Shortcut for pay-to-script-hash, which are more constrained than the other types:
