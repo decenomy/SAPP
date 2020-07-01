@@ -73,6 +73,7 @@ BASE_SCRIPTS= [
     'wallet_keypool_topup.py',                  # ~ 174 sec
     'sapling_wallet.py',                        # ~ 164 sec
     'sapling_wallet_anchorfork.py',
+    'sapling_wallet_nullifiers.py',
     'wallet_txn_doublespend.py --mineblock',    # ~ 157 sec
     'wallet_txn_clone.py --mineblock',          # ~ 157 sec
     'rpc_spork.py',                             # ~ 156 sec
