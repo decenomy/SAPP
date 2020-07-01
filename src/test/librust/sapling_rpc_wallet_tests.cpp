@@ -105,6 +105,14 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_getbalance)
     BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance *"));
     BOOST_CHECK_NO_THROW(CallRPC("getshieldedbalance * 6"));
     BOOST_CHECK_THROW(CallRPC("getshieldedbalance * -1"), std::runtime_error);
+
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyshieldedaddress too many args"), std::runtime_error);
+    // negative minconf not allowed
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyshieldedaddress yBYhwgzufrZ6F5VVuK9nEChENArq934mqC -1"), std::runtime_error);
+    // invalid zaddr, taddr not allowed
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyshieldedaddress yBYhwgzufrZ6F5VVuK9nEChENArq934mqC 0"), std::runtime_error);
+    // don't have the spending key
+    BOOST_CHECK_THROW(CallRPC("listreceivedbyshieldedaddress ptestsapling1nrn6exksuqtpld9gu6fwdz4hwg54h2x37gutdds89pfyg6mtjf63km45a8eare5qla45cj75vs8 1"), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importkey_paymentaddress) {

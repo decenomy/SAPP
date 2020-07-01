@@ -854,6 +854,16 @@ bool SaplingScriptPubKeyMan::HaveSpendingKeyForPaymentAddress(const libzcash::Sa
            wallet->HaveSaplingSpendingKey(extfvk);
 }
 
+bool SaplingScriptPubKeyMan::PaymentAddressBelongsToWallet(const libzcash::SaplingPaymentAddress &zaddr) const
+{
+    libzcash::SaplingIncomingViewingKey ivk;
+
+    // If we have a SaplingExtendedSpendingKey in the wallet, then we will
+    // also have the corresponding SaplingExtendedFullViewingKey.
+    return wallet->GetSaplingIncomingViewingKey(zaddr, ivk) &&
+           wallet->HaveSaplingFullViewingKey(ivk);
+}
+
 ///////////////////// Load ////////////////////////////////////////
 
 bool SaplingScriptPubKeyMan::LoadCryptedSaplingZKey(

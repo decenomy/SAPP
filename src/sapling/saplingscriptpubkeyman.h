@@ -197,6 +197,8 @@ public:
             const std::vector<unsigned char> &vchCryptedSecret);
     //! Returns true if the wallet contains the spending key
     bool HaveSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &zaddr) const;
+    //! Returns true if the wallet contains the spending and viewing key for the shielded address
+    bool PaymentAddressBelongsToWallet(const libzcash::SaplingPaymentAddress &zaddr) const;
 
     //! Adds spending key to the store, without saving it to disk (used by LoadWallet)
     bool LoadSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key);

@@ -2163,6 +2163,99 @@ UniValue listreceivedbyaddress(const JSONRPCRequest& request)
     return ListReceived(request.params, false);
 }
 
+UniValue listreceivedbyshieldedaddress(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size()==0 || request.params.size() >2)
+        throw std::runtime_error(
+                "listreceivedbyshieldedaddress \"address\" ( minconf )\n"
+                "\nReturn a list of amounts received by a shielded addr belonging to the node's wallet.\n"
+                "\nArguments:\n"
+                "1. \"address\"      (string) The private address.\n"
+                "2. minconf          (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"txid\": \"txid\",           (string) the transaction id\n"
+                "  \"amount\": xxxxx,         (numeric) the amount of value in the note\n"
+                "  \"memo\": xxxxx,           (string) hexadecimal string representation of memo field\n"
+                "  \"confirmations\" : n,     (numeric) the number of confirmations\n"
+                "  \"blockheight\": n,         (numeric) The block height containing the transaction\n"
+                "  \"blockindex\": n,         (numeric) The block index containing the transaction.\n"
+                "  \"blocktime\": xxx,              (numeric) The transaction time in seconds since epoch (midnight Jan 1 1970 GMT).\n"
+                "  \"outindex\" (sapling) : n,     (numeric) the output index\n"
+                "  \"change\": true|false,    (boolean) true if the address that received the note is also one of the sending addresses\n"
+                "}\n"
+                "\nExamples:\n"
+                + HelpExampleCli("listreceivedbyshieldedaddress", "\"ps1ra969yfhvhp73rw5ak2xvtcm9fkuqsnmad7qln79mphhdrst3lwu9vvv03yuyqlh42p42st47qd\"")
+                + HelpExampleRpc("listreceivedbyshieldedaddress", "\"ps1ra969yfhvhp73rw5ak2xvtcm9fkuqsnmad7qln79mphhdrst3lwu9vvv03yuyqlh42p42st47qd\"")
+        );
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    int nMinDepth = 1;
+    if (request.params.size() > 1) {
+        nMinDepth = request.params[1].get_int();
+    }
+    if (nMinDepth < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Minimum number of confirmations cannot be less than 0");
+    }
+
+    // Check that the from address is valid.
+    auto fromaddress = request.params[0].get_str();
+
+    auto zaddr = KeyIO::DecodePaymentAddress(fromaddress);
+    if (!IsValidPaymentAddress(zaddr)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid addr.");
+    }
+    libzcash::SaplingPaymentAddress shieldedAddr = *boost::get<libzcash::SaplingPaymentAddress>(&zaddr);
+
+    auto sspkm = pwalletMain->GetSaplingScriptPubKeyMan();
+    // Visitor to support Sprout and Sapling addrs
+    if (!sspkm->PaymentAddressBelongsToWallet(shieldedAddr)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "From address does not belong to this node, shielded addr spending key or viewing key not found.");
+    }
+
+    UniValue result(UniValue::VARR);
+    std::vector<SaplingNoteEntry> saplingEntries;
+    sspkm->GetFilteredNotes(saplingEntries, zaddr, nMinDepth, false, false);
+
+    std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet;
+    bool hasSpendingKey = pwalletMain->HaveSpendingKeyForPaymentAddress(shieldedAddr);
+    if (hasSpendingKey) {
+        nullifierSet = sspkm->GetNullifiersForAddresses({zaddr});
+    }
+
+    for (const SaplingNoteEntry& entry : saplingEntries) {
+        UniValue obj(UniValue::VOBJ);
+        obj.pushKV("txid", entry.op.hash.ToString());
+        obj.pushKV("amount", ValueFromAmount(CAmount(entry.note.value())));
+        obj.pushKV("memo", HexStr(entry.memo));
+        obj.pushKV("outindex", (int)entry.op.n);
+        obj.pushKV("confirmations", entry.confirmations);
+
+        int height = 0;
+        int index = -1;
+        int64_t time = 0;
+
+        if (pwalletMain->mapWallet.count(entry.op.hash)) {
+            const CWalletTx& wtx = pwalletMain->mapWallet[entry.op.hash];
+            if (!wtx.hashBlock.IsNull())
+                height = mapBlockIndex[wtx.hashBlock]->nHeight;
+            index = wtx.nIndex;
+            time = wtx.GetTxTime();
+        }
+
+        obj.pushKV("blockheight", height);
+        obj.pushKV("blockindex", index);
+        obj.pushKV("blocktime", time);
+
+        if (hasSpendingKey) {
+            obj.pushKV("change", sspkm->IsNoteSaplingChange(nullifierSet, entry.address, entry.op));
+        }
+        result.push_back(obj);
+    }
+    return result;
+}
+
 UniValue listreceivedbylabel(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 3)
@@ -3770,8 +3863,9 @@ static const CRPCCommand commands[] =
     { "wallet",             "getshieldedbalance",       &getshieldedbalance,       false },
     { "wallet",             "listshieldedunspent",      &listshieldedunspent,      false },
     { "wallet",             "shielded_sendmany",        &shielded_sendmany,        false },
+    { "wallet",             "listreceivedbyshieldedaddress", &listreceivedbyshieldedaddress,  false },
 
-    /** Label functions (to replace non-balance account functions) */
+        /** Label functions (to replace non-balance account functions) */
     { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },
     { "wallet",             "getreceivedbylabel",       &getreceivedbylabel,       false },
     { "wallet",             "listlabels",               &listlabels,               false },
