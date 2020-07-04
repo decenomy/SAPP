@@ -169,6 +169,8 @@ public:
     void SetHDChain(CHDChain& chain, bool memonly);
     const CHDChain& GetHDChain() const { return hdChain; }
 
+    uint256 getCommonOVKFromSeed();
+
     /* Encrypt Sapling keys */
     bool EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn);
 

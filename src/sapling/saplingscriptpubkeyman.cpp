@@ -875,3 +875,18 @@ void SaplingScriptPubKeyMan::SetHDChain(CHDChain& chain, bool memonly)
     if (!wallet->HaveKey(hdChain.GetID()))
         throw std::runtime_error(std::string(__func__) + ": Not found sapling seed in wallet");
 }
+
+uint256 SaplingScriptPubKeyMan::getCommonOVKFromSeed()
+{
+    // Sending from a t-address, which we don't have an ovk for. Instead,
+    // generate a common one from the HD seed. This ensures the data is
+    // recoverable, while keeping it logically separate from the ZIP 32
+    // Sapling key hierarchy, which the user might not be using.
+    const CKeyID seedID = GetHDChain().GetID();
+    CKey key;
+    if (!wallet->GetKey(seedID, key)) {
+        throw std::runtime_error("Shielded spend, HD seed not found");
+    }
+    HDSeed seed{key.GetPrivKey()};
+    return ovkForShieldingFromTaddr(seed);
+}
