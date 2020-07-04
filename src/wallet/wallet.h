@@ -1038,6 +1038,15 @@ public:
 
     void SetSaplingNoteData(mapSaplingNoteData_t &noteData);
 
+    Optional<std::pair<
+            libzcash::SaplingNotePlaintext,
+            libzcash::SaplingPaymentAddress>> DecryptSaplingNote(SaplingOutPoint op) const;
+
+    Optional<std::pair<
+            libzcash::SaplingNotePlaintext,
+            libzcash::SaplingPaymentAddress>> RecoverSaplingNote(
+            SaplingOutPoint op, std::set<uint256>& ovks) const;
+
     //! checks whether a tx has P2CS inputs or not
     bool HasP2CSInputs() const;
 
