@@ -1306,6 +1306,168 @@ UniValue getshieldedbalance(const JSONRPCRequest& request)
     return ValueFromAmount(nBalance);
 }
 
+UniValue viewshieldedtransaction(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+                "viewshieldedtransaction \"txid\"\n"
+                "\nGet detailed shielded information about in-wallet transaction <txid>\n"
+                + HelpRequiringPassphrase() + "\n"
+                "\nArguments:\n"
+                "1. \"txid\"    (string, required) The transaction id\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"txid\" : \"transactionid\",   (string) The transaction id\n"
+                "  \"spends\" : [\n"
+                "    {\n"
+                "      \"spend\" : n,                    (numeric, sapling) the index of the spend within vShieldedSpend\n"
+                "      \"txidPrev\" : \"transactionid\",   (string) The id for the transaction this note was created in\n"
+                "      \"outputPrev\" : n,               (numeric, sapling) the index of the output within the vShieldedOutput\n"
+                "      \"address\" : \"pivxaddress\",     (string) The PIVX address involved in the transaction\n"
+                "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
+                "      \"valueSat\" : xxxx               (numeric) The amount in satoshis\n"
+                "    }\n"
+                "    ,...\n"
+                "  ],\n"
+                "  \"outputs\" : [\n"
+                "    {\n"
+                "      \"output\" : n,                   (numeric, sapling) the index of the output within the vShieldedOutput\n"
+                "      \"address\" : \"pivxaddress\",     (string) The PIVX address involved in the transaction\n"
+                "      \"outgoing\" : true|false         (boolean, sapling) True if the output is not for an address in the wallet\n"
+                "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
+                "      \"valueSat\" : xxxx               (numeric) The amount in satoshis\n"
+                "      \"memo\" : \"hexmemo\",             (string) Hexademical string representation of the memo field\n"
+                "      \"memoStr\" : \"memo\",             (string) Only returned if memo contains valid UTF-8 text.\n"
+                "    }\n"
+                "    ,...\n"
+                "  ],\n"
+                "}\n"
+
+                "\nExamples:\n"
+                + HelpExampleCli("viewshieldedtransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
+                + HelpExampleRpc("viewshieldedtransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
+        );
+
+    EnsureWalletIsUnlocked();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    uint256 hash;
+    hash.SetHex(request.params[0].get_str());
+
+    UniValue entry(UniValue::VOBJ);
+    if (!pwalletMain->mapWallet.count(hash))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid or non-wallet transaction id");
+    const CWalletTx& wtx = pwalletMain->mapWallet[hash];
+
+    if (wtx.nVersion < CTransaction::SAPLING_VERSION || !wtx.hasSaplingData()) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid transaction, no shielded data available");
+    }
+
+    entry.pushKV("txid", hash.GetHex());
+
+    UniValue spends(UniValue::VARR);
+    UniValue outputs(UniValue::VARR);
+
+    auto addMemo = [](UniValue &entry, std::array<unsigned char, ZC_MEMO_SIZE> &memo) {
+        entry.pushKV("memo", HexStr(memo));
+        /*
+        // If the leading byte is 0xF4 or lower, the memo field should be interpreted as a
+        // UTF-8-encoded text string.
+        if (memo[0] <= 0xf4) {
+            // Trim off trailing zeroes
+            auto end = std::find_if(
+                    memo.rbegin(),
+                    memo.rend(),
+                    [](unsigned char v) { return v != 0; });
+            std::string memoStr(memo.begin(), end.base());
+            if (utf8::is_valid(memoStr)) { // todo: Add utf8 validation.
+                entry.pushKV("memoStr", memoStr));
+            }
+        }
+         */
+    };
+
+    auto sspkm = pwalletMain->GetSaplingScriptPubKeyMan();
+
+    // Collect OutgoingViewingKeys for recovering output information
+    std::set<uint256> ovks;
+    // Generate the common ovk for recovering t->shield outputs.
+    ovks.insert(sspkm->getCommonOVKFromSeed());
+
+    // Sapling spends
+    for (size_t i = 0; i < wtx.sapData->vShieldedSpend.size(); ++i) {
+        const auto& spend = wtx.sapData->vShieldedSpend[i];
+
+        // Fetch the note that is being spent
+        auto res = sspkm->mapSaplingNullifiersToNotes.find(spend.nullifier);
+        if (res == sspkm->mapSaplingNullifiersToNotes.end()) {
+            continue;
+        }
+        auto op = res->second;
+        auto wtxPrev = pwalletMain->mapWallet.at(op.hash);
+
+        auto decrypted = wtxPrev.DecryptSaplingNote(op).get();
+        auto notePt = decrypted.first;
+        auto pa = decrypted.second;
+
+        // Store the OutgoingViewingKey for recovering outputs
+        libzcash::SaplingExtendedFullViewingKey extfvk;
+        assert(pwalletMain->GetSaplingFullViewingKey(wtxPrev.mapSaplingNoteData.at(op).ivk, extfvk));
+        ovks.insert(extfvk.fvk.ovk);
+
+        UniValue entry_(UniValue::VOBJ);
+        entry_.pushKV("spend", (int)i);
+        entry_.pushKV("txidPrev", op.hash.GetHex());
+        entry_.pushKV("outputPrev", (int)op.n);
+        entry_.pushKV("address", KeyIO::EncodePaymentAddress(pa));
+        entry_.pushKV("value", ValueFromAmount(notePt.value()));
+        entry_.pushKV("valueSat", notePt.value());
+        spends.push_back(entry_);
+    }
+
+    // Sapling outputs
+    for (uint32_t i = 0; i < wtx.sapData->vShieldedOutput.size(); ++i) {
+        auto op = SaplingOutPoint(hash, i);
+
+        libzcash::SaplingNotePlaintext notePt;
+        libzcash::SaplingPaymentAddress pa;
+        bool isOutgoing;
+
+        auto decrypted = wtx.DecryptSaplingNote(op);
+        if (decrypted) {
+            notePt = decrypted->first;
+            pa = decrypted->second;
+            isOutgoing = false;
+        } else {
+            // Try recovering the output
+            auto recovered = wtx.RecoverSaplingNote(op, ovks);
+            if (recovered) {
+                notePt = recovered->first;
+                pa = recovered->second;
+                isOutgoing = true;
+            } else {
+                // Unreadable
+                continue;
+            }
+        }
+        auto memo = notePt.memo();
+
+        UniValue entry_(UniValue::VOBJ);
+        entry_.pushKV("output", (int)op.n);
+        entry_.pushKV("outgoing", isOutgoing);
+        entry_.pushKV("address", KeyIO::EncodePaymentAddress(pa));
+        entry_.pushKV("value", ValueFromAmount(notePt.value()));
+        entry_.pushKV("valueSat", notePt.value());
+        addMemo(entry_, memo);
+        outputs.push_back(entry_);
+    }
+
+    entry.pushKV("spends", spends);
+    entry.pushKV("outputs", outputs);
+
+    return entry;
+}
+
 // transaction.h comment: spending taddr output requires CTxIn >= 148 bytes and typical taddr txout is 34 bytes
 #define CTXIN_SPEND_DUST_SIZE   148
 #define CTXOUT_REGULAR_SIZE     34
@@ -2209,7 +2371,7 @@ UniValue listreceivedbyshieldedaddress(const JSONRPCRequest& request)
     libzcash::SaplingPaymentAddress shieldedAddr = *boost::get<libzcash::SaplingPaymentAddress>(&zaddr);
 
     auto sspkm = pwalletMain->GetSaplingScriptPubKeyMan();
-    // Visitor to support Sprout and Sapling addrs
+    // Visitor to support Sapling addrs
     if (!sspkm->PaymentAddressBelongsToWallet(shieldedAddr)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "From address does not belong to this node, shielded addr spending key or viewing key not found.");
     }
@@ -3864,6 +4026,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "listshieldedunspent",      &listshieldedunspent,      false },
     { "wallet",             "shielded_sendmany",        &shielded_sendmany,        false },
     { "wallet",             "listreceivedbyshieldedaddress", &listreceivedbyshieldedaddress,  false },
+    { "wallet",             "viewshieldedtransaction",       &viewshieldedtransaction,        false },
 
         /** Label functions (to replace non-balance account functions) */
     { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },
