@@ -50,6 +50,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"getreceivedbylabel", 1},
         {"listcoldutxos", 0},
         {"listdelegators", 0},
+        { "getsaplingnotescount", 0},
         {"listreceivedbyaddress", 0},
         {"listreceivedbyaddress", 1},
         {"listreceivedbyaddress", 2},

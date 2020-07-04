@@ -3944,6 +3944,35 @@ UniValue multisend(const JSONRPCRequest& request)
 }
 
 
+UniValue getsaplingnotescount(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() > 1)
+        throw std::runtime_error(
+                "getsaplingnodescount ( minconf )\n"
+                "Returns the number of sapling notes available in the wallet.\n"
+                "\nArguments:\n"
+                "1. minconf      (numeric, optional, default=1) Only include notes in transactions confirmed at least this many times.\n"
+                "\nResult:\n"
+                "\nResult:\n"
+                "num             (numeric) the number of sapling notes in the wallet\n"
+                "}\n"
+                "\nExamples:\n"
+                + HelpExampleCli("getsaplingnotescount", "0")
+                + HelpExampleRpc("getsaplingnotescount", "0")
+        );
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    int nMinDepth = request.params.size() > 0 ? request.params[0].get_int() : 1;
+    int count = 0;
+    for (const auto& wtx : pwalletMain->mapWallet) {
+        if (wtx.second.GetDepthInMainChain() >= nMinDepth) {
+            count += wtx.second.mapSaplingNoteData.size();
+        }
+    }
+    return count;
+}
+
 extern UniValue dumpprivkey(const JSONRPCRequest& request); // in rpcdump.cpp
 extern UniValue importprivkey(const JSONRPCRequest& request);
 extern UniValue importaddress(const JSONRPCRequest& request);
@@ -4027,8 +4056,9 @@ static const CRPCCommand commands[] =
     { "wallet",             "shielded_sendmany",        &shielded_sendmany,        false },
     { "wallet",             "listreceivedbyshieldedaddress", &listreceivedbyshieldedaddress,  false },
     { "wallet",             "viewshieldedtransaction",       &viewshieldedtransaction,        false },
+    { "wallet",             "getsaplingnotescount",          &getsaplingnotescount,           false },
 
-        /** Label functions (to replace non-balance account functions) */
+    /** Label functions (to replace non-balance account functions) */
     { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },
     { "wallet",             "getreceivedbylabel",       &getreceivedbylabel,       false },
     { "wallet",             "listlabels",               &listlabels,               false },
