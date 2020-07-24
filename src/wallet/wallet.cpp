@@ -1313,7 +1313,8 @@ CAmount CWalletTx::GetCachableAmount(AmountType type, const isminefilter& filter
     return amount.m_value[filter];
 }
 
-bool CWalletTx::IsAmountCached(AmountType type, const isminefilter& filter) const {
+bool CWalletTx::IsAmountCached(AmountType type, const isminefilter& filter) const
+{
     return m_amounts[type].m_cached[filter];
 }
 

@@ -1109,13 +1109,13 @@ BOOST_AUTO_TEST_CASE(MarkAffectedSaplingTransactionsDirty) {
     wallet.MarkAffectedTransactionsDirty(wtx);
 
     // After getting a cached value, the first tx should be clean
-    wallet.mapWallet[hash].GetDebit(ISMINE_ALL);
-    BOOST_CHECK(wallet.mapWallet[hash].GetDebit(ISMINE_SPENDABLE));
+    wallet.mapWallet[hash].GetDebit(ISMINE_SPENDABLE);
+    BOOST_CHECK(wallet.mapWallet[hash].IsAmountCached(CWalletTx::AmountType::DEBIT, ISMINE_SPENDABLE));
 
     // After adding the note spend, the first tx should be dirty
     wallet.LoadToWallet(wtx2);
     wallet.MarkAffectedTransactionsDirty(wtx2);
-    BOOST_CHECK(!wallet.mapWallet[hash].GetDebit(ISMINE_SPENDABLE));
+    BOOST_CHECK(!wallet.mapWallet[hash].IsAmountCached(CWalletTx::AmountType::DEBIT, ISMINE_SPENDABLE));
 
     // Tear down
     chainActive.SetTip(NULL);
