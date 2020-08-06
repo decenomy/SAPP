@@ -448,7 +448,7 @@ bool UpdateZPIVSupplyConnect(const CBlock& block, CBlockIndex* pindex, bool fJus
                         if (txid == m.GetTxHash()) {
                             CWalletTx wtx(pwalletMain, tx);
                             wtx.nTimeReceived = block.GetBlockTime();
-                            wtx.SetMerkleBranch(pindex, posInBlock);
+                            wtx.SetMerkleBranch(pindex->GetBlockHash(), posInBlock);
                             pwalletMain->AddToWallet(wtx);
                             setAddedToWallet.insert(txid);
                         }

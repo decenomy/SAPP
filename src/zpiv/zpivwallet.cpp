@@ -264,7 +264,7 @@ void CzPIVWallet::SyncWithChain(bool fGenerateMintPool)
                         int posInBlock;
                         for (posInBlock = 0; posInBlock < (int)block.vtx.size(); posInBlock++) {
                             if (wtx.GetHash() == txHash) {
-                                wtx.SetMerkleBranch(pindex, posInBlock);
+                                wtx.SetMerkleBranch(pindex->GetBlockHash(), posInBlock);
                                 break;
                             }
                         }
@@ -328,7 +328,7 @@ bool CzPIVWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
             int posInBlock;
             for (posInBlock = 0; posInBlock < (int) block.vtx.size(); posInBlock++) {
                 if (wtx.GetHash() == txidSpend) {
-                    wtx.SetMerkleBranch(pindex, posInBlock);
+                    wtx.SetMerkleBranch(pindex->GetBlockHash(), posInBlock);
                     break;
                 }
             }

@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE(rpc_shielded_sendmany_taddr_to_sapling)
     chainActive.SetTip(&fakeIndex);
     BOOST_CHECK(chainActive.Contains(&fakeIndex));
     BOOST_CHECK_EQUAL(1, chainActive.Height());
-    wtx.SetMerkleBranch(block);
+    wtx.SetMerkleBranch(blockHash, 0);
     pwalletMain->LoadToWallet(wtx);
 
     // Context that shielded_sendmany requires

@@ -927,7 +927,7 @@ public:
         READWRITE(nIndex);
     }
 
-    void SetMerkleBranch(const CBlockIndex* pIndex, int posInBlock);
+    void SetMerkleBranch(const uint256& blockHash, int posInBlock);
 
     /**
      * Return depth of transaction in blockchain:

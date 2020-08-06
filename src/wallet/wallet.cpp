@@ -1067,7 +1067,7 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
 
             // Get merkle branch if transaction was found in a block
             if (posInBlock != -1)
-                wtx.SetMerkleBranch(pIndex, posInBlock);
+                wtx.SetMerkleBranch(pIndex->GetBlockHash(), posInBlock);
 
             return AddToWallet(wtx, false);
         }
@@ -4171,10 +4171,10 @@ CWalletKey::CWalletKey(int64_t nExpires)
     nTimeExpires = nExpires;
 }
 
-void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
+void CMerkleTx::SetMerkleBranch(const uint256& blockHash, int posInBlock)
 {
     // Update the tx's hashBlock
-    hashBlock = pindex->GetBlockHash();
+    hashBlock = blockHash;
 
     // set the position of the transaction in the block
     nIndex = posInBlock;
