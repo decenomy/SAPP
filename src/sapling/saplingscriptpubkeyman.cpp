@@ -210,6 +210,8 @@ void SaplingScriptPubKeyMan::IncrementNoteWitnesses(const CBlockIndex* pindex,
     }
 
     for (const auto& tx : pblock->vtx) {
+        if (!tx->hasSaplingData()) continue;
+
         const uint256& hash = tx->GetHash();
         bool txIsOurs = wallet->mapWallet.count(hash);
 
