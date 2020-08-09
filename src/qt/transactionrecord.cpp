@@ -313,6 +313,11 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
     }
 
+    // TODO: Add shielded transactions parsing.
+    if (wtx.hasSaplingData()) {
+        return parts;
+    }
+
     // Decompose coinstake if needed (if it's not a coinstake, the method will no perform any action).
     if (decomposeCoinStake(wallet, wtx, nCredit, nDebit, fZSpendFromMe, parts)) {
         return parts;
