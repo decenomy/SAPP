@@ -66,6 +66,7 @@ private:
     size_t nUsageSize;    //! ... and total memory usage
     CFeeRate feeRate;     //! ... and fee per kB
     bool hasZerocoins{false}; //! ... and checking if it contains zPIV (mints/spends)
+    bool m_isShielded{false}; //! ... and checking if it contains shielded spends/outputs
     int64_t nTime;        //! Local time when entering the mempool
     double entryPriority;     //! Priority when entering the mempool
     unsigned int entryHeight; //! Chain height when entering the mempool
@@ -102,6 +103,7 @@ public:
     int64_t GetTime() const { return nTime; }
     unsigned int GetHeight() const { return entryHeight; }
     bool HasZerocoins() const { return hasZerocoins; }
+    bool IsShielded() const { return m_isShielded; }
     bool WasClearAtEntry() const { return hadNoDependencies; }
     unsigned int GetSigOpCount() const { return sigOpCount; }
     int64_t GetModifiedFee() const { return nFee + feeDelta; }

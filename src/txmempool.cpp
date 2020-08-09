@@ -30,6 +30,7 @@ CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
     nModSize = tx.CalculateModifiedSize(nTxSize);
     nUsageSize = tx.DynamicMemoryUsage();
     hasZerocoins = tx.ContainsZerocoins();
+    m_isShielded = tx.hasSaplingData();
 
     nCountWithDescendants = 1;
     nSizeWithDescendants = nTxSize;
