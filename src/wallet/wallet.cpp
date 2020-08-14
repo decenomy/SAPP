@@ -1006,6 +1006,20 @@ bool CWallet::LoadToWallet(const CWalletTx& wtxIn)
     return true;
 }
 
+bool CWallet::FindNotesDataAndAddMissingIVKToKeystore(const CTransaction& tx, Optional<mapSaplingNoteData_t>& saplingNoteData)
+{
+    auto saplingNoteDataAndAddressesToAdd = m_sspk_man->FindMySaplingNotes(tx);
+    saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
+    auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
+    // Add my addresses
+    for (const auto& addressToAdd : addressesToAdd) {
+        if (!m_sspk_man->AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * Add a transaction to the wallet, or update it.
  * pblock is optional, but should be provided if the transaction is known to be in a block.
@@ -1033,20 +1047,14 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& bl
         if (fExisted && !fUpdate) return false;
 
         // Check tx for Sapling notes
-        mapSaplingNoteData_t saplingNoteData;
+        Optional<mapSaplingNoteData_t> saplingNoteData {nullopt};
         if (HasSaplingSPKM()) {
-            auto saplingNoteDataAndAddressesToAdd = m_sspk_man->FindMySaplingNotes(tx);
-            saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
-            auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
-            // Add my addresses
-            for (const auto &addressToAdd : addressesToAdd) {
-                if (!m_sspk_man->AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
-                    return false;
-                }
+            if (!FindNotesDataAndAddMissingIVKToKeystore(tx, saplingNoteData)) {
+                return false; // error adding incoming viewing key.
             }
         }
 
-        if (fExisted || IsMine(tx) || IsFromMe(tx) || saplingNoteData.size() > 0) {
+        if (fExisted || IsMine(tx) || IsFromMe(tx) || (saplingNoteData && !saplingNoteData->empty())) {
 
             /* Check if any keys in the wallet keypool that were supposed to be unused
              * have appeared in a new transaction. If so, remove those keys from the keypool.
@@ -1061,8 +1069,8 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& bl
 
             CWalletTx wtx(this, tx);
 
-            if (saplingNoteData.size() > 0) {
-                wtx.SetSaplingNoteData(saplingNoteData);
+            if (saplingNoteData && !saplingNoteData->empty()) {
+                wtx.SetSaplingNoteData(*saplingNoteData);
             }
 
             // Get merkle branch if transaction was found in a block

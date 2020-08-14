@@ -279,6 +279,7 @@ private:
 
 template <class T>
 using TxSpendMap = std::multimap<T, uint256>;
+typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
 
 /**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
@@ -484,6 +485,9 @@ public:
     int64_t GetKeyCreationTime(const CTxDestination& address);
 
     //////////// Sapling //////////////////
+
+    // Search for notes and addresses from this wallet in the tx, and add the addresses --> IVK mapping to the keystore if missing.
+    bool FindNotesDataAndAddMissingIVKToKeystore(const CTransaction& tx, Optional<mapSaplingNoteData_t>& saplingNoteData);
 
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
@@ -945,9 +949,6 @@ public:
     bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
     void setAbandoned() { hashBlock = ABANDON_HASH; }
 };
-
-// Sapling map
-typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
 
 /**
  * A transaction with a bunch of additional info that only the owner cares about.
