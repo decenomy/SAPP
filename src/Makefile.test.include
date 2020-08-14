@@ -123,7 +123,8 @@ BITCOIN_TESTS += \
 
 SAPLING_TESTS +=\
   test/librust/sapling_rpc_wallet_tests.cpp \
-  test/librust/sapling_wallet_tests.cpp
+  test/librust/sapling_wallet_tests.cpp \
+  wallet/test/wallet_shielded_balances_tests.cpp
 endif
 
 test_test_pivx_SOURCES = $(BITCOIN_TEST_SUITE) $(BITCOIN_TESTS) $(SAPLING_TESTS) $(ZEROCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
