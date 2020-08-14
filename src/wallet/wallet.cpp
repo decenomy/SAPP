@@ -74,18 +74,18 @@ std::string COutput::ToString() const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool CWallet::SetupSPKM(bool newKeypool)
+bool CWallet::SetupSPKM(bool newKeypool, bool memOnly)
 {
-    if (m_spk_man->SetupGeneration(newKeypool, true)) {
+    if (m_spk_man->SetupGeneration(newKeypool, true, memOnly)) {
         LogPrintf("%s : spkm setup completed\n", __func__);
-        return ActivateSaplingWallet();
+        return ActivateSaplingWallet(memOnly);
     }
     return false;
 }
 
-bool CWallet::ActivateSaplingWallet()
+bool CWallet::ActivateSaplingWallet(bool memOnly)
 {
-    if (m_sspk_man->SetupGeneration(m_spk_man->GetHDChain().GetID())) {
+    if (m_sspk_man->SetupGeneration(m_spk_man->GetHDChain().GetID(), true, memOnly)) {
         LogPrintf("%s : sapling spkm setup completed\n", __func__);
         return true;
     }

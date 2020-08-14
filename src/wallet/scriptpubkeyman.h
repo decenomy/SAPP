@@ -35,7 +35,7 @@ public:
       * Returns false if already setup or setup fails, true if setup is successful
       * Set force=true to make it re-setup if already setup, used for upgrades
       */
-    bool SetupGeneration(bool newKeypool = true, bool force = false);
+    bool SetupGeneration(bool newKeypool = true, bool force = false, bool memOnly = false);
 
     /** Upgrades the wallet to the specified version */
     bool Upgrade(const int& prev_version, std::string& error);
@@ -71,7 +71,7 @@ public:
       Sets the seed's version based on the current wallet version (so the
       caller must ensure the current wallet version is correct before calling
       this function). */
-    void SetHDSeed(const CPubKey& key, bool force = false);
+    void SetHDSeed(const CPubKey& key, bool force = false, bool memOnly = false);
 
     //! Load a keypool entry
     void LoadKeyPool(int64_t nIndex, const CKeyPool &keypool);

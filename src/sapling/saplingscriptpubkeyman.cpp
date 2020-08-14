@@ -894,9 +894,9 @@ bool SaplingScriptPubKeyMan::LoadSaplingPaymentAddress(
 
 ///////////////////// Setup ///////////////////////////////////////
 
-bool SaplingScriptPubKeyMan::SetupGeneration(const CKeyID& keyID, bool force)
+bool SaplingScriptPubKeyMan::SetupGeneration(const CKeyID& keyID, bool force, bool memonly)
 {
-    SetHDSeed(keyID, force);
+    SetHDSeed(keyID, force, memonly);
     return true;
 }
 

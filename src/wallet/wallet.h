@@ -351,7 +351,7 @@ public:
     static const CAmount DEFAULT_STAKE_SPLIT_THRESHOLD = 500 * COIN;
 
     //! Generates hd wallet //
-    bool SetupSPKM(bool newKeypool = true);
+    bool SetupSPKM(bool newKeypool = true, bool memOnly = false);
     //! Whether the wallet is hd or not //
     bool IsHDEnabled() const;
 
@@ -580,7 +580,7 @@ public:
      * Upgrade wallet to HD and Sapling if needed. Does nothing if not.
      */
     bool Upgrade(std::string& error, const int& prevVersion);
-    bool ActivateSaplingWallet();
+    bool ActivateSaplingWallet(bool memOnly = false);
 
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false, bool fromStartup = false);
     void ReacceptWalletTransactions(bool fFirstLoad = false);

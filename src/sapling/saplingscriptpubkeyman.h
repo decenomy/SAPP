@@ -155,7 +155,7 @@ public:
     /**
      * Set and initialize the Sapling HD chain.
      */
-    bool SetupGeneration(const CKeyID& keyID, bool force = false);
+    bool SetupGeneration(const CKeyID& keyID, bool force = false, bool memonly = false);
     bool IsEnabled() const { return !hdChain.IsNull(); };
 
     /* Set the current HD seed (will reset the chain child index counters)
