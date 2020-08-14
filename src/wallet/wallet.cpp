@@ -1356,8 +1356,9 @@ bool CWalletTx::IsAmountCached(AmountType type, const isminefilter& filter) cons
 //! filter decides which addresses will count towards the debit
 CAmount CWalletTx::GetDebit(const isminefilter& filter) const
 {
-    if (vin.empty())
+    if (vin.empty() && (sapData && sapData->vShieldedSpend.empty())) {
         return 0;
+    }
 
     CAmount debit = 0;
     if (filter & ISMINE_SPENDABLE) {
@@ -1372,6 +1373,10 @@ CAmount CWalletTx::GetDebit(const isminefilter& filter) const
     if (filter & ISMINE_SPENDABLE_DELEGATED) {
         debit += GetCachableAmount(DEBIT, ISMINE_SPENDABLE_DELEGATED);
     }
+    if (filter & ISMINE_SPENDABLE_SHIELDED) {
+        debit += GetCachableAmount(DEBIT, ISMINE_SPENDABLE_SHIELDED);
+    }
+
     return debit;
 }
 
@@ -4434,6 +4439,14 @@ CAmount CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) co
         if (!Params().GetConsensus().MoneyRange(nDebit))
             throw std::runtime_error("CWallet::GetDebit() : value out of range");
     }
+
+    // Shielded debit
+    if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+        if (tx.hasSaplingData()) {
+            nDebit += m_sspk_man->GetDebit(tx, filter);
+        }
+    }
+
     return nDebit;
 }
 

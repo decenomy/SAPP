@@ -527,6 +527,34 @@ CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const isminefilte
     return nCredit;
 }
 
+CAmount SaplingScriptPubKeyMan::GetDebit(const CTransaction& tx, const isminefilter& filter)
+{
+    CAmount nDebit = 0;
+    for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
+        const auto &it = mapSaplingNullifiersToNotes.find(spend.nullifier);
+        if (it != mapSaplingNullifiersToNotes.end()) {
+            // If we have the sapling output means that this input is mine.
+            SaplingOutPoint op = it->second;
+            const auto& itTx = wallet->mapWallet.find(op.hash);
+            if (itTx == wallet->mapWallet.end()) {
+                continue;
+            }
+
+            // Now try to decrypt the note (it should never fail if it reach to this point, mapSaplingNullifiersToNotes is loaded after the note decryption)
+            Optional<std::pair<
+                    libzcash::SaplingNotePlaintext,
+                    libzcash::SaplingPaymentAddress>> decryptedNote = itTx->second.DecryptSaplingNote(op);
+
+            // todo: Add watch only check.
+            CAmount value = decryptedNote->first.value();
+            nDebit += value;
+            if (!Params().GetConsensus().MoneyRange(nDebit))
+                throw std::runtime_error("SaplingScriptPubKeyMan::GetDebit() : value out of range");
+        }
+    }
+    return nDebit;
+}
+
 bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address)
 {
     LOCK(wallet->cs_KeyStore);
