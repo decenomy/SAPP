@@ -1401,6 +1401,9 @@ CAmount CWalletTx::GetCredit(const isminefilter& filter, bool recalculate) const
     if (filter & ISMINE_SPENDABLE_DELEGATED) {
         credit += GetCachableAmount(CREDIT, ISMINE_SPENDABLE_DELEGATED, recalculate);
     }
+    if (filter & ISMINE_SPENDABLE_SHIELDED) {
+        credit += GetCachableAmount(CREDIT, ISMINE_SPENDABLE_SHIELDED);
+    }
     return credit;
 }
 
@@ -4440,6 +4443,14 @@ CAmount CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) c
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         nCredit += GetCredit(tx.vout[i], filter);
     }
+
+    // Shielded credit
+    if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+        if (tx.hasSaplingData()) {
+            nCredit += m_sspk_man->GetCredit(tx, filter);
+        }
+    }
+
     if (!Params().GetConsensus().MoneyRange(nCredit))
         throw std::runtime_error("CWallet::GetCredit() : value out of range");
     return nCredit;

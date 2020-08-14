@@ -502,6 +502,31 @@ std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::G
     return nullifierSet;
 }
 
+CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent)
+{
+    CAmount nCredit = 0;
+    for (int i = 0; i < (int) tx.sapData->vShieldedOutput.size(); ++i) {
+        SaplingOutPoint op(tx.GetHash(), i);
+        auto noteAndAddress = tx.DecryptSaplingNote(op);
+        // todo: if cannot be decrypted, use RecoverSaplingNote.
+        if (noteAndAddress) {
+            // Obtain the noteData and check if the nullifier has being spent or not
+            SaplingNoteData noteData = tx.mapSaplingNoteData.at(op);
+
+            // The nullifier could be null if the wallet was locked when the noteData was created.
+            if (noteData.nullifier &&
+                (fUnspent && IsSaplingSpent(*noteData.nullifier))) {
+                continue; // only unspent
+            }
+            // todo: check if we can spend this note or not. (if not, then it's a watch only)
+
+            const libzcash::SaplingNotePlaintext &note = noteAndAddress->first;
+            nCredit += note.value();
+        }
+    }
+    return nCredit;
+}
+
 bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address)
 {
     LOCK(wallet->cs_KeyStore);
