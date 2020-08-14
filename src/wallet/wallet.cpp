@@ -4450,7 +4450,7 @@ CAmount CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) co
     return nDebit;
 }
 
-CAmount CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) const
+CAmount CWallet::GetCredit(const CWalletTx& tx, const isminefilter& filter) const
 {
     CAmount nCredit = 0;
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
