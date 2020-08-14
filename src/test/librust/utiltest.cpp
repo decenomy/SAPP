@@ -31,11 +31,16 @@ libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey() {
     return libzcash::SaplingExtendedSpendingKey::Master(seed);
 }
 
-CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore, bool genNewKey) {
+CKey CreateCkey(bool genNewKey) {
     CKey tsk;
     if (genNewKey) tsk.MakeNewKey(true);
     else tsk = KeyIO::DecodeSecret(T_SECRET_REGTEST);
-    if (!tsk.IsValid()) throw std::runtime_error("AddTestCKeyToKeyStore:: Invalid priv key");
+    if (!tsk.IsValid()) throw std::runtime_error("CreateCkey:: Invalid priv key");
+    return tsk;
+}
+
+CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore, bool genNewKey) {
+    CKey tsk = CreateCkey(genNewKey);
     keyStore.AddKey(tsk);
     return tsk;
 }
@@ -53,7 +58,8 @@ CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
                                  CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
                                  CAmount value,
-                                 bool genNewKey) {
+                                 bool genNewKey,
+                                 const CWallet* pwalletIn) {
     // From taddr
     CKey tsk = AddTestCKeyToKeyStore(keyStore, genNewKey);
     auto scriptPubKey = GetScriptForDestination(tsk.GetPubKey().GetID());
@@ -67,6 +73,31 @@ CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
     builder.AddSaplingOutput(fvk.ovk, pa, value, {});
 
     CTransaction tx = builder.Build().GetTxOrThrow();
-    CWalletTx wtx {NULL, tx};
+    CWalletTx wtx {pwalletIn, tx};
     return wtx;
+}
+
+CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 const libzcash::SaplingExtendedSpendingKey &sk,
+                                 CAmount value,
+                                 const CWallet* pwalletIn) {
+    // Dummy wallet, used to generate the dummy transparent input key and sign it in the transaction builder
+    CWallet wallet;
+    wallet.SetMinVersion(FEATURE_SAPLING);
+    wallet.SetupSPKM(false, true);
+
+    CWalletTx tx = GetValidSaplingReceive(
+            consensusParams,
+            wallet,
+            sk,
+            value,
+            true,
+            pwalletIn
+            );
+    return tx;
+}
+
+CScript CreateDummyDestinationScript() {
+    CKey key = CreateCkey(true);
+    return GetScriptForDestination(key.GetPubKey().GetID());
 }

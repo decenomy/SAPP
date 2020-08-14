@@ -26,6 +26,11 @@ libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey();
 CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore, bool genNewKey = false);
 
 /**
+ * Generates a dummy destination script
+ */
+CScript CreateDummyDestinationScript();
+
+/**
  * Generate a dummy SaplingNote and a SaplingMerkleTree with that note's commitment.
  */
 TestSaplingNote GetTestSaplingNote(const libzcash::SaplingPaymentAddress& pa, CAmount value);
@@ -34,6 +39,16 @@ CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
                                  CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
                                  CAmount value,
-                                 bool genNewKey = false);
+                                 bool genNewKey = false,
+                                 const CWallet* pwalletIn = nullptr);
+
+/**
+ * Shield balance, from dummy transparent inputs, to the default address of sk (incoming shielded balance for pwalletIn).
+ * pwalletIn will be the parent of the returned CWalletTx.
+ */
+CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 const libzcash::SaplingExtendedSpendingKey &sk,
+                                 CAmount value,
+                                 const CWallet* pwalletIn);
 
 #endif // PIVX_UTIL_TEST_H
