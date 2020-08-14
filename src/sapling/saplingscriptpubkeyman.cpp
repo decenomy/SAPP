@@ -59,8 +59,7 @@ void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapWithTx(CWalletTx& wtx)
                 mapSaplingNullifiersToNotes.erase(item.second.nullifier.get());
             }
             item.second.nullifier = boost::none;
-        }
-        else {
+        } else {
             uint64_t position = nd.witnesses.front().position();
             auto extfvk = wallet->mapSaplingFullViewingKeys.at(nd.ivk);
             OutputDescription output = wtx.sapData->vShieldedOutput[op.n];
@@ -501,6 +500,14 @@ std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::G
         }
     }
     return nullifierSet;
+}
+
+bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address)
+{
+    LOCK(wallet->cs_KeyStore);
+    std::set<libzcash::PaymentAddress> shieldedAddresses = {address};
+    std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet = GetNullifiersForAddresses(shieldedAddresses);
+    return IsNoteSaplingChange(nullifierSet, address, op);
 }
 
 bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>> & nullifierSet,
