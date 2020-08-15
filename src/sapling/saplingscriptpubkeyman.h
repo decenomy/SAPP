@@ -261,6 +261,8 @@ public:
     CAmount GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent = false);
     //! Return the shielded debit of the tx.
     CAmount GetDebit(const CTransaction& tx, const isminefilter& filter);
+    //! Return the shielded change of the tx
+    CAmount GetShieldedChange(const CWalletTx& wtx);
 
     //! Check whether an specific output is change or not.
     bool IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address);

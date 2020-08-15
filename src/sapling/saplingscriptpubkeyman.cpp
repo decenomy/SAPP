@@ -555,6 +555,31 @@ CAmount SaplingScriptPubKeyMan::GetDebit(const CTransaction& tx, const isminefil
     return nDebit;
 }
 
+CAmount SaplingScriptPubKeyMan::GetShieldedChange(const CWalletTx& wtx)
+{
+    if (!wtx.isSapling() || wtx.sapData->vShieldedOutput.empty()) {
+        return 0;
+    }
+    const uint256& txHash = wtx.GetHash();
+    CAmount nChange = 0;
+    SaplingOutPoint sapOutPoint{txHash, 0};
+    for (uint32_t pos = 0; pos < (uint32_t) wtx.sapData->vShieldedOutput.size(); ++pos) {
+        sapOutPoint.n = pos;
+        const auto noteAndAddress = wtx.DecryptSaplingNote(sapOutPoint);
+        if (noteAndAddress) {
+            const libzcash::SaplingNotePlaintext& notePlaintext = noteAndAddress->first;
+            const libzcash::SaplingPaymentAddress& pa = noteAndAddress->second;
+
+            if (IsNoteSaplingChange(sapOutPoint, pa)) {
+                nChange += notePlaintext.value();
+                if (!Params().GetConsensus().MoneyRange(nChange))
+                    throw std::runtime_error("GetShieldedChange() : value out of range");
+            }
+        }
+    }
+    return nChange;
+}
+
 bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address)
 {
     LOCK(wallet->cs_KeyStore);
