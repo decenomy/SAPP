@@ -4563,6 +4563,8 @@ void CWalletTx::Init(const CWallet* pwalletIn)
     fChangeCached = false;
     nChangeCached = 0;
     fStakeDelegationVoided = false;
+    fShieldedChangeCached = false;
+    nShieldedChangeCached = 0;
     nOrderPos = -1;
 }
 
@@ -4627,6 +4629,8 @@ void CWalletTx::MarkDirty()
     m_amounts[AVAILABLE_CREDIT].Reset();
     nChangeCached = 0;
     fChangeCached = false;
+    nShieldedChangeCached = 0;
+    fShieldedChangeCached = false;
     fStakeDelegationVoided = false;
 }
 
@@ -4721,6 +4725,16 @@ CAmount CWalletTx::GetChange() const
     nChangeCached = pwallet->GetChange(*this);
     fChangeCached = true;
     return nChangeCached;
+}
+
+CAmount CWalletTx::GetShieldedChange() const
+{
+    if (fShieldedChangeCached) {
+        return nShieldedChangeCached;
+    }
+    nShieldedChangeCached = pwallet->GetSaplingScriptPubKeyMan()->GetShieldedChange(*this);
+    fShieldedChangeCached = true;
+    return nShieldedChangeCached;
 }
 
 bool CWalletTx::IsFromMe(const isminefilter& filter) const

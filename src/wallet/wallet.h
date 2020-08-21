@@ -978,9 +978,12 @@ public:
     CAmount GetCachableAmount(AmountType type, const isminefilter& filter, bool recalculate = false) const;
     bool IsAmountCached(AmountType type, const isminefilter& filter) const; // Only used in unit tests
     mutable CachableAmount m_amounts[AMOUNTTYPE_ENUM_ELEMENTS];
-    mutable bool fChangeCached;
+
     mutable bool fStakeDelegationVoided;
+    mutable bool fChangeCached;
     mutable CAmount nChangeCached;
+    mutable bool fShieldedChangeCached;
+    mutable CAmount nShieldedChangeCached;
 
     CWalletTx();
     CWalletTx(const CWallet* pwalletIn);
@@ -1064,6 +1067,9 @@ public:
     CAmount GetImmatureWatchOnlyCredit(const bool& fUseCache = true) const;
     CAmount GetAvailableWatchOnlyCredit(const bool& fUseCache = true) const;
     CAmount GetChange() const;
+
+    // Shielded credit/debit/change
+    CAmount GetShieldedChange() const;
 
     // Cold staking contracts credit/debit
     CAmount GetColdStakingCredit(bool fUseCache = true) const;
