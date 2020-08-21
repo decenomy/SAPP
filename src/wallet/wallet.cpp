@@ -1428,7 +1428,8 @@ CAmount CWalletTx::GetAvailableCredit(bool fUseCache, const isminefilter& filter
         return 0;
 
     // Avoid caching ismine for NO or ALL cases (could remove this check and simplify in the future).
-    bool allow_cache = filter == ISMINE_SPENDABLE || filter == ISMINE_WATCH_ONLY;
+    bool allow_cache = filter == ISMINE_SPENDABLE || filter == ISMINE_WATCH_ONLY ||
+            filter == ISMINE_SPENDABLE_SHIELDED || filter == ISMINE_WATCH_ONLY_SHIELDED;
 
     // Must wait until coinbase/coinstake is safely deep enough in the chain before valuing it
     if (GetBlocksToMaturity() > 0)
@@ -1439,13 +1440,25 @@ CAmount CWalletTx::GetAvailableCredit(bool fUseCache, const isminefilter& filter
     }
 
     CAmount nCredit = 0;
-    const uint256& hashTx = GetHash();
-    for (unsigned int i = 0; i < vout.size(); i++) {
-        if (!pwallet->IsSpent(hashTx, i)) {
-            const CTxOut &txout = vout[i];
-            nCredit += pwallet->GetCredit(txout, filter);
-            if (!Params().GetConsensus().MoneyRange(nCredit))
-                throw std::runtime_error(std::string(__func__) + " : value out of range");
+    // If the filter is only for shielded amounts, do not calculate the regular outputs
+    if (filter != ISMINE_SPENDABLE_SHIELDED && filter != ISMINE_WATCH_ONLY_SHIELDED) {
+
+        const uint256& hashTx = GetHash();
+        for (unsigned int i = 0; i < vout.size(); i++) {
+            if (!pwallet->IsSpent(hashTx, i)) {
+                const CTxOut &txout = vout[i];
+                nCredit += pwallet->GetCredit(txout, filter);
+                if (!Params().GetConsensus().MoneyRange(nCredit))
+                    throw std::runtime_error(std::string(__func__) + " : value out of range");
+            }
+        }
+
+    }
+
+    if (pwallet->HasSaplingSPKM()) {
+        // Can calculate the shielded available balance.
+        if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+            nCredit += pwallet->GetSaplingScriptPubKeyMan()->GetCredit(*this, filter, true);
         }
     }
 
@@ -4460,7 +4473,7 @@ CAmount CWallet::GetCredit(const CWalletTx& tx, const isminefilter& filter) cons
     // Shielded credit
     if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
         if (tx.hasSaplingData()) {
-            nCredit += m_sspk_man->GetCredit(tx, filter);
+            nCredit += m_sspk_man->GetCredit(tx, filter, false);
         }
     }
 
@@ -4742,7 +4755,11 @@ bool CWalletTx::IsFromMe(const isminefilter& filter) const
     return (GetDebit(filter) > 0);
 }
 
+CAmount CWalletTx::GetShieldedAvailableCredit(bool fUseCache) const
+{
+    return GetAvailableCredit(fUseCache, ISMINE_SPENDABLE_SHIELDED);
+}
+
 CStakeableOutput::CStakeableOutput(const CWalletTx* txIn, int iIn, int nDepthIn, bool fSpendableIn, bool fSolvableIn,
                                    const CBlockIndex*& _pindex) : COutput(txIn, iIn, nDepthIn, fSpendableIn, fSolvableIn),
                                                                 pindex(_pindex) {}
-

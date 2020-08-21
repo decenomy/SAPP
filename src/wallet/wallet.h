@@ -1070,6 +1070,7 @@ public:
 
     // Shielded credit/debit/change
     CAmount GetShieldedChange() const;
+    CAmount GetShieldedAvailableCredit(bool fUseCache = true) const;
 
     // Cold staking contracts credit/debit
     CAmount GetColdStakingCredit(bool fUseCache = true) const;
