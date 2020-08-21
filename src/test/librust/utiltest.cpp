@@ -55,46 +55,65 @@ TestSaplingNote GetTestSaplingNote(const libzcash::SaplingPaymentAddress& pa, CA
 }
 
 CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
-                                 CBasicKeyStore& keyStore,
-                                 const libzcash::SaplingExtendedSpendingKey &sk,
-                                 CAmount value,
-                                 bool genNewKey,
-                                 const CWallet* pwalletIn) {
-    // From taddr
-    CKey tsk = AddTestCKeyToKeyStore(keyStore, genNewKey);
-    auto scriptPubKey = GetScriptForDestination(tsk.GetPubKey().GetID());
-    // To shielded addr
-    auto fvk = sk.expsk.full_viewing_key();
-    auto pa = sk.DefaultAddress();
-
-    auto builder = TransactionBuilder(consensusParams, 1, &keyStore);
+                                 CBasicKeyStore& keyStoreFrom,
+                                 std::vector<TransparentInput> vIn,
+                                 std::vector<ShieldedDestination> vDest,
+                                 const CWallet* pwalletIn)
+{
+    auto builder = TransactionBuilder(consensusParams, 1, &keyStoreFrom);
     builder.SetFee(0);
-    builder.AddTransparentInput(COutPoint(), scriptPubKey, value);
-    builder.AddSaplingOutput(fvk.ovk, pa, value, {});
+
+    // From transparent inputs
+    for (const auto& in : vIn) {
+        builder.AddTransparentInput(in.outPoint, in.scriptPubKey, in.amount);
+    }
+
+    // To shielded addrs
+    for (const auto& dest : vDest) {
+        auto fvk = dest.sk.expsk.full_viewing_key();
+        auto pa = dest.sk.DefaultAddress();
+        builder.AddSaplingOutput(fvk.ovk, pa, dest.amount, {});
+    }
 
     CTransaction tx = builder.Build().GetTxOrThrow();
     CWalletTx wtx {pwalletIn, tx};
     return wtx;
 }
 
+// Two dummy input (to trick coinbase check), one or many shielded outputs
 CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 CBasicKeyStore& keyStoreFrom,
+                                 CAmount inputAmount,
+                                 std::vector<ShieldedDestination> vDest,
+                                 bool genNewKey,
+                                 const CWallet* pwalletIn) {
+    // From taddr
+    CKey tsk = AddTestCKeyToKeyStore(keyStoreFrom, genNewKey);
+    auto scriptPubKey = GetScriptForDestination(tsk.GetPubKey().GetID());
+
+    // Two equal dummy inputs to by-pass the coinbase check.
+    TransparentInput dummyInput{COutPoint(), scriptPubKey, inputAmount / 2};
+    std::vector<TransparentInput> vIn = {dummyInput, dummyInput};
+    return GetValidSaplingReceive(consensusParams, keyStoreFrom, vIn, vDest, pwalletIn);
+}
+
+// Single input, single shielded output
+CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
                                  CAmount value,
+                                 bool genNewKey,
                                  const CWallet* pwalletIn) {
-    // Dummy wallet, used to generate the dummy transparent input key and sign it in the transaction builder
-    CWallet wallet;
-    wallet.SetMinVersion(FEATURE_SAPLING);
-    wallet.SetupSPKM(false, true);
-
-    CWalletTx tx = GetValidSaplingReceive(
+    std::vector<ShieldedDestination> vDest;
+    vDest.push_back({sk, value});
+    return GetValidSaplingReceive(
             consensusParams,
-            wallet,
-            sk,
+            keyStore,
             value,
-            true,
+            vDest,
+            genNewKey,
             pwalletIn
-            );
-    return tx;
+    );
 }
 
 CScript CreateDummyDestinationScript() {

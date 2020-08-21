@@ -17,6 +17,17 @@ struct TestSaplingNote {
     SaplingMerkleTree tree;
 };
 
+struct ShieldedDestination {
+    const libzcash::SaplingExtendedSpendingKey &sk;
+    CAmount amount;
+};
+
+struct TransparentInput {
+    COutPoint outPoint;
+    CScript scriptPubKey;
+    CAmount amount;
+};
+
 const Consensus::Params& RegtestActivateSapling();
 
 void RegtestDeactivateSapling();
@@ -35,20 +46,34 @@ CScript CreateDummyDestinationScript();
  */
 TestSaplingNote GetTestSaplingNote(const libzcash::SaplingPaymentAddress& pa, CAmount value);
 
+
+/**
+ * One or many inputs from keyStoreFrom, one or many shielded outputs to pwalletIn (if not nullptr).
+ */
+CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 CBasicKeyStore& keyStoreFrom,
+                                 std::vector<TransparentInput> vIn,
+                                 std::vector<ShieldedDestination> vDest,
+                                 const CWallet* pwalletIn = nullptr);
+
+/**
+ * Single dummy input, one or many shielded outputs.
+ */
+CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
+                                 CBasicKeyStore& keyStoreFrom,
+                                 CAmount inputAmount,
+                                 std::vector<ShieldedDestination> vDest,
+                                 bool genNewKey = false,
+                                 const CWallet* pwalletIn = nullptr);
+
+/**
+ * Single dummy input, single shielded output to sk default address.
+ */
 CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
                                  CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
                                  CAmount value,
                                  bool genNewKey = false,
                                  const CWallet* pwalletIn = nullptr);
-
-/**
- * Shield balance, from dummy transparent inputs, to the default address of sk (incoming shielded balance for pwalletIn).
- * pwalletIn will be the parent of the returned CWalletTx.
- */
-CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
-                                 const libzcash::SaplingExtendedSpendingKey &sk,
-                                 CAmount value,
-                                 const CWallet* pwalletIn);
 
 #endif // PIVX_UTIL_TEST_H
