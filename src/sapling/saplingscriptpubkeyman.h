@@ -47,6 +47,11 @@ public:
 
     std::list<SaplingWitness> witnesses;
     libzcash::SaplingIncomingViewingKey ivk;
+    /**
+     * Cached note amount.
+     * It will be loaded the first time that the note is decrypted.
+     */
+    Optional<CAmount> amount{nullopt};
 
     /**
      * Block height corresponding to the most current witness.
