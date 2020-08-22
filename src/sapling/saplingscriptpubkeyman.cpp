@@ -503,27 +503,51 @@ std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::G
     return nullifierSet;
 }
 
+CAmount SaplingScriptPubKeyMan::TryToRecoverAndSetAmount(const CWalletTx& tx, const SaplingOutPoint& op)
+{
+    CAmount nCredit = 0;
+    // if amount was not set, let's try to decrypt the note and set it.
+    auto noteAndAddress = tx.DecryptSaplingNote(op);
+    // todo: if cannot be decrypted, use RecoverSaplingNote.
+    if (noteAndAddress) {
+        const libzcash::SaplingNotePlaintext &note = noteAndAddress->first;
+        nCredit = note.value();
+        // if it's not set, then set it.
+        wallet->mapWallet[tx.GetHash()].mapSaplingNoteData[op].amount = nCredit;
+    }
+    return nCredit;
+}
+
+CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const SaplingOutPoint& op)
+{
+    const auto& it = tx.mapSaplingNoteData.find(op);
+    if (it == tx.mapSaplingNoteData.end()) {
+        return 0;
+    }
+    SaplingNoteData noteData = it->second;
+    return (noteData.amount) ? *noteData.amount : TryToRecoverAndSetAmount(tx, op);
+}
+
 CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent)
 {
     CAmount nCredit = 0;
     for (int i = 0; i < (int) tx.sapData->vShieldedOutput.size(); ++i) {
         SaplingOutPoint op(tx.GetHash(), i);
-        auto noteAndAddress = tx.DecryptSaplingNote(op);
-        // todo: if cannot be decrypted, use RecoverSaplingNote.
-        if (noteAndAddress) {
-            // Obtain the noteData and check if the nullifier has being spent or not
-            SaplingNoteData noteData = tx.mapSaplingNoteData.at(op);
-
-            // The nullifier could be null if the wallet was locked when the noteData was created.
-            if (noteData.nullifier &&
-                (fUnspent && IsSaplingSpent(*noteData.nullifier))) {
-                continue; // only unspent
-            }
-            // todo: check if we can spend this note or not. (if not, then it's a watch only)
-
-            const libzcash::SaplingNotePlaintext &note = noteAndAddress->first;
-            nCredit += note.value();
+        if (tx.mapSaplingNoteData.find(op) == tx.mapSaplingNoteData.end()) {
+            continue;
         }
+        // Obtain the noteData and check if the nullifier has being spent or not
+        SaplingNoteData noteData = tx.mapSaplingNoteData.at(op);
+
+        // The nullifier could be null if the wallet was locked when the noteData was created.
+        if (noteData.nullifier &&
+            (fUnspent && IsSaplingSpent(*noteData.nullifier))) {
+            continue; // only unspent
+        }
+        // todo: check if we can spend this note or not. (if not, then it's a watch only)
+
+        // Check whether the note value was already cached or needs to be loaded
+        nCredit += noteData.amount ? *noteData.amount : TryToRecoverAndSetAmount(tx, op);
     }
     return nCredit;
 }

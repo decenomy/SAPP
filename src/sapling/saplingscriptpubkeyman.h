@@ -262,6 +262,11 @@ public:
     std::set<std::pair<libzcash::PaymentAddress, uint256>> GetNullifiersForAddresses(const std::set<libzcash::PaymentAddress> & addresses);
     bool IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>>& nullifierSet, const libzcash::PaymentAddress& address, const SaplingOutPoint& entry);
 
+    //! Try to decrypt the note and load the amount into the always available SaplingNoteData
+    CAmount TryToRecoverAndSetAmount(const CWalletTx& tx, const SaplingOutPoint& op);
+
+    //! Return the shielded credit of an specific output description
+    CAmount GetCredit(const CWalletTx& tx, const SaplingOutPoint& op);
     //! Return the shielded credit of the tx
     CAmount GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent = false);
     //! Return the shielded debit of the tx.
