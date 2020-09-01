@@ -260,6 +260,7 @@ set(WALLET_SOURCES
         ./src/masternode-budget.cpp
         ./src/masternode-payments.cpp
         ./src/masternode-sync.cpp
+        ./src/tiertwo_networksync.cpp
         ./src/masternodeconfig.cpp
         ./src/masternodeman.cpp
         ./src/messagesigner.cpp

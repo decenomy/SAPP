@@ -368,6 +368,7 @@ libbitcoin_wallet_a_SOURCES = \
   masternode.cpp \
   masternode-budget.cpp \
   masternode-payments.cpp \
+  tiertwo_networksync.cpp \
   masternode-sync.cpp \
   masternodeconfig.cpp \
   masternodeman.cpp \
