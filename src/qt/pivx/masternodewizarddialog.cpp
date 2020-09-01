@@ -363,7 +363,7 @@ bool MasterNodeWizardDialog::createMN()
     // Lock collateral output
     walletModel->lockCoin(collateralOut);
 
-    returnStr = tr("Master node created! Wait %1 confirmations before starting it.").arg(MASTERNODE_MIN_CONFIRMATIONS);
+    returnStr = tr("Master node created! Wait %1 confirmations before starting it.").arg(MasternodeCollateralMinConf());
     return true;
 }
 

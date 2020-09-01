@@ -1986,8 +1986,8 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     }
 
     // Depth must be at least MASTERNODE_MIN_CONFIRMATIONS
-    if (nDepth < MASTERNODE_MIN_CONFIRMATIONS) {
-        strError = strprintf("Collateral tx must have at least %d confirmations", MASTERNODE_MIN_CONFIRMATIONS);
+    if (nDepth < MasternodeCollateralMinConf()) {
+        strError = strprintf("Collateral tx must have at least %d confirmations, has %d", MasternodeCollateralMinConf(), nDepth);
         return error("%s: %s", __func__, strError);
     }
 

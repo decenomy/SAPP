@@ -236,7 +236,7 @@ void CMasternodeMan::AskForMN(CNode* pnode, const CTxIn& vin)
 
     LogPrint(BCLog::MASTERNODE, "CMasternodeMan::AskForMN - Asking node for missing entry, vin: %s\n", vin.prevout.hash.ToString());
     g_connman->PushMessage(pnode, CNetMsgMaker(pnode->GetSendVersion()).Make(NetMsgType::GETMNLIST, vin));
-    int64_t askAgain = GetTime() + MASTERNODE_MIN_MNP_SECONDS;
+    int64_t askAgain = GetTime() + MasternodeMinPingSeconds();
     mWeAskedForMasternodeListEntry[vin.prevout] = askAgain;
 }
 
@@ -326,7 +326,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     // remove expired mapSeenMasternodeBroadcast
     std::map<uint256, CMasternodeBroadcast>::iterator it3 = mapSeenMasternodeBroadcast.begin();
     while (it3 != mapSeenMasternodeBroadcast.end()) {
-        if ((*it3).second.lastPing.sigTime < GetTime() - (MASTERNODE_REMOVAL_SECONDS * 2)) {
+        if ((*it3).second.lastPing.sigTime < GetTime() - (MasternodeRemovalSeconds() * 2)) {
             mapSeenMasternodeBroadcast.erase(it3++);
             masternodeSync.mapSeenSyncMNB.erase((*it3).second.GetHash());
         } else {
@@ -337,7 +337,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     // remove expired mapSeenMasternodePing
     std::map<uint256, CMasternodePing>::iterator it4 = mapSeenMasternodePing.begin();
     while (it4 != mapSeenMasternodePing.end()) {
-        if ((*it4).second.sigTime < GetTime() - (MASTERNODE_REMOVAL_SECONDS * 2)) {
+        if ((*it4).second.sigTime < GetTime() - (MasternodeRemovalSeconds() * 2)) {
             mapSeenMasternodePing.erase(it4++);
         } else {
             ++it4;
@@ -856,9 +856,9 @@ void ThreadCheckMasternodes()
             if (masternodeSync.IsBlockchainSynced()) {
                 c++;
 
-                // check if we should activate or ping every few minutes,
-                // start right after sync is considered to be done
-                if (c % MASTERNODE_PING_SECONDS == 1) activeMasternode.ManageStatus();
+            // check if we should activate or ping every few minutes,
+            // start right after sync is considered to be done
+            if (c % MasternodePingSeconds() == 1) activeMasternode.ManageStatus();
 
                 if (c % 60 == 0) {
                     mnodeman.CheckAndRemove();
