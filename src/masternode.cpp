@@ -448,7 +448,7 @@ bool CMasternodeBroadcast::CheckDefaultPort(CService service, std::string& strEr
 {
     int nDefaultPort = Params().GetDefaultPort();
 
-    if (service.GetPort() != nDefaultPort) {
+    if (service.GetPort() != nDefaultPort && !Params().IsRegTestNet()) {
         strErrorRet = strprintf("Invalid port %u for masternode %s, only %d is supported on %s-net.",
             service.GetPort(), service.ToString(), nDefaultPort, Params().NetworkIDString());
         LogPrint(BCLog::MASTERNODE, "%s - %s\n", strContext, strErrorRet);

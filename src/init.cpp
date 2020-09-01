@@ -1032,7 +1032,7 @@ bool AppInit2()
     if (GetBoolArg("-masternode", DEFAULT_MASTERNODE) && !GetBoolArg("-listen", DEFAULT_LISTEN))
         return UIError(_("Error: -listen must be true if -masternode is set."));
     // Exit early if -masternode=1 and -port is not the default port
-    if (GetBoolArg("-masternode", DEFAULT_MASTERNODE) && GetListenPort() != Params().GetDefaultPort())
+    if (GetBoolArg("-masternode", DEFAULT_MASTERNODE) && (GetListenPort() != Params().GetDefaultPort() && !Params().IsRegTestNet()))
         return UIError(strprintf(_("Error: Invalid port %d for running a masternode."), GetListenPort()) + "\n\n" +
                        strprintf(_("Masternodes are required to run on port %d for %s-net"), Params().GetDefaultPort(), Params().NetworkIDString()));
 
@@ -1809,15 +1809,16 @@ bool AppInit2()
         LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
 
         if (!strMasterNodeAddr.empty()) {
+            const CChainParams& params = Params();
             int nPort;
-            int nDefaultPort = Params().GetDefaultPort();
+            int nDefaultPort = params.GetDefaultPort();
             std::string strHost;
             SplitHostPort(strMasterNodeAddr, nPort, strHost);
 
             // Allow for the port number to be omitted here and just double check
             // that if a port is supplied, it matches the required default port.
             if (nPort == 0) nPort = nDefaultPort;
-            if (nPort != nDefaultPort) {
+            if (nPort != nDefaultPort && !params.IsRegTestNet()) {
                 return UIError(strprintf(_("Invalid -masternodeaddr port %d, only %d is supported on %s-net."),
                     nPort, nDefaultPort, Params().NetworkIDString()));
             }
