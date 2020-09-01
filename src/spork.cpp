@@ -168,10 +168,16 @@ void CSporkManager::ProcessGetSporks(CNode* pfrom, std::string& strCommand, CDat
 
     std::map<SporkId, CSporkMessage>::iterator it = mapSporksActive.begin();
 
-        while (it != mapSporksActive.end()) {
-            g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::SPORK, it->second));
-            it++;
-        }
+    while (it != mapSporksActive.end()) {
+        g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::SPORK, it->second));
+        it++;
+    }
+
+    // end message
+    if (Params().IsRegTestNet()) {
+        // For now, only use it on regtest.
+        CSporkMessage msg(SPORK_INVALID, 0, 0);
+        g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::SPORK, msg));
     }
 }
 
