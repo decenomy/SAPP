@@ -14,22 +14,6 @@
 #include "timedata.h"
 #include "util.h"
 
-#define MASTERNODE_MIN_CONFIRMATIONS_REGTEST 1
-#define MASTERNODE_MIN_MNP_SECONDS_REGTEST 90
-#define MASTERNODE_MIN_MNB_SECONDS_REGTEST 25
-#define MASTERNODE_PING_SECONDS_REGTEST 25
-#define MASTERNODE_EXPIRATION_SECONDS_REGTEST 180
-#define MASTERNODE_REMOVAL_SECONDS_REGTEST 200
-
-#define MASTERNODE_MIN_CONFIRMATIONS 15
-#define MASTERNODE_MIN_MNP_SECONDS (10 * 60)
-#define MASTERNODE_MIN_MNB_SECONDS (5 * 60)
-#define MASTERNODE_PING_SECONDS (5 * 60)
-#define MASTERNODE_EXPIRATION_SECONDS (120 * 60)
-#define MASTERNODE_REMOVAL_SECONDS (130 * 60)
-#define MASTERNODE_CHECK_SECONDS 5
-
-
 class CMasternode;
 class CMasternodeBroadcast;
 class CMasternodePing;
@@ -37,35 +21,12 @@ extern std::map<int64_t, uint256> mapCacheBlockHashes;
 
 bool GetBlockHash(uint256& hash, int nBlockHeight);
 
-int MasternodeMinPingSeconds()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_MIN_MNP_SECONDS_REGTEST : MASTERNODE_MIN_MNP_SECONDS;
-}
-
-int MasternodeBroadcastSeconds()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_MIN_MNB_SECONDS_REGTEST : MASTERNODE_MIN_MNB_SECONDS;
-}
-
-int MasternodeCollateralMinConf()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_MIN_CONFIRMATIONS_REGTEST : MASTERNODE_MIN_CONFIRMATIONS;
-}
-
-int MasternodePingSeconds()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_PING_SECONDS_REGTEST : MASTERNODE_PING_SECONDS;
-}
-
-int MasternodeExpirationSeconds()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_EXPIRATION_SECONDS_REGTEST : MASTERNODE_EXPIRATION_SECONDS;
-}
-
-int MasternodeRemovalSeconds()
-{
-    return Params().IsRegTestNet() ? MASTERNODE_REMOVAL_SECONDS_REGTEST : MASTERNODE_REMOVAL_SECONDS;
-}
+int MasternodeMinPingSeconds();
+int MasternodeBroadcastSeconds();
+int MasternodeCollateralMinConf();
+int MasternodePingSeconds();
+int MasternodeExpirationSeconds();
+int MasternodeRemovalSeconds();
 
 //
 // The Masternode Ping Class : Contains a different serialize method for sending pings from masternodes throughout the network
