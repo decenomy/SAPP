@@ -1,6 +1,6 @@
 // Copyright (c) 2017-2020 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// file COPYING or https://www.opensource.org/licenses/mit-license.php.
 
 #include "stakeinput.h"
 
@@ -120,21 +120,7 @@ CDataStream CPivStake::GetUniqueness() const
 //The block that the UTXO was added to the chain
 CBlockIndex* CPivStake::GetIndexFrom()
 {
-    if (pindexFrom)
-        return pindexFrom;
-    uint256 hashBlock = UINT256_ZERO;
-    CTransaction tx;
-    if (GetTransaction(opOutpointFrom->hash, tx, hashBlock, true)) {
-        // If the index is in the chain, then set it as the "index from"
-        if (mapBlockIndex.count(hashBlock)) {
-            CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
-            if (chainActive.Contains(pindex))
-                pindexFrom = pindex;
-        }
-    } else {
-        LogPrintf("%s : failed to find tx %s\n", __func__, opOutpointFrom->hash.GetHex());
-    }
-
+    if (!pindexFrom) throw std::runtime_error("CPivStake: uninitialized pindexFrom");
     return pindexFrom;
 }
 
