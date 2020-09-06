@@ -41,14 +41,6 @@ bool CPivStake::SetPrevout(CTransaction txPrev, unsigned int n)
     return true;
 }
 
-bool CPivStake::GetTxFrom(CTransaction& tx) const
-{
-    if (txFrom.IsNull())
-        return false;
-    tx = txFrom;
-    return true;
-}
-
 bool CPivStake::GetTxOutFrom(CTxOut& out) const
 {
     if (txFrom.IsNull() || nPosition >= txFrom.vout.size())
