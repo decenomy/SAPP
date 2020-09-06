@@ -19,7 +19,7 @@ bool CPivStake::InitFromTxIn(const CTxIn& txin)
     CTransaction txPrev;
     if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true))
         return error("%s : INFO: read txPrev failed, tx id prev: %s", __func__, txin.prevout.hash.GetHex());
-    SetPrevout(txPrev, txin.prevout.n);
+    SetPrevout(txPrev.vout[txin.prevout.n], txin.prevout);
 
     // Find the index of the block of the previous transaction
     if (mapBlockIndex.count(hashBlock)) {
@@ -34,37 +34,37 @@ bool CPivStake::InitFromTxIn(const CTxIn& txin)
     return true;
 }
 
-bool CPivStake::SetPrevout(CTransaction txPrev, unsigned int n)
+bool CPivStake::SetPrevout(const CTxOut& out, const COutPoint& outpointFrom)
 {
-    this->txFrom = txPrev;
-    this->nPosition = n;
+    this->opOutputFrom = out;
+    this->opOutpointFrom = outpointFrom;
     return true;
 }
 
 bool CPivStake::GetTxOutFrom(CTxOut& out) const
 {
-    if (txFrom.IsNull() || nPosition >= txFrom.vout.size())
+    if (!opOutputFrom || !opOutpointFrom)
         return false;
-    out = txFrom.vout[nPosition];
+    out = *opOutputFrom;
     return true;
 }
 
 bool CPivStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
-    txIn = CTxIn(txFrom.GetHash(), nPosition);
+    txIn = CTxIn(opOutpointFrom->hash, opOutpointFrom->n);
     return true;
 }
 
 CAmount CPivStake::GetValue() const
 {
-    return txFrom.vout[nPosition].nValue;
+    return opOutputFrom->nValue;
 }
 
 bool CPivStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal, const bool onlyP2PK)
 {
     std::vector<valtype> vSolutions;
     txnouttype whichType;
-    CScript scriptPubKeyKernel = txFrom.vout[nPosition].scriptPubKey;
+    CScript scriptPubKeyKernel = opOutputFrom->scriptPubKey;
     if (!Solver(scriptPubKeyKernel, whichType, vSolutions))
         return error("%s: failed to parse kernel", __func__);
 
@@ -113,7 +113,7 @@ CDataStream CPivStake::GetUniqueness() const
 {
     //The unique identifier for a PIV stake is the outpoint
     CDataStream ss(SER_NETWORK, 0);
-    ss << nPosition << txFrom.GetHash();
+    ss << opOutpointFrom->n << opOutpointFrom->hash;
     return ss;
 }
 
@@ -124,7 +124,7 @@ CBlockIndex* CPivStake::GetIndexFrom()
         return pindexFrom;
     uint256 hashBlock = UINT256_ZERO;
     CTransaction tx;
-    if (GetTransaction(txFrom.GetHash(), tx, hashBlock, true)) {
+    if (GetTransaction(opOutpointFrom->hash, tx, hashBlock, true)) {
         // If the index is in the chain, then set it as the "index from"
         if (mapBlockIndex.count(hashBlock)) {
             CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
@@ -132,7 +132,7 @@ CBlockIndex* CPivStake::GetIndexFrom()
                 pindexFrom = pindex;
         }
     } else {
-        LogPrintf("%s : failed to find tx %s\n", __func__, txFrom.GetHash().GetHex());
+        LogPrintf("%s : failed to find tx %s\n", __func__, opOutpointFrom->hash.GetHex());
     }
 
     return pindexFrom;

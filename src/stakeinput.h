@@ -35,14 +35,14 @@ public:
 class CPivStake : public CStakeInput
 {
 private:
-    CTransaction txFrom{CTransaction()};
-    unsigned int nPosition{0};
+    Optional<CTxOut> opOutputFrom{nullopt};
+    Optional<COutPoint> opOutpointFrom{nullopt};
 
 public:
     CPivStake() {}
 
     bool InitFromTxIn(const CTxIn& txin) override;
-    bool SetPrevout(CTransaction txPrev, unsigned int n);
+    bool SetPrevout(const CTxOut& out, const COutPoint& outpointFrom);
 
     CBlockIndex* GetIndexFrom() override;
     bool GetTxOutFrom(CTxOut& out) const override;
