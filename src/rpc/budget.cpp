@@ -134,18 +134,10 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     // create transaction 15 minutes into the future, to allow for confirmation time
     CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, UINT256_ZERO);
-
-    int nChainHeight = chainActive.Height();
-    if (!budgetProposalBroadcast.UpdateValid(nChainHeight, false))
+    if (!budgetProposalBroadcast.IsWellFormed(budget.GetTotalBudget(budgetProposalBroadcast.GetBlockStart())))
         throw std::runtime_error("Proposal is not valid " + budgetProposalBroadcast.IsInvalidReason());
 
-    bool useIX = false; //true;
-    // if (request.params.size() > 7) {
-    //     if(request.params[7].get_str() != "false" && request.params[7].get_str() != "true")
-    //         return "Invalid use_ix, must be true or false";
-    //     useIX = request.params[7].get_str() == "true" ? true : false;
-    // }
-
+    bool useIX = false;
     CWalletTx wtx;
     // make our change address
     CReserveKey keyChange(pwalletMain);
@@ -201,22 +193,18 @@ UniValue submitbudget(const JSONRPCRequest& request)
     //create the proposal incase we're the first to make it
     CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
 
-    std::string strError = "";
-    int nConf = 0;
-    if (!IsBudgetCollateralValid(hash, budgetProposalBroadcast.GetHash(), strError, budgetProposalBroadcast.nTime, nConf)) {
-        throw std::runtime_error("Proposal FeeTX is not valid - " + hash.ToString() + " - " + strError);
-    }
-
     if (!masternodeSync.IsBlockchainSynced()) {
         throw std::runtime_error("Must wait for client to sync with masternode network. Try again in a minute or so.");
     }
 
     budget.AddSeenProposal(budgetProposalBroadcast);
     budgetProposalBroadcast.Relay();
-    if(budget.AddProposal(budgetProposalBroadcast)) {
-        return budgetProposalBroadcast.GetHash().ToString();
+
+    if(!budget.AddProposal(budgetProposalBroadcast)) {
+        throw std::runtime_error("Invalid proposal, see debug.log for details.");
     }
-    throw std::runtime_error("Invalid proposal, see debug.log for details.");
+
+    return budgetProposalBroadcast.GetHash().ToString();
 }
 
 UniValue mnbudgetvote(const JSONRPCRequest& request)
