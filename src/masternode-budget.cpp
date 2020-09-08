@@ -1437,16 +1437,21 @@ bool CBudgetProposal::CheckAmount(const CAmount& nTotalBudget)
 
 bool CBudgetProposal::CheckAddress()
 {
-    if (address == CScript()) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid Payment Address (null)";
+    // !TODO: There might be an issue with multisig in the coinbase on mainnet
+    // we will add support for it in a future release.
+    if (address.IsPayToScriptHash()) {
+        strInvalid = "Proposal " + strProposalName + ": Multisig is not currently supported.";
         return false;
     }
 
-    /*
-        TODO: There might be an issue with multisig in the coinbase on mainnet, we will add support for it in a future release.
-    */
-    if (address.IsPayToScriptHash()) {
-        strInvalid = "Proposal " + strProposalName + ": Multisig is not currently supported.";
+    // Check address
+    CTxDestination dest;
+    if (!ExtractDestination(address, dest, false)) {
+        strInvalid = "Proposal " + strProposalName + ": Invalid script";
+        return false;
+    }
+    if (!IsValidDestination(dest)) {
+        strInvalid = "Proposal " + strProposalName + ": Invalid recipient address";
         return false;
     }
 
