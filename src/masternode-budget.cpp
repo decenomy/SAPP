@@ -1390,7 +1390,7 @@ void CBudgetProposal::SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) con
 bool CBudgetProposal::IsHeavilyDownvoted()
 {
     if (GetNays() - GetYeas() > mnodeman.CountEnabled(ActiveProtocol()) / 10) {
-        strInvalid = "Proposal " + strProposalName + ": Active removal";
+        strInvalid = "Active removal";
         return true;
     }
     return false;
@@ -1404,13 +1404,13 @@ bool CBudgetProposal::CheckStartEnd()
     }
 
     if (nBlockEnd < nBlockStart) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nBlockEnd (end before start)";
+        strInvalid = "Invalid nBlockEnd (end before start)";
         return false;
     }
 
     int nProposalEnd = nBlockStart + (Params().GetConsensus().nBudgetCycleBlocks + 1) * GetTotalPaymentCount();
     if (nBlockEnd != nProposalEnd) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nBlockEnd (mismatch with payments count)";
+        strInvalid = "Invalid nBlockEnd (mismatch with payments count)";
         return false;
     }
 
@@ -1421,14 +1421,14 @@ bool CBudgetProposal::CheckAmount(const CAmount& nTotalBudget)
 {
     // check minimum amount
     if (nAmount < 10 * COIN) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nAmount (too low)";
+        strInvalid = "Invalid nAmount (too low)";
         return false;
     }
 
     // check maximum amount
     // can only pay out 10% of the possible coins (min value of coins)
     if (nAmount > nTotalBudget) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nAmount (too high)";
+        strInvalid = "Invalid nAmount (too high)";
         return false;
     }
 
@@ -1440,18 +1440,18 @@ bool CBudgetProposal::CheckAddress()
     // !TODO: There might be an issue with multisig in the coinbase on mainnet
     // we will add support for it in a future release.
     if (address.IsPayToScriptHash()) {
-        strInvalid = "Proposal " + strProposalName + ": Multisig is not currently supported.";
+        strInvalid = "Multisig is not currently supported.";
         return false;
     }
 
     // Check address
     CTxDestination dest;
     if (!ExtractDestination(address, dest, false)) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid script";
+        strInvalid = "Invalid script";
         return false;
     }
     if (!IsValidDestination(dest)) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid recipient address";
+        strInvalid = "Invalid recipient address";
         return false;
     }
 
@@ -1466,7 +1466,7 @@ bool CBudgetProposal::IsWellFormed(const CAmount& nTotalBudget)
 bool CBudgetProposal::IsExpired(int nCurrentHeight)
 {
     if (nBlockEnd < nCurrentHeight) {
-        strInvalid = "Proposal " + strProposalName + ": Proposal expired";
+        strInvalid = "Proposal expired";
         return true;
     }
     return false;
@@ -1493,7 +1493,7 @@ bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
         int nConf = 0;
         std::string strError;
         if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError, nTime, nConf)) {
-            strInvalid = "Proposal " + strProposalName + ": Invalid collateral (" + strError + ")";
+            strInvalid = "Invalid collateral (" + strError + ")";
             return false;
         }
     }
