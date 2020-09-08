@@ -467,20 +467,31 @@ bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
 
 bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
 {
-    LOCK(cs_proposals);
-    if (!budgetProposal.UpdateValid(GetBestHeight())) {
-        LogPrint(BCLog::MNBUDGET,"%s: invalid budget proposal - %s\n", __func__, budgetProposal.IsInvalidReason());
-        return false;
-    }
+    AssertLockNotHeld(cs_proposals);    // need to lock cs_main here (CheckCollateral)
 
     const uint256& hash = budgetProposal.GetHash();
-
-    if (mapProposals.count(hash)) {
+    const std::string& strName = budgetProposal.GetName();
+    if (WITH_LOCK(cs_proposals, return mapProposals.count(hash))) {
+        LogPrint(BCLog::MNBUDGET,"%s: proposal %s already added\n", __func__, strName);
         return false;
     }
 
-    mapProposals.emplace(hash, budgetProposal);
-    LogPrint(BCLog::MNBUDGET,"%s: proposal %s added\n", __func__, budgetProposal.GetName());
+    if (!budgetProposal.IsWellFormed(GetTotalBudget(budgetProposal.GetBlockStart()))) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid budget proposal (%s) - %s\n",
+                __func__, strName, budgetProposal.IsInvalidReason());
+        return false;
+    }
+
+    int nConf = 0;
+    std::string strError;
+    if (!CheckCollateral(budgetProposal.GetFeeTXHash(), hash, strError, budgetProposal.nTime, nConf, false)) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid budget proposal (%s) collateral - %s\n",
+                __func__, strName, strError);
+        return false;
+    }
+
+    WITH_LOCK(cs_proposals, mapProposals.emplace(hash, budgetProposal); );
+    LogPrint(BCLog::MNBUDGET,"%s: proposal %s added\n", __func__, strName);
     return true;
 }
 
@@ -1486,11 +1497,6 @@ bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
     fValid = false;
 
     if (IsHeavilyDownvoted()) {
-        return false;
-    }
-
-    // Checks that don't change. !TODO: remove from here, they should be done only once.
-    if (!IsWellFormed(budget.GetTotalBudget(nBlockStart))) {
         return false;
     }
 
