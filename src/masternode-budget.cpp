@@ -450,14 +450,24 @@ std::string CBudgetManager::GetFinalizedBudgetStatus(const uint256& nHash) const
 
 bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
 {
+    AssertLockNotHeld(cs_budgets);    // need to lock cs_main here (CheckCollateral)
     const uint256& nHash = finalizedBudget.GetHash();
+
     if (WITH_LOCK(cs_budgets, return mapFinalizedBudgets.count(nHash))) {
         LogPrint(BCLog::MNBUDGET,"%s: finalized budget %s already added\n", __func__, nHash.ToString());
         return false;
     }
 
-    if (!finalizedBudget.UpdateValid(GetBestHeight())) {
-        LogPrint(BCLog::MNBUDGET,"%s: Invalid finalized budget %s %s\n", __func__, nHash.ToString(), finalizedBudget.IsInvalidLogStr());
+    if (!finalizedBudget.IsWellFormed(GetTotalBudget(GetBestHeight()))) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid finalized budget: %s %s\n", __func__, nHash.ToString(), finalizedBudget.IsInvalidLogStr());
+        return false;
+    }
+
+    int nConf = 0;
+    std::string strError;
+    if (!CheckCollateral(finalizedBudget.GetFeeTXHash(), nHash, strError, finalizedBudget.nTime, nConf, true)) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid finalized budget (%s) collateral - %s\n",
+                __func__, nHash.ToString(), strError);
         return false;
     }
 
@@ -471,8 +481,8 @@ bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
 bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
 {
     AssertLockNotHeld(cs_proposals);    // need to lock cs_main here (CheckCollateral)
-
     const uint256& nHash = budgetProposal.GetHash();
+
     if (WITH_LOCK(cs_proposals, return mapProposals.count(nHash))) {
         LogPrint(BCLog::MNBUDGET,"%s: proposal %s already added\n", __func__, nHash.ToString());
         return false;
@@ -2061,11 +2071,6 @@ bool CFinalizedBudget::IsWellFormed(const CAmount& nTotalBudget)
 bool CFinalizedBudget::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
 {
     fValid = false;
-
-    // Checks that don't change. !TODO: remove from here, they should be done only once.
-    if (!IsWellFormed(budget.GetTotalBudget(nBlockStart))) {
-        return false;
-    }
 
     std::string strError = "";
     if (fCheckCollateral) {
