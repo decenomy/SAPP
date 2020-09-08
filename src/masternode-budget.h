@@ -436,6 +436,7 @@ public:
     bool UpdateValid(int nHeight, bool fCheckCollateral = true);
     bool IsValid() const  { return fValid; }
     std::string IsInvalidReason() const { return strInvalid; }
+    std::string IsInvalidLogStr() const { return strprintf("[%s (%s)]: %s", GetName(), GetProposalsStr(), IsInvalidReason()); }
 
     void SetProposalsStr(const std::string _strProposals) { strProposals = _strProposals; }
 
@@ -577,6 +578,7 @@ public:
     bool IsWellFormed(const CAmount& nTotalBudget);
     bool IsValid() const  { return fValid; }
     std::string IsInvalidReason() const { return strInvalid; }
+    std::string IsInvalidLogStr() const { return strprintf("[%s]: %s", GetName(), IsInvalidReason()); }
 
     bool IsEstablished() const;
     bool IsPassing(int nBlockStartBudget, int nBlockEndBudget, int mnCount) const;
