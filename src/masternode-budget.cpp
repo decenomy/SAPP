@@ -92,7 +92,7 @@ bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedH
     return true;
 }
 
-bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, int nCurrentHeight, int nProposalHeight, std::string& strError)
+bool CheckCollateralConfs(const uint256& nTxCollateralHash, int nCurrentHeight, int nProposalHeight, std::string& strError)
 {
     //if we're syncing we won't have swiftTX information, so accept 1 confirmation
     const int nRequiredConfs = Params().GetConsensus().nBudgetFeeConfirmations;
@@ -1431,8 +1431,7 @@ bool CBudgetProposal::CheckAddress()
 
 bool CBudgetProposal::CheckRequiredConfs(int nCurrentHeight)
 {
-    std::string strError;
-    return IsBudgetCollateralValid(nFeeTXHash, nCurrentHeight, nBlockFeeTx, strError);
+    return CheckCollateralConfs(nFeeTXHash, nCurrentHeight, nBlockFeeTx, strInvalid);
 }
 
 bool CBudgetProposal::IsWellFormed(const CAmount& nTotalBudget)
@@ -1990,8 +1989,7 @@ bool CFinalizedBudget::CheckName()
 
 bool CFinalizedBudget::CheckRequiredConfs(int nCurrentHeight)
 {
-    std::string strError;
-    return IsBudgetCollateralValid(nFeeTXHash, nCurrentHeight, nBlockFeeTx, strError);
+    return CheckCollateralConfs(nFeeTXHash, nCurrentHeight, nBlockFeeTx, strInvalid);
 }
 
 bool CFinalizedBudget::IsExpired(int nCurrentHeight)

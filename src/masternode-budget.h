@@ -40,9 +40,6 @@ static std::map<uint256, int> mapPayment_History;
 extern CBudgetManager budget;
 void DumpBudgets();
 
-//Check the collateral transaction for the budget proposal/finalized budget
-bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization=false);
-
 //
 // CBudgetVote - Allow a masternode node to vote and broadcast throughout the network
 //
