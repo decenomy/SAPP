@@ -1989,13 +1989,15 @@ void CFinalizedBudget::SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) co
     }
 }
 
-bool CFinalizedBudget::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
+bool CFinalizedBudget::CheckStartEnd()
 {
-    fValid = false;
+    if (nBlockStart == 0) {
+        strInvalid = "Invalid BlockStart == 0";
+        return false;
+    }
 
-    const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
     // Must be the correct block for payment to happen (once a month)
-    if (nBlockStart % nBlocksPerCycle != 0) {
+    if (nBlockStart % Params().GetConsensus().nBudgetCycleBlocks != 0) {
         strInvalid = "Invalid BlockStart";
         return false;
     }
@@ -2009,44 +2011,74 @@ bool CFinalizedBudget::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
         strInvalid = "Invalid budget payments count (too many)";
         return false;
     }
-    if (strBudgetName == "") {
-        strInvalid = "Invalid Budget Name";
-        return false;
-    }
-    if (nBlockStart == 0) {
-        strInvalid = "Invalid BlockStart == 0";
-        return false;
-    }
-    if (nFeeTXHash.IsNull()) {
-        strInvalid = "Invalid FeeTx == 0";
-        return false;
-    }
 
+    return true;
+}
+
+bool CFinalizedBudget::CheckAmount(const CAmount& nTotalBudget)
+{
     // Can only pay out 10% of the possible coins (min value of coins)
-    if (GetTotalPayout() > budget.GetTotalBudget(nBlockStart)) {
+    if (GetTotalPayout() > nTotalBudget) {
         strInvalid = "Invalid Payout (more than max)";
         return false;
     }
 
-    std::string strError2 = "";
+    return true;
+}
+
+bool CFinalizedBudget::CheckName()
+{
+    if (strBudgetName == "") {
+        strInvalid = "Invalid Budget Name";
+        return false;
+    }
+
+    return true;
+}
+
+bool CFinalizedBudget::IsExpired(int nCurrentHeight)
+{
+    // Remove obsolete finalized budgets after some time
+    const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
+    const int nBlockStart = nCurrentHeight - nCurrentHeight % nBlocksPerCycle + nBlocksPerCycle;
+
+    // Remove budgets where the last payment (from max. 100) ends before 2 budget-cycles before the current one
+    const int nMaxAge = nBlockStart - (2 * nBlocksPerCycle);
+
+    if (GetBlockEnd() < nMaxAge) {
+        strInvalid = strprintf("(ends at block %ld) too old and obsolete", GetBlockEnd());
+        return true;
+    }
+
+    return false;
+}
+
+bool CFinalizedBudget::IsWellFormed(const CAmount& nTotalBudget)
+{
+    return CheckStartEnd() && CheckAmount(nTotalBudget) && CheckName();
+}
+
+bool CFinalizedBudget::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
+{
+    fValid = false;
+
+    // Checks that don't change. !TODO: remove from here, they should be done only once.
+    if (!IsWellFormed(budget.GetTotalBudget(nBlockStart))) {
+        return false;
+    }
+
+    std::string strError = "";
     if (fCheckCollateral) {
         int nConf = 0;
-        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError2, nTime, nConf, true)) {
+        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError, nTime, nConf, true)) {
             {
-                strInvalid = "Invalid Collateral : " + strError2;
+                strInvalid = "Invalid Collateral : " + strError;
                 return false;
             }
         }
     }
 
-    // Remove obsolete finalized budgets after some time
-    int nBlockStart = nCurrentHeight - nCurrentHeight % nBlocksPerCycle + nBlocksPerCycle;
-
-    // Remove budgets where the last payment (from max. 100) ends before 2 budget-cycles before the current one
-    int nMaxAge = nBlockStart - (2 * nBlocksPerCycle);
-
-    if (GetBlockEnd() < nMaxAge) {
-        strInvalid = strprintf("(ends at block %ld) too old and obsolete", GetBlockEnd());
+    if (IsExpired(nCurrentHeight)) {
         return false;
     }
 

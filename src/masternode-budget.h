@@ -410,6 +410,12 @@ private:
     bool fValid;
     std::string strInvalid;
 
+    // Functions used inside IsWellFormed/UpdateValid - setting strInvalid
+    bool IsExpired(int nCurrentHeight);
+    bool CheckStartEnd();
+    bool CheckAmount(const CAmount& nTotalBudget);
+    bool CheckName();
+
 protected:
     std::map<uint256, CFinalizedBudgetVote> mapVotes;
     std::string strBudgetName;
@@ -434,6 +440,8 @@ public:
 
     // sets fValid and strInvalid, returns fValid
     bool UpdateValid(int nHeight, bool fCheckCollateral = true);
+    // Static checks that should be done only once - sets strInvalid
+    bool IsWellFormed(const CAmount& nTotalBudget);
     bool IsValid() const  { return fValid; }
     std::string IsInvalidReason() const { return strInvalid; }
     std::string IsInvalidLogStr() const { return strprintf("[%s (%s)]: %s", GetName(), GetProposalsStr(), IsInvalidReason()); }
