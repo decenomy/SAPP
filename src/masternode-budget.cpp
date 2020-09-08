@@ -23,7 +23,7 @@ std::map<uint256, int64_t> askedForSourceProposalOrBudget;
 
 int nSubmittedFinalBudget;
 
-bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
+bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
 {
     CTransaction txCollateral;
     uint256 nBlockHash;
@@ -69,6 +69,7 @@ bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nE
             }
         }
     }
+
     if (!foundOpReturn) {
         strError = strprintf("Couldn't find opReturn %s in %s", nExpectedHash.ToString(), txCollateral.ToString());
         LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
@@ -81,26 +82,34 @@ bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nE
         - nTime is never validated via the hashing mechanism and comes from a full-validated source (the blockchain)
     */
 
-    int conf = GetIXConfirmations(nTxCollateralHash);
+    nConf = GetIXConfirmations(nTxCollateralHash);
     if (!nBlockHash.IsNull()) {
         BlockMap::iterator mi = mapBlockIndex.find(nBlockHash);
         if (mi != mapBlockIndex.end() && (*mi).second) {
             CBlockIndex* pindex = (*mi).second;
             if (chainActive.Contains(pindex)) {
-                conf += chainActive.Height() - pindex->nHeight + 1;
+                nConf += chainActive.Height() - pindex->nHeight + 1;
                 nTime = pindex->nTime;
             }
         }
     }
 
-    nConf = conf;
+    return true;
+}
+
+bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
+{
+    // Static checks. !TODO: move from here - they should be done only once (or after reorgs).
+    uint256 nBlockHash;
+    if (!CheckCollateral(nTxCollateralHash, nExpectedHash, strError, nTime, nConf, fBudgetFinalization))
+        return false;
 
     //if we're syncing we won't have swiftTX information, so accept 1 confirmation
     const int nRequiredConfs = Params().GetConsensus().nBudgetFeeConfirmations;
-    if (conf >= nRequiredConfs) {
+    if (nConf >= nRequiredConfs) {
         return true;
     } else {
-        strError = strprintf("Collateral requires at least %d confirmations - %d confirmations", nRequiredConfs, conf);
+        strError = strprintf("Collateral requires at least %d confirmations - %d confirmations", nRequiredConfs, nConf);
         LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
         return false;
     }
