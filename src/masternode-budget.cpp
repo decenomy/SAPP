@@ -1387,14 +1387,17 @@ void CBudgetProposal::SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) con
     }
 }
 
-bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
+bool CBudgetProposal::IsHeavilyDownvoted()
 {
-    fValid = false;
     if (GetNays() - GetYeas() > mnodeman.CountEnabled(ActiveProtocol()) / 10) {
         strInvalid = "Proposal " + strProposalName + ": Active removal";
-        return false;
+        return true;
     }
+    return false;
+}
 
+bool CBudgetProposal::CheckStartEnd()
+{
     if (nBlockStart < 0) {
         strInvalid = "Invalid Proposal";
         return false;
@@ -1405,23 +1408,38 @@ bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
         return false;
     }
 
+    int nProposalEnd = nBlockStart + (Params().GetConsensus().nBudgetCycleBlocks + 1) * GetTotalPaymentCount();
+    if (nBlockEnd != nProposalEnd) {
+        strInvalid = "Proposal " + strProposalName + ": Invalid nBlockEnd (mismatch with payments count)";
+        return false;
+    }
+
+    return true;
+}
+
+bool CBudgetProposal::CheckAmount(const CAmount& nTotalBudget)
+{
+    // check minimum amount
     if (nAmount < 10 * COIN) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nAmount";
+        strInvalid = "Proposal " + strProposalName + ": Invalid nAmount (too low)";
         return false;
     }
 
+    // check maximum amount
+    // can only pay out 10% of the possible coins (min value of coins)
+    if (nAmount > nTotalBudget) {
+        strInvalid = "Proposal " + strProposalName + ": Invalid nAmount (too high)";
+        return false;
+    }
+
+    return true;
+}
+
+bool CBudgetProposal::CheckAddress()
+{
     if (address == CScript()) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid Payment Address";
+        strInvalid = "Proposal " + strProposalName + ": Invalid Payment Address (null)";
         return false;
-    }
-
-    if (fCheckCollateral) {
-        int nConf = 0;
-        std::string strError;
-        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError, nTime, nConf)) {
-            strInvalid = "Proposal " + strProposalName + ": Invalid collateral (" + strError + ")";
-            return false;
-        }
     }
 
     /*
@@ -1432,33 +1450,47 @@ bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
         return false;
     }
 
-    //if proposal doesn't gain traction within 2 weeks, remove it
-    // nTime not being saved correctly
-    // -- TODO: We should keep track of the last time the proposal was valid, if it's invalid for 2 weeks, erase it
-    // if(nTime + (60*60*24*2) < GetAdjustedTime()) {
-    //     if(GetYeas()-GetNays() < (mnodeman.CountEnabled(ActiveProtocol())/10)) {
-    //         strError = "Not enough support";
-    //         return false;
-    //     }
-    // }
+    return true;
+}
 
-    //can only pay out 10% of the possible coins (min value of coins)
-    if (nAmount > budget.GetTotalBudget(nBlockStart)) {
-        strInvalid = "Proposal " + strProposalName + ": Payment more than max";
-        return false;
-    }
+bool CBudgetProposal::IsWellFormed(const CAmount& nTotalBudget)
+{
+    return CheckStartEnd() && CheckAmount(nTotalBudget) && CheckAddress();
+}
 
-    // Calculate maximum block this proposal will be valid, which is start of proposal + (number of payments * cycle)
-    int nProposalEnd = GetBlockStart() + (Params().GetConsensus().nBudgetCycleBlocks * GetTotalPaymentCount());
-
-    if (nCurrentHeight <= 0) {
-        strInvalid = "Proposal " + strProposalName + ": Tip is NULL";
+bool CBudgetProposal::IsExpired(int nCurrentHeight)
+{
+    if (nBlockEnd < nCurrentHeight) {
+        strInvalid = "Proposal " + strProposalName + ": Proposal expired";
         return true;
     }
+    return false;
+}
 
-    if(nProposalEnd < nCurrentHeight) {
-        strInvalid = "Proposal " + strProposalName + ": Invalid nBlockEnd (" + std::to_string(nProposalEnd) + ") < current height (" + std::to_string(nCurrentHeight) + ")";
+bool CBudgetProposal::UpdateValid(int nCurrentHeight, bool fCheckCollateral)
+{
+    fValid = false;
+
+    if (IsHeavilyDownvoted()) {
         return false;
+    }
+
+    // Checks that don't change. !TODO: remove from here, they should be done only once.
+    if (!IsWellFormed(budget.GetTotalBudget(nBlockStart))) {
+        return false;
+    }
+
+    if (IsExpired(nCurrentHeight)) {
+        return false;
+    }
+
+    if (fCheckCollateral) {
+        int nConf = 0;
+        std::string strError;
+        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError, nTime, nConf)) {
+            strInvalid = "Proposal " + strProposalName + ": Invalid collateral (" + strError + ")";
+            return false;
+        }
     }
 
     fValid = true;

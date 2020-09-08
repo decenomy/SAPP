@@ -540,6 +540,15 @@ private:
     bool fValid;
     std::string strInvalid;
 
+    // Functions used inside UpdateValid() (!TODO: move) - setting strInvalid
+    bool IsHeavilyDownvoted();
+    bool IsExpired(int nCurrentHeight);
+    bool CheckStartEnd();
+    bool CheckAmount(const CAmount& nTotalBudget);
+    bool CheckAddress();
+    // Static checks that should be done only once
+    bool IsWellFormed(const CAmount& nTotalBudget);
+
 protected:
     std::map<uint256, CBudgetVote> mapVotes;
     std::string strProposalName;
