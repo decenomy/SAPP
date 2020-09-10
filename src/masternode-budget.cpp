@@ -560,7 +560,7 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfSta
     if (!GetPayeeAndAmount(chainHeight + 1, payee, nAmount))
         return;
 
-    CAmount blockValue = GetBlockValue(chainHeight);
+    CAmount blockValue = GetBlockValue(chainHeight + 1);
 
     if (fProofOfStake) {
         unsigned int i = txNew.vout.size();
