@@ -318,6 +318,22 @@ private:
 
     bool IsKeyUsed(const CPubKey& vchPubKey);
 
+    struct OutputAvailabilityResult
+    {
+        bool available{false};
+        bool solvable{false};
+        bool spendable{false};
+    };
+
+    OutputAvailabilityResult CheckOutputAvailability(const CTxOut& output,
+                                                     const unsigned int outIndex,
+                                                     const uint256& wtxid,
+                                                     AvailableCoinsType nCoinType,
+                                                     const CCoinControl* coinControl,
+                                                     const bool fCoinsSelected,
+                                                     const bool fIncludeColdStaking,
+                                                     const bool fIncludeDelegated) const;
+
     // Zerocoin wallet
     CzPIVWallet* zwallet{nullptr};
 

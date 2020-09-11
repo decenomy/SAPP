@@ -1999,6 +1999,60 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
             keyRet);
 }
 
+CWallet::OutputAvailabilityResult CWallet::CheckOutputAvailability(
+        const CTxOut& output,
+        const unsigned int outIndex,
+        const uint256& wtxid,
+        AvailableCoinsType nCoinType,
+        const CCoinControl* coinControl,
+        const bool fCoinsSelected,
+        const bool fIncludeColdStaking,
+        const bool fIncludeDelegated) const
+{
+    OutputAvailabilityResult res;
+
+    // Check for only 10k utxo
+    if (nCoinType == ONLY_10000 && output.nValue != 10000 * COIN) return res;
+
+    // Check for stakeable utxo
+    if (nCoinType == STAKEABLE_COINS && output.IsZerocoinMint()) return res;
+
+    // Check if the utxo was spent.
+    if (IsSpent(wtxid, outIndex)) return res;
+
+    isminetype mine = IsMine(output);
+
+    // Check If not mine
+    if (mine == ISMINE_NO) return res;
+
+    // Check if watch only utxo are allowed
+    if (mine == ISMINE_WATCH_ONLY && coinControl && !coinControl->fAllowWatchOnly) return res;
+
+    // Skip locked utxo
+    if (IsLockedCoin(wtxid, outIndex) && nCoinType != ONLY_10000) return res;
+
+    // Check if we should include zero value utxo
+    if (output.nValue <= 0) return res;
+
+    if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(wtxid, outIndex)))
+        return res;
+
+    // --Skip P2CS outputs
+    // skip cold coins
+    if (mine == ISMINE_COLD && (!fIncludeColdStaking || !HasDelegator(output))) return res;
+    // skip delegated coins
+    if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) return res;
+
+    res.solvable = IsSolvable(*this, output.scriptPubKey);
+
+    res.spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
+                     (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && res.solvable)) ||
+                     ((mine & ((fIncludeColdStaking ? ISMINE_COLD : ISMINE_NO) |
+                               (fIncludeDelegated ? ISMINE_SPENDABLE_DELEGATED : ISMINE_NO) )) != ISMINE_NO);
+    res.available = true;
+    return res;
+}
+
 /**
  * populate vCoins with vector of available COutputs.
  */
