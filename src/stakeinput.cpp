@@ -41,6 +41,11 @@ bool CPivStake::SetPrevout(const CTxOut& out, const COutPoint& outpointFrom)
     return true;
 }
 
+void CPivStake::SetIndexFrom(const CBlockIndex* pindex)
+{
+    this->pindexFrom = pindex;
+}
+
 bool CPivStake::GetTxOutFrom(CTxOut& out) const
 {
     if (!opOutputFrom || !opOutpointFrom)

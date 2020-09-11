@@ -43,6 +43,7 @@ public:
 
     bool InitFromTxIn(const CTxIn& txin) override;
     bool SetPrevout(const CTxOut& out, const COutPoint& outpointFrom);
+    void SetIndexFrom(const CBlockIndex* pindex);
 
     const CBlockIndex* GetIndexFrom() override;
     bool GetTxOutFrom(CTxOut& out) const override;
