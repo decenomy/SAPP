@@ -930,10 +930,7 @@ CDataStream CBudgetManager::GetProposalVoteSerialized(const uint256& voteHash) c
 CDataStream CBudgetManager::GetProposalSerialized(const uint256& propHash) const
 {
     LOCK(cs_proposals);
-    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-    ss.reserve(1000);
-    ss << mapSeenProposals.at(propHash);
-    return ss;
+    return mapProposals.at(propHash).GetBroadcast();
 }
 
 CDataStream CBudgetManager::GetFinalizedBudgetVoteSerialized(const uint256& voteHash) const
@@ -948,10 +945,7 @@ CDataStream CBudgetManager::GetFinalizedBudgetVoteSerialized(const uint256& vote
 CDataStream CBudgetManager::GetFinalizedBudgetSerialized(const uint256& budgetHash) const
 {
     LOCK(cs_budgets);
-    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-    ss.reserve(1000);
-    ss << mapSeenFinalizedBudgets.at(budgetHash);
-    return ss;
+    return mapFinalizedBudgets.at(budgetHash).GetBroadcast();
 }
 
 bool CBudgetManager::AddAndRelayProposalVote(const CBudgetVote& vote, std::string& strError)
