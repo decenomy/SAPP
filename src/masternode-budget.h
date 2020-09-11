@@ -399,7 +399,6 @@ public:
     int64_t nTime;
 
     CFinalizedBudget();
-    CFinalizedBudget(const CFinalizedBudget& other);
     CFinalizedBudget(const std::string& name, int blockstart, const std::vector<CTxBudgetPayment>& vecBudgetPaymentsIn, const uint256& nfeetxhash);
 
     void CleanAndRemove();
@@ -508,7 +507,6 @@ public:
     int64_t nTime;
 
     CBudgetProposal();
-    CBudgetProposal(const CBudgetProposal& other);
     CBudgetProposal(const std::string& name, const std::string& url, int paycount, const CScript& payee, const CAmount& amount, int blockstart, const uint256& nfeetxhash);
 
     bool AddOrUpdateVote(const CBudgetVote& vote, std::string& strError);

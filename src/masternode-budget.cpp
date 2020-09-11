@@ -1315,21 +1315,6 @@ CBudgetProposal::CBudgetProposal(const std::string& name,
     nBlockEnd = nCycleStart + (nBlocksPerCycle + 1)  * paycount;
 }
 
-CBudgetProposal::CBudgetProposal(const CBudgetProposal& other)
-{
-    strProposalName = other.strProposalName;
-    strURL = other.strURL;
-    nBlockStart = other.nBlockStart;
-    nBlockEnd = other.nBlockEnd;
-    address = other.address;
-    nAmount = other.nAmount;
-    nTime = other.nTime;
-    nFeeTXHash = other.nFeeTXHash;
-    mapVotes = other.mapVotes;
-    fValid = true;
-    strInvalid = "";
-}
-
 // initialize from network broadcast message
 bool CBudgetProposal::ParseBroadcast(CDataStream& broadcast)
 {
@@ -1718,19 +1703,6 @@ CFinalizedBudget::CFinalizedBudget(const std::string& name,
         nFeeTXHash(nfeetxhash),
         strProposals(""),
         nTime(0)
-{ }
-
-CFinalizedBudget::CFinalizedBudget(const CFinalizedBudget& other) :
-        fAutoChecked(false),
-        fValid(true),
-        strInvalid(),
-        mapVotes(other.mapVotes),
-        strBudgetName(other.strBudgetName),
-        nBlockStart(other.nBlockStart),
-        vecBudgetPayments(other.vecBudgetPayments),
-        nFeeTXHash(other.nFeeTXHash),
-        strProposals(other.strProposals),
-        nTime(other.nTime)
 { }
 
 bool CFinalizedBudget::ParseBroadcast(CDataStream& broadcast)
