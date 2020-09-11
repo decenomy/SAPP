@@ -1910,13 +1910,13 @@ void CWallet::GetAvailableP2CSCoins(std::vector<COutput>& vCoins) const {
 /**
  * Test if the transaction is spendable.
  */
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth, const CBlockIndex*& pindexRet)
 {
     if (!CheckFinalTx(*pcoin)) return false;
     if (fOnlyConfirmed && !pcoin->IsTrusted()) return false;
     if (pcoin->GetBlocksToMaturity() > 0) return false;
 
-    nDepth = pcoin->GetDepthInMainChain(false);
+    nDepth = pcoin->GetDepthInMainChain(pindexRet, false);
     // do not use IX for inputs that have less then 6 blockchain confirmations
     if (fUseIX && nDepth < 6) return false;
 
@@ -1925,6 +1925,12 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     if (nDepth == 0 && !pcoin->InMempool()) return false;
 
     return true;
+}
+
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+{
+    const CBlockIndex* pindexRet = nullptr;
+    return CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth, pindexRet);
 }
 
 bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex, std::string& strError)
