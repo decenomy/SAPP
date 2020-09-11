@@ -467,6 +467,7 @@ public:
     // Serialization for network messages.
     bool ParseBroadcast(CDataStream& broadcast);
     CDataStream GetBroadcast() const;
+    void Relay();
 
     // compare finalized budget by votes (sort tie with feeHash)
     bool operator>(const CFinalizedBudget& other) const;
@@ -625,6 +626,7 @@ public:
     // Serialization for network messages.
     bool ParseBroadcast(CDataStream& broadcast);
     CDataStream GetBroadcast() const;
+    void Relay();
 
     // compare proposals by proposal hash
     inline bool operator>(const CBudgetProposal& other) const { return GetHash() > other.GetHash(); }
