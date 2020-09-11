@@ -2757,6 +2757,7 @@ bool CWallet::CreateCoinStake(
     for (const auto& out : *availableCoins) {
         CPivStake stakeInput;
         stakeInput.SetPrevout(out.tx->vout[out.i], COutPoint(out.tx->GetHash(), out.i));
+        stakeInput.SetIndexFrom(out.pindex);
 
         //new block came in, move on
         if (WITH_LOCK(cs_main, return chainActive.Height()) != pindexPrev->nHeight) return false;
@@ -4043,7 +4044,7 @@ void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
 
 int CMerkleTx::GetDepthInMainChain(bool enableIX) const
 {
-    const CBlockIndex* pindexRet;
+    const CBlockIndex* pindexRet = nullptr;
     return GetDepthInMainChain(pindexRet, enableIX);
 }
 
