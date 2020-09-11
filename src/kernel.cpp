@@ -45,7 +45,7 @@ CStakeKernel::CStakeKernel(const CBlockIndex* const pindexPrev, CStakeInput* sta
         // Modifier v2
         stakeModifier << pindexPrev->GetStakeModifierV2();
     }
-    CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
+    const CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
     nTimeBlockFrom = pindexFrom->nTime;
 }
 

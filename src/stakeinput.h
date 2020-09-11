@@ -16,12 +16,12 @@ class CWalletTx;
 class CStakeInput
 {
 protected:
-    CBlockIndex* pindexFrom = nullptr;
+    const CBlockIndex* pindexFrom = nullptr;
 
 public:
     virtual ~CStakeInput(){};
     virtual bool InitFromTxIn(const CTxIn& txin) = 0;
-    virtual CBlockIndex* GetIndexFrom() = 0;
+    virtual const CBlockIndex* GetIndexFrom() = 0;
     virtual bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = UINT256_ZERO) = 0;
     virtual bool GetTxOutFrom(CTxOut& out) const = 0;
     virtual CAmount GetValue() const = 0;
@@ -44,7 +44,7 @@ public:
     bool InitFromTxIn(const CTxIn& txin) override;
     bool SetPrevout(const CTxOut& out, const COutPoint& outpointFrom);
 
-    CBlockIndex* GetIndexFrom() override;
+    const CBlockIndex* GetIndexFrom() override;
     bool GetTxOutFrom(CTxOut& out) const override;
     CAmount GetValue() const override;
     CDataStream GetUniqueness() const override;

@@ -51,7 +51,7 @@ CLegacyZPivStake::CLegacyZPivStake(const libzerocoin::CoinSpend& spend)
     this->hashSerial = Hash(nSerial.begin(), nSerial.end());
 }
 
-CBlockIndex* CLegacyZPivStake::GetIndexFrom()
+const CBlockIndex* CLegacyZPivStake::GetIndexFrom()
 {
     // First look in the legacy database
     int nHeightChecksum = 0;

@@ -22,7 +22,7 @@ public:
     bool InitFromTxIn(const CTxIn& txin) override;
     bool IsZPIV() const override { return true; }
     uint32_t GetChecksum() const { return nChecksum; }
-    CBlockIndex* GetIndexFrom() override;
+    const CBlockIndex* GetIndexFrom() override;
     CAmount GetValue() const override;
     CDataStream GetUniqueness() const override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = UINT256_ZERO) override { return false; /* creation disabled */}

@@ -118,7 +118,7 @@ CDataStream CPivStake::GetUniqueness() const
 }
 
 //The block that the UTXO was added to the chain
-CBlockIndex* CPivStake::GetIndexFrom()
+const CBlockIndex* CPivStake::GetIndexFrom()
 {
     if (!pindexFrom) throw std::runtime_error("CPivStake: uninitialized pindexFrom");
     return pindexFrom;
@@ -129,7 +129,7 @@ bool CPivStake::ContextCheck(int nHeight, uint32_t nTime)
 {
     const Consensus::Params& consensus = Params().GetConsensus();
     // Get Stake input block time/height
-    CBlockIndex* pindexFrom = GetIndexFrom();
+    const CBlockIndex* pindexFrom = GetIndexFrom();
     if (!pindexFrom)
         return error("%s: unable to get previous index for stake input", __func__);
     const int nHeightBlockFrom = pindexFrom->nHeight;
