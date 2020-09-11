@@ -43,7 +43,7 @@ bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedH
     CTransaction txCollateral;
     uint256 nBlockHash;
     if (!GetTransaction(nTxCollateralHash, txCollateral, nBlockHash, true)) {
-        strError = strprintf("Can't find collateral tx %s", txCollateral.ToString());
+        strError = strprintf("Can't find collateral tx %s", nTxCollateralHash.ToString());
         return false;
     }
 
@@ -1300,6 +1300,7 @@ CBudgetProposal::CBudgetProposal(const std::string& name,
         nBlockStart(blockstart),
         address(payee),
         nAmount(amount),
+        nFeeTXHash(nfeetxhash),
         nTime(0)
 {
     const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
@@ -1636,36 +1637,6 @@ void CBudgetProposal::Relay()
     g_connman->RelayInv(inv);
 }
 
-CBudgetProposalBroadcast::CBudgetProposalBroadcast(std::string strProposalNameIn, std::string strURLIn, int nPaymentCount, CScript addressIn, CAmount nAmountIn, int nBlockStartIn, uint256 nFeeTXHashIn)
-{
-    strProposalName = strProposalNameIn;
-    strURL = strURLIn;
-
-    nBlockStart = nBlockStartIn;
-
-    const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
-    int nCycleStart = nBlockStart - nBlockStart % nBlocksPerCycle;
-
-    // Right now single payment proposals have nBlockEnd have a cycle too early!
-    // switch back if it break something else
-    // calculate the end of the cycle for this vote, add half a cycle (vote will be deleted after that block)
-    // nBlockEnd = nCycleStart + GetBudgetPaymentCycleBlocks() * nPaymentCount + GetBudgetPaymentCycleBlocks() / 2;
-
-    // Calculate the end of the cycle for this vote, vote will be deleted after next cycle
-    nBlockEnd = nCycleStart + (nBlocksPerCycle + 1)  * nPaymentCount;
-
-    address = addressIn;
-    nAmount = nAmountIn;
-
-    nFeeTXHash = nFeeTXHashIn;
-}
-
-void CBudgetProposalBroadcast::Relay()
-{
-    CInv inv(MSG_BUDGET_PROPOSAL, GetHash());
-    g_connman->RelayInv(inv);
-}
-
 CBudgetVote::CBudgetVote() :
         CSignedMessage(),
         fValid(true),
@@ -1728,7 +1699,7 @@ CFinalizedBudget::CFinalizedBudget() :
         strBudgetName(""),
         nBlockStart(0),
         vecBudgetPayments(),
-        nFeeTXHash(),
+        nFeeTXHash(UINT256_ZERO),
         strProposals(""),
         nTime(0)
 { }
@@ -2222,32 +2193,6 @@ bool CFinalizedBudget::operator>(const CFinalizedBudget& other) const
 }
 
 void CFinalizedBudget::Relay()
-{
-    CInv inv(MSG_BUDGET_FINALIZED, GetHash());
-    g_connman->RelayInv(inv);
-}
-
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast() :
-        CFinalizedBudget()
-{ }
-
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& other) :
-        CFinalizedBudget(other)
-{ }
-
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn,
-                                                     int nBlockStartIn,
-                                                     const std::vector<CTxBudgetPayment>& vecBudgetPaymentsIn,
-                                                     uint256 nFeeTXHashIn)
-{
-    strBudgetName = strBudgetNameIn;
-    nBlockStart = nBlockStartIn;
-    for (const CTxBudgetPayment& out : vecBudgetPaymentsIn)
-        vecBudgetPayments.push_back(out);
-    nFeeTXHash = nFeeTXHashIn;
-}
-
-void CFinalizedBudgetBroadcast::Relay()
 {
     CInv inv(MSG_BUDGET_FINALIZED, GetHash());
     g_connman->RelayInv(inv);
