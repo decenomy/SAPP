@@ -1334,6 +1334,25 @@ CBudgetProposal::CBudgetProposal(const CBudgetProposal& other)
     strInvalid = "";
 }
 
+// initialize from network broadcast message
+bool CBudgetProposal::ParseBroadcast(CDataStream& broadcast)
+{
+    *this = CBudgetProposal();
+    try {
+        broadcast >> LIMITED_STRING(strProposalName, 20);
+        broadcast >> LIMITED_STRING(strURL, 64);
+        broadcast >> nTime;
+        broadcast >> nBlockStart;
+        broadcast >> nBlockEnd;
+        broadcast >> nAmount;
+        broadcast >> *(CScriptBase*)(&address);
+        broadcast >> nFeeTXHash;
+    } catch (std::exception& e) {
+        return error("Unable to deserialize proposal broadcast: %s", e.what());
+    }
+    return true;
+}
+
 void CBudgetProposal::SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) const
 {
     for (const auto& it: mapVotes) {
@@ -1590,6 +1609,22 @@ int CBudgetProposal::GetRemainingPaymentCount(int nCurrentHeight) const
     return std::min(nPayments, GetTotalPaymentCount());
 }
 
+// return broadcast serialization
+CDataStream CBudgetProposal::GetBroadcast() const
+{
+    CDataStream broadcast(SER_NETWORK, PROTOCOL_VERSION);
+    broadcast.reserve(1000);
+    broadcast << LIMITED_STRING(strProposalName, 20);
+    broadcast << LIMITED_STRING(strURL, 64);
+    broadcast << nTime;
+    broadcast << nBlockStart;
+    broadcast << nBlockEnd;
+    broadcast << nAmount;
+    broadcast << *(CScriptBase*)(&address);
+    broadcast << nFeeTXHash;
+    return broadcast;
+}
+
 inline bool CBudgetProposal::PtrHigherYes(CBudgetProposal* a, CBudgetProposal* b)
 {
     const int netYes_a = a->GetYeas() - a->GetNays();
@@ -1709,6 +1744,20 @@ CFinalizedBudget::CFinalizedBudget(const CFinalizedBudget& other) :
         strProposals(other.strProposals),
         nTime(other.nTime)
 { }
+
+bool CFinalizedBudget::ParseBroadcast(CDataStream& broadcast)
+{
+    *this = CFinalizedBudget();
+    try {
+        broadcast >> LIMITED_STRING(strBudgetName, 20);
+        broadcast >> nBlockStart;
+        broadcast >> vecBudgetPayments;
+        broadcast >> nFeeTXHash;
+    } catch (std::exception& e) {
+        return error("Unable to deserialize finalized budget broadcast: %s", e.what());
+    }
+    return true;
+}
 
 bool CFinalizedBudget::AddOrUpdateVote(const CFinalizedBudgetVote& vote, std::string& strError)
 {
@@ -2131,6 +2180,19 @@ void CFinalizedBudget::SubmitVote()
         LogPrint(BCLog::MNBUDGET,"%s: Error submitting vote - %s\n", __func__, strError);
     }
 }
+
+// return broadcast serialization
+CDataStream CFinalizedBudget::GetBroadcast() const
+{
+    CDataStream broadcast(SER_NETWORK, PROTOCOL_VERSION);
+    broadcast.reserve(1000);
+    broadcast << LIMITED_STRING(strBudgetName, 20);
+    broadcast << nBlockStart;
+    broadcast << vecBudgetPayments;
+    broadcast << nFeeTXHash;
+    return broadcast;
+}
+
 
 bool CFinalizedBudget::operator>(const CFinalizedBudget& other) const
 {

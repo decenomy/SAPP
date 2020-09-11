@@ -471,6 +471,7 @@ public:
         return ss.GetHash();
     }
 
+    // Serialization for local DB
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
@@ -484,6 +485,10 @@ public:
         READWRITE(mapVotes);
         READWRITE(strProposals);
     }
+
+    // Serialization for network messages.
+    bool ParseBroadcast(CDataStream& broadcast);
+    CDataStream GetBroadcast() const;
 
     // compare finalized budget by votes (sort tie with feeHash)
     bool operator>(const CFinalizedBudget& other) const;
@@ -623,23 +628,25 @@ public:
         return ss.GetHash();
     }
 
+    // Serialization for local DB
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        //for syncing with other clients
         READWRITE(LIMITED_STRING(strProposalName, 20));
         READWRITE(LIMITED_STRING(strURL, 64));
         READWRITE(nBlockStart);
         READWRITE(nBlockEnd);
         READWRITE(nAmount);
         READWRITE(*(CScriptBase*)(&address));
-        READWRITE(nTime);
         READWRITE(nFeeTXHash);
-
-        //for saving to the serialized db
+        READWRITE(nTime);
         READWRITE(mapVotes);
     }
+
+    // Serialization for network messages.
+    bool ParseBroadcast(CDataStream& broadcast);
+    CDataStream GetBroadcast() const;
 
     // compare proposals by proposal hash
     inline bool operator>(const CBudgetProposal& other) const { return GetHash() > other.GetHash(); }
