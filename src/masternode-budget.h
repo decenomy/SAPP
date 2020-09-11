@@ -208,8 +208,6 @@ private:
     std::map<uint256, CBudgetProposal> mapProposals;                        // guarded by cs_proposals
     std::map<uint256, CFinalizedBudget> mapFinalizedBudgets;                // guarded by cs_budgets
 
-    std::map<uint256, CBudgetProposalBroadcast> mapSeenProposals;           // guarded by cs_proposals
-    std::map<uint256, CFinalizedBudgetBroadcast> mapSeenFinalizedBudgets;   // guarded by cs_budgets
     std::map<uint256, CBudgetVote> mapSeenProposalVotes;                    // guarded by cs_votes
     std::map<uint256, CBudgetVote> mapOrphanProposalVotes;                  // guarded by cs_votes
     std::map<uint256, CFinalizedBudgetVote> mapSeenFinalizedBudgetVotes;    // guarded by cs_finalizedvotes
@@ -242,20 +240,16 @@ public:
 
     void ClearSeen()
     {
-        WITH_LOCK(cs_proposals, mapSeenProposals.clear(); );
         WITH_LOCK(cs_votes, mapSeenProposalVotes.clear(); );
-        WITH_LOCK(cs_budgets, mapSeenFinalizedBudgets.clear(); );
         WITH_LOCK(cs_finalizedvotes, mapSeenFinalizedBudgetVotes.clear(); );
     }
 
-    bool HaveSeenProposal(const uint256& propHash) const { LOCK(cs_proposals); return mapSeenProposals.count(propHash); }
+    bool HaveProposal(const uint256& propHash) const { LOCK(cs_proposals); return mapProposals.count(propHash); }
     bool HaveSeenProposalVote(const uint256& voteHash) const { LOCK(cs_votes); return mapSeenProposalVotes.count(voteHash); }
-    bool HaveSeenFinalizedBudget(const uint256& budgetHash) const { LOCK(cs_budgets); return mapSeenFinalizedBudgets.count(budgetHash); }
+    bool HaveFinalizedBudget(const uint256& budgetHash) const { LOCK(cs_budgets); return mapFinalizedBudgets.count(budgetHash); }
     bool HaveSeenFinalizedBudgetVote(const uint256& voteHash) const { LOCK(cs_finalizedvotes); return mapSeenFinalizedBudgetVotes.count(voteHash); }
 
-    void AddSeenProposal(const CBudgetProposalBroadcast& prop);
     void AddSeenProposalVote(const CBudgetVote& vote);
-    void AddSeenFinalizedBudget(const CFinalizedBudgetBroadcast& bud);
     void AddSeenFinalizedBudgetVote(const CFinalizedBudgetVote& vote);
 
     // Use const operator std::map::at(), thus existence must be checked before calling.
@@ -310,16 +304,8 @@ public:
     void CheckOrphanVotes();
     void Clear()
     {
-        {
-            LOCK(cs_proposals);
-            mapProposals.clear();
-            mapSeenProposals.clear();
-        }
-        {
-            LOCK(cs_budgets);
-            mapFinalizedBudgets.clear();
-            mapSeenFinalizedBudgets.clear();
-        }
+        WITH_LOCK(cs_proposals, mapProposals.clear(); );
+        WITH_LOCK(cs_budgets, mapFinalizedBudgets.clear(); );
         {
             LOCK(cs_votes);
             mapSeenProposalVotes.clear();
@@ -339,21 +325,13 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        {
-            LOCK(cs_proposals);
-            READWRITE(mapProposals);
-            READWRITE(mapSeenProposals);
-        }
+        WITH_LOCK(cs_proposals, READWRITE(mapProposals); );
         {
             LOCK(cs_votes);
             READWRITE(mapSeenProposalVotes);
             READWRITE(mapOrphanProposalVotes);
         }
-        {
-            LOCK(cs_budgets);
-            READWRITE(mapFinalizedBudgets);
-            READWRITE(mapSeenFinalizedBudgets);
-        }
+        WITH_LOCK(cs_budgets, READWRITE(mapFinalizedBudgets); );
         {
             LOCK(cs_finalizedvotes);
             READWRITE(mapSeenFinalizedBudgetVotes);

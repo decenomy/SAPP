@@ -192,7 +192,7 @@ void CBudgetManager::SubmitFinalBudget()
 
     CFinalizedBudgetBroadcast tempBudget(strBudgetName, nBlockStart, vecTxBudgetPayments, UINT256_ZERO);
     const uint256& budgetHash = tempBudget.GetHash();
-    if (HaveSeenFinalizedBudget(budgetHash)) {
+    if (HaveFinalizedBudget(budgetHash)) {
         LogPrint(BCLog::MNBUDGET,"%s: Budget already exists - %s\n", __func__, budgetHash.ToString());
         nSubmittedHeight = nCurrentHeight;
         return;
@@ -221,7 +221,6 @@ void CBudgetManager::SubmitFinalBudget()
     if (!AddFinalizedBudget(fb)) {
         return;
     }
-    AddSeenFinalizedBudget(finalizedBudgetBroadcast);
     finalizedBudgetBroadcast.Relay();
     nSubmittedHeight = nCurrentHeight;
     // Remove collateral tx from map
@@ -893,22 +892,10 @@ CAmount CBudgetManager::GetTotalBudget(int nHeight)
     }
 }
 
-void CBudgetManager::AddSeenProposal(const CBudgetProposalBroadcast& prop)
-{
-    LOCK(cs_proposals);
-    mapSeenProposals.emplace(prop.GetHash(), prop);
-}
-
 void CBudgetManager::AddSeenProposalVote(const CBudgetVote& vote)
 {
     LOCK(cs_votes);
     mapSeenProposalVotes.emplace(vote.GetHash(), vote);
-}
-
-void CBudgetManager::AddSeenFinalizedBudget(const CFinalizedBudgetBroadcast& bud)
-{
-    LOCK(cs_budgets);
-    mapSeenFinalizedBudgets.emplace(bud.GetHash(), bud);
 }
 
 void CBudgetManager::AddSeenFinalizedBudgetVote(const CFinalizedBudgetVote& vote)
@@ -1050,7 +1037,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         vRecv >> budgetProposalBroadcast;
 
         const uint256& nHash = budgetProposalBroadcast.GetHash();
-        if (HaveSeenProposal(nHash)) {
+        if (HaveProposal(nHash)) {
             masternodeSync.AddedBudgetItem(nHash);
             return;
         }
@@ -1059,7 +1046,6 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         if (!AddProposal(budgetProposal)) {
             return;
         }
-        AddSeenProposal(budgetProposalBroadcast);
         budgetProposalBroadcast.Relay();
         masternodeSync.AddedBudgetItem(nHash);
 
@@ -1114,7 +1100,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         vRecv >> finalizedBudgetBroadcast;
 
         const uint256& nHash = finalizedBudgetBroadcast.GetHash();
-        if (HaveSeenFinalizedBudget(nHash)) {
+        if (HaveFinalizedBudget(nHash)) {
             masternodeSync.AddedBudgetItem(nHash);
             return;
         }
@@ -1123,7 +1109,6 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         if (!AddFinalizedBudget(finalizedBudget)) {
             return;
         }
-        AddSeenFinalizedBudget(finalizedBudgetBroadcast);
         finalizedBudgetBroadcast.Relay();
         masternodeSync.AddedBudgetItem(nHash);
 
@@ -1180,8 +1165,8 @@ void CBudgetManager::SetSynced(bool synced)
 {
     {
         LOCK(cs_proposals);
-        for (const auto& it: mapSeenProposals) {
-            CBudgetProposal* pbudgetProposal = FindProposal(it.first);
+        for (auto& it: mapProposals) {
+            CBudgetProposal* pbudgetProposal = &(it.second);
             if (pbudgetProposal && pbudgetProposal->IsValid()) {
                 //mark votes
                 pbudgetProposal->SetSynced(synced);
@@ -1190,8 +1175,8 @@ void CBudgetManager::SetSynced(bool synced)
     }
     {
         LOCK(cs_budgets);
-        for (const auto& it: mapSeenFinalizedBudgets) {
-            CFinalizedBudget* pfinalizedBudget = FindFinalizedBudget(it.first);
+        for (auto& it: mapFinalizedBudgets) {
+            CFinalizedBudget* pfinalizedBudget = &(it.second);
             if (pfinalizedBudget && pfinalizedBudget->IsValid()) {
                 //mark votes
                 pfinalizedBudget->SetSynced(synced);
@@ -1206,8 +1191,8 @@ void CBudgetManager::Sync(CNode* pfrom, const uint256& nProp, bool fPartial)
     int nInvCount = 0;
     {
         LOCK(cs_proposals);
-        for (auto& it: mapSeenProposals) {
-            CBudgetProposal* pbudgetProposal = FindProposal(it.first);
+        for (auto& it: mapProposals) {
+            CBudgetProposal* pbudgetProposal = &(it.second);
             if (pbudgetProposal && pbudgetProposal->IsValid() && (nProp.IsNull() || it.first == nProp)) {
                 pfrom->PushInventory(CInv(MSG_BUDGET_PROPOSAL, it.second.GetHash()));
                 nInvCount++;
@@ -1221,8 +1206,8 @@ void CBudgetManager::Sync(CNode* pfrom, const uint256& nProp, bool fPartial)
     nInvCount = 0;
     {
         LOCK(cs_budgets);
-        for (auto& it: mapSeenFinalizedBudgets) {
-            CFinalizedBudget* pfinalizedBudget = FindFinalizedBudget(it.first);
+        for (auto& it: mapFinalizedBudgets) {
+            CFinalizedBudget* pfinalizedBudget = &(it.second);
             if (pfinalizedBudget && pfinalizedBudget->IsValid() && (nProp.IsNull() || it.first == nProp)) {
                 pfrom->PushInventory(CInv(MSG_BUDGET_FINALIZED, it.second.GetHash()));
                 nInvCount++;
@@ -2274,19 +2259,8 @@ std::string CFinalizedBudgetVote::GetStrMessage() const
 
 std::string CBudgetManager::ToString() const
 {
-    unsigned int nProposals = 0, nSeenProposals = 0;
-    {
-        LOCK(cs_proposals);
-        nProposals = mapProposals.size();
-        nSeenProposals = mapSeenProposals.size();
-    }
-
-    unsigned int nBudgets = 0, nSeenBudgets = 0;
-    {
-        LOCK(cs_budgets);
-        nBudgets = mapFinalizedBudgets.size();
-        nSeenBudgets = mapSeenFinalizedBudgets.size();
-    }
+    unsigned int nProposals = WITH_LOCK(cs_proposals, return mapProposals.size(); );
+    unsigned int nBudgets = WITH_LOCK(cs_budgets, return mapFinalizedBudgets.size(); );
 
     unsigned int nSeenVotes = 0, nOrphanVotes = 0;
     {
@@ -2302,10 +2276,9 @@ std::string CBudgetManager::ToString() const
         nOrphanFinalizedVotes = mapOrphanFinalizedBudgetVotes.size();
     }
 
-    return strprintf("Proposals: %d (seen: %d) - "
-            "Finalized Budgets: %d (seen: %d) - "
+    return strprintf("Proposals: %d - Finalized Budgets: %d - "
             "Proposal Votes: %d (orphan: %d) - "
             "Finalized Budget Votes: %d (orphan: %d)",
-            nProposals, nSeenProposals, nBudgets, nSeenBudgets,
+            nProposals, nBudgets,
             nSeenVotes, nOrphanVotes, nSeenFinalizedVotes, nOrphanFinalizedVotes);
 }

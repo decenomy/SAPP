@@ -201,8 +201,6 @@ UniValue submitbudget(const JSONRPCRequest& request)
         std::string strError = strprintf("invalid budget proposal - %s", budgetProposalBroadcast.IsInvalidReason());
         throw std::runtime_error(strError);
     }
-
-    budget.AddSeenProposal(budgetProposalBroadcast);
     budgetProposalBroadcast.Relay();
 
     return budgetProposalBroadcast.GetHash().ToString();
