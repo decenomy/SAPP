@@ -2186,17 +2186,45 @@ static void ApproximateBestSubset(std::vector<std::pair<CAmount, std::pair<const
     }
 }
 
-
-bool CWallet::StakeableCoins(std::vector<COutput>* pCoins)
+bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
 {
-    const bool fIncludeCold = (sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT) &&
+    const bool fIncludeColdStaking = (sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT) &&
                                GetBoolArg("-coldstaking", DEFAULT_COLDSTAKING));
 
-    return AvailableCoins(pCoins,
-            nullptr,            // coin control
-            false,              // fIncludeDelegated
-            fIncludeCold,       // fIncludeColdStaking
-            STAKEABLE_COINS);  // coin type
+    LOCK2(cs_main, cs_wallet);
+    for (const auto& it : mapWallet) {
+        const uint256& wtxid = it.first;
+        const CWalletTx* pcoin = &(it).second;
+
+        // Check if the tx is selectable
+        int nDepth;
+        const CBlockIndex* pindex = nullptr;
+        if (!CheckTXAvailability(pcoin, true, false, nDepth, pindex))
+            continue;
+
+        // Check min depth requirement for stake inputs
+        if (nDepth < Params().GetConsensus().nStakeMinDepth) continue;
+
+        for (unsigned int index = 0; index < pcoin->vout.size(); index++) {
+
+            auto res = CheckOutputAvailability(
+                    pcoin->vout[index],
+                    index,
+                    wtxid,
+                    STAKEABLE_COINS,
+                    nullptr, // coin control
+                    false,   // fIncludeDelegated
+                    fIncludeColdStaking,
+                    false);
+
+            if (!res.available) continue;
+
+            // found valid coin
+            if (!pCoins) return true;
+            pCoins->emplace_back(CStakeableOutput(pcoin, (int) index, nDepth, res.spendable, res.solvable, pindex));
+        }
+    }
+    return (pCoins && !pCoins->empty());
 }
 
 bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
@@ -2704,8 +2732,7 @@ bool CWallet::CreateCoinStake(
         unsigned int nBits,
         CMutableTransaction& txNew,
         int64_t& nTxNewTime,
-        std::vector<COutput>* availableCoins
-        )
+        std::vector<CStakeableOutput>* availableCoins)
 {
 
     const Consensus::Params& consensus = Params().GetConsensus();
@@ -2727,7 +2754,7 @@ bool CWallet::CreateCoinStake(
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
     int nAttempts = 0;
-    for (const COutput &out : *availableCoins) {
+    for (const auto& out : *availableCoins) {
         CPivStake stakeInput;
         stakeInput.SetPrevout(out.tx->vout[out.i], COutPoint(out.tx->GetHash(), out.i));
 
