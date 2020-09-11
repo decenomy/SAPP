@@ -25,11 +25,11 @@ int nSubmittedFinalBudget;
 
 bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nHeight, bool fBudgetFinalization)
 {
+    nTime = 0;  // Updated at the end.
     CTransaction txCollateral;
     uint256 nBlockHash;
     if (!GetTransaction(nTxCollateralHash, txCollateral, nBlockHash, true)) {
         strError = strprintf("Can't find collateral tx %s", txCollateral.ToString());
-        LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
         return false;
     }
 
@@ -43,7 +43,6 @@ bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedH
     for (const CTxOut &o : txCollateral.vout) {
         if (!o.scriptPubKey.IsNormalPaymentScript() && !o.scriptPubKey.IsUnspendable()) {
             strError = strprintf("Invalid Script %s", txCollateral.ToString());
-            LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
             return false;
         }
         if (fBudgetFinalization) {
@@ -71,13 +70,16 @@ bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedH
 
     if (!foundOpReturn) {
         strError = strprintf("Couldn't find opReturn %s in %s", nExpectedHash.ToString(), txCollateral.ToString());
-        LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
         return false;
     }
 
-    // Retrieve block height (checking that i's in the active chain) and time
+    // Retrieve block height (checking that it's in the active chain) and time
     // both get set in CBudgetProposal/CFinalizedBudget by the caller (AddProposal/AddFinalizedBudget)
-    if (!nBlockHash.IsNull()) {
+    if (nBlockHash.IsNull()) {
+        strError = strprintf("Collateral transaction %s is unconfirmed", nTxCollateralHash.ToString());
+        return false;
+    }
+    {
         LOCK(cs_main);
         BlockMap::iterator mi = mapBlockIndex.find(nBlockHash);
         if (mi != mapBlockIndex.end() && (*mi).second) {
@@ -87,6 +89,11 @@ bool CheckCollateral(const uint256& nTxCollateralHash, const uint256& nExpectedH
                 nTime = pindex->nTime;
             }
         }
+    }
+
+    if (!nTime) {
+        strError = strprintf("Collateral transaction %s not in Active chain", nTxCollateralHash.ToString());
+        return false;
     }
 
     return true;
@@ -164,7 +171,7 @@ void CBudgetManager::SubmitFinalBudget()
         return;
     }
 
-    std::vector<CBudgetProposal*> vBudgetProposals = budget.GetBudget();
+    std::vector<CBudgetProposal*> vBudgetProposals = GetBudget();
     std::string strBudgetName = "main";
     std::vector<CTxBudgetPayment> vecTxBudgetPayments;
 
@@ -186,14 +193,12 @@ void CBudgetManager::SubmitFinalBudget()
     if (HaveSeenFinalizedBudget(budgetHash)) {
         LogPrint(BCLog::MNBUDGET,"%s: Budget already exists - %s\n", __func__, budgetHash.ToString());
         nSubmittedHeight = nCurrentHeight;
-        return; //already exists
+        return;
     }
 
-    //create fee tx
-    CTransaction tx;
-    uint256 txidCollateral;
-
+    // See if collateral tx exists
     if (!mapCollateralTxids.count(budgetHash)) {
+        // create the collateral tx, send it to the network and return
         CWalletTx wtx;
         // Get our change address
         CReserveKey keyChange(pwalletMain);
@@ -201,32 +206,25 @@ void CBudgetManager::SubmitFinalBudget()
             LogPrint(BCLog::MNBUDGET,"%s: Can't make collateral transaction\n", __func__);
             return;
         }
-
         // Send the tx to the network. Do NOT use SwiftTx, locking might need too much time to propagate, especially for testnet
         const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get(), "NO-ix");
-        if (res.status != CWallet::CommitStatus::OK)
-            return;
-        tx = (CTransaction)wtx;
-        txidCollateral = tx.GetHash();
-        mapCollateralTxids.emplace(budgetHash, txidCollateral);
-    } else {
-        txidCollateral = mapCollateralTxids[budgetHash];
+        if (res.status == CWallet::CommitStatus::OK)
+            mapCollateralTxids.emplace(budgetHash, wtx.GetHash());
+        return;
     }
 
-    // create the proposal incase we're the first to make it
-    CFinalizedBudgetBroadcast finalizedBudgetBroadcast(strBudgetName, nBlockStart, vecTxBudgetPayments, txidCollateral);
-    const uint256& nHash = finalizedBudgetBroadcast.GetHash();
-
-    // check and add
+    // Collateral tx already exists, see if it's mature enough.
+    CFinalizedBudgetBroadcast finalizedBudgetBroadcast(strBudgetName, nBlockStart, vecTxBudgetPayments, mapCollateralTxids.at(budgetHash));
     CFinalizedBudget fb = CFinalizedBudget(finalizedBudgetBroadcast);
     if (!AddFinalizedBudget(fb)) {
-        LogPrint(BCLog::MNBUDGET,"%s: Invalid finalized budget %s %s\n", __func__, nHash.ToString(), fb.IsInvalidLogStr());
         return;
     }
     AddSeenFinalizedBudget(finalizedBudgetBroadcast);
     finalizedBudgetBroadcast.Relay();
     nSubmittedHeight = nCurrentHeight;
-    LogPrint(BCLog::MNBUDGET,"%s: Done! %s\n", __func__, nHash.ToString());
+    // Remove collateral tx from map
+    mapCollateralTxids.erase(budgetHash);
+    LogPrint(BCLog::MNBUDGET,"%s: Done! %s\n", __func__, budgetHash.ToString());
 }
 
 //
@@ -980,10 +978,10 @@ void CBudgetManager::NewBlock(int height)
         MarkSynced();
     }
 
+    // remove expired/heavily downvoted budgets
     CheckAndRemove();
 
-    //remove invalid votes once in a while (we have to check the signatures and validity of every vote, somewhat CPU intensive)
-
+    //remove invalid (from non-active masternode) votes once in a while
     LogPrint(BCLog::MNBUDGET,"%s:  askedForSourceProposalOrBudget cleanup - size: %d\n", __func__, askedForSourceProposalOrBudget.size());
     for (auto it = askedForSourceProposalOrBudget.begin(); it !=  askedForSourceProposalOrBudget.end(); ) {
         if (it->second <= GetTime() - (60 * 60 * 24)) {
@@ -999,17 +997,6 @@ void CBudgetManager::NewBlock(int height)
         for (auto& it: mapProposals) {
             it.second.CleanAndRemove();
         }
-        LogPrint(BCLog::MNBUDGET,"%s:  vecImmatureProposals cleanup - size: %d\n", __func__, vecImmatureProposals.size());
-        std::vector<CBudgetProposalBroadcast>::iterator it = vecImmatureProposals.begin();
-        while (it != vecImmatureProposals.end()) {
-            CBudgetProposal budgetProposal(*it);
-            if (!AddProposal(budgetProposal)) {
-                ++it;
-                continue;
-            }
-            it->Relay();
-            it = vecImmatureProposals.erase(it);
-        }
     }
     {
         TRY_LOCK(cs_budgets, fBudgetNewBlock);
@@ -1017,17 +1004,6 @@ void CBudgetManager::NewBlock(int height)
         LogPrint(BCLog::MNBUDGET,"%s:  mapFinalizedBudgets cleanup - size: %d\n", __func__, mapFinalizedBudgets.size());
         for (auto& it: mapFinalizedBudgets) {
             it.second.CleanAndRemove();
-        }
-        LogPrint(BCLog::MNBUDGET,"%s:  vecImmatureFinalizedBudgets cleanup - size: %d\n", __func__, vecImmatureFinalizedBudgets.size());
-        std::vector<CFinalizedBudgetBroadcast>::iterator it = vecImmatureFinalizedBudgets.begin();
-        while (it != vecImmatureFinalizedBudgets.end()) {
-            CFinalizedBudget finalizedBudget(*it);
-            if (!AddFinalizedBudget(finalizedBudget)) {
-                ++it;
-                continue;
-            }
-            it->Relay();
-            it = vecImmatureFinalizedBudgets.erase(it);
         }
     }
     LogPrint(BCLog::MNBUDGET,"%s:  PASSED\n", __func__);
@@ -1071,7 +1047,6 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         CBudgetProposal budgetProposal(budgetProposalBroadcast);
         if (!AddProposal(budgetProposal)) {
-            LogPrint(BCLog::MNBUDGET,"mprop (immature/invalid) %s %s\n", nHash.ToString(), budgetProposal.IsInvalidLogStr());
             return;
         }
         AddSeenProposal(budgetProposalBroadcast);
@@ -1136,7 +1111,6 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         CFinalizedBudget finalizedBudget(finalizedBudgetBroadcast);
         if (!AddFinalizedBudget(finalizedBudget)) {
-            LogPrint(BCLog::MNBUDGET,"fbs (immature/invalid) %s %s\n", nHash.ToString(), finalizedBudgetBroadcast.IsInvalidLogStr());
             return;
         }
         AddSeenFinalizedBudget(finalizedBudgetBroadcast);

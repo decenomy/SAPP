@@ -190,19 +190,20 @@ UniValue submitbudget(const JSONRPCRequest& request)
 
     uint256 hash = ParseHashV(request.params[6], "parameter 1");
 
-    //create the proposal incase we're the first to make it
-    CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
-
     if (!masternodeSync.IsBlockchainSynced()) {
         throw std::runtime_error("Must wait for client to sync with masternode network. Try again in a minute or so.");
     }
 
-    budget.AddSeenProposal(budgetProposalBroadcast);
-    budgetProposalBroadcast.Relay();
+    //create the proposal incase we're the first to make it
+    CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
 
     if(!budget.AddProposal(budgetProposalBroadcast)) {
-        throw std::runtime_error("Invalid proposal, see debug.log for details.");
+        std::string strError = strprintf("invalid budget proposal - %s", budgetProposalBroadcast.IsInvalidReason());
+        throw std::runtime_error(strError);
     }
+
+    budget.AddSeenProposal(budgetProposalBroadcast);
+    budgetProposalBroadcast.Relay();
 
     return budgetProposalBroadcast.GetHash().ToString();
 }

@@ -201,7 +201,8 @@ public:
 class CBudgetManager
 {
 private:
-    //hold txes until they mature enough to use
+    // map budget hash --> CollTx hash.
+    // hold finalized-budgets collateral txes until they mature enough to use
     std::map<uint256, uint256> mapCollateralTxids;
 
     std::map<uint256, CBudgetProposal> mapProposals;                        // guarded by cs_proposals
@@ -213,10 +214,6 @@ private:
     std::map<uint256, CBudgetVote> mapOrphanProposalVotes;                  // guarded by cs_votes
     std::map<uint256, CFinalizedBudgetVote> mapSeenFinalizedBudgetVotes;    // guarded by cs_finalizedvotes
     std::map<uint256, CFinalizedBudgetVote> mapOrphanFinalizedBudgetVotes;  // guarded by cs_finalizedvotes
-
-    // Memory only
-    std::vector<CBudgetProposalBroadcast> vecImmatureProposals;             // guarded by cs_proposals
-    std::vector<CFinalizedBudgetBroadcast> vecImmatureFinalizedBudgets;     // guarded by cs_budgets
 
     // Memory Only. Updated in NewBlock (blocks arrive in order)
     std::atomic<int> nBestHeight;
