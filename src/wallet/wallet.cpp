@@ -2043,7 +2043,7 @@ CWallet::OutputAvailabilityResult CWallet::CheckOutputAvailability(
     // skip delegated coins
     if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) return res;
 
-    res.solvable = IsSolvable(*this, output.scriptPubKey);
+    res.solvable = IsSolvable(*this, output.scriptPubKey, mine == ISMINE_COLD);
 
     res.spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
                      (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && res.solvable)) ||
@@ -2086,52 +2086,26 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
             if (nCoinType == STAKEABLE_COINS && nDepth < Params().GetConsensus().nStakeMinDepth) continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+                const auto& output = pcoin->vout[i];
 
-                // Check for only 10k utxo
-                if (nCoinType == ONLY_10000 && pcoin->vout[i].nValue != 10000 * COIN) continue;
+                auto res = CheckOutputAvailability(
+                        output,
+                        i,
+                        wtxid,
+                        nCoinType,
+                        coinControl,
+                        fCoinsSelected,
+                        fIncludeColdStaking,
+                        fIncludeDelegated);
 
-                // Check for stakeable utxo
-                if (nCoinType == STAKEABLE_COINS && pcoin->vout[i].IsZerocoinMint()) continue;
-
-                // Check if the utxo was spent.
-                if (IsSpent(wtxid, i)) continue;
-
-                isminetype mine = IsMine(pcoin->vout[i]);
-
-                // Check If not mine
-                if (mine == ISMINE_NO) continue;
-
-                // Check if watch only utxo are allowed
-                if (mine == ISMINE_WATCH_ONLY && coinControl && !coinControl->fAllowWatchOnly) continue;
-
-                // Skip locked utxo
-                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_10000) continue;
-
-                // Check if we should include zero value utxo
-                if (pcoin->vout[i].nValue <= 0) continue;
-
-                if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint((*it).first, i)))
-                    continue;
-
-                // --Skip P2CS outputs
-                // skip cold coins
-                if (mine == ISMINE_COLD && (!fIncludeColdStaking || !HasDelegator(pcoin->vout[i]))) continue;
-                // skip delegated coins
-                if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) continue;
-
-                bool solvable = IsSolvable(*this, pcoin->vout[i].scriptPubKey, mine == ISMINE_COLD);
-
-                bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
-                        (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable)) ||
-                        ((mine & ((fIncludeColdStaking ? ISMINE_COLD : ISMINE_NO) |
-                        (fIncludeDelegated ? ISMINE_SPENDABLE_DELEGATED : ISMINE_NO) )) != ISMINE_NO);
+                if (!res.available) continue;
 
                 // found valid coin
                 if (!pCoins) return true;
-                pCoins->emplace_back(pcoin, i, nDepth, spendable, solvable);
+                pCoins->emplace_back(pcoin, (int) i, nDepth, res.spendable, res.solvable);
             }
         }
-        return (pCoins && pCoins->size() > 0);
+        return (pCoins && !pCoins->empty());
     }
 }
 
