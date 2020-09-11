@@ -190,7 +190,7 @@ void CBudgetManager::SubmitFinalBudget()
         return;
     }
 
-    CFinalizedBudgetBroadcast tempBudget(strBudgetName, nBlockStart, vecTxBudgetPayments, UINT256_ZERO);
+    CFinalizedBudget tempBudget(strBudgetName, nBlockStart, vecTxBudgetPayments, UINT256_ZERO);
     const uint256& budgetHash = tempBudget.GetHash();
     if (HaveFinalizedBudget(budgetHash)) {
         LogPrint(BCLog::MNBUDGET,"%s: Budget already exists - %s\n", __func__, budgetHash.ToString());
@@ -216,12 +216,11 @@ void CBudgetManager::SubmitFinalBudget()
     }
 
     // Collateral tx already exists, see if it's mature enough.
-    CFinalizedBudgetBroadcast finalizedBudgetBroadcast(strBudgetName, nBlockStart, vecTxBudgetPayments, mapCollateralTxids.at(budgetHash));
-    CFinalizedBudget fb = CFinalizedBudget(finalizedBudgetBroadcast);
+    CFinalizedBudget fb(strBudgetName, nBlockStart, vecTxBudgetPayments, mapCollateralTxids.at(budgetHash));
     if (!AddFinalizedBudget(fb)) {
         return;
     }
-    finalizedBudgetBroadcast.Relay();
+    fb.Relay();
     nSubmittedHeight = nCurrentHeight;
     // Remove collateral tx from map
     mapCollateralTxids.erase(budgetHash);
@@ -1274,28 +1273,45 @@ bool CBudgetManager::UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pf
     return mapFinalizedBudgets[nBudgetHash].AddOrUpdateVote(vote, strError);
 }
 
-CBudgetProposal::CBudgetProposal()
-{
-    strProposalName = "unknown";
-    nBlockStart = 0;
-    nBlockEnd = 0;
-    nAmount = 0;
-    nTime = 0;
-    fValid = true;
-    strInvalid = "";
-}
+CBudgetProposal::CBudgetProposal():
+        fValid(true),
+        strInvalid(""),
+        strProposalName("unknown"),
+        strURL(""),
+        nBlockStart(0),
+        nBlockEnd(0),
+        address(),
+        nAmount(0),
+        nFeeTXHash(UINT256_ZERO),
+        nTime(0)
+{}
 
-CBudgetProposal::CBudgetProposal(std::string strProposalNameIn, std::string strURLIn, int nBlockStartIn, int nBlockEndIn, CScript addressIn, CAmount nAmountIn, uint256 nFeeTXHashIn)
+CBudgetProposal::CBudgetProposal(const std::string& name,
+                                 const std::string& url,
+                                 int paycount,
+                                 const CScript& payee,
+                                 const CAmount& amount,
+                                 int blockstart,
+                                 const uint256& nfeetxhash):
+        fValid(true),
+        strInvalid(""),
+        strProposalName(name),
+        strURL(url),
+        nBlockStart(blockstart),
+        address(payee),
+        nAmount(amount),
+        nTime(0)
 {
-    strProposalName = strProposalNameIn;
-    strURL = strURLIn;
-    nBlockStart = nBlockStartIn;
-    nBlockEnd = nBlockEndIn;
-    address = addressIn;
-    nAmount = nAmountIn;
-    nFeeTXHash = nFeeTXHashIn;
-    fValid = true;
-    strInvalid = "";
+    const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
+    int nCycleStart = nBlockStart - nBlockStart % nBlocksPerCycle;
+
+    // Right now single payment proposals have nBlockEnd have a cycle too early!
+    // switch back if it break something else
+    // calculate the end of the cycle for this vote, add half a cycle (vote will be deleted after that block)
+    // nBlockEnd = nCycleStart + GetBudgetPaymentCycleBlocks() * nPaymentCount + GetBudgetPaymentCycleBlocks() / 2;
+
+    // Calculate the end of the cycle for this vote, vote will be deleted after next cycle
+    nBlockEnd = nCycleStart + (nBlocksPerCycle + 1)  * paycount;
 }
 
 CBudgetProposal::CBudgetProposal(const CBudgetProposal& other)
@@ -1713,6 +1729,22 @@ CFinalizedBudget::CFinalizedBudget() :
         nBlockStart(0),
         vecBudgetPayments(),
         nFeeTXHash(),
+        strProposals(""),
+        nTime(0)
+{ }
+
+CFinalizedBudget::CFinalizedBudget(const std::string& name,
+                                   int blockstart,
+                                   const std::vector<CTxBudgetPayment>& vecBudgetPaymentsIn,
+                                   const uint256& nfeetxhash):
+        fAutoChecked(false),
+        fValid(true),
+        strInvalid(),
+        mapVotes(),
+        strBudgetName(name),
+        nBlockStart(blockstart),
+        vecBudgetPayments(vecBudgetPaymentsIn),
+        nFeeTXHash(nfeetxhash),
         strProposals(""),
         nTime(0)
 { }

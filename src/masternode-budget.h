@@ -402,6 +402,7 @@ public:
 
     CFinalizedBudget();
     CFinalizedBudget(const CFinalizedBudget& other);
+    CFinalizedBudget(const std::string& name, int blockstart, const std::vector<CTxBudgetPayment>& vecBudgetPaymentsIn, const uint256& nfeetxhash);
 
     void CleanAndRemove();
     bool AddOrUpdateVote(const CFinalizedBudgetVote& vote, std::string& strError);
@@ -543,8 +544,8 @@ protected:
     std::string strURL;
     int nBlockStart;
     int nBlockEnd;
-    CAmount nAmount;
     CScript address;
+    CAmount nAmount;
     uint256 nFeeTXHash;
 
 public:
@@ -553,7 +554,7 @@ public:
 
     CBudgetProposal();
     CBudgetProposal(const CBudgetProposal& other);
-    CBudgetProposal(std::string strProposalNameIn, std::string strURLIn, int nBlockStartIn, int nBlockEndIn, CScript addressIn, CAmount nAmountIn, uint256 nFeeTXHashIn);
+    CBudgetProposal(const std::string& name, const std::string& url, int paycount, const CScript& payee, const CAmount& amount, int blockstart, const uint256& nfeetxhash);
 
     bool AddOrUpdateVote(const CBudgetVote& vote, std::string& strError);
     UniValue GetVotesArray() const;
