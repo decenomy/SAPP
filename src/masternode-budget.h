@@ -200,8 +200,13 @@ class CBudgetManager
 {
 private:
     // map budget hash --> CollTx hash.
-    // hold finalized-budgets collateral txes until they mature enough to use
-    std::map<uint256, uint256> mapCollateralTxids;
+    // hold unconfirmed finalized-budgets collateral txes until they mature enough to use
+    std::map<uint256, uint256> mapUnconfirmedFeeTx;                         // guarded by cs_budgets
+
+    // map CollTx hash --> budget hash
+    // keep track of collaterals for valid budgets/proposals (for reorgs)
+    std::map<uint256, uint256> mapFeeTxToProposal;                          // guarded by cs_proposals
+    std::map<uint256, uint256> mapFeeTxToBudget;                            // guarded by cs_budgets
 
     std::map<uint256, CBudgetProposal> mapProposals;                        // guarded by cs_proposals
     std::map<uint256, CFinalizedBudget> mapFinalizedBudgets;                // guarded by cs_budgets
@@ -234,6 +239,8 @@ public:
         LOCK2(cs_budgets, cs_proposals);
         mapProposals.clear();
         mapFinalizedBudgets.clear();
+        mapFeeTxToProposal.clear();
+        mapFeeTxToBudget.clear();
     }
 
     void ClearSeen()
@@ -302,8 +309,17 @@ public:
     void CheckOrphanVotes();
     void Clear()
     {
-        WITH_LOCK(cs_proposals, mapProposals.clear(); );
-        WITH_LOCK(cs_budgets, mapFinalizedBudgets.clear(); );
+        {
+            LOCK(cs_proposals);
+            mapProposals.clear();
+            mapFeeTxToProposal.clear();
+        }
+        {
+            LOCK(cs_budgets);
+            mapFinalizedBudgets.clear();
+            mapFeeTxToBudget.clear();
+            mapUnconfirmedFeeTx.clear();
+        }
         {
             LOCK(cs_votes);
             mapSeenProposalVotes.clear();
@@ -323,13 +339,22 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        WITH_LOCK(cs_proposals, READWRITE(mapProposals); );
+        {
+            LOCK(cs_proposals);
+            READWRITE(mapProposals);
+            READWRITE(mapFeeTxToProposal);
+        }
         {
             LOCK(cs_votes);
             READWRITE(mapSeenProposalVotes);
             READWRITE(mapOrphanProposalVotes);
         }
-        WITH_LOCK(cs_budgets, READWRITE(mapFinalizedBudgets); );
+        {
+            LOCK(cs_budgets);
+            READWRITE(mapFinalizedBudgets);
+            READWRITE(mapFeeTxToBudget);
+            READWRITE(mapUnconfirmedFeeTx);
+        }
         {
             LOCK(cs_finalizedvotes);
             READWRITE(mapSeenFinalizedBudgetVotes);
