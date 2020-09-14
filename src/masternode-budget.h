@@ -335,6 +335,9 @@ public:
     void CheckAndRemove();
     std::string ToString() const;
 
+    // Remove proposal/budget by FeeTx (called when a block is disconnected)
+    void RemoveByFeeTxId(const uint256& feeTxId);
+
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action)
@@ -451,6 +454,7 @@ public:
     int GetBlockEnd() const { return nBlockStart + (int)(vecBudgetPayments.size() - 1); }
     const uint256& GetFeeTXHash() const { return nFeeTXHash;  }
     int GetVoteCount() const { return (int)mapVotes.size(); }
+    std::vector<uint256> GetVotesHashes() const;
     bool IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const;
     TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment) const;
@@ -565,6 +569,7 @@ public:
     const uint256& GetFeeTXHash() const { return nFeeTXHash;  }
     double GetRatio() const;
     int GetVoteCount(CBudgetVote::VoteDirection vd) const;
+    std::vector<uint256> GetVotesHashes() const;
     int GetYeas() const { return GetVoteCount(CBudgetVote::VOTE_YES); }
     int GetNays() const { return GetVoteCount(CBudgetVote::VOTE_NO); }
     int GetAbstains() const { return GetVoteCount(CBudgetVote::VOTE_ABSTAIN); };

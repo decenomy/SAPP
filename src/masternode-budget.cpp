@@ -561,6 +561,60 @@ void CBudgetManager::CheckAndRemove()
     }
 
 }
+
+void CBudgetManager::RemoveByFeeTxId(const uint256& feeTxId)
+{
+    {
+        LOCK(cs_proposals);
+        // Is this collateral related to a proposal?
+        const auto& it = mapFeeTxToProposal.find(feeTxId);
+        if (it != mapFeeTxToProposal.end()) {
+            // Remove proposal
+            CBudgetProposal* p = FindProposal(it->second);
+            if (p) {
+                LogPrintf("%s: Removing proposal %s (collateral disconnected, id=%s)\n", __func__, p->GetName(), feeTxId.ToString());
+                {
+                    // Erase seen/orhpan votes
+                    LOCK(cs_votes);
+                    for (const uint256& hash: p->GetVotesHashes()) {
+                        mapSeenProposalVotes.erase(hash);
+                        mapOrphanProposalVotes.erase(hash);
+                    }
+                }
+                // Erase proposal object
+                mapProposals.erase(it->second);
+            }
+            // Remove from collateral index
+            mapFeeTxToProposal.erase(it);
+            return;
+        }
+    }
+    {
+        LOCK(cs_budgets);
+        // Is this collateral related to a finalized budget?
+        const auto& it = mapFeeTxToBudget.find(feeTxId);
+        if (it != mapFeeTxToBudget.end()) {
+            // Remove finalized budget
+            CFinalizedBudget* b = FindFinalizedBudget(it->second);
+            if (b) {
+                LogPrintf("%s: Removing finalized budget %s (collateral disconnected, id=%s)\n", __func__, b->GetName(), feeTxId.ToString());
+                {
+                    // Erase seen/orhpan votes
+                    LOCK(cs_finalizedvotes);
+                    for (const uint256& hash: b->GetVotesHashes()) {
+                        mapSeenFinalizedBudgetVotes.erase(hash);
+                        mapOrphanFinalizedBudgetVotes.erase(hash);
+                    }
+                }
+                // Erase finalized budget object
+                mapFinalizedBudgets.erase(it->second);
+            }
+            // Remove from collateral index
+            mapFeeTxToBudget.erase(it);
+        }
+    }
+}
+
 const CFinalizedBudget* CBudgetManager::GetBudgetWithHighestVoteCount(int chainHeight) const
 {
     LOCK(cs_budgets);
@@ -1573,6 +1627,15 @@ int CBudgetProposal::GetVoteCount(CBudgetVote::VoteDirection vd) const
     return ret;
 }
 
+std::vector<uint256> CBudgetProposal::GetVotesHashes() const
+{
+    std::vector<uint256> vRet;
+    for (const auto& it: mapVotes) {
+        vRet.push_back(it.first);
+    }
+    return vRet;
+}
+
 int CBudgetProposal::GetBlockStartCycle() const
 {
     //end block is half way through the next cycle (so the proposal will be removed much after the payment is sent)
@@ -2015,6 +2078,15 @@ bool CFinalizedBudget::UpdateValid(int nCurrentHeight)
     fValid = true;
     strInvalid.clear();
     return true;
+}
+
+std::vector<uint256> CFinalizedBudget::GetVotesHashes() const
+{
+    std::vector<uint256> vRet;
+    for (const auto& it: mapVotes) {
+        vRet.push_back(it.first);
+    }
+    return vRet;
 }
 
 bool CFinalizedBudget::IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const
