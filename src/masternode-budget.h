@@ -234,14 +234,7 @@ public:
     mutable RecursiveMutex cs_finalizedvotes;
     mutable RecursiveMutex cs_votes;
 
-    CBudgetManager()
-    {
-        LOCK2(cs_budgets, cs_proposals);
-        mapProposals.clear();
-        mapFinalizedBudgets.clear();
-        mapFeeTxToProposal.clear();
-        mapFeeTxToBudget.clear();
-    }
+    CBudgetManager() {}
 
     void ClearSeen()
     {
