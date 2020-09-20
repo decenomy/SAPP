@@ -689,6 +689,35 @@ bool CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfSta
     return true;
 }
 
+void CBudgetManager::SubmitVote(const uint256& nBudgetHash)
+{
+    // function called only from initialized masternodes
+    assert(fMasterNode && activeMasternode.vin != nullopt);
+
+    CPubKey pubKeyMasternode;
+    CKey keyMasternode;
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
+        LogPrint(BCLog::MNBUDGET,"%s: Error upon calling GetKeysFromSecret\n", __func__);
+        return;
+    }
+
+    CFinalizedBudgetVote vote(*(activeMasternode.vin), nBudgetHash);
+    if (!vote.Sign(keyMasternode, pubKeyMasternode)) {
+        LogPrint(BCLog::MNBUDGET,"%s: Failure to sign.", __func__);
+        return;
+    }
+
+    std::string strError = "";
+    if (!UpdateFinalizedBudget(vote, NULL, strError)) {
+        LogPrintf("%s: Error submitting vote - %s\n", __func__, strError);
+        return;
+    }
+
+    LogPrint(BCLog::MNBUDGET,"%s: new finalized budget vote signed: %s\n", __func__, vote.GetHash().ToString());
+    AddSeenFinalizedBudgetVote(vote);
+    vote.Relay();
+}
+
 CFinalizedBudget* CBudgetManager::FindFinalizedBudget(const uint256& nHash)
 {
     AssertLockHeld(cs_budgets);
@@ -1960,7 +1989,8 @@ void CFinalizedBudget::CheckAndVote()
         }
 
         LogPrint(BCLog::MNBUDGET,"%s: Finalized Budget Matches! Submitting Vote.\n", __func__);
-        SubmitVote();
+        // TODO: move CheckAndVote to budget manager
+        g_budgetman.SubmitVote(GetHash());
     }
 }
 
@@ -2206,37 +2236,6 @@ bool CFinalizedBudget::GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, C
     payee = vecBudgetPayments[i].payee;
     nAmount = vecBudgetPayments[i].nAmount;
     return true;
-}
-
-void CFinalizedBudget::SubmitVote()
-{
-    // function called only from initialized masternodes
-    assert(fMasterNode && activeMasternode.vin != nullopt);
-
-    std::string strError = "";
-    CPubKey pubKeyMasternode;
-    CKey keyMasternode;
-
-    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
-        LogPrint(BCLog::MNBUDGET,"%s: Error upon calling GetKeysFromSecret\n", __func__);
-        return;
-    }
-
-    CFinalizedBudgetVote vote(*(activeMasternode.vin), GetHash());
-    if (!vote.Sign(keyMasternode, pubKeyMasternode)) {
-        LogPrint(BCLog::MNBUDGET,"%s: Failure to sign.", __func__);
-        return;
-    }
-
-    // !TODO: move to CBudgetManager
-    if (g_budgetman.UpdateFinalizedBudget(vote, NULL, strError)) {
-        LogPrint(BCLog::MNBUDGET,"%s: new finalized budget vote - %s\n", __func__, vote.GetHash().ToString());
-
-        g_budgetman.AddSeenFinalizedBudgetVote(vote);
-        vote.Relay();
-    } else {
-        LogPrint(BCLog::MNBUDGET,"%s: Error submitting vote - %s\n", __func__, strError);
-    }
 }
 
 // return broadcast serialization

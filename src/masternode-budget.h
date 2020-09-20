@@ -299,6 +299,9 @@ public:
     std::string GetRequiredPaymentsString(int nBlockHeight);
     bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
+    // Only initialized masternodes: sign and submit vote on a finalized budget with given key
+    void SubmitVote(const uint256& nBudgetHash);
+
     void CheckOrphanVotes();
     void Clear()
     {
@@ -457,8 +460,6 @@ public:
     void CheckAndVote();
     //total pivx paid out by this budget
     CAmount GetTotalPayout() const;
-    //vote on this finalized budget as a masternode
-    void SubmitVote();
 
     uint256 GetHash() const
     {
