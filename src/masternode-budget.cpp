@@ -17,7 +17,7 @@
 #include "util.h"
 
 
-CBudgetManager budget;
+CBudgetManager g_budgetman;
 
 std::map<uint256, int64_t> askedForSourceProposalOrBudget;
 
@@ -374,7 +374,7 @@ void DumpBudgets()
         }
     }
     LogPrint(BCLog::MNBUDGET,"Writting info to budget.dat...\n");
-    budgetdb.Write(budget);
+    budgetdb.Write(g_budgetman);
 
     LogPrint(BCLog::MNBUDGET,"Budget dump finished  %dms\n", GetTimeMillis() - nStart);
 }
@@ -1892,9 +1892,10 @@ void CFinalizedBudget::CheckAndVote()
 
     fAutoChecked = true; //we only need to check this once
 
+    // !TODO: move it to CBudgetManager
     if (strBudgetMode == "auto") //only vote for exact matches
     {
-        std::vector<CBudgetProposal*> vBudgetProposals = budget.GetBudget();
+        std::vector<CBudgetProposal*> vBudgetProposals = g_budgetman.GetBudget();
 
         // We have to resort the proposals by hash (they are sorted by votes here) and sort the payments
         // by hash (they are not sorted at all) to make the following tests deterministic
@@ -2227,10 +2228,11 @@ void CFinalizedBudget::SubmitVote()
         return;
     }
 
-    if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
+    // !TODO: move to CBudgetManager
+    if (g_budgetman.UpdateFinalizedBudget(vote, NULL, strError)) {
         LogPrint(BCLog::MNBUDGET,"%s: new finalized budget vote - %s\n", __func__, vote.GetHash().ToString());
 
-        budget.AddSeenFinalizedBudgetVote(vote);
+        g_budgetman.AddSeenFinalizedBudgetVote(vote);
         vote.Relay();
     } else {
         LogPrint(BCLog::MNBUDGET,"%s: Error submitting vote - %s\n", __func__, strError);

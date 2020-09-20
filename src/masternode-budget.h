@@ -35,7 +35,7 @@ static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
 static std::map<uint256, std::pair<uint256,int> > mapPayment_History;   // proposal hash --> (block hash, block height)
 
-extern CBudgetManager budget;
+extern CBudgetManager g_budgetman;
 void DumpBudgets();
 
 //

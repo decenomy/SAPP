@@ -131,10 +131,10 @@ void CMasternodeSync::AddedMasternodeWinner(const uint256& hash)
 
 void CMasternodeSync::AddedBudgetItem(const uint256& hash)
 {
-    if (budget.HaveProposal(hash) ||
-            budget.HaveSeenProposalVote(hash) ||
-            budget.HaveFinalizedBudget(hash) ||
-            budget.HaveSeenFinalizedBudgetVote(hash)) {
+    if (g_budgetman.HaveProposal(hash) ||
+            g_budgetman.HaveSeenProposalVote(hash) ||
+            g_budgetman.HaveFinalizedBudget(hash) ||
+            g_budgetman.HaveSeenFinalizedBudgetVote(hash)) {
         if (mapSeenSyncBudget[hash] < MASTERNODE_SYNC_THRESHOLD) {
             lastBudgetItem = GetTime();
             mapSeenSyncBudget[hash]++;

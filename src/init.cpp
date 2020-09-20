@@ -1769,8 +1769,8 @@ bool AppInit2()
 
     CBudgetDB budgetdb;
     const bool fDryRun = (nChainHeight <= 0);
-    if (!fDryRun) budget.SetBestHeight(nChainHeight);
-    CBudgetDB::ReadResult readResult2 = budgetdb.Read(budget, fDryRun);
+    if (!fDryRun) g_budgetman.SetBestHeight(nChainHeight);
+    CBudgetDB::ReadResult readResult2 = budgetdb.Read(g_budgetman, fDryRun);
 
     if (readResult2 == CBudgetDB::FileError)
         LogPrintf("Missing budget cache - budget.dat, will try to recreate\n");
@@ -1783,8 +1783,8 @@ bool AppInit2()
     }
 
     //flag our cached items so we send them to our peers
-    budget.ResetSync();
-    budget.ClearSeen();
+    g_budgetman.ResetSync();
+    g_budgetman.ClearSeen();
 
 
     uiInterface.InitMessage(_("Loading masternode payment cache..."));
