@@ -299,8 +299,8 @@ public:
     std::string GetRequiredPaymentsString(int nBlockHeight);
     bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
-    // Only initialized masternodes: sign and submit vote on a finalized budget with given key
-    void SubmitVote(CFinalizedBudget* pfb);
+    // Only initialized masternodes: sign and submit votes on valid finalized budgets
+    void VoteOnFinalizedBudgets();
 
     void CheckOrphanVotes();
     void Clear()
@@ -460,7 +460,7 @@ public:
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 
     // Check finalized budget proposals. Masternodes only (when voting on finalized budgets)
-    bool CheckProposals(const std::vector<CBudgetProposal*>& vBudgetProposalsSortedByHash) const;
+    bool CheckProposals(std::vector<CBudgetProposal*>& vBudget) const;
     // Total amount paid out by this budget
     CAmount GetTotalPayout() const;
 
