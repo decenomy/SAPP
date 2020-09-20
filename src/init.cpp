@@ -236,7 +236,7 @@ void PrepareShutdown()
     g_connman.reset();
 
     DumpMasternodes();
-    DumpBudgets();
+    DumpBudgets(g_budgetman);
     DumpMasternodePayments();
     UnregisterNodeSignals(GetNodeSignals());
 

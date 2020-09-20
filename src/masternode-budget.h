@@ -36,7 +36,7 @@ static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
 static std::map<uint256, std::pair<uint256,int> > mapPayment_History;   // proposal hash --> (block hash, block height)
 
 extern CBudgetManager g_budgetman;
-void DumpBudgets();
+void DumpBudgets(CBudgetManager& budgetman);
 
 //
 // CBudgetVote - Allow a masternode node to vote and broadcast throughout the network

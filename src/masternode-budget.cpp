@@ -352,7 +352,7 @@ CBudgetDB::ReadResult CBudgetDB::Read(CBudgetManager& objToLoad, bool fDryRun)
     return Ok;
 }
 
-void DumpBudgets()
+void DumpBudgets(CBudgetManager& budgetman)
 {
     int64_t nStart = GetTimeMillis();
 
@@ -374,7 +374,7 @@ void DumpBudgets()
         }
     }
     LogPrint(BCLog::MNBUDGET,"Writting info to budget.dat...\n");
-    budgetdb.Write(g_budgetman);
+    budgetdb.Write(budgetman);
 
     LogPrint(BCLog::MNBUDGET,"Budget dump finished  %dms\n", GetTimeMillis() - nStart);
 }
