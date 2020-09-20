@@ -61,7 +61,7 @@ private:
 
 public:
     CBudgetVote();
-    CBudgetVote(CTxIn vin, uint256 nProposalHash, VoteDirection nVoteIn);
+    CBudgetVote(const CTxIn& vin, const uint256& nProposalHash, VoteDirection nVoteIn);
 
     void Relay() const;
 
@@ -129,7 +129,7 @@ private:
 
 public:
     CFinalizedBudgetVote();
-    CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn);
+    CFinalizedBudgetVote(const CTxIn& vinIn, const uint256& nBudgetHashIn);
 
     void Relay() const;
     uint256 GetHash() const;

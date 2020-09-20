@@ -1796,7 +1796,7 @@ CBudgetVote::CBudgetVote() :
         vin()
 { }
 
-CBudgetVote::CBudgetVote(CTxIn vinIn, uint256 nProposalHashIn, VoteDirection nVoteIn) :
+CBudgetVote::CBudgetVote(const CTxIn& vinIn, const uint256& nProposalHashIn, VoteDirection nVoteIn) :
         CSignedMessage(),
         fValid(true),
         fSynced(false),
@@ -2277,7 +2277,7 @@ CFinalizedBudgetVote::CFinalizedBudgetVote() :
         nTime(0)
 { }
 
-CFinalizedBudgetVote::CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn) :
+CFinalizedBudgetVote::CFinalizedBudgetVote(const CTxIn& vinIn, const uint256& nBudgetHashIn) :
         CSignedMessage(),
         fValid(true),
         fSynced(false),
