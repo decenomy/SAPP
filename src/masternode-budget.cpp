@@ -533,7 +533,8 @@ void CBudgetManager::CheckAndRemove()
             } else {
                 LogPrint(BCLog::MNBUDGET,"%s: Found valid finalized budget: %s %s\n", __func__,
                           pfinalizedBudget->GetName(), pfinalizedBudget->GetFeeTXHash().ToString());
-                pfinalizedBudget->CheckAndVote();
+                // if this is  a masternode, vote for finalized budget (!TODO: don't lock cs_budgets)
+                SubmitVote(pfinalizedBudget);
                 tmpMapFinalizedBudgets.emplace(pfinalizedBudget->GetHash(), *pfinalizedBudget);
             }
         }
@@ -689,11 +690,40 @@ bool CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfSta
     return true;
 }
 
-void CBudgetManager::SubmitVote(const uint256& nBudgetHash)
+void CBudgetManager::SubmitVote(CFinalizedBudget* pfb)
 {
     // function called only from initialized masternodes
-    assert(fMasterNode && activeMasternode.vin != nullopt);
+    if (!fMasterNode) {
+        LogPrint(BCLog::MNBUDGET,"%s: Not a masternode\n", __func__);
+        return;
+    }
+    if (activeMasternode.vin == nullopt) {
+        LogPrint(BCLog::MNBUDGET,"%s: Active Masternode not initialized.\n", __func__);
+        return;
+    }
 
+    // Do this 1 in 4 blocks -- spread out the voting activity
+    // -- this function is only called every fourteenth block, so this is really 1 in 56 blocks
+    if (rand() % 4 != 0) {
+        LogPrint(BCLog::MNBUDGET,"%s: waiting\n", __func__);
+        return;
+    }
+
+    // we only need to check this once
+    if (pfb->IsAutoChecked()) return;
+    pfb->SetAutoChecked(true);
+
+    //only vote for exact matches
+    if (strBudgetMode == "auto") {
+        // sort proposals and payments by votes and compare.
+        std::vector<CBudgetProposal*> vBudgetProposalsSortedByHash = GetBudget();
+        std::sort(vBudgetProposalsSortedByHash.begin(), vBudgetProposalsSortedByHash.end(), CBudgetProposal::PtrGreater);
+        if (!pfb->CheckProposals(vBudgetProposalsSortedByHash)) {
+            return;
+        }
+    }
+
+    // -- sign and submit vote
     CPubKey pubKeyMasternode;
     CKey keyMasternode;
     if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
@@ -701,7 +731,7 @@ void CBudgetManager::SubmitVote(const uint256& nBudgetHash)
         return;
     }
 
-    CFinalizedBudgetVote vote(*(activeMasternode.vin), nBudgetHash);
+    CFinalizedBudgetVote vote(*(activeMasternode.vin), pfb->GetHash());
     if (!vote.Sign(keyMasternode, pubKeyMasternode)) {
         LogPrint(BCLog::MNBUDGET,"%s: Failure to sign.", __func__);
         return;
@@ -1899,99 +1929,63 @@ struct sortProposalsByHash  {
     }
 };
 
-// Check finalized budget and vote on it if correct. Masternodes only
-void CFinalizedBudget::CheckAndVote()
+bool CFinalizedBudget::CheckProposals(const std::vector<CBudgetProposal*>& vBudgetProposalsSortedByHash) const
 {
-    if (!fMasterNode || fAutoChecked) {
-        LogPrint(BCLog::MNBUDGET,"%s: fMasterNode=%d fAutoChecked=%d\n", __func__, fMasterNode, fAutoChecked);
-        return;
+    // Sort copy payments by hash (descending)
+    std::vector<CTxBudgetPayment> vecBudgetPaymentsSortedByHash(vecBudgetPayments);
+    std::sort(vecBudgetPaymentsSortedByHash.begin(), vecBudgetPaymentsSortedByHash.end(), std::greater<CTxBudgetPayment>());
+
+    for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nProp %d %s\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - Payee %d %s\n", __func__, i, HexStr(vecBudgetPaymentsSortedByHash[i].payee));
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nAmount %d %lli\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nAmount);
     }
 
-    if (activeMasternode.vin == nullopt) {
-        LogPrint(BCLog::MNBUDGET,"%s: Active Masternode not initialized.\n", __func__);
-        return;
+    for (unsigned int i = 0; i < vBudgetProposalsSortedByHash.size(); i++) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %d %s\n", __func__, i, vBudgetProposalsSortedByHash[i]->GetHash().ToString());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %d %s\n", __func__, i, HexStr(vBudgetProposalsSortedByHash[i]->GetPayee()));
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %d %lli\n", __func__, i, vBudgetProposalsSortedByHash[i]->GetAmount());
     }
 
-    // Do this 1 in 4 blocks -- spread out the voting activity
-    // -- this function is only called every fourteenth block, so this is really 1 in 56 blocks
-    if (rand() % 4 != 0) {
-        LogPrint(BCLog::MNBUDGET,"%s: waiting\n", __func__);
-        return;
+    if (vBudgetProposalsSortedByHash.size() == 0) {
+        LogPrint(BCLog::MNBUDGET,"%s: No Budget-Proposals found, aborting\n", __func__);
+        return false;
     }
 
-    fAutoChecked = true; //we only need to check this once
-
-    // !TODO: move it to CBudgetManager
-    if (strBudgetMode == "auto") //only vote for exact matches
-    {
-        std::vector<CBudgetProposal*> vBudgetProposals = g_budgetman.GetBudget();
-
-        // We have to resort the proposals by hash (they are sorted by votes here) and sort the payments
-        // by hash (they are not sorted at all) to make the following tests deterministic
-        // We're working on copies to avoid any side-effects by the possibly changed sorting order
-
-        // Sort copy of proposals by hash (descending)
-        std::vector<CBudgetProposal*> vBudgetProposalsSortedByHash(vBudgetProposals);
-        std::sort(vBudgetProposalsSortedByHash.begin(), vBudgetProposalsSortedByHash.end(), CBudgetProposal::PtrGreater);
-
-        // Sort copy payments by hash (descending)
-        std::vector<CTxBudgetPayment> vecBudgetPaymentsSortedByHash(vecBudgetPayments);
-        std::sort(vecBudgetPaymentsSortedByHash.begin(), vecBudgetPaymentsSortedByHash.end(), std::greater<CTxBudgetPayment>());
-
-        for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nProp %d %s\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString());
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - Payee %d %s\n", __func__, i, HexStr(vecBudgetPaymentsSortedByHash[i].payee));
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nAmount %d %lli\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nAmount);
-        }
-
-        for (unsigned int i = 0; i < vBudgetProposalsSortedByHash.size(); i++) {
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %d %s\n", __func__, i, vBudgetProposalsSortedByHash[i]->GetHash().ToString());
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %d %s\n", __func__, i, HexStr(vBudgetProposalsSortedByHash[i]->GetPayee()));
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %d %lli\n", __func__, i, vBudgetProposalsSortedByHash[i]->GetAmount());
-        }
-
-        if (vBudgetProposalsSortedByHash.size() == 0) {
-            LogPrint(BCLog::MNBUDGET,"%s: No Budget-Proposals found, aborting\n", __func__);
-            return;
-        }
-
-        if (vBudgetProposalsSortedByHash.size() != vecBudgetPaymentsSortedByHash.size()) {
-            LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposal length (%ld) doesn't match Budget-Payment length (%ld).\n", __func__,
-                      vBudgetProposalsSortedByHash.size(), vecBudgetPaymentsSortedByHash.size());
-            return;
-        }
-
-        for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
-            if (i > vBudgetProposalsSortedByHash.size() - 1) {
-                LogPrint(BCLog::MNBUDGET,"%s: Proposal size mismatch, i=%d > (vBudgetProposals.size() - 1)=%d\n",
-                        __func__, i, vBudgetProposalsSortedByHash.size() - 1);
-                return;
-            }
-
-            if (vecBudgetPaymentsSortedByHash[i].nProposalHash != vBudgetProposalsSortedByHash[i]->GetHash()) {
-                LogPrint(BCLog::MNBUDGET,"%s: item #%d doesn't match %s %s\n", __func__,
-                        i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString(), vBudgetProposalsSortedByHash[i]->GetHash().ToString());
-                return;
-            }
-
-            // if(vecBudgetPayments[i].payee != vBudgetProposals[i]->GetPayee()){ -- triggered with false positive
-            if (HexStr(vecBudgetPaymentsSortedByHash[i].payee) != HexStr(vBudgetProposalsSortedByHash[i]->GetPayee())) {
-                LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %s %s\n", __func__,
-                        i, HexStr(vecBudgetPaymentsSortedByHash[i].payee), HexStr(vBudgetProposalsSortedByHash[i]->GetPayee()));
-                return;
-            }
-
-            if (vecBudgetPaymentsSortedByHash[i].nAmount != vBudgetProposalsSortedByHash[i]->GetAmount()) {
-                LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %lli %lli\n", __func__,
-                        i, vecBudgetPaymentsSortedByHash[i].nAmount, vBudgetProposalsSortedByHash[i]->GetAmount());
-                return;
-            }
-        }
-
-        LogPrint(BCLog::MNBUDGET,"%s: Finalized Budget Matches! Submitting Vote.\n", __func__);
-        // TODO: move CheckAndVote to budget manager
-        g_budgetman.SubmitVote(GetHash());
+    if (vBudgetProposalsSortedByHash.size() != vecBudgetPaymentsSortedByHash.size()) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposal length (%ld) doesn't match Budget-Payment length (%ld).\n", __func__,
+                  vBudgetProposalsSortedByHash.size(), vecBudgetPaymentsSortedByHash.size());
+        return false;
     }
+
+    for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
+        if (i > vBudgetProposalsSortedByHash.size() - 1) {
+            LogPrint(BCLog::MNBUDGET,"%s: Proposal size mismatch, i=%d > (vBudgetProposals.size() - 1)=%d\n",
+                    __func__, i, vBudgetProposalsSortedByHash.size() - 1);
+            return false;
+        }
+
+        if (vecBudgetPaymentsSortedByHash[i].nProposalHash != vBudgetProposalsSortedByHash[i]->GetHash()) {
+            LogPrint(BCLog::MNBUDGET,"%s: item #%d doesn't match %s %s\n", __func__,
+                    i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString(), vBudgetProposalsSortedByHash[i]->GetHash().ToString());
+            return false;
+        }
+
+        // if(vecBudgetPayments[i].payee != vBudgetProposals[i]->GetPayee()){ -- triggered with false positive
+        if (HexStr(vecBudgetPaymentsSortedByHash[i].payee) != HexStr(vBudgetProposalsSortedByHash[i]->GetPayee())) {
+            LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %s %s\n", __func__,
+                    i, HexStr(vecBudgetPaymentsSortedByHash[i].payee), HexStr(vBudgetProposalsSortedByHash[i]->GetPayee()));
+            return false;
+        }
+
+        if (vecBudgetPaymentsSortedByHash[i].nAmount != vBudgetProposalsSortedByHash[i]->GetAmount()) {
+            LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %lli %lli\n", __func__,
+                    i, vecBudgetPaymentsSortedByHash[i].nAmount, vBudgetProposalsSortedByHash[i]->GetAmount());
+            return false;
+        }
+    }
+    LogPrint(BCLog::MNBUDGET,"%s: Finalized Budget Matches! Submitting Vote.\n", __func__);
+    return true;
 }
 
 // Remove votes from masternodes which are not valid/existent anymore

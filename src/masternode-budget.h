@@ -300,7 +300,7 @@ public:
     bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
     // Only initialized masternodes: sign and submit vote on a finalized budget with given key
-    void SubmitVote(const uint256& nBudgetHash);
+    void SubmitVote(CFinalizedBudget* pfb);
 
     void CheckOrphanVotes();
     void Clear()
@@ -441,6 +441,9 @@ public:
     std::string IsInvalidReason() const { return strInvalid; }
     std::string IsInvalidLogStr() const { return strprintf("[%s (%s)]: %s", GetName(), GetProposalsStr(), IsInvalidReason()); }
 
+    bool IsAutoChecked() const { return fAutoChecked; }
+    void SetAutoChecked(bool _fAutoChecked) { fAutoChecked = _fAutoChecked; }
+
     void SetProposalsStr(const std::string _strProposals) { strProposals = _strProposals; }
 
     std::string GetName() const { return strBudgetName; }
@@ -456,9 +459,9 @@ public:
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment) const;
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 
-    // Verify and vote on finalized budget
-    void CheckAndVote();
-    //total pivx paid out by this budget
+    // Check finalized budget proposals. Masternodes only (when voting on finalized budgets)
+    bool CheckProposals(const std::vector<CBudgetProposal*>& vBudgetProposalsSortedByHash) const;
+    // Total amount paid out by this budget
     CAmount GetTotalPayout() const;
 
     uint256 GetHash() const
