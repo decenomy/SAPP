@@ -3600,6 +3600,10 @@ bool static LoadBlockIndexDB(std::string& strError)
     PruneBlockIndexCandidates();
 
     const CBlockIndex* pChainTip = chainActive.Tip();
+
+    // initial global flag update
+    g_IsSaplingActive = Params().GetConsensus().NetworkUpgradeActive(pChainTip->nHeight, Consensus::UPGRADE_V5_DUMMY);
+
     LogPrintf("LoadBlockIndexDB(): hashBestChain=%s height=%d date=%s progress=%f\n",
             pChainTip->GetBlockHash().GetHex(), pChainTip->nHeight,
             DateTimeStrFormat("%Y-%m-%d %H:%M:%S", pChainTip->GetBlockTime()),
