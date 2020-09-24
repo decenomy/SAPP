@@ -421,6 +421,22 @@ def sync_mempools(rpc_connections, *, wait=1, timeout=60, flush_scheduler=True):
         "".join("\n  {!r}".format(m) for m in pool),
     ))
 
+def sync_tiertwo(rpc_connections, *, wait=5, timeout=60):
+    """
+    Wait until everybody has the tier two synced
+    pools
+    """
+    stop_time = time.time() + timeout
+    while time.time() <= stop_time:
+        # Check that each peer has at least one connection
+        assert (all([len(x.getpeerinfo()) for x in rpc_connections]))
+        time.sleep(wait)
+
+        sync_status = [x.mnsync("status")["RequestedMasternodeAssets"] for x in rpc_connections]
+        if sync_status.count(999) == len(rpc_connections):
+            return
+    raise AssertionError("Tier two sync timed out")
+
 # Transaction/Block functions
 #############################
 
