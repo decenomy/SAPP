@@ -8,7 +8,6 @@
 
 #include "base58.h"
 #include "key.h"
-#include "main.h"
 #include "messagesigner.h"
 #include "net.h"
 #include "sync.h"

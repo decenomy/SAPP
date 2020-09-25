@@ -17,36 +17,23 @@
 
 #include "amount.h"
 #include "chain.h"
-#include "chainparams.h"
 #include "coins.h"
 #include "consensus/validation.h"
-#include "net.h"
-#include "pow.h"
-#include "primitives/block.h"
-#include "primitives/transaction.h"
-#include "zpiv/zerocoin.h"
-#include "zpiv/zpivmodule.h"
-#include "script/script.h"
-#include "script/sigcache.h"
-#include "script/standard.h"
+#include "fs.h"
+#include "script/script_error.h"
 #include "sync.h"
-#include "tinyformat.h"
 #include "txmempool.h"
-#include "uint256.h"
-#include "undo.h"
-#include "validationinterface.h"
 
 #include <algorithm>
 #include <atomic>
 #include <exception>
 #include <map>
+#include <memory>
 #include <set>
 #include <stdint.h>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "libzerocoin/CoinSpend.h"
 
 class CBlockIndex;
 class CBlockTreeDB;
@@ -56,9 +43,8 @@ class CSporkDB;
 class CBloomFilter;
 class CInv;
 class CConnman;
+class CNode;
 class CScriptCheck;
-class CValidationInterface;
-class CValidationState;
 
 struct PrecomputedTransactionData;
 struct CBlockTemplate;
@@ -87,8 +73,6 @@ static const unsigned int DEFAULT_LIMITFREERELAY = 30;
 /** The maximum size for transactions we're willing to relay/mine */
 static const unsigned int MAX_STANDARD_TX_SIZE = 100000;
 static const unsigned int MAX_ZEROCOIN_TX_SIZE = 150000;
-/** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
-static const unsigned int DEFAULT_MAX_ORPHAN_TRANSACTIONS = 100;
 /** Default for -checkblocks */
 static const signed int DEFAULT_CHECKBLOCKS = 10;
 /** The maximum size of a blk?????.dat file (since 0.8) */

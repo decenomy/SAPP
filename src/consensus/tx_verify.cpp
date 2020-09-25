@@ -6,8 +6,8 @@
 
 #include "consensus/consensus.h"
 #include "consensus/zerocoin_verify.h"
-#include "main.h"
 #include "script/interpreter.h"
+#include "../validation.h"
 
 bool IsFinalTx(const CTransaction& tx, int nBlockHeight, int64_t nBlockTime)
 {

@@ -7,18 +7,16 @@
 // Unit tests for denial-of-service detection/prevention code
 //
 
-
+#include "test/test_pivx.h"
 
 #include "keystore.h"
-#include "main.h"
 #include "net_processing.h"
 #include "net.h"
 #include "pow.h"
 #include "script/sign.h"
 #include "serialize.h"
 #include "util.h"
-
-#include "test/test_pivx.h"
+#include "validation.h"
 
 #include <stdint.h>
 
@@ -26,7 +24,7 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/test/unit_test.hpp>
 
-// Tests this internal-to-main.cpp method:
+// Tests this internal-to-validation.cpp method:
 extern bool AddOrphanTx(const CTransaction& tx, NodeId peer);
 extern void EraseOrphansFor(NodeId peer);
 extern unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans);

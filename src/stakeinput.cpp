@@ -5,7 +5,6 @@
 #include "stakeinput.h"
 
 #include "chain.h"
-#include "main.h"
 #include "txdb.h"
 #include "zpiv/deterministicmint.h"
 #include "wallet/wallet.h"

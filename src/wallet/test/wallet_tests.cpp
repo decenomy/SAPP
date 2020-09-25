@@ -3,8 +3,12 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "wallet/wallet.h"
+#include "wallet/test/wallet_test_fixture.h"
+
 #include "consensus/merkle.h"
+#include "txmempool.h"
+#include "validation.h"
+#include "wallet/wallet.h"
 
 #include <set>
 #include <stdint.h>
@@ -12,7 +16,6 @@
 #include <vector>
 
 #include <boost/test/unit_test.hpp>
-#include "wallet/test/wallet_test_fixture.h"
 
 // how many times to run all the tests to have a chance to catch errors that only show up with particular random shuffles
 #define RUN_TESTS 100

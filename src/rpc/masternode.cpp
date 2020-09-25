@@ -6,7 +6,6 @@
 #include "activemasternode.h"
 #include "db.h"
 #include "init.h"
-#include "main.h"
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "masternodeconfig.h"

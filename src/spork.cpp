@@ -10,6 +10,8 @@
 #include "netmessagemaker.h"
 #include "net_processing.h"
 #include "sporkdb.h"
+#include "validation.h"
+
 #include <iostream>
 
 #define MAKE_SPORK_DEF(name, defaultValue) CSporkDef(name, defaultValue, #name)

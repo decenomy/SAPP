@@ -8,10 +8,10 @@
 #include "policy/policy.h"
 
 #include "consensus/tx_verify.h" // for IsFinal()
-#include "main.h"
 #include "tinyformat.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "validation.h"
 
 #include <boost/foreach.hpp>
 

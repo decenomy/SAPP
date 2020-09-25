@@ -7,7 +7,6 @@
 #include "net_processing.h"
 
 #include "chain.h"
-#include "main.h"
 #include "masternodeman.h"
 #include "masternode-payments.h"
 #include "masternode-budget.h"

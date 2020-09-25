@@ -6,7 +6,6 @@
 #define PIVX_LEGACY_ZPOS_H
 
 #include "stakeinput.h"
-#include "main.h"
 #include "txdb.h"
 
 class CLegacyZPivStake : public CStakeInput

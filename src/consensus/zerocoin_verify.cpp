@@ -9,12 +9,13 @@
 #include "guiinterface.h"        // for ui_interface
 #include "init.h"                // for ShutdownRequested()
 #include "invalid.h"
-#include "main.h"
 #include "script/interpreter.h"
 #include "spork.h"               // for sporkManager
 #include "txdb.h"
 #include "upgrades.h"            // for IsActivationHeight
 #include "utilmoneystr.h"        // for FormatMoney
+#include "../validation.h"
+#include "zpiv/zpivmodule.h"
 
 
 bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidationState& state, bool fFakeSerialAttack)

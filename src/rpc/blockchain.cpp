@@ -10,7 +10,6 @@
 #include "clientversion.h"
 #include "consensus/upgrades.h"
 #include "kernel.h"
-#include "main.h"
 #include "masternode-budget.h"
 #include "policy/policy.h"
 #include "rpc/server.h"

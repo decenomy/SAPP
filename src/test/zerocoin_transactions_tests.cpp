@@ -2,21 +2,21 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "libzerocoin/Denominations.h"
-#include "libzerocoin/Coin.h"
-#include "libzerocoin/CoinRandomnessSchnorrSignature.h"
+
 #include "amount.h"
 #include "chainparams.h"
 #include "coincontrol.h"
 #include "consensus/zerocoin_verify.h"
-#include "main.h"
+#include "libzerocoin/Denominations.h"
+#include "libzerocoin/Coin.h"
+#include "libzerocoin/CoinRandomnessSchnorrSignature.h"
+#include "txdb.h"
+#include "wallet/test/wallet_test_fixture.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
-#include "txdb.h"
 #include "zpiv/zpivmodule.h"
-#include "wallet/test/wallet_test_fixture.h"
+
 #include <boost/test/unit_test.hpp>
-#include <iostream>
 
 
 

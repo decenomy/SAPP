@@ -30,7 +30,6 @@
 
 #include "fs.h"
 #include "init.h"
-#include "main.h"
 #include "rpc/server.h"
 #include "guiinterface.h"
 #include "util.h"

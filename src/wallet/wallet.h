@@ -12,11 +12,11 @@
 #include "amount.h"
 #include "base58.h"
 #include "consensus/tx_verify.h"
+#include "consensus/validation.h"
 #include "crypter.h"
 #include "kernel.h"
 #include "key.h"
 #include "keystore.h"
-#include "main.h"
 #include "pairresult.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
@@ -29,6 +29,7 @@
 #include "script/ismine.h"
 #include "wallet/scriptpubkeyman.h"
 #include "sapling/saplingscriptpubkeyman.h"
+#include "validation.h"
 #include "wallet/walletdb.h"
 #include "zpiv/zpivmodule.h"
 #include "zpiv/zpivwallet.h"
@@ -43,6 +44,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/thread/thread.hpp>
 
 extern CWallet* pwalletMain;
 

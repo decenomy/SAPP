@@ -6,6 +6,8 @@
 #ifndef MASTERNODE_SYNC_H
 #define MASTERNODE_SYNC_H
 
+#include "net.h"
+
 #include <atomic>
 
 #define MASTERNODE_SYNC_INITIAL 0

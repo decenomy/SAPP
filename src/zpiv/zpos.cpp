@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zpiv/zpos.h"
+
+#include "validation.h"
 #include "zpivchain.h"
 
 

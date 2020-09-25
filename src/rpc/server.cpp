@@ -10,7 +10,6 @@
 #include "base58.h"
 #include "fs.h"
 #include "init.h"
-#include "main.h"
 #include "random.h"
 #include "sync.h"
 #include "guiinterface.h"

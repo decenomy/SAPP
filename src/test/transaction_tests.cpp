@@ -3,25 +3,22 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "data/tx_invalid.json.h"
-#include "data/tx_valid.json.h"
 #include "test/test_pivx.h"
+
+#include "test/data/tx_invalid.json.h"
+#include "test/data/tx_valid.json.h"
 
 #include "consensus/tx_verify.h"
 #include "clientversion.h"
 #include "checkqueue.h"
+#include "core_io.h"
 #include "key.h"
 #include "keystore.h"
-#include "main.h"
 #include "policy/policy.h"
 #include "script/script.h"
 #include "script/script_error.h"
 #include "script/sign.h"
-#include "core_io.h"
-#include "test_pivx.h"
-
-#include <map>
-#include <string>
+#include "validation.h"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>

@@ -3,16 +3,17 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "data/sighash.json.h"
+#include "test/test_pivx.h"
+
+#include "test/data/sighash.json.h"
 
 #include "consensus/tx_verify.h"
-#include "main.h"
 #include "serialize.h"
 #include "script/script.h"
 #include "script/interpreter.h"
 #include "util.h"
+#include "validation.h"
 #include "version.h"
-#include "test_pivx.h"
 
 #include <iostream>
 

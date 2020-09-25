@@ -9,11 +9,12 @@
 
 #include "db.h"
 #include "legacy/stakemodifier.h"
-#include "script/interpreter.h"
-#include "util.h"
 #include "policy/policy.h"
+#include "script/interpreter.h"
 #include "stakeinput.h"
+#include "util.h"
 #include "utilmoneystr.h"
+#include "validation.h"
 #include "zpivchain.h"
 #include "zpiv/zpos.h"
 

@@ -8,7 +8,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "main.h"
+#include "validation.h"
 
 #include "addrman.h"
 #include "amount.h"
@@ -22,33 +22,33 @@
 #include "consensus/validation.h"
 #include "consensus/zerocoin_verify.h"
 #include "fs.h"
+#include "guiinterface.h"
 #include "init.h"
+#include "invalid.h"
+#include "legacy/validation_zerocoin_legacy.h"
+#include "libzerocoin/Denominations.h"
 #include "kernel.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
+#include "masternode-sync.h"
 #include "masternodeman.h"
 #include "messagesigner.h"
 #include "netmessagemaker.h"
 #include "net_processing.h"
 #include "policy/policy.h"
 #include "pow.h"
+#include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"
 #include "swifttx.h"
 #include "txdb.h"
 #include "txmempool.h"
-#include "guiinterface.h"
+#include "undo.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
 #include "zpivchain.h"
-
-#include "invalid.h"
-#include "legacy/validation_zerocoin_legacy.h"
-#include "libzerocoin/Denominations.h"
-#include "masternode-sync.h"
 #include "zpiv/zerocoin.h"
-#include <sstream>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>

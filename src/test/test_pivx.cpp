@@ -5,14 +5,15 @@
 
 #define BOOST_TEST_MODULE Pivx Test Suite
 
-#include "test_pivx.h"
+#include "test/test_pivx.h"
 
-#include "main.h"
+#include "guiinterface.h"
 #include "net_processing.h"
 #include "random.h"
 #include "script/sigcache.h"
+#include "txmempool.h"
 #include "txdb.h"
-#include "guiinterface.h"
+#include "validation.h"
 
 #include <boost/test/unit_test.hpp>
 
