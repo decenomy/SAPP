@@ -991,6 +991,39 @@ void static ProcessGetData(CNode* pfrom, CConnman& connman, std::atomic<bool>& i
     }
 }
 
+static void CheckBlockSpam(CValidationState& state, CNode* pfrom, const uint256& hashBlock)
+{
+    // Block spam filtering
+    if (!GetBoolArg("-blockspamfilter", DEFAULT_BLOCK_SPAM_FILTER)) {
+        return;
+    }
+    CNodeState *nodestate = State(pfrom->GetId());
+    if(!nodestate) {
+        return;
+    }
+
+    const auto it = mapBlockIndex.find(hashBlock);
+    if (it == mapBlockIndex.end()) {
+        return;
+    }
+
+    nodestate->nodeBlocks.onBlockReceived(it->second->nHeight);
+    bool nodeStatus = true;
+    // UpdateState will return false if the node is attacking us or update the score and return true.
+    nodeStatus = nodestate->nodeBlocks.updateState(state, nodeStatus);
+    int nDoS = 0;
+    if (state.IsInvalid(nDoS)) {
+        if (nDoS > 0) {
+            LOCK(cs_main);
+            Misbehaving(pfrom->GetId(), nDoS);
+        }
+        nodeStatus = false;
+    }
+
+    if (!nodeStatus) {
+        LogPrintf("Block spam protection: %s\n", hashBlock.ToString());
+    }
+}
 
 bool fRequestedSporksIDB = false;
 bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vRecv, int64_t nTimeReceived, CConnman& connman, std::atomic<bool>& interruptMsgProc)
@@ -1577,7 +1610,11 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             CValidationState state;
             if (!mapBlockIndex.count(hashBlock)) {
                 WITH_LOCK(cs_main, MarkBlockAsReceived(hashBlock); );
-                ProcessNewBlock(state, pfrom, &block, nullptr);
+                bool fAccepted = true;
+                ProcessNewBlock(state, pfrom, &block, nullptr, &fAccepted);
+                if (!fAccepted) {
+                    CheckBlockSpam(state, pfrom, hashBlock);
+                }
                 WITH_LOCK(cs_main, mapBlockSource.emplace(hashBlock, pfrom->GetId()); );
                 int nDoS;
                 if(state.IsInvalid(nDoS)) {
