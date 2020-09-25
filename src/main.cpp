@@ -3939,9 +3939,6 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
         // Store to disk
         CBlockIndex* pindex = nullptr;
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp, checked);
-        if (pindex && pfrom) {
-            mapBlockSource[pindex->GetBlockHash ()] = pfrom->GetId ();
-        }
         CheckBlockIndex();
         if (!ret) {
             // Check spamming
@@ -5610,6 +5607,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (!mapBlockIndex.count(hashBlock)) {
                 WITH_LOCK(cs_main, MarkBlockAsReceived(hashBlock); );
                 ProcessNewBlock(state, pfrom, &block, nullptr);
+                WITH_LOCK(cs_main, mapBlockSource.emplace(hashBlock, pfrom->GetId()); );
                 int nDoS;
                 if(state.IsInvalid(nDoS)) {
                     assert (state.GetRejectCode() < REJECT_INTERNAL); // Blocks are never rejected with internal reject codes
