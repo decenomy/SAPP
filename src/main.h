@@ -133,13 +133,6 @@ static const unsigned int AVG_INVENTORY_BROADCAST_INTERVAL = 5;
 /** If the tip is older than this (in seconds), the node is considered to be in initial block download. */
 static const int64_t DEFAULT_MAX_TIP_AGE = 24 * 60 * 60;
 
-/** Default for -blockspamfilter, use header spam filter */
-static const bool DEFAULT_BLOCK_SPAM_FILTER = true;
-/** Default for -blockspamfiltermaxsize, maximum size of the list of indexes in the block spam filter */
-static const unsigned int DEFAULT_BLOCK_SPAM_FILTER_MAX_SIZE = 100;
-/** Default for -blockspamfiltermaxavg, maximum average size of an index occurrence in the block spam filter */
-static const unsigned int DEFAULT_BLOCK_SPAM_FILTER_MAX_AVG = 10;
-
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetCheapHash(); }
 };
@@ -422,50 +415,5 @@ static const unsigned int REJECT_HIGHFEE = 0x100;
 static const unsigned int REJECT_ALREADY_KNOWN = 0x101;
 /** Transaction conflicts with a transaction already known */
 static const unsigned int REJECT_CONFLICT = 0x102;
-
-
-// The following things handle network-processing logic
-// (and should be moved to a separate file)
-
-/** Register with a network node to receive its signals */
-void RegisterNodeSignals(CNodeSignals& nodeSignals);
-/** Unregister a network node */
-void UnregisterNodeSignals(CNodeSignals& nodeSignals);
-
-class PeerLogicValidation : public CValidationInterface {
-private:
-    CConnman* connman;
-
-public:
-    PeerLogicValidation(CConnman* connmanIn);
-    ~PeerLogicValidation() = default;
-
-    virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload);
-    virtual void BlockChecked(const CBlock& block, const CValidationState& state);
-};
-
-struct CNodeStateStats {
-    int nMisbehavior;
-    int nSyncHeight;
-    int nCommonHeight;
-    std::vector<int> vHeightInFlight;
-};
-
-/** Get statistics from node state */
-bool GetNodeStateStats(NodeId nodeid, CNodeStateStats& stats);
-/** Increase a node's misbehavior score. */
-void Misbehaving(NodeId nodeid, int howmuch) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
-
-/** Process protocol messages received from a given node */
-bool ProcessMessages(CNode* pfrom, CConnman& connman, std::atomic<bool>& interrupt);
-/**
- * Send queued protocol messages to be sent to a give node.
- *
- * @param[in]   pto             The node which we are sending messages to.
- * @param[in]   connman         The connection manager for that node.
- * @param[in]   interrupt       Interrupt condition for processing threads
- * @return                      True if there is more work to be done
- */
-bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interrupt);
 
 #endif // BITCOIN_MAIN_H

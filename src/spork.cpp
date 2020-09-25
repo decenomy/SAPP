@@ -3,11 +3,12 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "main.h"
+#include "spork.h"
+
 #include "messagesigner.h"
 #include "net.h"
 #include "netmessagemaker.h"
-#include "spork.h"
+#include "net_processing.h"
 #include "sporkdb.h"
 #include <iostream>
 

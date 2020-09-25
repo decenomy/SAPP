@@ -8,6 +8,7 @@
 #include "test_pivx.h"
 
 #include "main.h"
+#include "net_processing.h"
 #include "random.h"
 #include "script/sigcache.h"
 #include "txdb.h"

@@ -11,6 +11,7 @@
 
 #include "keystore.h"
 #include "main.h"
+#include "net_processing.h"
 #include "net.h"
 #include "pow.h"
 #include "script/sign.h"

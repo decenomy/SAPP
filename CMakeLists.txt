@@ -201,6 +201,7 @@ set(SERVER_SOURCES
         ./src/merkleblock.cpp
         ./src/miner.cpp
         ./src/net.cpp
+        ./src/net_processing.cpp
         ./src/noui.cpp
         ./src/policy/fees.cpp
         ./src/policy/policy.cpp

@@ -8,8 +8,8 @@
 #include "clientmodel.h"
 #include "guiconstants.h"
 #include "guiutil.h"
-
 #include "net.h"
+#include "main.h"   // cs_main
 #include "sync.h"
 
 #include <algorithm>

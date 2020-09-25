@@ -34,7 +34,7 @@
 #include "messagesigner.h"
 #include "miner.h"
 #include "netbase.h"
-#include "net.h"
+#include "net_processing.h"
 #include "policy/policy.h"
 #include "rpc/server.h"
 #include "script/standard.h"
@@ -63,6 +63,7 @@
 
 #endif
 
+#include <atomic>
 #include <fstream>
 #include <stdint.h>
 #include <stdio.h>

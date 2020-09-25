@@ -14,6 +14,7 @@
 #include "masternode.h"
 #include "masternodeman.h"
 #include "netmessagemaker.h"
+#include "net_processing.h"
 #include "util.h"
 
 

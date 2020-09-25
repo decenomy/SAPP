@@ -10,6 +10,7 @@
 #include "main.h"
 #include "net.h"
 #include "netbase.h"
+#include "net_processing.h"
 #include "protocol.h"
 #include "sync.h"
 #include "timedata.h"

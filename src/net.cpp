@@ -21,6 +21,7 @@
 #include "main.h"
 #include "miner.h"
 #include "netmessagemaker.h"
+#include "net_processing.h"
 #include "primitives/transaction.h"
 #include "netbase.h"
 #include "scheduler.h"

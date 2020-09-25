@@ -13,6 +13,7 @@
 #include "messagesigner.h"
 #include "netbase.h"
 #include "netmessagemaker.h"
+#include "net_processing.h"
 #include "spork.h"
 #include "swifttx.h"
 #include "util.h"
