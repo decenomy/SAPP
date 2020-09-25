@@ -7,7 +7,7 @@
 
 #include "sapling/address.hpp"
 #include "sapling/note.hpp"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 
 #include "amount.h"
 #include "random.h"

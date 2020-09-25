@@ -5,7 +5,7 @@
 
 #include "test/test_pivx.h"
 
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include <boost/test/unit_test.hpp>
 
 

@@ -20,7 +20,7 @@
 #include "streams.h"
 
 #include "sapling/incrementalmerkletree.hpp"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 
 #include "json_test_vectors.h"
 

@@ -128,7 +128,7 @@ LIBSAPLING_H = \
   sapling/sapling.h \
   bech32.h \
   sapling/key_io_sapling.h \
-  sapling/util.h \
+  sapling/sapling_util.h \
   sapling/prf.h \
   sapling/noteencryption.hpp \
   sapling/address.hpp \
@@ -539,7 +539,7 @@ libsapling_a_CPPFLAGS = $(AM_CPPFLAGS) $(PIC_FLAGS) $(BITCOIN_INCLUDES)
 libsapling_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libsapling_a_SOURCES = \
   bech32.cpp \
-  sapling/util.cpp \
+  sapling/sapling_util.cpp \
   sapling/key_io_sapling.cpp \
   sapling/prf.cpp \
   sapling/noteencryption.cpp \

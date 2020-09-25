@@ -12,7 +12,7 @@
 #include "sapling/noteencryption.hpp"
 #include "sapling/prf.h"
 #include "sapling/address.hpp"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include "crypto/sha256.h"
 
 #include <boost/test/unit_test.hpp>

@@ -3,7 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include "sync.h"
 
 #include <algorithm>

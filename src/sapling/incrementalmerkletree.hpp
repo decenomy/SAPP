@@ -11,7 +11,7 @@
 #include "serialize.h"
 
 #include "sapling/sapling.h"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 
 #include <array>
 #include <deque>
