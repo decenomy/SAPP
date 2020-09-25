@@ -27,6 +27,7 @@ struct COrphanTx {
     CTransaction tx;
     NodeId fromPeer;
 };
+
 std::map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_main);
 std::map<uint256, std::set<uint256> > mapOrphanTransactionsByPrev GUARDED_BY(cs_main);
 

@@ -10,6 +10,8 @@
 #include "net.h"
 #include "validationinterface.h"
 
+extern RecursiveMutex cs_main; // !TODO: change mutex to cs_orphans
+
 /** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
 static const unsigned int DEFAULT_MAX_ORPHAN_TRANSACTIONS = 100;
 /** Default for -blockspamfilter, use header spam filter */
