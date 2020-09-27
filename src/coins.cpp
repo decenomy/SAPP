@@ -293,6 +293,19 @@ CAmount CCoinsViewCache::GetTotalAmount() const
     return nTotal;
 }
 
+void CCoinsViewCache::PruneZerocoinMints()
+{
+    std::unique_ptr<CCoinsViewCursor> pcursor(Cursor());
+    while (pcursor->Valid()) {
+        COutPoint key;
+        Coin coin;
+        if (pcursor->GetKey(key) && pcursor->GetValue(coin) && coin.out.IsZerocoinMint()) {
+            SpendCoin(key);
+        }
+        pcursor->Next();
+    }
+}
+
 static const size_t MAX_OUTPUTS_PER_BLOCK = MAX_BLOCK_SIZE_CURRENT /  ::GetSerializeSize(CTxOut(), SER_NETWORK, PROTOCOL_VERSION); // TODO: merge with similar definition in undo.h.
 
 const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)

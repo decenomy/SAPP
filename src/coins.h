@@ -295,6 +295,11 @@ public:
      */
     CAmount GetTotalAmount() const;
 
+    /*
+     * Prune zerocoin mints - do it once, after initialization
+     */
+    void PruneZerocoinMints();
+
 
 private:
     CCoinsMap::iterator FetchCoin(const COutPoint& outpoint) const;

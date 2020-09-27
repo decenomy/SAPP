@@ -1555,9 +1555,20 @@ bool AppInit2()
                 bool fReindexZerocoin = GetBoolArg("-reindexzerocoin", false);
 
                 int chainHeight;
+                bool fZerocoinActive;
                 {
                     LOCK(cs_main);
                     chainHeight = chainActive.Height();
+                    fZerocoinActive = consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC);
+
+                    // Prune zerocoin mints that were improperly stored in the coins database
+                    // Do it only once, when removing money supply (key 'M') from the DB. Can be skipped in future versions.
+                    int64_t nDummySupply;
+                    if (fZerocoinActive && pblocktree->Read('M', nDummySupply)) {
+                        LogPrintf("Pruning zerocoin mints at height %d\n", chainHeight);
+                        pcoinsTip->PruneZerocoinMints();
+                        pblocktree->Erase('M');
+                    }
 
                     // initialize zPIV supply to 0
                     mapZerocoinSupply.clear();
@@ -1569,8 +1580,7 @@ bool AppInit2()
                         CLegacyBlockIndex bi;
 
                         // Load zPIV supply map
-                        if (!fReindexZerocoin && consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC) &&
-                                !zerocoinDB->ReadZCSupply(mapZerocoinSupply)) {
+                        if (!fReindexZerocoin && fZerocoinActive && !zerocoinDB->ReadZCSupply(mapZerocoinSupply)) {
                             // try first reading legacy block index from DB
                             if (pblocktree->ReadLegacyBlockIndex(tipHash, bi) && !bi.mapZerocoinSupply.empty()) {
                                 mapZerocoinSupply = bi.mapZerocoinSupply;
@@ -1583,7 +1593,7 @@ bool AppInit2()
                 }
 
                 // Drop all information from the zerocoinDB and repopulate
-                if (fReindexZerocoin && consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC)) {
+                if (fReindexZerocoin && fZerocoinActive) {
                     LOCK(cs_main);
                     uiInterface.InitMessage(_("Reindexing zerocoin database..."));
                     std::string strError = ReindexZerocoinDB();
