@@ -1565,8 +1565,8 @@ bool AppInit2()
                     // Do it only once, when removing money supply (key 'M') from the DB. Can be skipped in future versions.
                     int64_t nDummySupply;
                     if (fZerocoinActive && pblocktree->Read('M', nDummySupply)) {
-                        LogPrintf("Pruning zerocoin mints at height %d\n", chainHeight);
-                        pcoinsTip->PruneZerocoinMints();
+                        LogPrintf("Pruning zerocoin mints / invalid outs, at height %d\n", chainHeight);
+                        pcoinsTip->PruneInvalidEntries();
                         pblocktree->Erase('M');
                     }
 

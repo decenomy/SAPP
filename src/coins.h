@@ -296,9 +296,9 @@ public:
     CAmount GetTotalAmount() const;
 
     /*
-     * Prune zerocoin mints - do it once, after initialization
+     * Prune zerocoin mints and frozen outputs - do it once, after initialization
      */
-    void PruneZerocoinMints();
+    void PruneInvalidEntries();
 
 
 private:

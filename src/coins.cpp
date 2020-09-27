@@ -6,6 +6,7 @@
 #include "coins.h"
 
 #include "consensus/consensus.h"
+#include "invalid.h"
 #include "memusage.h"
 #include "random.h"
 
@@ -293,14 +294,16 @@ CAmount CCoinsViewCache::GetTotalAmount() const
     return nTotal;
 }
 
-void CCoinsViewCache::PruneZerocoinMints()
+void CCoinsViewCache::PruneInvalidEntries()
 {
+    // Prune zerocoin Mints and fraudulent/frozen outputs
     std::unique_ptr<CCoinsViewCursor> pcursor(Cursor());
     while (pcursor->Valid()) {
         COutPoint key;
         Coin coin;
-        if (pcursor->GetKey(key) && pcursor->GetValue(coin) && coin.out.IsZerocoinMint()) {
-            SpendCoin(key);
+        if (pcursor->GetKey(key) && pcursor->GetValue(coin)) {
+            if (coin.out.IsZerocoinMint() || invalid_out::ContainsOutPoint(key))
+                SpendCoin(key);
         }
         pcursor->Next();
     }
