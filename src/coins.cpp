@@ -276,6 +276,22 @@ int CCoinsViewCache::GetCoinDepthAtHeight(const COutPoint& output, int nHeight) 
     return -1;
 }
 
+CAmount CCoinsViewCache::GetTotalAmount() const
+{
+    CAmount nTotal = 0;
+
+    std::unique_ptr<CCoinsViewCursor> pcursor(Cursor());
+    while (pcursor->Valid()) {
+        Coin coin;
+        if (pcursor->GetValue(coin) && !coin.IsSpent()) {
+            nTotal += coin.out.nValue;
+        }
+        pcursor->Next();
+    }
+
+    return nTotal;
+}
+
 static const size_t MAX_OUTPUTS_PER_BLOCK = MAX_BLOCK_SIZE_CURRENT /  ::GetSerializeSize(CTxOut(), SER_NETWORK, PROTOCOL_VERSION); // TODO: merge with similar definition in undo.h.
 
 const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
@@ -288,3 +304,4 @@ const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
     }
     return coinEmpty;
 }
+

@@ -290,6 +290,11 @@ public:
      */
     int GetCoinDepthAtHeight(const COutPoint& output, int nHeight) const;
 
+    /*
+     * Return the sum of the value of all transaction outputs
+     */
+    CAmount GetTotalAmount() const;
+
 
 private:
     CCoinsMap::iterator FetchCoin(const COutPoint& outpoint) const;
