@@ -191,18 +191,3 @@ bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const lib
     return true;
 }
 
-CAmount GetInvalidUTXOValue()
-{
-    CAmount nValue = 0;
-    for (auto out : invalid_out::setInvalidOutPoints) {
-        bool fSpent = false;
-        CCoinsViewCache cache(pcoinsTip);
-        const Coin& coin = cache.AccessCoin(out);
-        if(coin.IsSpent())
-            fSpent = true;
-        if (!fSpent)
-            nValue += coin.out.nValue;
-    }
-
-    return nValue;
-}
