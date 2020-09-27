@@ -1821,10 +1821,6 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
                 if (!mapZerocoinSupply.empty() && !zerocoinDB->WriteZCSupply(mapZerocoinSupply)) {
                     return AbortNode(state, "Failed to write zerocoin supply to DB");
                 }
-                // Flush money supply
-                if (!pblocktree->WriteMoneySupply(nMoneySupply)) {
-                    return AbortNode(state, "Failed to write money supply to DB");
-                }
             }
             nLastWrite = nNow;
         }

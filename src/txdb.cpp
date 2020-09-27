@@ -24,7 +24,7 @@ static const char DB_BEST_BLOCK = 'B';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
-static const char DB_MONEY_SUPPLY = 'M';
+// static const char DB_MONEY_SUPPLY = 'M';
 
 namespace {
 
@@ -191,16 +191,6 @@ void CCoinsViewDBCursor::Next()
     } else {
         keyTmp.first = entry.key;
     }
-}
-
-bool CBlockTreeDB::WriteMoneySupply(const int64_t& nSupply)
-{
-    return Write(DB_MONEY_SUPPLY, nSupply);
-}
-
-bool CBlockTreeDB::ReadMoneySupply(int64_t& nSupply) const
-{
-    return Read(DB_MONEY_SUPPLY, nSupply);
 }
 
 bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo) {
