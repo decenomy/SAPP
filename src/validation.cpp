@@ -1326,7 +1326,7 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         // Check that all outputs are available and match the outputs in the block itself
         // exactly.
         for (size_t o = 0; o < tx.vout.size(); o++) {
-            if (!tx.vout[o].scriptPubKey.IsUnspendable()) {
+            if (!tx.vout[o].scriptPubKey.IsUnspendable() && !tx.vout[o].IsZerocoinMint()) {
                 COutPoint out(hash, o);
                 Coin coin;
                 view.SpendCoin(out, &coin);
