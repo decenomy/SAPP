@@ -200,7 +200,6 @@ BITCOIN_CORE_H = \
   limitedmap.h \
   logging.h \
   legacy/validation_zerocoin_legacy.h \
-  main.h \
   memusage.h \
   masternode.h \
   masternode-payments.h \
@@ -212,6 +211,7 @@ BITCOIN_CORE_H = \
   messagesigner.h \
   miner.h \
   net.h \
+  net_processing.h \
   netaddress.h \
   netbase.h \
   netmessagemaker.h \
@@ -267,6 +267,7 @@ BITCOIN_CORE_H = \
   utilstrencodings.h \
   utilmoneystr.h \
   utiltime.h \
+  validation.h \
   validationinterface.h \
   version.h \
   wallet/hdchain.h \
@@ -311,10 +312,10 @@ libbitcoin_server_a_SOURCES = \
   init.cpp \
   dbwrapper.cpp \
   legacy/validation_zerocoin_legacy.cpp \
-  main.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
+  net_processing.cpp \
   noui.cpp \
   policy/fees.cpp \
   policy/policy.cpp \
@@ -335,6 +336,7 @@ libbitcoin_server_a_SOURCES = \
   torcontrol.cpp \
   txdb.cpp \
   txmempool.cpp \
+  validation.cpp \
   validationinterface.cpp \
   zpivchain.cpp \
   $(BITCOIN_CORE_H) \

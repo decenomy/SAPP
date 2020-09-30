@@ -8,6 +8,7 @@
 #include "coincontrol.h"
 #include "consensus/zerocoin_verify.h"
 #include "denomination_functions.h"
+#include "net.h"
 #include "primitives/transaction.h"
 #include "script/sign.h"
 #include "utilmoneystr.h"

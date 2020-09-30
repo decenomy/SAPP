@@ -7,7 +7,7 @@
 #include "primitives/transaction.h"
 
 #include "hash.h"
-#include "main.h"
+#include "script/standard.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 

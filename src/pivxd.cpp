@@ -8,7 +8,6 @@
 #include "clientversion.h"
 #include "fs.h"
 #include "init.h"
-#include "main.h"
 #include "masternodeconfig.h"
 #include "noui.h"
 #include "rpc/server.h"
@@ -16,6 +15,7 @@
 #include "util.h"
 #include "httpserver.h"
 #include "httprpc.h"
+#include "validation.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/thread.hpp>

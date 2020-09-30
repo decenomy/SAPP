@@ -6,9 +6,10 @@
 
 #include "checkpoints.h"
 
+#include "chain.h"
 #include "chainparams.h"
-#include "main.h"
 #include "uint256.h"
+#include "validation.h"
 
 #include <stdint.h>
 

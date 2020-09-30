@@ -8,7 +8,6 @@
 #ifndef PIVX_KERNEL_H
 #define PIVX_KERNEL_H
 
-#include "main.h"
 #include "stakeinput.h"
 
 class CStakeKernel {

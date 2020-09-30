@@ -2,14 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "main.h"
-#include "test_pivx.h"
+#include "test/test_pivx.h"
+
 #include "txmempool.h"
 #include "util.h"
 
 #include <boost/test/unit_test.hpp>
-#include <list>
-#include <vector>
 
 BOOST_FIXTURE_TEST_SUITE(mempool_tests, TestingSetup)
 

@@ -4,11 +4,14 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "test/test_pivx.h"
+
 #include "blocksignature.h"
-#include "main.h"
+#include "net.h"
 #include "primitives/transaction.h"
 #include "script/sign.h"
-#include "test_pivx.h"
+#include "validation.h"
+
 #include <boost/test/unit_test.hpp>
 
 BOOST_FIXTURE_TEST_SUITE(main_tests, TestingSetup)

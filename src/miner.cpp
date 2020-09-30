@@ -14,7 +14,6 @@
 #include "consensus/merkle.h"
 #include "consensus/tx_verify.h" // needed in case of no ENABLE_WALLET
 #include "hash.h"
-#include "main.h"
 #include "masternode-sync.h"
 #include "net.h"
 #include "pow.h"

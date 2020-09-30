@@ -8,9 +8,9 @@
 #include "clientmodel.h"
 #include "guiconstants.h"
 #include "guiutil.h"
-
 #include "net.h"
 #include "sync.h"
+#include "validation.h"  // cs_main
 
 #include <algorithm>
 

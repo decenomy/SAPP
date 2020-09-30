@@ -2,11 +2,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "chainparams.h"
 #include "zmqpublishnotifier.h"
-#include "main.h"
+
+#include "chainparams.h"
 #include "util.h"
 #include "crypto/common.h"
+#include "validation.h"     // cs_main
 
 static std::multimap<std::string, CZMQAbstractPublishNotifier*> mapPublishNotifiers;
 

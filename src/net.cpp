@@ -18,12 +18,13 @@
 #include "crypto/sha256.h"
 #include "guiinterface.h"
 #include "hash.h"
-#include "main.h"
 #include "miner.h"
-#include "netmessagemaker.h"
-#include "primitives/transaction.h"
 #include "netbase.h"
+#include "netmessagemaker.h"
+#include "net_processing.h"
+#include "primitives/transaction.h"
 #include "scheduler.h"
+#include "validation.h"
 
 #ifdef WIN32
 #include <string.h>

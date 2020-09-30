@@ -14,7 +14,6 @@
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "clientversion.h"
-#include "main.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "net.h"

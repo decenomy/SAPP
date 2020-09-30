@@ -11,7 +11,6 @@
 #include "consensus/zerocoin_verify.h"
 #include "init.h"
 #include "sapling/key_io_sapling.h"
-#include "main.h"
 #include "masternode-sync.h"
 #include "net.h"
 #include "netbase.h"

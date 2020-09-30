@@ -11,6 +11,7 @@
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "netmessagemaker.h"
+#include "net_processing.h"
 #include "spork.h"
 #include "sync.h"
 #include "util.h"

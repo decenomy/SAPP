@@ -6,7 +6,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "legacy/stakemodifier.h"
-#include "main.h"   // mapBlockIndex, chainActive
+#include "validation.h"   // mapBlockIndex, chainActive
 
 /*
  * Old Modifier - Only for IBD

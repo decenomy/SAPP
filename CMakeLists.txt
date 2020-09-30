@@ -197,10 +197,10 @@ set(SERVER_SOURCES
         ./src/interface/wallet.cpp
         ./src/dbwrapper.cpp
         ./src/legacy/validation_zerocoin_legacy.cpp
-        ./src/main.cpp
         ./src/merkleblock.cpp
         ./src/miner.cpp
         ./src/net.cpp
+        ./src/net_processing.cpp
         ./src/noui.cpp
         ./src/policy/fees.cpp
         ./src/policy/policy.cpp
@@ -221,6 +221,7 @@ set(SERVER_SOURCES
         ./src/torcontrol.cpp
         ./src/txdb.cpp
         ./src/txmempool.cpp
+        ./src/validation.cpp
         ./src/validationinterface.cpp
         ./src/zpivchain.cpp
         )

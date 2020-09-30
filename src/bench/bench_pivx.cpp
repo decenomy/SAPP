@@ -6,7 +6,6 @@
 #include "bench.h"
 
 #include "key.h"
-#include "main.h"
 #include "util.h"
 
 int

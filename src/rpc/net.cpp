@@ -7,16 +7,16 @@
 #include "rpc/server.h"
 
 #include "clientversion.h"
-#include "main.h"
 #include "net.h"
 #include "netbase.h"
+#include "net_processing.h"
 #include "protocol.h"
 #include "sync.h"
 #include "timedata.h"
 #include "guiinterface.h"
 #include "util.h"
 #include "version.h"
-
+#include "validation.h"
 
 #include <univalue.h>
 

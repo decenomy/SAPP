@@ -11,7 +11,6 @@
 #include "timedata.h"
 #include "wallet/wallet.h"
 #include "zpivchain.h"
-#include "main.h"
 
 #include <algorithm>
 #include <stdint.h>

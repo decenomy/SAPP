@@ -16,7 +16,6 @@
 #include "clientmodel.h"
 #include "qt/pivx/qtutils.h"
 
-#include "main.h" // for MAX_SCRIPTCHECK_THREADS
 #include "netbase.h"
 #include "txdb.h" // for -dbcache defaults
 

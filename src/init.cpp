@@ -26,7 +26,6 @@
 #include "httprpc.h"
 #include "invalid.h"
 #include "key.h"
-#include "main.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
 #include "masternodeconfig.h"
@@ -34,9 +33,10 @@
 #include "messagesigner.h"
 #include "miner.h"
 #include "netbase.h"
-#include "net.h"
+#include "net_processing.h"
 #include "policy/policy.h"
 #include "rpc/server.h"
+#include "script/sigcache.h"
 #include "script/standard.h"
 #include "scheduler.h"
 #include "spork.h"
@@ -48,6 +48,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "util/threadnames.h"
+#include "validation.h"
 #include "validationinterface.h"
 #include "zpivchain.h"
 
@@ -63,6 +64,7 @@
 
 #endif
 
+#include <atomic>
 #include <fstream>
 #include <stdint.h>
 #include <stdio.h>
