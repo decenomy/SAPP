@@ -244,6 +244,11 @@ public:
         return WITH_LOCK(cs, return activeState == MASTERNODE_ENABLED);
     }
 
+    bool IsPreEnabled()
+    {
+        return WITH_LOCK(cs, return activeState == MASTERNODE_PRE_ENABLED );
+    }
+
     std::string Status()
     {
         std::string strStatus = "ACTIVE";
