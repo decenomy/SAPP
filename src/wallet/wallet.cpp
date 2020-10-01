@@ -1946,22 +1946,20 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     }
 
     // Find specific vin
-    uint256 txHash = uint256S(strTxHash);
-    std::map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(txHash);
-    if (mi == mapWallet.end()) {
+    const uint256 txHash = uint256S(strTxHash);
+    const CWalletTx* wtx = GetWalletTx(txHash);
+    if (!wtx) {
         strError = "collateral tx not found in the wallet";
         return error("%s: %s", __func__, strError);
     }
 
-    const CWalletTx& wtx = mi->second;
-
     // Verify index limits
-    if (nOutputIndex < 0 || nOutputIndex >= (int) wtx.vout.size()) {
+    if (nOutputIndex < 0 || nOutputIndex >= (int) wtx->vout.size()) {
         strError = "Invalid masternode output index";
         return error("%s: output index %d not found in %s", __func__, nOutputIndex, strTxHash);
     }
 
-    CTxOut txOut = wtx.vout[nOutputIndex];
+    CTxOut txOut = wtx->vout[nOutputIndex];
 
     // Masternode collateral value
     if (txOut.nValue != 10000 * COIN) {
@@ -1971,7 +1969,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
 
     // Check availability
     int nDepth = 0;
-    if (!CheckTXAvailability(&wtx, true, false, nDepth)) {
+    if (!CheckTXAvailability(wtx, true, false, nDepth)) {
         strError = "Not available collateral transaction";
         return error("%s: tx %s not available", __func__, strTxHash);
     }
@@ -1995,7 +1993,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     }
 
     return GetVinAndKeysFromOutput(
-            COutput(&wtx, nOutputIndex, nDepth, true, true),
+            COutput(wtx, nOutputIndex, nDepth, true, true),
             txinRet,
             pubKeyRet,
             keyRet);
