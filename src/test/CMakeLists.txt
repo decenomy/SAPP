@@ -74,6 +74,7 @@ set(BITCOIN_TESTS
         ${CMAKE_CURRENT_SOURCE_DIR}/base64_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/bech32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/budget_tests.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/bip32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/checkblock_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Checkpoints_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/coins_tests.cpp
