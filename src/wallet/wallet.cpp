@@ -2065,7 +2065,7 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                 // skip delegated coins
                 if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) continue;
 
-                bool solvable = IsSolvable(*this, pcoin->vout[i].scriptPubKey);
+                bool solvable = IsSolvable(*this, pcoin->vout[i].scriptPubKey, mine == ISMINE_COLD);
 
                 bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
                         (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable)) ||

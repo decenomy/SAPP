@@ -85,6 +85,6 @@ void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const Signatur
   * have all private keys. While this function does not need private keys, the passed
   * keystore is used to look up public keys and redeemscripts by hash.
   * Solvability is unrelated to whether we consider this output to be ours. */
-bool IsSolvable(const CKeyStore& store, const CScript& script);
+bool IsSolvable(const CKeyStore& store, const CScript& script, bool fColdStaking);
 
 #endif // BITCOIN_SCRIPT_SIGN_H
