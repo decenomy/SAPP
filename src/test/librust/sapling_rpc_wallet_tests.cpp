@@ -26,6 +26,25 @@ extern UniValue CallRPC(std::string args); // Implemented in rpc_tests.cpp
 // Remember: this method will be moved to an utility file in the short future. For now, it's in sapling_keystore_tests.cpp
 extern libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey();
 
+namespace {
+
+    /** Set the working directory for the duration of the scope. */
+    class PushCurrentDirectory {
+    public:
+        PushCurrentDirectory(const std::string &new_cwd)
+                : old_cwd(boost::filesystem::current_path()) {
+            boost::filesystem::current_path(new_cwd);
+        }
+
+        ~PushCurrentDirectory() {
+            boost::filesystem::current_path(old_cwd);
+        }
+    private:
+        boost::filesystem::path old_cwd;
+    };
+
+}
+
 BOOST_FIXTURE_TEST_SUITE(sapling_rpc_wallet_tests, WalletTestingSetup)
 
 /**
@@ -232,7 +251,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_encrypted_wallet_sapzkeys)
     strWalletPass.reserve(100);
     strWalletPass = "hello";
 
-    boost::filesystem::current_path(GetArg("-datadir","/tmp/thisshouldnothappen"));
+    PushCurrentDirectory push_dir(GetArg("-datadir","/tmp/thisshouldnothappen"));
     BOOST_CHECK(pwalletMain->EncryptWallet(strWalletPass));
 
     // Verify we can still list the keys imported
