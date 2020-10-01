@@ -5,11 +5,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "base58.h"
 #include "key.h"
-#include "uint256.h"
-#include "util.h"
-#include "test/test_bitcoin.h"
+#include "key_io.h"
+#include "test/test_pivx.h"
 
 #include <string>
 #include <vector>
@@ -82,27 +80,20 @@ void RunTest(const TestVector &test) {
     std::vector<unsigned char> seed = ParseHex(test.strHexMaster);
     CExtKey key;
     CExtPubKey pubkey;
-    key.SetSeed(&seed[0], seed.size());
+    key.SetSeed(seed.data(), seed.size());
     pubkey = key.Neuter();
     for (const TestDerivation &derive : test.vDerive) {
         unsigned char data[74];
         key.Encode(data);
         pubkey.Encode(data);
-        // Test private key
-        CBitcoinExtKey b58key; b58key.SetKey(key);
-        BOOST_CHECK(b58key.ToString() == derive.prv);
 
-        CBitcoinExtKey b58keyDecodeCheck(derive.prv);
-        CExtKey checkKey = b58keyDecodeCheck.GetKey();
-        assert(checkKey == key); //ensure a base58 decoded key also matches
+        // Test private key
+        BOOST_CHECK(KeyIO::EncodeExtKey(key) == derive.prv);
+        BOOST_CHECK(KeyIO::DecodeExtKey(derive.prv) == key); //ensure a base58 decoded key also matches
 
         // Test public key
-        CBitcoinExtPubKey b58pubkey; b58pubkey.SetKey(pubkey);
-        BOOST_CHECK(b58pubkey.ToString() == derive.pub);
-
-        CBitcoinExtPubKey b58PubkeyDecodeCheck(derive.pub);
-        CExtPubKey checkPubKey = b58PubkeyDecodeCheck.GetKey();
-        assert(checkPubKey == pubkey); //ensure a base58 decoded pubkey also matches
+        BOOST_CHECK(KeyIO::EncodeExtPubKey(pubkey) == derive.pub);
+        BOOST_CHECK(KeyIO::DecodeExtPubKey(derive.pub) == pubkey); //ensure a base58 decoded pubkey also matches
 
         // Derive new keys
         CExtKey keyNew;
@@ -116,26 +107,10 @@ void RunTest(const TestVector &test) {
         }
         key = keyNew;
         pubkey = pubkeyNew;
-
-        CDataStream ssPub(SER_DISK, CLIENT_VERSION);
-        ssPub << pubkeyNew;
-        BOOST_CHECK(ssPub.size() == 75);
-
-        CDataStream ssPriv(SER_DISK, CLIENT_VERSION);
-        ssPriv << keyNew;
-        BOOST_CHECK(ssPriv.size() == 75);
-
-        CExtPubKey pubCheck;
-        CExtKey privCheck;
-        ssPub >> pubCheck;
-        ssPriv >> privCheck;
-
-        BOOST_CHECK(pubCheck == pubkeyNew);
-        BOOST_CHECK(privCheck == keyNew);
     }
 }
 
-BOOST_FIXTURE_TEST_SUITE(bip32_tests, BasicTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(bip32_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(bip32_test1) {
     RunTest(test1);
