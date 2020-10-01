@@ -34,36 +34,6 @@ Notable Changes
 
 (Developers: add your notes here as part of your pull requests whenever possible)
 
-Low-level RPC changes
----------------------
-
-- The new database model no longer stores information about transaction
-  versions of unspent outputs. This means that:
-  - The `gettxout` RPC no longer has a `version` field in the response.
-  - The `gettxoutsetinfo` RPC reports `hash_serialized_2` instead of `hash_serialized`,
-    which does not commit to the transaction versions of unspent outputs, but does
-    commit to the height and coinbase/coinstake information.
-  - The `getutxos` REST path no longer reports the `txvers` field in JSON format,
-    and always reports 0 for transaction versions in the binary format
-
-Removal of Priority Estimation
-------------------------------
-
-- Estimation of "priority" needed for a transaction to be included within a target number of blocks has been removed.  The rpc calls are deprecated and will either return -1 or 1e24 appropriately. 
-The format for fee_estimates.dat has also changed to no longer save these priority estimates. It will automatically be converted to the new format which is not readable by prior versions of the software.
-
-RPC Changes
-------------
-
-
-### Low-level API changes
-
-### Modified input/output for existing commands
-
-### Removed commands
-
-The following commands have been removed from the interface:
-- `estimatepriority`
 
 *version* Change log
 ==============
