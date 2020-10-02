@@ -85,6 +85,7 @@ BITCOIN_TESTS =\
   test/scriptnum_tests.cpp \
   test/serialize_tests.cpp \
   test/sighash_tests.cpp \
+  test/script_P2CS_tests.cpp \
   test/sigopcount_tests.cpp \
   test/skiplist_tests.cpp \
   test/sync_tests.cpp \
