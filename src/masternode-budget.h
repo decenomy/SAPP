@@ -409,7 +409,6 @@ private:
     bool CheckStartEnd();
     bool CheckAmount(const CAmount& nTotalBudget);
     bool CheckName();
-    bool CheckRequiredConfs(int nCurrentHeight);
 
 protected:
     std::map<uint256, CFinalizedBudgetVote> mapVotes;
@@ -422,7 +421,6 @@ protected:
 public:
     // Set in CBudgetManager::AddFinalizedBudget via CheckCollateral
     int64_t nTime;
-    int nBlockFeeTx;
 
     CFinalizedBudget();
     CFinalizedBudget(const CFinalizedBudget& other);
@@ -479,7 +477,6 @@ public:
     {
         READWRITE(LIMITED_STRING(strBudgetName, 20));
         READWRITE(nFeeTXHash);
-        READWRITE(nBlockFeeTx);
         READWRITE(nTime);
         READWRITE(nBlockStart);
         READWRITE(vecBudgetPayments);
@@ -553,7 +550,6 @@ private:
     bool CheckStartEnd();
     bool CheckAmount(const CAmount& nTotalBudget);
     bool CheckAddress();
-    bool CheckRequiredConfs(int nCurrentHeight);
 
 protected:
     std::map<uint256, CBudgetVote> mapVotes;
@@ -568,7 +564,6 @@ protected:
 public:
     // Set in CBudgetManager::AddProposal via CheckCollateral
     int64_t nTime;
-    int nBlockFeeTx;
 
     CBudgetProposal();
     CBudgetProposal(const CBudgetProposal& other);
@@ -633,14 +628,12 @@ public:
         //for syncing with other clients
         READWRITE(LIMITED_STRING(strProposalName, 20));
         READWRITE(LIMITED_STRING(strURL, 64));
-        READWRITE(nTime);
         READWRITE(nBlockStart);
         READWRITE(nBlockEnd);
         READWRITE(nAmount);
         READWRITE(*(CScriptBase*)(&address));
         READWRITE(nTime);
         READWRITE(nFeeTXHash);
-        READWRITE(nBlockFeeTx);
 
         //for saving to the serialized db
         READWRITE(mapVotes);
