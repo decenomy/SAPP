@@ -843,7 +843,6 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
             const uint256& nHash = finalizedBudget->GetHash();
             UniValue bObj(UniValue::VOBJ);
             bObj.pushKV("FeeTX", finalizedBudget->GetFeeTXHash().ToString());
-            bObj.pushKV("Hash", nHash.ToString());
             bObj.pushKV("BlockStart", (int64_t)finalizedBudget->GetBlockStart());
             bObj.pushKV("BlockEnd", (int64_t)finalizedBudget->GetBlockEnd());
             bObj.pushKV("Proposals", finalizedBudget->GetProposalsStr());
@@ -855,7 +854,8 @@ UniValue mnfinalbudget(const JSONRPCRequest& request)
             if (!fValid)
                 bObj.pushKV("IsInvalidReason", finalizedBudget->IsInvalidReason());
 
-            resultObj.pushKV(finalizedBudget->GetName(), bObj);
+            std::string strName = strprintf("%s (%s)", finalizedBudget->GetName(), nHash.ToString());
+            resultObj.pushKV(strName, bObj);
         }
 
         return resultObj;
