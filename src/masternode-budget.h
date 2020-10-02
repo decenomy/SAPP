@@ -482,6 +482,7 @@ public:
         READWRITE(vecBudgetPayments);
         READWRITE(fAutoChecked);
         READWRITE(mapVotes);
+        READWRITE(strProposals);
     }
 
     // compare finalized budget by votes (sort tie with feeHash)
@@ -510,6 +511,7 @@ public:
         first.vecBudgetPayments.swap(second.vecBudgetPayments);
         swap(first.nFeeTXHash, second.nFeeTXHash);
         swap(first.nTime, second.nTime);
+        swap(first.strProposals, second.strProposals);
     }
 
     CFinalizedBudgetBroadcast& operator=(CFinalizedBudgetBroadcast from)
