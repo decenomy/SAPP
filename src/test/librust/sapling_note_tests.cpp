@@ -20,7 +20,6 @@ BOOST_FIXTURE_TEST_SUITE(sapling_note_tests, BasicTestingSetup)
 
 // Test data from https://github.com/zcash-hackworks/zcash-test-vectors/blob/master/sapling_key_components.py
 BOOST_AUTO_TEST_CASE(testVectors) {
-    using namespace libzcash;
     uint64_t v = 0;
     uint64_t note_pos = 0;
     std::array<uint8_t, 11> diversifier{0xf1, 0x9d, 0x9b, 0x79, 0x7e, 0x39, 0xf3, 0x37, 0x44, 0x58, 0x39};
@@ -51,21 +50,20 @@ BOOST_AUTO_TEST_CASE(testVectors) {
     uint256 nf(v_nf);
 
     // Test commitment
-    SaplingNote note = SaplingNote(diversifier, pk_d, v, r);
+    libzcash::SaplingNote note = libzcash::SaplingNote(diversifier, pk_d, v, r);
     BOOST_CHECK(note.cmu().get() == cm);
 
     // Test nullifier
-    SaplingSpendingKey spendingKey(sk);
+    libzcash::SaplingSpendingKey spendingKey(sk);
     BOOST_CHECK(note.nullifier(spendingKey.full_viewing_key(), note_pos) == nf);
 }
 
 BOOST_AUTO_TEST_CASE(random) {
-    using namespace libzcash;
     CAmount MAX_MONEY_OUT = 21000000 * COIN;
     // Test creating random notes using the same spending key
-    auto address = SaplingSpendingKey::random().default_address();
-    SaplingNote note1(address, GetRand(MAX_MONEY_OUT));
-    SaplingNote note2(address, GetRand(MAX_MONEY_OUT));
+    auto address = libzcash::SaplingSpendingKey::random().default_address();
+    libzcash::SaplingNote note1(address, GetRand(MAX_MONEY_OUT));
+    libzcash::SaplingNote note2(address, GetRand(MAX_MONEY_OUT));
 
     BOOST_CHECK(note1.d == note2.d);
     BOOST_CHECK(note1.pk_d == note2.pk_d);
@@ -73,7 +71,7 @@ BOOST_AUTO_TEST_CASE(random) {
     BOOST_CHECK(note1.r != note2.r);
 
     // Test diversifier and pk_d are not the same for different spending keys
-    SaplingNote note3(SaplingSpendingKey::random().default_address(), GetRand(MAX_MONEY_OUT));
+    libzcash::SaplingNote note3(libzcash::SaplingSpendingKey::random().default_address(), GetRand(MAX_MONEY_OUT));
     BOOST_CHECK(note1.d != note3.d);
     BOOST_CHECK(note1.pk_d != note3.pk_d);
 }
