@@ -30,8 +30,8 @@ bool CheckCollateralConfs(const uint256& nTxCollateralHash, int nCurrentHeight, 
     const int nConf = GetIXConfirmations(nTxCollateralHash) + nCurrentHeight - nProposalHeight + 1;
 
     if (nConf < nRequiredConfs) {
-        strError = strprintf("Collateral requires at least %d confirmations - %d confirmations "
-                "(current height: %d, fee tx height: %d)", nRequiredConfs, nConf, nCurrentHeight, nProposalHeight);
+        strError = strprintf("Collateral requires at least %d confirmations - %d confirmations (current height: %d, fee tx height: %d)",
+                nRequiredConfs, nConf, nCurrentHeight, nProposalHeight);
         LogPrint(BCLog::MNBUDGET,"%s: %s\n", __func__, strError);
         return false;
     }
