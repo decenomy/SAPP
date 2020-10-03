@@ -1,7 +1,7 @@
 #include "sapling/address.hpp"
 #include "sapling/noteencryption.hpp"
 #include "sapling/prf.h"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 
 #include "hash.h"
 #include "streams.h"

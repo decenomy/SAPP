@@ -53,7 +53,7 @@
 #include "zpivchain.h"
 
 // Sapling
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include <librustzcash.h>
 
 #ifdef ENABLE_WALLET

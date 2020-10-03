@@ -5,7 +5,7 @@
 
 #include "wallet/test/wallet_test_fixture.h"
 
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include "sapling/address.hpp"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"

@@ -6,7 +6,7 @@
 #include "sapling/noteencryption.hpp"
 
 #include "sapling/prf.h"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include <boost/static_assert.hpp>
 #include <librustzcash.h>
 #include <sodium.h>

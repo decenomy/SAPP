@@ -1,8 +1,9 @@
 // Copyright (c) 2012-2013 The Bitcoin Core developers
 // Copyright (c) 2019 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// file COPYING or https://www.opensource.org/licenses/mit-license.php.
 
+#include "optional.h"
 #include "serialize.h"
 #include "streams.h"
 #include "hash.h"
@@ -12,6 +13,23 @@
 
 #include <boost/test/unit_test.hpp>
 
+template<typename T>
+void check_ser_rep(T thing, std::vector<unsigned char> expected)
+{
+    CDataStream ss(SER_DISK, 0);
+    ss << thing;
+
+    BOOST_CHECK(GetSerializeSize(thing, 0, 0) == ss.size());
+
+    std::vector<unsigned char> serialized_representation(ss.begin(), ss.end());
+
+    BOOST_CHECK(serialized_representation == expected);
+
+    T thing_deserialized;
+    ss >> thing_deserialized;
+
+    BOOST_CHECK(thing_deserialized == thing);
+}
 
 BOOST_FIXTURE_TEST_SUITE(serialize_tests, BasicTestingSetup)
 
@@ -169,6 +187,13 @@ BOOST_AUTO_TEST_CASE(doubles)
         ss >> j;
         BOOST_CHECK_MESSAGE(i == j, "decoded:" << j << " expected:" << i);
     }
+}
+
+BOOST_AUTO_TEST_CASE(boost_optional)
+{
+    check_ser_rep<Optional<unsigned char>>(0xff, {0x01, 0xff});
+    check_ser_rep<Optional<unsigned char>>(boost::none, {0x00});
+    check_ser_rep<Optional<std::string>>(std::string("Test"), {0x01, 0x04, 'T', 'e', 's', 't'});
 }
 
 BOOST_AUTO_TEST_CASE(varints)

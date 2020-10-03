@@ -444,7 +444,7 @@ target_include_directories(CLI_A PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 
 set(SAPLING_SOURCES
         ./src/bech32.cpp
-        ./src/sapling/util.cpp
+        ./src/sapling/sapling_util.cpp
         ./src/sapling/key_io_sapling.cpp
         ./src/sapling/prf.cpp
         ./src/sapling/noteencryption.cpp
@@ -452,6 +452,7 @@ set(SAPLING_SOURCES
         ./src/sapling/note.cpp
         ./src/sapling/zip32.cpp
         ./src/sapling/crypter_sapling.cpp
+        ./src/sapling/incrementalmerkletree.cpp
         ./src/sapling/saplingscriptpubkeyman.cpp
         )
 

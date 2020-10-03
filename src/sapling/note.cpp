@@ -1,7 +1,7 @@
 #include "sapling/note.hpp"
 
 #include "sapling/prf.h"
-#include "sapling/util.h"
+#include "sapling/sapling_util.h"
 #include "crypto/sha256.h"
 
 #include "random.h"

@@ -15,6 +15,11 @@ set(JSON_TEST_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/data/tx_invalid.json
         ${CMAKE_CURRENT_SOURCE_DIR}/data/tx_valid.json
         ${CMAKE_CURRENT_SOURCE_DIR}/data/sighash.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/merkle_roots_sapling.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/merkle_serialization_sapling.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/merkle_witness_serialization_sapling.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/merkle_path_sapling.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/merkle_commitments_sapling.json
         ${CMAKE_CURRENT_SOURCE_DIR}/data/sapling_key_components.json
         )
 
@@ -52,6 +57,7 @@ set(BITCOIN_TEST_SUITE
         ${CMAKE_CURRENT_SOURCE_DIR}/test_pivx.cpp
         ${CMAKE_SOURCE_DIR}/src/wallet/test/wallet_test_fixture.h
         ${CMAKE_SOURCE_DIR}/src/wallet/test/wallet_test_fixture.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/json_test_vectors.h
         )
 
 set(BITCOIN_TESTS
@@ -69,6 +75,7 @@ set(BITCOIN_TESTS
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/sapling_keystore_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/zip32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/wallet_zkeys_tests.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/merkletree_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base58_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base64_tests.cpp
