@@ -43,7 +43,7 @@ bool CLegacyZPivStake::InitFromTxIn(const CTxIn& txin)
     return true;
 }
 
-CLegacyZPivStake::CLegacyZPivStake(const libzerocoin::CoinSpend& spend)
+CLegacyZPivStake::CLegacyZPivStake(const libzerocoin::CoinSpend& spend) : CStakeInput(nullptr)
 {
     this->nChecksum = spend.getAccumulatorChecksum();
     this->denom = spend.getDenomination();
@@ -51,7 +51,7 @@ CLegacyZPivStake::CLegacyZPivStake(const libzerocoin::CoinSpend& spend)
     this->hashSerial = Hash(nSerial.begin(), nSerial.end());
 }
 
-const CBlockIndex* CLegacyZPivStake::GetIndexFrom()
+const CBlockIndex* CLegacyZPivStake::GetIndexFrom() const
 {
     // First look in the legacy database
     int nHeightChecksum = 0;

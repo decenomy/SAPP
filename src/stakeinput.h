@@ -19,9 +19,10 @@ protected:
     const CBlockIndex* pindexFrom = nullptr;
 
 public:
+    CStakeInput(const CBlockIndex* _pindexFrom) : pindexFrom(_pindexFrom) {}
     virtual ~CStakeInput(){};
     virtual bool InitFromTxIn(const CTxIn& txin) = 0;
-    virtual const CBlockIndex* GetIndexFrom() = 0;
+    virtual const CBlockIndex* GetIndexFrom() const = 0;
     virtual bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = UINT256_ZERO) = 0;
     virtual bool GetTxOutFrom(CTxOut& out) const = 0;
     virtual CAmount GetValue() const = 0;
@@ -35,17 +36,17 @@ public:
 class CPivStake : public CStakeInput
 {
 private:
-    Optional<CTxOut> opOutputFrom{nullopt};
-    Optional<COutPoint> opOutpointFrom{nullopt};
+    const CTxOut outputFrom;
+    const COutPoint outpointFrom;
 
 public:
-    CPivStake() {}
+    CPivStake(const CTxOut& _from, const COutPoint& _outPointFrom, const CBlockIndex* _pindexFrom) :
+            CStakeInput(_pindexFrom), outputFrom(_from), outpointFrom(_outPointFrom) {}
 
-    bool InitFromTxIn(const CTxIn& txin) override;
-    bool SetPrevout(const CTxOut& out, const COutPoint& outpointFrom);
-    void SetIndexFrom(const CBlockIndex* pindex);
+    static CPivStake* NewPivStake(const CTxIn& txin);
 
-    const CBlockIndex* GetIndexFrom() override;
+    bool InitFromTxIn(const CTxIn& txin) override { return pindexFrom; }
+    const CBlockIndex* GetIndexFrom() const override;
     bool GetTxOutFrom(CTxOut& out) const override;
     CAmount GetValue() const override;
     CDataStream GetUniqueness() const override;

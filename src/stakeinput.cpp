@@ -9,67 +9,60 @@
 #include "zpiv/deterministicmint.h"
 #include "wallet/wallet.h"
 
-bool CPivStake::InitFromTxIn(const CTxIn& txin)
+CPivStake* CPivStake::NewPivStake(const CTxIn& txin)
 {
-    if (txin.IsZerocoinSpend())
-        return error("%s: unable to initialize CPivStake from zerocoin spend", __func__);
+    if (txin.IsZerocoinSpend()) {
+        error("%s: unable to initialize CPivStake from zerocoin spend", __func__);
+        return nullptr;
+    }
 
     // Find the previous transaction in database
     uint256 hashBlock;
     CTransaction txPrev;
-    if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true))
-        return error("%s : INFO: read txPrev failed, tx id prev: %s", __func__, txin.prevout.hash.GetHex());
-    SetPrevout(txPrev.vout[txin.prevout.n], txin.prevout);
+    if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true)) {
+        error("%s : INFO: read txPrev failed, tx id prev: %s", __func__, txin.prevout.hash.GetHex());
+        return nullptr;
+    }
 
+    const CBlockIndex* pindexFrom = nullptr;
     // Find the index of the block of the previous transaction
     if (mapBlockIndex.count(hashBlock)) {
         CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
         if (chainActive.Contains(pindex)) pindexFrom = pindex;
     }
     // Check that the input is in the active chain
-    if (!pindexFrom)
-        return error("%s : Failed to find the block index for stake origin", __func__);
+    if (!pindexFrom) {
+        error("%s : Failed to find the block index for stake origin", __func__);
+        return nullptr;
+    }
 
-    // All good
-    return true;
-}
-
-bool CPivStake::SetPrevout(const CTxOut& out, const COutPoint& outpointFrom)
-{
-    this->opOutputFrom = out;
-    this->opOutpointFrom = outpointFrom;
-    return true;
-}
-
-void CPivStake::SetIndexFrom(const CBlockIndex* pindex)
-{
-    this->pindexFrom = pindex;
+    return new CPivStake(txPrev.vout[txin.prevout.n],
+                         txin.prevout,
+                         pindexFrom);
 }
 
 bool CPivStake::GetTxOutFrom(CTxOut& out) const
 {
-    if (!opOutputFrom || !opOutpointFrom)
-        return false;
-    out = *opOutputFrom;
+    out = outputFrom;
     return true;
 }
 
 bool CPivStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
 {
-    txIn = CTxIn(opOutpointFrom->hash, opOutpointFrom->n);
+    txIn = CTxIn(outpointFrom.hash, outpointFrom.n);
     return true;
 }
 
 CAmount CPivStake::GetValue() const
 {
-    return opOutputFrom->nValue;
+    return outputFrom.nValue;
 }
 
 bool CPivStake::CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal, const bool onlyP2PK)
 {
     std::vector<valtype> vSolutions;
     txnouttype whichType;
-    CScript scriptPubKeyKernel = opOutputFrom->scriptPubKey;
+    CScript scriptPubKeyKernel = outputFrom.scriptPubKey;
     if (!Solver(scriptPubKeyKernel, whichType, vSolutions))
         return error("%s: failed to parse kernel", __func__);
 
@@ -118,13 +111,14 @@ CDataStream CPivStake::GetUniqueness() const
 {
     //The unique identifier for a PIV stake is the outpoint
     CDataStream ss(SER_NETWORK, 0);
-    ss << opOutpointFrom->n << opOutpointFrom->hash;
+    ss << outpointFrom.n << outpointFrom.hash;
     return ss;
 }
 
 //The block that the UTXO was added to the chain
-const CBlockIndex* CPivStake::GetIndexFrom()
+const CBlockIndex* CPivStake::GetIndexFrom() const
 {
+    // Sanity check, pindexFrom is set on the constructor.
     if (!pindexFrom) throw std::runtime_error("CPivStake: uninitialized pindexFrom");
     return pindexFrom;
 }

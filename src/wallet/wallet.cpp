@@ -2755,9 +2755,9 @@ bool CWallet::CreateCoinStake(
     bool fKernelFound = false;
     int nAttempts = 0;
     for (const auto& out : *availableCoins) {
-        CPivStake stakeInput;
-        stakeInput.SetPrevout(out.tx->vout[out.i], COutPoint(out.tx->GetHash(), out.i));
-        stakeInput.SetIndexFrom(out.pindex);
+        CPivStake stakeInput(out.tx->vout[out.i],
+                             COutPoint(out.tx->GetHash(), out.i),
+                             out.pindex);
 
         //new block came in, move on
         if (WITH_LOCK(cs_main, return chainActive.Height()) != pindexPrev->nHeight) return false;
