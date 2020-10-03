@@ -571,19 +571,26 @@ int CBudgetManager::GetHighestVoteCount(int chainHeight) const
 bool CBudgetManager::GetPayeeAndAmount(int chainHeight, CScript& payeeRet, CAmount& nAmountRet) const
 {
     const CFinalizedBudget* pfb = GetBudgetWithHighestVoteCount(chainHeight);
-    return pfb && pfb->GetPayeeAndAmount(chainHeight, payeeRet, nAmountRet);
+    if (!pfb) return false;
+
+    // Check that there are enough votes
+    int nFivePercent = mnodeman.CountEnabled(ActiveProtocol()) / 20;
+    if (nFivePercent == 0 || pfb->GetVoteCount() < nFivePercent)
+        return false;
+
+    return pfb->GetPayeeAndAmount(chainHeight, payeeRet, nAmountRet);
 }
 
-void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const
+bool CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const
 {
     int chainHeight = GetBestHeight();
-    if (chainHeight <= 0) return;
+    if (chainHeight <= 0) return false;
 
     CScript payee;
     CAmount nAmount = 0;
 
     if (!GetPayeeAndAmount(chainHeight + 1, payee, nAmount))
-        return;
+        return false;
 
     CAmount blockValue = GetBlockValue(chainHeight);
 
@@ -605,6 +612,7 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfSta
     CTxDestination address;
     ExtractDestination(payee, address);
     LogPrint(BCLog::MNBUDGET,"%s: Budget payment to %s for %lld\n", __func__, EncodeDestination(address), nAmount);
+    return true;
 }
 
 CFinalizedBudget* CBudgetManager::FindFinalizedBudget(const uint256& nHash)

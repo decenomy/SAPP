@@ -305,7 +305,7 @@ public:
     bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError);
     TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const;
     std::string GetRequiredPaymentsString(int nBlockHeight);
-    void FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
+    bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
     void CheckOrphanVotes();
     void Clear()

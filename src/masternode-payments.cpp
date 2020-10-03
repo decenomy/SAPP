@@ -301,9 +301,10 @@ void FillBlockPayee(CMutableTransaction& txNew, const CBlockIndex* pindexPrev, b
 {
     if (!pindexPrev) return;
 
-    if (sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) && budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1)) {
-        budget.FillBlockPayee(txNew, fProofOfStake);
-    } else {
+    if (!sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) ||  // if superblocks are not enabled
+            !budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1) || // or this is not a superblock
+            !budget.FillBlockPayee(txNew, fProofOfStake) ) {         // or there's no budget with enough votes
+        // pay a masternode
         masternodePayments.FillBlockPayee(txNew, pindexPrev, fProofOfStake);
     }
 }
