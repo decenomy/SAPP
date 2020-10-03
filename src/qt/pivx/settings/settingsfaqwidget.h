@@ -16,8 +16,16 @@ class SettingsFaqWidget;
 class SettingsFaqWidget : public QDialog
 {
     Q_OBJECT
-
 public:
+    enum Section {
+        INTRO,
+        UNSPENDABLE,
+        STAKE,
+        SUPPORT,
+        MASTERNODE,
+        MNCONTROLLER
+    };
+
     explicit SettingsFaqWidget(PIVXGUI *parent = nullptr);
     ~SettingsFaqWidget();
 
@@ -25,13 +33,14 @@ public:
 
 public Q_SLOTS:
    void windowResizeEvent(QResizeEvent* event);
-   void setSection(int num);
+   void setSection(Section _section);
 private Q_SLOTS:
     void onFaqClicked(const QWidget* const widget);
 private:
     Ui::SettingsFaqWidget *ui;
-    int pos = 0;
+    Section section = INTRO;
 
+    // This needs to be edited if changes are made to the Section enum.
     std::vector<QPushButton*> getButtons();
 };
 
