@@ -183,7 +183,6 @@ public:
         consensus.ZC_MinMintFee = 1 * CENT;
         consensus.ZC_MinStakeDepth = 200;
         consensus.ZC_TimeStart = 1508214600;        // October 17, 2017 4:30:00 AM
-        consensus.ZC_WrappedSerialsSupply = 4131563 * COIN;   // zerocoin supply at height_last_ZC_WrappedSerials
 
         // Network upgrades
         consensus.vUpgrades[Consensus::BASE_NETWORK].nActivationHeight =
@@ -322,7 +321,6 @@ public:
         consensus.ZC_MinMintFee = 1 * CENT;
         consensus.ZC_MinStakeDepth = 200;
         consensus.ZC_TimeStart = 1501776000;
-        consensus.ZC_WrappedSerialsSupply = 0;   // WrappedSerials only on main net
 
         // Network upgrades
         consensus.vUpgrades[Consensus::BASE_NETWORK].nActivationHeight =
@@ -463,7 +461,6 @@ public:
         consensus.ZC_MinMintFee = 1 * CENT;
         consensus.ZC_MinStakeDepth = 10;
         consensus.ZC_TimeStart = 0;                 // not implemented on regtest
-        consensus.ZC_WrappedSerialsSupply = 0;
 
         // Network upgrades
         consensus.vUpgrades[Consensus::BASE_NETWORK].nActivationHeight =
