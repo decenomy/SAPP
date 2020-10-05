@@ -22,6 +22,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         self.num_nodes = 5
         self.extra_args = [[], [], [], [], []]
         self.setup_clean_chain = True
+        self.enable_mocktime()
 
         self.ownerOnePos = 0
         self.remoteOnePos = 1
@@ -51,11 +52,14 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ret = mnOwner.startmasternode("alias", "false", masternodeAlias)
         assert_equal(ret["result"], "success")
 
-    def wait_for_mn_enable_time(self, miner):
-        for i in range(1, 5):
-            miner.generate(1)
-            sync_blocks(self.nodes)
-            time.sleep(25)
+    def generate_two_blocks(self):
+        # create two blocks (mocktime +120 sec) + sleep 5 seconds on every block
+        # so the node has time to broadcast the mnping.
+        for i in range(0, 2):
+            self.generate(1)
+            time.sleep(5)
+        set_node_times(self.nodes, self.mocktime + 15)
+        time.sleep(5)
 
     def check_mn_status(self, mnTxHash, status):
         for node in self.nodes:
@@ -74,7 +78,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         miner.sendtoaddress(mnOwnerAddr, Decimal('10001'))
         sync_mempools(self.nodes)
         # confirm the tx
-        miner.generate(1)
+        self.generate(1)
         self.sync_all()
         # verify reception
         assert_equal(mnOwner.getbalance(), Decimal('10001'))
@@ -91,7 +95,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         collateralTxId = mnOwner.sendtoaddress(mnAddress, Decimal('10000'))
 
         sync_mempools(self.nodes)
-        miner.generate(2)
+        self.generate(1)
         self.sync_all()
         # check if tx got confirmed
         assert(mnOwner.getrawtransaction(collateralTxId, 1)["confirmations"] > 0)
@@ -131,19 +135,21 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         connect_nodes(nodes[a], b)
         connect_nodes(nodes[b], a)
 
-    def start_nodes_and_check_mnsync_finished(self, miner):
+    def connect_nodes_and_check_mnsync_finished(self):
         r = len(self.nodes)
         for i in range(0, r):
             for j in range(i + 1, r):
                 self.connect_nodes_bi(self.nodes, i, j)
         self.log.info("syncing tier two across recently started peers..")
         # let the nodes sync the tier two
-        time.sleep(20)
-        miner.generate(1)
+        set_node_times(self.nodes, self.mocktime + 20)
+        time.sleep(5)
+        self.generate(1)
         sync_blocks(self.nodes)
 
         # wait a little bit until the tier two is synced.
-        time.sleep(20)
+        set_node_times(self.nodes, self.mocktime + 5)
+        time.sleep(10)
         self.check_mnsync_finished()
 
     def check_proposal_existence(self, proposalName, proposalHash):
@@ -160,8 +166,15 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             assert_equal(voteInfo["mnId"], mnCollateralHash)
             assert_equal(voteInfo["Vote"], voteType)
 
+    def generate(self, gen):
+        for i in range(0, gen):
+            self.mocktime = self.generate_pow(self.minerPos, self.mocktime)
+            set_node_times(self.nodes, self.mocktime)
+        sync_blocks(self.nodes)
 
     def run_test(self):
+        # init time
+        set_node_times(self.nodes, self.mocktime)
 
         ownerOne = self.nodes[self.ownerOnePos]
         remoteOne = self.nodes[self.remoteOnePos]
@@ -175,7 +188,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         remoteTwoDir = os.path.join(self.options.tmpdir, "node3")
 
         self.log.info("generating 301 blocks..")
-        miner.generate(301)
+        self.generate(301)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
@@ -203,21 +216,24 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         # to activate the masternodes
         self.stop_nodes()
         self.start_nodes()
+        set_node_times(self.nodes, self.mocktime)
 
         # # now need connection
-        self.start_nodes_and_check_mnsync_finished(miner)
+        self.connect_nodes_and_check_mnsync_finished()
         self.log.info("tier two synced! starting masternodes..")
         #
         # ## Now everything is set, can start both masternodes
         self.start_masternode(ownerOne, masternodeOneAlias)
         self.start_masternode(ownerTwo, masternodeTwoAlias)
 
-        time.sleep(7)
+        time.sleep(7) # sleep to have everyone updated.
         self.check_mn_status(mnOneTxHash, "ACTIVE")
         self.check_mn_status(mnTwoTxHash, "ACTIVE")
+        set_node_times(self.nodes, self.mocktime + 10)
+        time.sleep(5)
 
-        self.log.info("masternodes started, waiting 125 seconds until both gets enabled..")
-        self.wait_for_mn_enable_time(miner)
+        self.log.info("masternodes started, waiting until both gets enabled..")
+        self.generate_two_blocks()
 
         # check masternode enabled
         self.check_mn_status(mnOneTxHash, "ENABLED")
@@ -227,14 +243,13 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         self.log.info("masternodes enabled and running properly!")
 
         # now let's prepare the proposal
-        self.log.info("preparing the budget proposal..")
+        self.log.info("preparing budget proposal..")
         firstProposalName = "super-cool"
         firstProposalLink = "https://forum.pivx.org/t/test-proposal"
         firstProposalCycles = 2
         firstProposalAddress = miner.getnewaddress()
         firstProposalAmountPerCycle = 300
         nextSuperBlockHeight = miner.getnextsuperblock()
-
 
         proposalFeeTxId = miner.preparebudget(
             firstProposalName,
@@ -244,10 +259,10 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             firstProposalAddress,
             firstProposalAmountPerCycle)
 
-
         sync_mempools(self.nodes)
-        miner.generate(4)
-        sync_blocks(self.nodes)
+        # generate 4 blocks to confirm the tx (waiting in-between to let nodes update the mnping)
+        self.generate_two_blocks()
+        self.generate_two_blocks()
 
         txinfo = miner.gettransaction(proposalFeeTxId)
         assert_equal(txinfo['amount'], -50.00)
