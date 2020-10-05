@@ -16,7 +16,6 @@
 #include "guiinterface.h"
 #include "qt/pivx/qtutils.h"
 #include "qt/pivx/defaultdialog.h"
-#include "qt/pivx/settings/settingsfaqwidget.h"
 
 #include "init.h"
 #include "util.h"
@@ -587,11 +586,11 @@ int PIVXGUI::getNavWidth()
     return this->navMenu->width();
 }
 
-void PIVXGUI::openFAQ(int section)
+void PIVXGUI::openFAQ(SettingsFaqWidget::Section section)
 {
     showHide(true);
     SettingsFaqWidget* dialog = new SettingsFaqWidget(this);
-    if (section > 0) dialog->setSection(section);
+    dialog->setSection(section);
     openDialogWithOpaqueBackgroundFullScreen(dialog, this);
     dialog->deleteLater();
 }
