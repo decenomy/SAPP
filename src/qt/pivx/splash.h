@@ -18,7 +18,7 @@ class Splash : public QWidget
     Q_OBJECT
 
 public:
-    explicit Splash(Qt::WindowFlags f, const NetworkStyle* networkStyle);
+    explicit Splash(const NetworkStyle* networkStyle);
     ~Splash();
 
 public Q_SLOTS:
