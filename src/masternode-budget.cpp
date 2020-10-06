@@ -1362,12 +1362,6 @@ bool CBudgetProposal::CheckStartEnd()
         return false;
     }
 
-    int nProposalEnd = nBlockStart + (Params().GetConsensus().nBudgetCycleBlocks + 1) * GetTotalPaymentCount();
-    if (nBlockEnd != nProposalEnd) {
-        strInvalid = "Invalid nBlockEnd (mismatch with payments count)";
-        return false;
-    }
-
     return true;
 }
 
