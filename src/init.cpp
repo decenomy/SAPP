@@ -1762,9 +1762,8 @@ bool AppInit2()
     CBudgetDB budgetdb;
     int nChainHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
     const bool fDryRun = (nChainHeight <= 0);
+    if (!fDryRun) budget.SetBestHeight(nChainHeight);
     CBudgetDB::ReadResult readResult2 = budgetdb.Read(budget, fDryRun);
-    if (nChainHeight > 0)
-        budget.SetBestHeight(nChainHeight);
 
     if (readResult2 == CBudgetDB::FileError)
         LogPrintf("Missing budget cache - budget.dat, will try to recreate\n");
