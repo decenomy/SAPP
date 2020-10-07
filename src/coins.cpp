@@ -55,7 +55,10 @@ SaltedIdHasher::SaltedIdHasher() : k0(GetRand(std::numeric_limits<uint64_t>::max
 CCoinsViewCache::CCoinsViewCache(CCoinsView *baseIn) : CCoinsViewBacked(baseIn), cachedCoinsUsage(0) {}
 
 size_t CCoinsViewCache::DynamicMemoryUsage() const {
-    return memusage::DynamicUsage(cacheCoins) + cachedCoinsUsage;
+    return memusage::DynamicUsage(cacheCoins) +
+           memusage::DynamicUsage(cacheSaplingAnchors) +
+           memusage::DynamicUsage(cacheSaplingNullifiers) +
+           cachedCoinsUsage;
 }
 
 CCoinsMap::iterator CCoinsViewCache::FetchCoin(const COutPoint& outpoint) const
@@ -173,7 +176,8 @@ void CCoinsViewCache::SetBestBlock(const uint256& hashBlockIn)
 template<typename Map, typename MapIterator, typename MapEntry>
 void BatchWriteAnchors(
         Map &mapAnchors,
-        Map &cacheAnchors
+        Map &cacheAnchors,
+        size_t &cachedCoinsUsage
 )
 {
     for (MapIterator child_it = mapAnchors.begin(); child_it != mapAnchors.end();)
@@ -187,8 +191,7 @@ void BatchWriteAnchors(
                 entry.tree = child_it->second.tree;
                 entry.flags = MapEntry::DIRTY;
 
-                // TODO: Complete memory usage
-                //cachedCoinsUsage += entry.tree.DynamicMemoryUsage();
+                cachedCoinsUsage += entry.tree.DynamicMemoryUsage();
             } else {
                 if (parent_it->second.entered != child_it->second.entered) {
                     // The parent may have removed the entry.
@@ -284,8 +287,7 @@ bool CCoinsViewCache::BatchWrite(CCoinsMap& mapCoins,
     }
 
     // Sapling
-    // TODO: add cache coins usage
-    ::BatchWriteAnchors<CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, cacheSaplingAnchors);
+    ::BatchWriteAnchors<CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, cacheSaplingAnchors, cachedCoinsUsage);
     ::BatchWriteNullifiers(mapSaplingNullifiers, cacheSaplingNullifiers);
     hashSaplingAnchor = hashSaplingAnchorIn;
 
@@ -452,9 +454,7 @@ bool CCoinsViewCache::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &t
     CAnchorsSaplingMap::iterator ret = cacheSaplingAnchors.insert(std::make_pair(rt, CAnchorsSaplingCacheEntry())).first;
     ret->second.entered = true;
     ret->second.tree = tree;
-
-    // TODO: add cached coins usage
-    //cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
+    cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
 
     return true;
 }
@@ -499,8 +499,7 @@ void CCoinsViewCache::AbstractPushAnchor(
 
         if (insertRet.second) {
             // An insert took place
-            // TODO: add coins usage..
-            //cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
+            cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
         }
 
         hash = newrt;

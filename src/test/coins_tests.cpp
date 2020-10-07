@@ -196,7 +196,9 @@ public:
     void SelfTest() const
     {
         // Manually recompute the dynamic usage of the whole data, and compare it.
-        size_t ret = memusage::DynamicUsage(cacheCoins);
+        size_t ret = memusage::DynamicUsage(cacheCoins) +
+                     memusage::DynamicUsage(cacheSaplingAnchors) +
+                     memusage::DynamicUsage(cacheSaplingNullifiers);
         size_t count = 0;
         for (CCoinsMap::iterator it = cacheCoins.begin(); it != cacheCoins.end(); it++) {
             ret += memusage::DynamicUsage(it->second.coin);
