@@ -1739,6 +1739,7 @@ bool AppInit2()
 
     uiInterface.InitMessage(_("Loading masternode cache..."));
 
+    mnodeman.SetBestHeight(nChainHeight);
     CMasternodeDB mndb;
     CMasternodeDB::ReadResult readResult = mndb.Read(mnodeman);
     if (readResult == CMasternodeDB::FileError)

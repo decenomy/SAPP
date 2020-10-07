@@ -11,6 +11,7 @@
 #include "consensus/upgrades.h"
 #include "kernel.h"
 #include "masternode-budget.h"
+#include "masternodeman.h"
 #include "policy/policy.h"
 #include "rpc/server.h"
 #include "sync.h"
@@ -1185,7 +1186,9 @@ UniValue invalidateblock(const JSONRPCRequest& request)
 
     if (state.IsValid()) {
         ActivateBestChain(state);
-        budget.SetBestHeight(WITH_LOCK(cs_main, return chainActive.Height(); ));
+        int nHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
+        budget.SetBestHeight(nHeight);
+        mnodeman.SetBestHeight(nHeight);
     }
 
     if (!state.IsValid()) {
@@ -1225,6 +1228,9 @@ UniValue reconsiderblock(const JSONRPCRequest& request)
     if (state.IsValid()) {
         ActivateBestChain(state);
         budget.SetBestHeight(WITH_LOCK(cs_main, return chainActive.Height(); ));
+        int nHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
+        budget.SetBestHeight(nHeight);
+        mnodeman.SetBestHeight(nHeight);
     }
 
     if (!state.IsValid()) {
