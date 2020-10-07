@@ -566,3 +566,20 @@ uint256 CCoinsViewCache::GetBestAnchor() const {
         hashSaplingAnchor = base->GetBestAnchor();
     return hashSaplingAnchor;
 }
+
+bool CCoinsViewCache::HaveShieldedRequirements(const CTransaction& tx) const
+{
+    if (tx.hasSaplingData()) {
+        for (const SpendDescription &spendDescription : tx.sapData->vShieldedSpend) {
+            if (GetNullifier(spendDescription.nullifier)) // Prevent double spends
+                return false;
+
+            SaplingMerkleTree tree;
+            if (!GetSaplingAnchorAt(spendDescription.anchor, tree)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
