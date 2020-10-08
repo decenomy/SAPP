@@ -704,7 +704,11 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
     LogPrint(BCLog::MNPING, "%s: New Ping - %s - %s - %lli\n", __func__, GetHash().ToString(), blockHash.ToString(), sigTime);
 
     if (isMasternodeFound && pmn->protocolVersion >= ActiveProtocol()) {
-        if (fRequireEnabled && !pmn->IsEnabled()) return false;
+
+        // Update ping only if the masternode is active/enabled
+        if (fRequireEnabled && (!pmn->IsEnabled() && !pmn->IsPreEnabled())) {
+            return false;
+        }
 
         // update only if there is no known ping for this masternode or
         // last ping was more then MASTERNODE_MIN_MNP_SECONDS-60 ago comparing to this one
