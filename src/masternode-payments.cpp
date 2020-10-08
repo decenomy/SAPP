@@ -661,7 +661,6 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
         return error("%s: Active Masternode not initialized.", __func__);
 
     //reference node - hybrid mode
-
     int n = mnodeman.GetMasternodeRank(*(activeMasternode.vin), nBlockHeight - 100, ActiveProtocol());
 
     if (n == -1) {
