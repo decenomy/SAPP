@@ -96,6 +96,7 @@ class CAddressBookIterator;
 class CAccountingEntry;
 class CCoinControl;
 class COutput;
+class CStakeableOutput;
 class CReserveKey;
 class CScript;
 class CWalletTx;
@@ -318,6 +319,22 @@ private:
 
     bool IsKeyUsed(const CPubKey& vchPubKey);
 
+    struct OutputAvailabilityResult
+    {
+        bool available{false};
+        bool solvable{false};
+        bool spendable{false};
+    };
+
+    OutputAvailabilityResult CheckOutputAvailability(const CTxOut& output,
+                                                     const unsigned int outIndex,
+                                                     const uint256& wtxid,
+                                                     AvailableCoinsType nCoinType,
+                                                     const CCoinControl* coinControl,
+                                                     const bool fCoinsSelected,
+                                                     const bool fIncludeColdStaking,
+                                                     const bool fIncludeDelegated) const;
+
     // Zerocoin wallet
     CzPIVWallet* zwallet{nullptr};
 
@@ -429,7 +446,7 @@ public:
     bool SelectCoinsToSpend(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl = nullptr) const;
     bool SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const;
     //! >> Available coins (staking)
-    bool StakeableCoins(std::vector<COutput>* pCoins = nullptr);
+    bool StakeableCoins(std::vector<CStakeableOutput>* pCoins = nullptr);
     //! >> Available coins (P2CS)
     void GetAvailableP2CSCoins(std::vector<COutput>& vCoins) const;
 
@@ -611,7 +628,7 @@ public:
                          unsigned int nBits,
                          CMutableTransaction& txNew,
                          int64_t& nTxNewTime,
-                         std::vector<COutput>* availableCoins);
+                         std::vector<CStakeableOutput>* availableCoins);
     bool MultiSend();
     void AutoCombineDust(CConnman* connman);
 
@@ -1056,6 +1073,15 @@ public:
     std::string ToString() const;
 };
 
+class CStakeableOutput : public COutput
+{
+public:
+    const CBlockIndex* pindex{nullptr};
+
+    CStakeableOutput(const CWalletTx* txIn, int iIn, int nDepthIn, bool fSpendableIn, bool fSolvableIn,
+                     const CBlockIndex*& pindex);
+
+};
 
 /** Private key that includes an expiration date in case it never gets used. */
 class CWalletKey

@@ -16,14 +16,14 @@ class CWalletTx;
 class CStakeInput
 {
 protected:
-    CBlockIndex* pindexFrom = nullptr;
+    const CBlockIndex* pindexFrom = nullptr;
 
 public:
+    CStakeInput(const CBlockIndex* _pindexFrom) : pindexFrom(_pindexFrom) {}
     virtual ~CStakeInput(){};
     virtual bool InitFromTxIn(const CTxIn& txin) = 0;
-    virtual CBlockIndex* GetIndexFrom() = 0;
+    virtual const CBlockIndex* GetIndexFrom() const = 0;
     virtual bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = UINT256_ZERO) = 0;
-    virtual bool GetTxFrom(CTransaction& tx) const = 0;
     virtual bool GetTxOutFrom(CTxOut& out) const = 0;
     virtual CAmount GetValue() const = 0;
     virtual bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal, const bool onlyP2PK) = 0;
@@ -36,17 +36,17 @@ public:
 class CPivStake : public CStakeInput
 {
 private:
-    CTransaction txFrom{CTransaction()};
-    unsigned int nPosition{0};
+    const CTxOut outputFrom;
+    const COutPoint outpointFrom;
 
 public:
-    CPivStake() {}
+    CPivStake(const CTxOut& _from, const COutPoint& _outPointFrom, const CBlockIndex* _pindexFrom) :
+            CStakeInput(_pindexFrom), outputFrom(_from), outpointFrom(_outPointFrom) {}
 
-    bool InitFromTxIn(const CTxIn& txin) override;
-    bool SetPrevout(CTransaction txPrev, unsigned int n);
+    static CPivStake* NewPivStake(const CTxIn& txin);
 
-    CBlockIndex* GetIndexFrom() override;
-    bool GetTxFrom(CTransaction& tx) const override;
+    bool InitFromTxIn(const CTxIn& txin) override { return pindexFrom; }
+    const CBlockIndex* GetIndexFrom() const override;
     bool GetTxOutFrom(CTxOut& out) const override;
     CAmount GetValue() const override;
     CDataStream GetUniqueness() const override;

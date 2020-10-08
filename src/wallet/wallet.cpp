@@ -1910,13 +1910,13 @@ void CWallet::GetAvailableP2CSCoins(std::vector<COutput>& vCoins) const {
 /**
  * Test if the transaction is spendable.
  */
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth, const CBlockIndex*& pindexRet)
 {
     if (!CheckFinalTx(*pcoin)) return false;
     if (fOnlyConfirmed && !pcoin->IsTrusted()) return false;
     if (pcoin->GetBlocksToMaturity() > 0) return false;
 
-    nDepth = pcoin->GetDepthInMainChain(false);
+    nDepth = pcoin->GetDepthInMainChain(pindexRet, false);
     // do not use IX for inputs that have less then 6 blockchain confirmations
     if (fUseIX && nDepth < 6) return false;
 
@@ -1925,6 +1925,12 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     if (nDepth == 0 && !pcoin->InMempool()) return false;
 
     return true;
+}
+
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+{
+    const CBlockIndex* pindexRet = nullptr;
+    return CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth, pindexRet);
 }
 
 bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex, std::string& strError)
@@ -1999,6 +2005,60 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
             keyRet);
 }
 
+CWallet::OutputAvailabilityResult CWallet::CheckOutputAvailability(
+        const CTxOut& output,
+        const unsigned int outIndex,
+        const uint256& wtxid,
+        AvailableCoinsType nCoinType,
+        const CCoinControl* coinControl,
+        const bool fCoinsSelected,
+        const bool fIncludeColdStaking,
+        const bool fIncludeDelegated) const
+{
+    OutputAvailabilityResult res;
+
+    // Check for only 10k utxo
+    if (nCoinType == ONLY_10000 && output.nValue != 10000 * COIN) return res;
+
+    // Check for stakeable utxo
+    if (nCoinType == STAKEABLE_COINS && output.IsZerocoinMint()) return res;
+
+    // Check if the utxo was spent.
+    if (IsSpent(wtxid, outIndex)) return res;
+
+    isminetype mine = IsMine(output);
+
+    // Check If not mine
+    if (mine == ISMINE_NO) return res;
+
+    // Check if watch only utxo are allowed
+    if (mine == ISMINE_WATCH_ONLY && coinControl && !coinControl->fAllowWatchOnly) return res;
+
+    // Skip locked utxo
+    if (IsLockedCoin(wtxid, outIndex) && nCoinType != ONLY_10000) return res;
+
+    // Check if we should include zero value utxo
+    if (output.nValue <= 0) return res;
+
+    if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint(wtxid, outIndex)))
+        return res;
+
+    // --Skip P2CS outputs
+    // skip cold coins
+    if (mine == ISMINE_COLD && (!fIncludeColdStaking || !HasDelegator(output))) return res;
+    // skip delegated coins
+    if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) return res;
+
+    res.solvable = IsSolvable(*this, output.scriptPubKey, mine == ISMINE_COLD);
+
+    res.spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
+                     (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && res.solvable)) ||
+                     ((mine & ((fIncludeColdStaking ? ISMINE_COLD : ISMINE_NO) |
+                               (fIncludeDelegated ? ISMINE_SPENDABLE_DELEGATED : ISMINE_NO) )) != ISMINE_NO);
+    res.available = true;
+    return res;
+}
+
 /**
  * populate vCoins with vector of available COutputs.
  */
@@ -2032,52 +2092,26 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
             if (nCoinType == STAKEABLE_COINS && nDepth < Params().GetConsensus().nStakeMinDepth) continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+                const auto& output = pcoin->vout[i];
 
-                // Check for only 10k utxo
-                if (nCoinType == ONLY_10000 && pcoin->vout[i].nValue != 10000 * COIN) continue;
+                auto res = CheckOutputAvailability(
+                        output,
+                        i,
+                        wtxid,
+                        nCoinType,
+                        coinControl,
+                        fCoinsSelected,
+                        fIncludeColdStaking,
+                        fIncludeDelegated);
 
-                // Check for stakeable utxo
-                if (nCoinType == STAKEABLE_COINS && pcoin->vout[i].IsZerocoinMint()) continue;
-
-                // Check if the utxo was spent.
-                if (IsSpent(wtxid, i)) continue;
-
-                isminetype mine = IsMine(pcoin->vout[i]);
-
-                // Check If not mine
-                if (mine == ISMINE_NO) continue;
-
-                // Check if watch only utxo are allowed
-                if (mine == ISMINE_WATCH_ONLY && coinControl && !coinControl->fAllowWatchOnly) continue;
-
-                // Skip locked utxo
-                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_10000) continue;
-
-                // Check if we should include zero value utxo
-                if (pcoin->vout[i].nValue <= 0) continue;
-
-                if (fCoinsSelected && !coinControl->fAllowOtherInputs && !coinControl->IsSelected(COutPoint((*it).first, i)))
-                    continue;
-
-                // --Skip P2CS outputs
-                // skip cold coins
-                if (mine == ISMINE_COLD && (!fIncludeColdStaking || !HasDelegator(pcoin->vout[i]))) continue;
-                // skip delegated coins
-                if (mine == ISMINE_SPENDABLE_DELEGATED && !fIncludeDelegated) continue;
-
-                bool solvable = IsSolvable(*this, pcoin->vout[i].scriptPubKey, mine == ISMINE_COLD);
-
-                bool spendable = ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
-                        (((mine & ISMINE_WATCH_ONLY) != ISMINE_NO) && (coinControl && coinControl->fAllowWatchOnly && solvable)) ||
-                        ((mine & ((fIncludeColdStaking ? ISMINE_COLD : ISMINE_NO) |
-                        (fIncludeDelegated ? ISMINE_SPENDABLE_DELEGATED : ISMINE_NO) )) != ISMINE_NO);
+                if (!res.available) continue;
 
                 // found valid coin
                 if (!pCoins) return true;
-                pCoins->emplace_back(pcoin, i, nDepth, spendable, solvable);
+                pCoins->emplace_back(pcoin, (int) i, nDepth, res.spendable, res.solvable);
             }
         }
-        return (pCoins && pCoins->size() > 0);
+        return (pCoins && !pCoins->empty());
     }
 }
 
@@ -2152,17 +2186,45 @@ static void ApproximateBestSubset(std::vector<std::pair<CAmount, std::pair<const
     }
 }
 
-
-bool CWallet::StakeableCoins(std::vector<COutput>* pCoins)
+bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
 {
-    const bool fIncludeCold = (sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT) &&
+    const bool fIncludeColdStaking = (sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT) &&
                                GetBoolArg("-coldstaking", DEFAULT_COLDSTAKING));
 
-    return AvailableCoins(pCoins,
-            nullptr,            // coin control
-            false,              // fIncludeDelegated
-            fIncludeCold,       // fIncludeColdStaking
-            STAKEABLE_COINS);  // coin type
+    LOCK2(cs_main, cs_wallet);
+    for (const auto& it : mapWallet) {
+        const uint256& wtxid = it.first;
+        const CWalletTx* pcoin = &(it).second;
+
+        // Check if the tx is selectable
+        int nDepth;
+        const CBlockIndex* pindex = nullptr;
+        if (!CheckTXAvailability(pcoin, true, false, nDepth, pindex))
+            continue;
+
+        // Check min depth requirement for stake inputs
+        if (nDepth < Params().GetConsensus().nStakeMinDepth) continue;
+
+        for (unsigned int index = 0; index < pcoin->vout.size(); index++) {
+
+            auto res = CheckOutputAvailability(
+                    pcoin->vout[index],
+                    index,
+                    wtxid,
+                    STAKEABLE_COINS,
+                    nullptr, // coin control
+                    false,   // fIncludeDelegated
+                    fIncludeColdStaking,
+                    false);
+
+            if (!res.available) continue;
+
+            // found valid coin
+            if (!pCoins) return true;
+            pCoins->emplace_back(CStakeableOutput(pcoin, (int) index, nDepth, res.spendable, res.solvable, pindex));
+        }
+    }
+    return (pCoins && !pCoins->empty());
 }
 
 bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
@@ -2670,8 +2732,7 @@ bool CWallet::CreateCoinStake(
         unsigned int nBits,
         CMutableTransaction& txNew,
         int64_t& nTxNewTime,
-        std::vector<COutput>* availableCoins
-        )
+        std::vector<CStakeableOutput>* availableCoins)
 {
 
     const Consensus::Params& consensus = Params().GetConsensus();
@@ -2693,9 +2754,10 @@ bool CWallet::CreateCoinStake(
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
     int nAttempts = 0;
-    for (const COutput &out : *availableCoins) {
-        CPivStake stakeInput;
-        stakeInput.SetPrevout((CTransaction) *out.tx, out.i);
+    for (const auto& out : *availableCoins) {
+        CPivStake stakeInput(out.tx->vout[out.i],
+                             COutPoint(out.tx->GetHash(), out.i),
+                             out.pindex);
 
         //new block came in, move on
         if (WITH_LOCK(cs_main, return chainActive.Height()) != pindexPrev->nHeight) return false;
@@ -3982,7 +4044,7 @@ void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
 
 int CMerkleTx::GetDepthInMainChain(bool enableIX) const
 {
-    const CBlockIndex* pindexRet;
+    const CBlockIndex* pindexRet = nullptr;
     return GetDepthInMainChain(pindexRet, enableIX);
 }
 
@@ -4402,3 +4464,8 @@ bool CWalletTx::IsFromMe(const isminefilter& filter) const
 {
     return (GetDebit(filter) > 0);
 }
+
+CStakeableOutput::CStakeableOutput(const CWalletTx* txIn, int iIn, int nDepthIn, bool fSpendableIn, bool fSolvableIn,
+                                   const CBlockIndex*& _pindex) : COutput(txIn, iIn, nDepthIn, fSpendableIn, fSolvableIn),
+                                                                pindex(_pindex) {}
+

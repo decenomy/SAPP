@@ -45,7 +45,7 @@ CStakeKernel::CStakeKernel(const CBlockIndex* const pindexPrev, CStakeInput* sta
         // Modifier v2
         stakeModifier << pindexPrev->GetStakeModifierV2();
     }
-    CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
+    const CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
     nTimeBlockFrom = pindexFrom->nTime;
 }
 
@@ -110,9 +110,9 @@ bool LoadStakeInput(const CBlock& block, const CBlockIndex* pindexPrev, std::uni
     const CTxIn& txin = block.vtx[1]->vin[0];
     stake = txin.IsZerocoinSpend() ?
             std::unique_ptr<CStakeInput>(new CLegacyZPivStake()) :
-            std::unique_ptr<CStakeInput>(new CPivStake());
+            std::unique_ptr<CStakeInput>(CPivStake::NewPivStake(txin));
 
-    return stake->InitFromTxIn(txin);
+    return stake && stake->InitFromTxIn(txin);
 }
 
 /*

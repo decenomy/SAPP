@@ -16,18 +16,17 @@ private:
     uint256 hashSerial;
 
 public:
-    CLegacyZPivStake() {}
+    CLegacyZPivStake() : CStakeInput(nullptr) {}
 
     explicit CLegacyZPivStake(const libzerocoin::CoinSpend& spend);
     bool InitFromTxIn(const CTxIn& txin) override;
     bool IsZPIV() const override { return true; }
     uint32_t GetChecksum() const { return nChecksum; }
-    CBlockIndex* GetIndexFrom() override;
+    const CBlockIndex* GetIndexFrom() const override;
     CAmount GetValue() const override;
     CDataStream GetUniqueness() const override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = UINT256_ZERO) override { return false; /* creation disabled */}
     bool CreateTxOuts(CWallet* pwallet, std::vector<CTxOut>& vout, CAmount nTotal, const bool onlyP2PK) override { return false; /* creation disabled */}
-    bool GetTxFrom(CTransaction& tx) const override { return false; /* not available */ }
     bool GetTxOutFrom(CTxOut& out) const override { return false; /* not available */ }
     virtual bool ContextCheck(int nHeight, uint32_t nTime) override;
 };

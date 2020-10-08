@@ -160,7 +160,7 @@ UniValue generate(const JSONRPCRequest& request)
     while (nHeight < nHeightEnd && !ShutdownRequested()) {
 
         // Get available coins
-        std::vector<COutput> availableCoins;
+        std::vector<CStakeableOutput> availableCoins;
         if (fPoS && !pwalletMain->StakeableCoins(&availableCoins)) {
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "No available coins to stake");
         }
