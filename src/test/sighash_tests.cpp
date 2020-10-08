@@ -94,9 +94,16 @@ void static RandomScript(CScript &script) {
 }
 
 void static RandomTransaction(CMutableTransaction &tx, bool fSingle) {
-    tx.nVersion = InsecureRand32();
+    bool isSapling = !(InsecureRand32() % 7);
+    if (isSapling) {
+        tx.nVersion = 2;
+    } else {
+        do tx.nVersion = InsecureRand32(); while (tx.nVersion == 2);
+    }
     tx.vin.clear();
     tx.vout.clear();
+    tx.sapData->vShieldedSpend.clear();
+    tx.sapData->vShieldedOutput.clear();
     tx.nLockTime = (InsecureRandBool()) ? InsecureRand32() : 0;
     int ins = (InsecureRandBits(2)) + 1;
     int outs = fSingle ? ins : (InsecureRandBits(2)) + 1;
@@ -113,6 +120,31 @@ void static RandomTransaction(CMutableTransaction &tx, bool fSingle) {
         CTxOut &txout = tx.vout.back();
         txout.nValue = InsecureRandRange(100000000);
         RandomScript(txout.scriptPubKey);
+    }
+
+    if (tx.nVersion == 2) {
+        int shielded_spends = (InsecureRandBits(2)) + 1;
+        int shielded_outs = (InsecureRandBits(2)) + 1;
+        tx.sapData->valueBalance = InsecureRandRange(100000000);;
+        for (int spend = 0; spend < shielded_spends; spend++) {
+            SpendDescription sdesc;
+            sdesc.cv = GetRandHash();
+            sdesc.anchor = GetRandHash();
+            sdesc.nullifier = GetRandHash();
+            sdesc.rk = GetRandHash();
+            randombytes_buf(sdesc.zkproof.begin(), sdesc.zkproof.size());
+            tx.sapData->vShieldedSpend.push_back(sdesc);
+        }
+        for (int out = 0; out < shielded_outs; out++) {
+            OutputDescription odesc;
+            odesc.cv = GetRandHash();
+            odesc.cmu = GetRandHash();
+            odesc.ephemeralKey = GetRandHash();
+            randombytes_buf(odesc.encCiphertext.begin(), odesc.encCiphertext.size());
+            randombytes_buf(odesc.outCiphertext.begin(), odesc.outCiphertext.size());
+            randombytes_buf(odesc.zkproof.begin(), odesc.zkproof.size());
+            tx.sapData->vShieldedOutput.push_back(odesc);
+        }
     }
 }
 
@@ -145,7 +177,6 @@ BOOST_AUTO_TEST_CASE(sighash_test)
         #if defined(PRINT_SIGHASH_JSON)
         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
         ss << txTo;
-
         std::cout << "\t[\"" ;
         std::cout << HexStr(ss.begin(), ss.end()) << "\", \"";
         std::cout << HexStr(scriptCode) << "\", ";
@@ -157,7 +188,9 @@ BOOST_AUTO_TEST_CASE(sighash_test)
         }
         std::cout << "\n";
         #endif
-        BOOST_CHECK(sh == sho);
+        if (txTo.nVersion != CTransaction::SAPLING_VERSION) { // Sapling has a different signature.
+            BOOST_CHECK(sh == sho);
+        }
     }
     #if defined(PRINT_SIGHASH_JSON)
     std::cout << "]\n";
@@ -165,6 +198,7 @@ BOOST_AUTO_TEST_CASE(sighash_test)
 }
 
 // Goal: check that SignatureHash generates correct hash
+// TODO: Update with Sapling transactions..
 BOOST_AUTO_TEST_CASE(sighash_from_data)
 {
     UniValue tests = read_json(std::string(json_tests::sighash, json_tests::sighash + sizeof(json_tests::sighash)));
