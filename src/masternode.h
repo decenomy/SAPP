@@ -14,6 +14,9 @@
 #include "timedata.h"
 #include "util.h"
 
+/* Depth of the block pinged by masternodes */
+static const unsigned int MNPING_DEPTH = 12;
+
 class CMasternode;
 class CMasternodeBroadcast;
 class CMasternodePing;
@@ -37,7 +40,7 @@ public:
     int64_t sigTime; //mnb message times
 
     CMasternodePing();
-    CMasternodePing(CTxIn& newVin);
+    CMasternodePing(const CTxIn& newVin, const uint256& nBlockHash);
 
     ADD_SERIALIZE_METHODS;
 
@@ -307,8 +310,8 @@ public:
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that
-    static bool Create(CTxIn vin, CService service, CKey keyCollateralAddressNew, CPubKey pubKeyCollateralAddressNew, CKey keyMasternodeNew, CPubKey pubKeyMasternodeNew, std::string& strErrorRet, CMasternodeBroadcast& mnbRet);
-    static bool Create(std::string strService, std::string strKey, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast& mnbRet, bool fOffline = false);
+    static bool Create(const CTxIn& vin, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string& strErrorRet, CMasternodeBroadcast& mnbRet);
+    static bool Create(const std::string& strService, const std::string& strKey, const std::string& strTxHash, const std::string& strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast& mnbRet, bool fOffline = false);
     static bool CheckDefaultPort(CService service, std::string& strErrorRet, const std::string& strContext);
 };
 
