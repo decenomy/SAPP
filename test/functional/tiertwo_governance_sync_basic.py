@@ -48,9 +48,25 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
     def check_mn_list_empty(self, node):
         assert(len(node.listmasternodes()) == 0)
 
+    def check_budget_finalization_sync(self):
+        for i in range(0, len(self.nodes)):
+            node = self.nodes[i]
+            assert_true(len(node.mnfinalbudget("show")) == 1, "MN budget finalization not synced in node" + str(i))
+
     def start_masternode(self, mnOwner, masternodeAlias):
         ret = mnOwner.startmasternode("alias", "false", masternodeAlias)
         assert_equal(ret["result"], "success")
+
+    def broadcastbudgetfinalization(self, node):
+        self.log.info("suggesting the budget finalization..")
+        node.mnfinalbudgetsuggest()
+
+        self.log.info("confirming the budget finalization..")
+        self.generate_two_blocks()
+        self.generate_two_blocks()
+
+        self.log.info("broadcasting the budget finalization..")
+        node.mnfinalbudgetsuggest()
 
     def generate_two_blocks(self):
         # create two blocks (mocktime +120 sec) + sleep 5 seconds on every block
@@ -59,7 +75,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             self.generate(1)
             time.sleep(5)
         set_node_times(self.nodes, self.mocktime + 15)
-        time.sleep(5)
+        time.sleep(3)
 
     def check_mn_status(self, mnTxHash, status):
         for node in self.nodes:
@@ -159,12 +175,17 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             assert_equal(proposals[0]["Hash"], proposalHash)
 
     def check_vote_existence(self, proposalName, mnCollateralHash, voteType):
-        for node in self.nodes:
+        for i in range(0, len(self.nodes)):
+            node = self.nodes[i]
             votesInfo = node.getbudgetvotes(proposalName)
             assert(len(votesInfo) > 0)
-            voteInfo = votesInfo[0]
-            assert_equal(voteInfo["mnId"], mnCollateralHash)
-            assert_equal(voteInfo["Vote"], voteType)
+            found = False
+            for voteInfo in votesInfo:
+                if (voteInfo["mnId"] == mnCollateralHash) :
+                    assert_equal(voteInfo["Vote"], voteType)
+                    found = True
+            assert_true(found, "Error checking vote existence in node " + str(i))
+
 
     def generate(self, gen):
         for i in range(0, gen):
@@ -187,8 +208,8 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ownerTwoDir = os.path.join(self.options.tmpdir, "node2")
         remoteTwoDir = os.path.join(self.options.tmpdir, "node3")
 
-        self.log.info("generating 301 blocks..")
-        self.generate(301)
+        self.log.info("generating 412 blocks..")
+        self.generate(412)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
@@ -215,7 +236,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         # now that both are configured, let's restart them
         # to activate the masternodes
         self.stop_nodes()
-        self.start_nodes()
+        self.start_nodes(self.extra_args)
         set_node_times(self.nodes, self.mocktime)
 
         # # now need connection
@@ -283,13 +304,42 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         self.check_proposal_existence(firstProposalName, proposalHash)
         self.log.info("proposal broadcast succeed!")
 
-        # now let's vote for the proposal
+        # now let's vote for the proposal with the first MN
         self.log.info("broadcasting votes for the proposal now..")
         ownerOne.mnbudgetvote("alias", proposalHash, "yes", masternodeOneAlias)
-        time.sleep(10)
+        time.sleep(5)
         # check that the vote was accepted everywhere
         self.check_vote_existence(firstProposalName, mnOneTxHash, "YES")
-        self.log.info("all good, vote accepted everywhere!")
+        self.log.info("all good, MN1 vote accepted everywhere!")
+
+        # now let's vote for the proposal with the second MN
+        ownerTwo.mnbudgetvote("alias", proposalHash, "yes", masternodeTwoAlias)
+        time.sleep(5)
+        # check that the vote was accepted everywhere
+        self.check_vote_existence(firstProposalName, mnTwoTxHash, "YES")
+        self.log.info("all good, MN2 vote accepted everywhere!")
+
+        # Quick block count check.
+        assert_equal(ownerOne.getblockcount(), 423)
+        # Proposal needs to be on the chain > 5 min.
+        self.generate_two_blocks()
+        self.generate_two_blocks()
+
+        self.log.info("starting budget finalization sync test..")
+        # Now let's submit a budget finalization, next superblock will occur at block 432
+
+        # assert that there is no budget finalization first.
+        assert_true(len(ownerOne.mnfinalbudget("show")) == 0)
+
+        # suggest the budget finalization and confirm the tx.
+        self.broadcastbudgetfinalization(miner)
+        time.sleep(5)
+
+        self.log.info("checking budget finalization sync..")
+        self.check_budget_finalization_sync()
+
+        self.log.info("budget finalization synced!")
+
 
 
 
