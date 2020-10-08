@@ -17,7 +17,6 @@
 class CMasternode;
 class CMasternodeBroadcast;
 class CMasternodePing;
-extern std::map<int64_t, uint256> mapCacheBlockHashes;
 
 int MasternodeMinPingSeconds();
 int MasternodeBroadcastSeconds();
