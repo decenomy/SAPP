@@ -19,8 +19,6 @@ class CMasternodeBroadcast;
 class CMasternodePing;
 extern std::map<int64_t, uint256> mapCacheBlockHashes;
 
-bool GetBlockHash(uint256& hash, int nBlockHeight);
-
 int MasternodeMinPingSeconds();
 int MasternodeBroadcastSeconds();
 int MasternodeCollateralMinConf();
