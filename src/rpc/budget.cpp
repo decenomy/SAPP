@@ -719,6 +719,21 @@ UniValue mnbudgetrawvote(const JSONRPCRequest& request)
     }
 }
 
+UniValue mnfinalbudgetsuggest(const JSONRPCRequest& request)
+{
+    if (request.fHelp || !request.params.empty())
+        throw std::runtime_error(
+                "mnfinalbudgetsuggest\n"
+                "\nTry to submit a budget finalization\n");
+
+    if (!Params().IsRegTestNet()) {
+        throw std::runtime_error("mnfinalbudgetsuggest enabled only in regtest");
+    }
+
+    budget.SubmitFinalBudget();
+    return NullUniValue;
+}
+
 UniValue mnfinalbudget(const JSONRPCRequest& request)
 {
     std::string strCommand;

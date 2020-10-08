@@ -298,6 +298,8 @@ extern UniValue mnbudgetrawvote(const JSONRPCRequest& request);
 extern UniValue mnfinalbudget(const JSONRPCRequest& request);
 extern UniValue checkbudgets(const JSONRPCRequest& request);
 
+extern UniValue mnfinalbudgetsuggest(const JSONRPCRequest& request);
+
 extern UniValue getinfo(const JSONRPCRequest& request); // in rpc/misc.cpp
 extern UniValue logging(const JSONRPCRequest& request);
 extern UniValue mnsync(const JSONRPCRequest& request);
