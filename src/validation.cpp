@@ -108,6 +108,8 @@ CTxMemPool mempool(::minRelayTxFee);
 
 std::map<uint256, int64_t> mapRejectedBlocks;
 
+CMoneySupply MoneySupply;
+
 static void CheckBlockIndex();
 
 /** Constant stuff for coinbase transactions we create: */

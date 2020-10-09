@@ -1730,6 +1730,11 @@ bool AppInit2()
         uiInterface.NotifyBlockTip.disconnect(BlockNotifyGenesisWait);
     }
 
+    uiInterface.InitMessage(_("Calculating money supply..."));
+    int nChainHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
+    MoneySupply.Update(pcoinsTip->GetTotalAmount(), nChainHeight);
+
+
     // ********************************************************* Step 10: setup layer 2 data
 
     uiInterface.InitMessage(_("Loading masternode cache..."));
@@ -1749,7 +1754,6 @@ bool AppInit2()
     uiInterface.InitMessage(_("Loading budget cache..."));
 
     CBudgetDB budgetdb;
-    int nChainHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
     const bool fDryRun = (nChainHeight <= 0);
     if (!fDryRun) budget.SetBestHeight(nChainHeight);
     CBudgetDB::ReadResult readResult2 = budgetdb.Read(budget, fDryRun);
