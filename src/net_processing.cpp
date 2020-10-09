@@ -863,16 +863,8 @@ void static ProcessGetData(CNode* pfrom, CConnman& connman, std::atomic<bool>& i
             } else if (inv.IsKnownType()) {
                 // Send stream from relay memory
                 bool pushed = false;
-                {
-                    LOCK(cs_mapRelay);
-                    std::map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
-                    if (mi != mapRelay.end()) {
-                        connman.PushMessage(pfrom, msgMaker.Make(inv.GetCommand(), (*mi).second));
-                        pushed = true;
-                    }
-                }
 
-                if (!pushed && inv.type == MSG_TX) {
+                if (inv.type == MSG_TX) {
                     CTransaction tx;
                     if (mempool.lookup(inv.hash, tx)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);

@@ -456,10 +456,6 @@ bool validateMasternodeIP(const std::string& addrStr);          // valid, reacha
 extern bool fDiscover;
 extern bool fListen;
 
-extern std::map<CInv, CDataStream> mapRelay;
-extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
-extern RecursiveMutex cs_mapRelay;
-
 extern limitedmap<CInv, int64_t> mapAlreadyAskedFor;
 
 /** Subversion as sent to the P2P network in `version` messages */
