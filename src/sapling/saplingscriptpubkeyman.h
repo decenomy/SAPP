@@ -9,6 +9,13 @@
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 
+enum KeyAddResult {
+    SpendingKeyExists,
+    KeyAlreadyExists,
+    KeyAdded,
+    KeyNotAdded,
+};
+
 /*
  * Sapling keys manager
  * todo: add real description..
@@ -37,18 +44,25 @@ public:
     /* Encrypt Sapling keys */
     bool EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn);
 
+    // Add full viewing key if it's not already in the wallet
+    KeyAddResult AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const;
+
+    // Add spending key if it's not already in the wallet
+    KeyAddResult AddSpendingKeyToWallet(
+            const Consensus::Params &params,
+            const libzcash::SaplingExtendedSpendingKey &sk,
+            int64_t nTime);
+
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
     //! Adds Sapling spending key to the store, and saves it to disk
-    bool AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key,
-                        const libzcash::SaplingPaymentAddress &defaultAddr);
+    bool AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key);
     bool AddSaplingIncomingViewingKey(
             const libzcash::SaplingIncomingViewingKey &ivk,
             const libzcash::SaplingPaymentAddress &addr);
     bool AddCryptedSaplingSpendingKeyDB(
             const libzcash::SaplingExtendedFullViewingKey &extfvk,
-            const std::vector<unsigned char> &vchCryptedSecret,
-            const libzcash::SaplingPaymentAddress &defaultAddr);
+            const std::vector<unsigned char> &vchCryptedSecret);
     //! Returns true if the wallet contains the spending key
     bool HaveSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &zaddr) const;
 
@@ -64,9 +78,14 @@ public:
     bool LoadSaplingPaymentAddress(
             const libzcash::SaplingPaymentAddress &addr,
             const libzcash::SaplingIncomingViewingKey &ivk);
-    bool AddSaplingSpendingKey(
-            const libzcash::SaplingExtendedSpendingKey &sk,
-            const libzcash::SaplingPaymentAddress &defaultAddr);
+    bool AddSaplingSpendingKey(const libzcash::SaplingExtendedSpendingKey &sk);
+
+    //! Return the full viewing key for the shielded address
+    Optional<libzcash::SaplingExtendedFullViewingKey> GetViewingKeyForPaymentAddress(
+            const libzcash::SaplingPaymentAddress &addr) const;
+
+    //! Return the spending key for the payment address (nullopt if the wallet has no spending key for such address)
+    Optional<libzcash::SaplingExtendedSpendingKey> GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const;
 
     // Sapling metadata
     std::map<libzcash::SaplingIncomingViewingKey, CKeyMetadata> mapSaplingZKeyMetadata;

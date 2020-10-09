@@ -4315,8 +4315,7 @@ int CWallet::GetVersion()
 
 libzcash::SaplingPaymentAddress CWallet::GenerateNewSaplingZKey() { return m_sspk_man->GenerateNewSaplingZKey(); }
 
-bool CWallet::AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key,
-                    const libzcash::SaplingPaymentAddress &defaultAddr) { return m_sspk_man->AddSaplingZKey(key, defaultAddr); }
+bool CWallet::AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key) { return m_sspk_man->AddSaplingZKey(key); }
 
 bool CWallet::AddSaplingIncomingViewingKeyW(
         const libzcash::SaplingIncomingViewingKey &ivk,
@@ -4324,8 +4323,7 @@ bool CWallet::AddSaplingIncomingViewingKeyW(
 
 bool CWallet::AddCryptedSaplingSpendingKeyW(
         const libzcash::SaplingExtendedFullViewingKey &extfvk,
-        const std::vector<unsigned char> &vchCryptedSecret,
-        const libzcash::SaplingPaymentAddress &defaultAddr) { return m_sspk_man->AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret, defaultAddr); }
+        const std::vector<unsigned char> &vchCryptedSecret) { return m_sspk_man->AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret); }
 
 bool CWallet::HaveSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &zaddr) const { return m_sspk_man->HaveSpendingKeyForPaymentAddress(zaddr); }
 bool CWallet::LoadSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key) { return m_sspk_man->LoadSaplingZKey(key); }

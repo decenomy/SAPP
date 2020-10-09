@@ -6,6 +6,31 @@
 #include "sapling/saplingscriptpubkeyman.h"
 
 
+Optional<libzcash::SaplingExtendedSpendingKey> SaplingScriptPubKeyMan::GetSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &addr) const
+{
+    libzcash::SaplingExtendedSpendingKey extsk;
+    if (wallet->GetSaplingExtendedSpendingKey(addr, extsk)) {
+        return extsk;
+    } else {
+        return nullopt;
+    }
+}
+
+Optional<libzcash::SaplingExtendedFullViewingKey> SaplingScriptPubKeyMan::GetViewingKeyForPaymentAddress(
+        const libzcash::SaplingPaymentAddress &addr) const
+{
+    libzcash::SaplingIncomingViewingKey ivk;
+    libzcash::SaplingExtendedFullViewingKey extfvk;
+
+    if (wallet->GetSaplingIncomingViewingKey(addr, ivk) &&
+        wallet->GetSaplingFullViewingKey(ivk, extfvk))
+    {
+        return extfvk;
+    } else {
+        return nullopt;
+    }
+}
+
 //! TODO: Should be Sapling address format, SaplingPaymentAddress
 // Generate a new Sapling spending key and return its public payment address
 libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
@@ -31,7 +56,7 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     do {
         xsk = m_32h_cth.Derive(hdChain.nExternalChainCounter | ZIP32_HARDENED_KEY_LIMIT);
         hdChain.nExternalChainCounter++; // Increment childkey index
-    } while (wallet->HaveSaplingSpendingKey(xsk.expsk.full_viewing_key()));
+    } while (wallet->HaveSaplingSpendingKey(xsk.ToXFVK()));
 
     // Update the chain model in the database
     if (wallet->fFileBacked && !CWalletDB(wallet->strWalletFile).WriteHDChain(hdChain))
@@ -47,22 +72,69 @@ libzcash::SaplingPaymentAddress SaplingScriptPubKeyMan::GenerateNewSaplingZKey()
     metadata.hd_seed_id = hdChain.GetID();
     mapSaplingZKeyMetadata[ivk] = metadata;
 
-    auto addr = xsk.DefaultAddress();
-    if (!AddSaplingZKey(xsk, addr)) {
+    if (!AddSaplingZKey(xsk)) {
         throw std::runtime_error(std::string(__func__) + ": AddSaplingZKey failed");
     }
     // return default sapling payment address.
-    return addr;
+    return xsk.DefaultAddress();
+}
+
+KeyAddResult SaplingScriptPubKeyMan::AddViewingKeyToWallet(const libzcash::SaplingExtendedFullViewingKey &extfvk) const {
+    if (wallet->HaveSaplingSpendingKey(extfvk)) {
+        return SpendingKeyExists;
+    } else if (wallet->HaveSaplingFullViewingKey(extfvk.fvk.in_viewing_key())) {
+        return KeyAlreadyExists;
+    } else if (wallet->AddSaplingFullViewingKey(extfvk)) {
+        return KeyAdded;
+    } else {
+        return KeyNotAdded;
+    }
+}
+
+KeyAddResult SaplingScriptPubKeyMan::AddSpendingKeyToWallet(
+        const Consensus::Params &params,
+        const libzcash::SaplingExtendedSpendingKey &sk,
+        int64_t nTime)
+{
+    auto extfvk = sk.ToXFVK();
+    auto ivk = extfvk.fvk.in_viewing_key();
+    {
+        //LogPrint(BCLog::SAPLING, "Importing shielded addr %s...\n", KeyIO::EncodePaymentAddress(sk.DefaultAddress()));
+        // Don't throw error in case a key is already there
+        if (wallet->HaveSaplingSpendingKey(extfvk)) {
+            return KeyAlreadyExists;
+        } else {
+            if (!wallet-> AddSaplingZKey(sk)) {
+                return KeyNotAdded;
+            }
+
+            int64_t nTimeToSet;
+            // Sapling addresses can't have been used in transactions prior to activation.
+            if (params.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight == Consensus::NetworkUpgrade::ALWAYS_ACTIVE) {
+                nTimeToSet = nTime;
+            } else {
+                // TODO: Update epoch before release v5.
+                // 154051200 seconds from epoch is Friday, 26 October 2018 00:00:00 GMT - definitely before Sapling activates
+                nTimeToSet = std::max((int64_t) 154051200, nTime);
+            }
+
+            mapSaplingZKeyMetadata[ivk] = CKeyMetadata(nTimeToSet);
+            return KeyAdded;
+        }
+    }
 }
 
 // Add spending key to keystore
 bool SaplingScriptPubKeyMan::AddSaplingZKey(
-        const libzcash::SaplingExtendedSpendingKey &sk,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const libzcash::SaplingExtendedSpendingKey &sk)
 {
     AssertLockHeld(wallet->cs_wallet); // mapSaplingZKeyMetadata
 
-    if (!AddSaplingSpendingKey(sk, defaultAddr)) {
+    if (!IsEnabled()) {
+        return error("%s: Sapling spkm not enabled", __func__ );
+    }
+
+    if (!AddSaplingSpendingKey(sk)) {
         return false;
     }
 
@@ -79,13 +151,12 @@ bool SaplingScriptPubKeyMan::AddSaplingZKey(
 }
 
 bool SaplingScriptPubKeyMan::AddSaplingSpendingKey(
-        const libzcash::SaplingExtendedSpendingKey &sk,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const libzcash::SaplingExtendedSpendingKey &sk)
 {
     {
         LOCK(wallet->cs_KeyStore);
         if (!wallet->IsCrypted()) {
-            return wallet->AddSaplingSpendingKey(sk, defaultAddr); // keystore
+            return wallet->AddSaplingSpendingKey(sk); // keystore
         }
 
         if (wallet->IsLocked()) {
@@ -102,7 +173,7 @@ bool SaplingScriptPubKeyMan::AddSaplingSpendingKey(
             return false;
         }
 
-        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret, defaultAddr)) {
+        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret)) {
             return false;
         }
     }
@@ -145,7 +216,7 @@ bool SaplingScriptPubKeyMan::EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn)
         if (!EncryptSecret(vMasterKeyIn, vchSecret, extfvk.fvk.GetFingerprint(), vchCryptedSecret)) {
             return false;
         }
-        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret, sk.DefaultAddress())) {
+        if (!AddCryptedSaplingSpendingKeyDB(extfvk, vchCryptedSecret)) {
             return false;
         }
     }
@@ -154,10 +225,9 @@ bool SaplingScriptPubKeyMan::EncryptSaplingKeys(CKeyingMaterial& vMasterKeyIn)
 }
 
 bool SaplingScriptPubKeyMan::AddCryptedSaplingSpendingKeyDB(const libzcash::SaplingExtendedFullViewingKey &extfvk,
-                                           const std::vector<unsigned char> &vchCryptedSecret,
-                                           const libzcash::SaplingPaymentAddress &defaultAddr)
+                                           const std::vector<unsigned char> &vchCryptedSecret)
 {
-    if (!wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret, defaultAddr))
+    if (!wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret))
         return false;
     if (!wallet->fFileBacked)
         return true;
@@ -179,11 +249,11 @@ bool SaplingScriptPubKeyMan::AddCryptedSaplingSpendingKeyDB(const libzcash::Sapl
 bool SaplingScriptPubKeyMan::HaveSpendingKeyForPaymentAddress(const libzcash::SaplingPaymentAddress &zaddr) const
 {
     libzcash::SaplingIncomingViewingKey ivk;
-    libzcash::SaplingFullViewingKey fvk;
+    libzcash::SaplingExtendedFullViewingKey extfvk;
 
     return wallet->GetSaplingIncomingViewingKey(zaddr, ivk) &&
-           wallet->GetSaplingFullViewingKey(ivk, fvk) &&
-           wallet->HaveSaplingSpendingKey(fvk);
+           wallet->GetSaplingFullViewingKey(ivk, extfvk) &&
+           wallet->HaveSaplingSpendingKey(extfvk);
 }
 
 ///////////////////// Load ////////////////////////////////////////
@@ -192,7 +262,7 @@ bool SaplingScriptPubKeyMan::LoadCryptedSaplingZKey(
         const libzcash::SaplingExtendedFullViewingKey &extfvk,
         const std::vector<unsigned char> &vchCryptedSecret)
 {
-    return wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret, extfvk.DefaultAddress());
+    return wallet->AddCryptedSaplingSpendingKey(extfvk, vchCryptedSecret);
 }
 
 bool SaplingScriptPubKeyMan::LoadSaplingZKeyMetadata(const libzcash::SaplingIncomingViewingKey &ivk, const CKeyMetadata &meta)
@@ -204,7 +274,7 @@ bool SaplingScriptPubKeyMan::LoadSaplingZKeyMetadata(const libzcash::SaplingInco
 
 bool SaplingScriptPubKeyMan::LoadSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key)
 {
-    return wallet->AddSaplingSpendingKey(key, key.DefaultAddress());
+    return wallet->AddSaplingSpendingKey(key);
 }
 
 bool SaplingScriptPubKeyMan::LoadSaplingPaymentAddress(

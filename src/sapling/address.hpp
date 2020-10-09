@@ -219,14 +219,10 @@ public:
 };
 
 typedef boost::variant<InvalidEncoding, SproutPaymentAddress, SaplingPaymentAddress> PaymentAddress;
-typedef boost::variant<InvalidEncoding, SproutViewingKey> ViewingKey;
 
 }
 
 /** Check whether a PaymentAddress is not an InvalidEncoding. */
 bool IsValidPaymentAddress(const libzcash::PaymentAddress& zaddr);
-
-/** Check whether a ViewingKey is not an InvalidEncoding. */
-bool IsValidViewingKey(const libzcash::ViewingKey& vk);
 
 #endif // ZC_ADDRESS_H_

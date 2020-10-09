@@ -16,16 +16,15 @@
 
 bool CCryptoKeyStore::AddCryptedSaplingSpendingKey(
         const libzcash::SaplingExtendedFullViewingKey &extfvk,
-        const std::vector<unsigned char> &vchCryptedSecret,
-        const libzcash::SaplingPaymentAddress &defaultAddr)
+        const std::vector<unsigned char> &vchCryptedSecret)
 {
     LOCK(cs_KeyStore);
     if (!SetCrypted()) {
         return false;
     }
 
-    // if SaplingFullViewingKey is not in SaplingFullViewingKeyMap, add it
-    if (!AddSaplingFullViewingKey(extfvk.fvk, defaultAddr)){
+    // if extfvk is not in SaplingFullViewingKeyMap, add it
+    if (!AddSaplingFullViewingKey(extfvk)) {
         return false;
     }
 
@@ -50,15 +49,17 @@ static bool DecryptSaplingSpendingKey(const CKeyingMaterial& vMasterKey,
     return sk.expsk.full_viewing_key() == extfvk.fvk;
 }
 
-bool CCryptoKeyStore::GetSaplingSpendingKey(const libzcash::SaplingFullViewingKey &fvk, libzcash::SaplingExtendedSpendingKey &skOut) const
+bool CCryptoKeyStore::GetSaplingSpendingKey(
+        const libzcash::SaplingExtendedFullViewingKey &extfvk,
+        libzcash::SaplingExtendedSpendingKey &skOut) const
 {
     {
         LOCK(cs_KeyStore);
         if (!IsCrypted())
-            return CBasicKeyStore::GetSaplingSpendingKey(fvk, skOut);
+            return CBasicKeyStore::GetSaplingSpendingKey(extfvk, skOut);
 
         for (auto entry : mapCryptedSaplingSpendingKeys) { // Work more on this flow..
-            if (entry.first.fvk == fvk) {
+            if (entry.first == extfvk) {
                 const std::vector<unsigned char> &vchCryptedSecret = entry.second;
                 return DecryptSaplingSpendingKey(vMasterKey, vchCryptedSecret, entry.first, skOut);
             }
@@ -67,13 +68,13 @@ bool CCryptoKeyStore::GetSaplingSpendingKey(const libzcash::SaplingFullViewingKe
     return false;
 }
 
-bool CCryptoKeyStore::HaveSaplingSpendingKey(const libzcash::SaplingFullViewingKey &fvk) const
+bool CCryptoKeyStore::HaveSaplingSpendingKey(const libzcash::SaplingExtendedFullViewingKey &extfvk) const
 {
     LOCK(cs_KeyStore);
     if (!IsCrypted())
-        return CBasicKeyStore::HaveSaplingSpendingKey(fvk);
+        return CBasicKeyStore::HaveSaplingSpendingKey(extfvk);
     for (auto entry : mapCryptedSaplingSpendingKeys) { // work more on this flow..
-        if (entry.first.fvk == fvk) {
+        if (entry.first == extfvk) {
             return true;
         }
     }

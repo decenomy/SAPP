@@ -116,7 +116,3 @@ SaplingPaymentAddress SaplingSpendingKey::default_address() const {
 bool IsValidPaymentAddress(const libzcash::PaymentAddress& zaddr) {
     return zaddr.which() != 0;
 }
-
-bool IsValidViewingKey(const libzcash::ViewingKey& vk) {
-    return vk.which() != 0;
-}

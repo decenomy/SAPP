@@ -8,6 +8,7 @@
 #include "init.h"
 #include "key_io.h"
 #include "rpc/server.h"
+#include "sapling/key_io_sapling.h"
 #include "script/script.h"
 #include "script/standard.h"
 #include "sync.h"
@@ -329,6 +330,26 @@ UniValue importwallet(const JSONRPCRequest& request)
         boost::split(vstr, line, boost::is_any_of(" "));
         if (vstr.size() < 2)
             continue;
+
+        // Sapling keys
+        // Let's see if the address is a valid PIVX spending key
+        if (pwalletMain->HasSaplingSPKM()) {
+            libzcash::SpendingKey spendingkey = KeyIO::DecodeSpendingKey(vstr[0]);
+            int64_t nTime = DecodeDumpTime(vstr[1]);
+            if (IsValidSpendingKey(spendingkey)) {
+                libzcash::SaplingExtendedSpendingKey saplingSpendingKey = *boost::get<libzcash::SaplingExtendedSpendingKey>(&spendingkey);
+                auto addResult = pwalletMain->GetSaplingScriptPubKeyMan()->AddSpendingKeyToWallet(
+                        Params().GetConsensus(), saplingSpendingKey, nTime);
+                if (addResult == KeyAlreadyExists) {
+                    LogPrint(BCLog::SAPLING, "Skipping import of shielded addr (key already present)\n");
+                } else if (addResult == KeyNotAdded) {
+                    // Something went wrong
+                    fGood = false;
+                }
+                continue;
+            }
+        }
+
         CKey key = DecodeSecret(vstr[0]);
         if (!key.IsValid())
             continue;
@@ -521,6 +542,29 @@ UniValue dumpwallet(const JSONRPCRequest& request)
             file << strprintf(" # addr=%s%s\n", strAddr, (metadata.HasKeyOrigin() ? " hdkeypath="+metadata.key_origin.pathToString() : ""));
         }
     }
+
+    // Sapling
+    file << "# Sapling keys\n";
+    file << "\n";
+    std::set<libzcash::SaplingPaymentAddress> saplingAddresses;
+    pwalletMain->GetSaplingPaymentAddresses(saplingAddresses);
+    file << "\n";
+    for (const auto& addr : saplingAddresses) {
+        libzcash::SaplingExtendedSpendingKey extsk;
+        if (pwalletMain->GetSaplingExtendedSpendingKey(addr, extsk)) {
+            auto ivk = extsk.expsk.full_viewing_key().in_viewing_key();
+            CKeyMetadata keyMeta = pwalletMain->GetSaplingScriptPubKeyMan()->mapSaplingZKeyMetadata[ivk];
+            std::string strTime = EncodeDumpTime(keyMeta.nCreateTime);
+            // Keys imported with importsaplingkey do not have key origin metadata
+            file << strprintf("%s %s # shielded_addr=%s%s\n",
+                    KeyIO::EncodeSpendingKey(extsk),
+                    strTime,
+                    KeyIO::EncodePaymentAddress(addr),
+                    (keyMeta.HasKeyOrigin() ? " hdkeypath=" + keyMeta.key_origin.pathToString() : "")
+                    );
+        }
+    }
+
     file << "\n";
     file << "# End of dump\n";
     file.close();
@@ -642,4 +686,256 @@ UniValue bip38decrypt(const JSONRPCRequest& request)
     }
 
     return result;
+}
+
+// Sapling
+
+UniValue importsaplingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
+        throw std::runtime_error(
+                "importsaplingkey \"key\" ( rescan startHeight )\n"
+                "\nAdds a key (as returned by exportsaplingkey) to your wallet.\n"
+                "\nArguments:\n"
+                "1. \"key\"             (string, required) The zkey (see exportsaplingkey)\n"
+                "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
+                "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
+                "\nNote: This call can take minutes to complete if rescan is true.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"address\" : \"address|DefaultAddress\",    (string) The address corresponding to the spending key (the default address).\n"
+                "}\n"
+                "\nExamples:\n"
+                "\nExport a zkey\n"
+                + HelpExampleCli("exportsaplingkey", "\"myaddress\"") +
+                "\nImport the key with rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\"") +
+                "\nImport the key with partial rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\" whenkeyisnew 30000") +
+                "\nRe-import the key with longer partial rescan\n"
+                + HelpExampleCli("importsaplingkey", "\"mykey\" yes 20000") +
+                "\nAs a JSON-RPC call\n"
+                + HelpExampleRpc("importsaplingkey", "\"mykey\", \"no\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    EnsureWalletIsUnlocked();
+
+    // Whether to perform rescan after import
+    bool fRescan = true;
+    bool fIgnoreExistingKey = true;
+    if (request.params.size() > 1) {
+        auto rescan = request.params[1].get_str();
+        if (rescan.compare("whenkeyisnew") != 0) {
+            fIgnoreExistingKey = false;
+            if (rescan.compare("yes") == 0) {
+                fRescan = true;
+            } else if (rescan.compare("no") == 0) {
+                fRescan = false;
+            } else {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "rescan must be \"yes\", \"no\" or \"whenkeyisnew\"");
+            }
+        }
+    }
+
+    // Height to rescan from
+    int nRescanHeight = 0;
+    if (request.params.size() > 2)
+        nRescanHeight = request.params[2].get_int();
+    if (nRescanHeight < 0 || nRescanHeight > chainActive.Height()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+    }
+
+    std::string strSecret = request.params[0].get_str();
+    auto spendingkey = KeyIO::DecodeSpendingKey(strSecret);
+    if (!IsValidSpendingKey(spendingkey)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid spending key");
+    }
+
+    libzcash::SaplingExtendedSpendingKey saplingSpendingKey = *boost::get<libzcash::SaplingExtendedSpendingKey>(&spendingkey);
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("address", KeyIO::EncodePaymentAddress( saplingSpendingKey.DefaultAddress()));
+
+    // Sapling support
+    auto addResult = pwalletMain->GetSaplingScriptPubKeyMan()->AddSpendingKeyToWallet(Params().GetConsensus(), saplingSpendingKey, -1);
+    if (addResult == KeyAlreadyExists && fIgnoreExistingKey) {
+        return result;
+    }
+    pwalletMain->MarkDirty();
+    if (addResult == KeyNotAdded) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error adding spending key to wallet");
+    }
+
+    // whenever a key is imported, we need to scan the whole chain
+    pwalletMain->nTimeFirstKey = 1; // 0 would be considered 'no value'
+
+    // We want to scan for transactions and notes
+    if (fRescan) {
+        pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight], true);
+    }
+
+    return result;
+}
+
+UniValue importsaplingviewingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
+        throw std::runtime_error(
+                "importsaplingviewingkey \"vkey\" ( rescan startHeight )\n"
+                "\nAdds a viewing key (as returned by exportsaplingviewingkey) to your wallet.\n"
+                "\nArguments:\n"
+                "1. \"vkey\"             (string, required) The viewing key (see exportsaplingviewingkey)\n"
+                "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
+                "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
+                "\nNote: This call can take minutes to complete if rescan is true.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"address\" : \"address|DefaultAddress\",    (string) The address corresponding to the viewing key (for Sapling, this is the default address).\n"
+                "}\n"
+                "\nExamples:\n"
+                "\nImport a viewing key\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\"") +
+                "\nImport the viewing key without rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\", no") +
+                "\nImport the viewing key with partial rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\" whenkeyisnew 30000") +
+                "\nRe-import the viewing key with longer partial rescan\n"
+                + HelpExampleCli("importsaplingviewingkey", "\"vkey\" yes 20000") +
+                "\nAs a JSON-RPC call\n"
+                + HelpExampleRpc("importsaplingviewingkey", "\"vkey\", \"no\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    // Whether to perform rescan after import
+    bool fRescan = true;
+    bool fIgnoreExistingKey = true;
+    if (request.params.size() > 1) {
+        auto rescan = request.params[1].get_str();
+        if (rescan.compare("whenkeyisnew") != 0) {
+            fIgnoreExistingKey = false;
+            if (rescan.compare("no") == 0) {
+                fRescan = false;
+            } else if (rescan.compare("yes") != 0) {
+                throw JSONRPCError(
+                        RPC_INVALID_PARAMETER,
+                        "rescan must be \"yes\", \"no\" or \"whenkeyisnew\"");
+            }
+        }
+    }
+
+    // Height to rescan from
+    int nRescanHeight = 0;
+    if (request.params.size() > 2) {
+        nRescanHeight = request.params[2].get_int();
+    }
+    if (nRescanHeight < 0 || nRescanHeight > chainActive.Height()) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+    }
+
+    std::string strVKey = request.params[0].get_str();
+    libzcash::ViewingKey viewingkey = KeyIO::DecodeViewingKey(strVKey);
+    if (!IsValidViewingKey(viewingkey)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid viewing key");
+    }
+    libzcash::SaplingExtendedFullViewingKey efvk = *boost::get<libzcash::SaplingExtendedFullViewingKey>(&viewingkey);
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("address", KeyIO::EncodePaymentAddress(efvk.DefaultAddress()));
+
+    auto addResult = pwalletMain->GetSaplingScriptPubKeyMan()->AddViewingKeyToWallet(efvk);
+    if (addResult == SpendingKeyExists) {
+        throw JSONRPCError(
+                RPC_WALLET_ERROR,
+                "The wallet already contains the private key for this viewing key");
+    } else if (addResult == KeyAlreadyExists && fIgnoreExistingKey) {
+        return result;
+    }
+    pwalletMain->MarkDirty();
+    if (addResult == KeyNotAdded) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error adding viewing key to wallet");
+    }
+
+    // We want to scan for transactions and notes
+    if (fRescan) {
+        pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight], true);
+    }
+
+    return result;
+}
+
+UniValue exportsaplingviewingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+                "exportsaplingviewingkey \"shielded_addr\"\n"
+                "\nReveals the viewing key corresponding to 'shielded addr'.\n"
+                "Then the importsaplingviewingkey can be used with this output\n"
+                "\nArguments:\n"
+                "1. \"shielded_addr\"   (string, required) The shielded addr for the viewing key\n"
+                "\nResult:\n"
+                "\"vkey\"                  (string) The viewing key\n"
+                "\nExamples:\n"
+                + HelpExampleCli("exportsaplingviewingkey", "\"myaddress\"")
+                + HelpExampleRpc("exportsaplingviewingkey", "\"myaddress\"")
+        );
+
+    EnsureWallet();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    std::string strAddress = request.params[0].get_str();
+    auto address = KeyIO::DecodePaymentAddress(strAddress);
+    if (!IsValidPaymentAddress(address)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid shielded addr");
+    }
+    const libzcash::SaplingPaymentAddress &sapAddr = *boost::get<libzcash::SaplingPaymentAddress>(&address);
+    auto vk = pwalletMain->GetSaplingScriptPubKeyMan()->GetViewingKeyForPaymentAddress(sapAddr);
+    if (vk) {
+        return KeyIO::EncodeViewingKey(vk.get());
+    } else {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet does not hold private key or viewing key for this shielded addr");
+    }
+}
+
+UniValue exportsaplingkey(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+                "exportsaplingkey \"shielded addr\"\n"
+                "\nReveals the key corresponding to the 'shielded addr'.\n"
+                "Then the importsaplingkey can be used with this output\n"
+                "\nArguments:\n"
+                "1. \"addr\"   (string, required) The shielded addr for the private key\n"
+                "\nResult:\n"
+                "\"key\"                  (string) The private key\n"
+                "\nExamples:\n"
+                + HelpExampleCli("exportsaplingkey", "\"myaddress\"")
+                + HelpExampleRpc("exportsaplingkey", "\"myaddress\"")
+        );
+
+    EnsureWallet();
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    EnsureWalletIsUnlocked();
+
+    std::string strAddress = request.params[0].get_str();
+
+    auto address = KeyIO::DecodePaymentAddress(strAddress);
+    if (!IsValidPaymentAddress(address)) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid shielded addr");
+    }
+    libzcash::SaplingPaymentAddress addr = *boost::get<libzcash::SaplingPaymentAddress>(&address);
+
+    // Sapling support
+    Optional<libzcash::SaplingExtendedSpendingKey> sk = pwalletMain->GetSaplingScriptPubKeyMan()->GetSpendingKeyForPaymentAddress(addr);
+    if (!sk) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Wallet does not hold private key for this shielded addr");
+    }
+    return KeyIO::EncodeSpendingKey(libzcash::SpendingKey(sk.get()));
 }

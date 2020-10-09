@@ -124,6 +124,7 @@ const CLogCategoryDesc LogCategories[] = {
         {BCLog::MNBUDGET,       "mnbudget"},
         {BCLog::LEGACYZC,       "zero"},
         {BCLog::MNPING,         "mnping"},
+        {BCLog::SAPLING,        "sapling"},
         {BCLog::ALL,            "1"},
         {BCLog::ALL,            "all"},
 };
