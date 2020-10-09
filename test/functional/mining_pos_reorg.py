@@ -52,12 +52,15 @@ class ReorgStakeTest(PivxTestFramework):
         return wi['balance'] + wi['immature_balance']
 
     def check_money_supply(self, expected_piv, expected_zpiv):
-        g_info = [self.nodes[i].getinfo() for i in range(self.num_nodes)]
         # verify that nodes have the expected PIV and zPIV supply
-        for node in g_info:
-            assert_equal(node['moneysupply'], DecimalAmt(expected_piv))
-            for denom in node['zPIVsupply']:
-                assert_equal(node['zPIVsupply'][denom], DecimalAmt(expected_zpiv[denom]))
+        piv_supply = [self.nodes[i].getsupplyinfo(True)['supply']
+                      for i in range(self.num_nodes)]
+        assert_equal(piv_supply, [DecimalAmt(expected_piv)] * self.num_nodes)
+        zpiv_supply = [self.nodes[i].getinfo()['zPIVsupply']
+                       for i in range(self.num_nodes)]
+        for s in zpiv_supply:
+            for denom in s:
+                assert_equal(s[denom], DecimalAmt(expected_zpiv[denom]))
 
 
     def run_test(self):
