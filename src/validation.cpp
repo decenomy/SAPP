@@ -1718,6 +1718,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
  * Update the on-disk chain state.
  * The caches and indexes are flushed if either they're too large, forceWrite is set, or
  * fast is not set and it's been a while since the last write.
+ * Full flush also updates the money supply from disk (except during shutdown)
  */
 bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 {
@@ -1799,6 +1800,10 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
             if (!pcoinsTip->Flush())
                 return AbortNode(state, "Failed to write to coin database");
             nLastFlush = nNow;
+            // Update money supply on memory, reading data from disk
+            if (!ShutdownRequested()) {
+                MoneySupply.Update(pcoinsTip->GetTotalAmount(), chainActive.Height());
+            }
         }
         if ((mode == FLUSH_STATE_ALWAYS || mode == FLUSH_STATE_PERIODIC) && nNow > nLastSetChain + (int64_t)DATABASE_WRITE_INTERVAL * 1000000) {
             // Update best block in wallet (so we can detect restored wallets).
