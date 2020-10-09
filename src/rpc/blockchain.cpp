@@ -594,6 +594,45 @@ UniValue getblockheader(const JSONRPCRequest& request)
     return blockheaderToJSON(pblockindex);
 }
 
+UniValue getsupplyinfo(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() > 1)
+        throw std::runtime_error(
+            "getsupplyinfo ( forceupdate )\n"
+            "\nIf forceupdate=false (default if no argument is given): return the last cached money supply"
+            "\n(sum of spendable transaction outputs) and the height of the chain when it was last updated"
+            "\n(it is updated periodically, whenever the chainstate is flushed)."
+            "\n"
+            "\nIf forceupdate=true: Flush the chainstate to disk and return the money supply updated to"
+            "\nthe current chain height.\n"
+
+            "\nArguments:\n"
+            "1. forceupdate       (boolean, optional, default=false) flush chainstate to disk and update cache\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"updateheight\" : n, (numeric) The chain height when the supply was updated\n"
+            "  \"supply\" :       n   (numeric) The sum of all spendable transaction outputs at height updateheight\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getsupplyinfo", "") + HelpExampleCli("getsupplyinfo", "true") +
+            HelpExampleRpc("getsupplyinfo", ""));
+
+    const bool fForceUpdate = request.params.size() > 0 ? request.params[0].get_bool() : false;
+
+    if (fForceUpdate) {
+        // Flush state to disk (which updates the cached supply)
+        FlushStateToDisk();
+    }
+
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("updateheight", MoneySupply.GetCacheHeight());
+    ret.pushKV("supply", ValueFromAmount(MoneySupply.Get()));
+
+    return ret;
+}
+
 struct CCoinsStats
 {
     int nHeight;
