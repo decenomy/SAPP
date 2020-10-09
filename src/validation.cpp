@@ -1801,7 +1801,7 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
                 return AbortNode(state, "Failed to write to coin database");
             nLastFlush = nNow;
             // Update money supply on memory, reading data from disk
-            if (!ShutdownRequested()) {
+            if (!ShutdownRequested() && !IsInitialBlockDownload()) {
                 MoneySupply.Update(pcoinsTip->GetTotalAmount(), chainActive.Height());
             }
         }
