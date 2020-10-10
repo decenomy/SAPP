@@ -81,7 +81,6 @@ RecursiveMutex cs_main;
 BlockMap mapBlockIndex;
 CChain chainActive;
 CBlockIndex* pindexBestHeader = NULL;
-int64_t nMoneySupply;
 
 // Best block section
 Mutex g_best_block_mutex;
@@ -1308,7 +1307,7 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         // Check that all outputs are available and match the outputs in the block itself
         // exactly.
         for (size_t o = 0; o < tx.vout.size(); o++) {
-            if (!tx.vout[o].scriptPubKey.IsUnspendable()) {
+            if (!tx.vout[o].scriptPubKey.IsUnspendable() && !tx.vout[o].IsZerocoinMint()) {
                 COutPoint out(hash, o);
                 Coin coin;
                 view.SpendCoin(out, &coin);
@@ -1340,9 +1339,6 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         if (view.HaveInputs(tx))
             nValueIn += view.GetValueIn(tx);
     }
-
-    // track money
-    nMoneySupply -= (nValueOut - nValueIn);
 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
@@ -1686,24 +1682,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
     }
 
-    // A one-time event where the zPIV supply was off (due to serial duplication off-chain on main net)
-    if (Params().NetworkID() == CBaseChainParams::MAIN && pindex->nHeight == consensus.height_last_ZC_WrappedSerials + 1
-            && GetZerocoinSupply() != consensus.ZC_WrappedSerialsSupply + GetWrapppedSerialInflationAmount()) {
-        RecalculatePIVSupply(consensus.vUpgrades[Consensus::UPGRADE_ZC].nActivationHeight, false);
-    }
-
-    // Add fraudulent funds to the supply and remove any recovered funds.
-    if (Params().NetworkID() == CBaseChainParams::MAIN && pindex->nHeight == consensus.height_ZC_RecalcAccumulators) {
-        LogPrintf("%s : Adding fraudulent funds at height_ZC_RecalcAccumulators\n", __func__);
-        const CAmount nInvalidAmountFiltered = 268200*COIN;    //Amount of invalid coins filtered through exchanges, that should be considered valid
-        nMoneySupply += nInvalidAmountFiltered;
-        CAmount nLocked = GetInvalidUTXOValue();
-        nMoneySupply -= nLocked;
-    }
-
-    // Update PIV money supply
-    nMoneySupply += (nValueOut - nValueIn);
-
     int64_t nTime3 = GetTimeMicros();
     nTimeIndex += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "    - Index writing: %.2fms [%.2fs]\n", 0.001 * (nTime3 - nTime2), nTimeIndex * 0.000001);
@@ -1801,10 +1779,6 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
                 // Flush zerocoin supply
                 if (!mapZerocoinSupply.empty() && !zerocoinDB->WriteZCSupply(mapZerocoinSupply)) {
                     return AbortNode(state, "Failed to write zerocoin supply to DB");
-                }
-                // Flush money supply
-                if (!pblocktree->WriteMoneySupply(nMoneySupply)) {
-                    return AbortNode(state, "Failed to write money supply to DB");
                 }
             }
             nLastWrite = nNow;

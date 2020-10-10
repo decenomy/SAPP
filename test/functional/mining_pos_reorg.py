@@ -82,8 +82,8 @@ class ReorgStakeTest(PivxTestFramework):
             "5000": 10000,
             "total": 13332,
         }
-        # PIV supply: block rewards minus burned fees for minting
-        expected_money_supply = 250.0 * 330 - 16 * 0.01
+        # PIV supply: block rewards minus burned fees for minting minus mint values
+        expected_money_supply = 250.0 * 330 - 16 * 0.01 - 2 * 6666
         self.check_money_supply(expected_money_supply, expected_zpiv_supply)
 
         # Stake with node 0 and node 1 up to public spend activation (400)
@@ -146,8 +146,8 @@ class ReorgStakeTest(PivxTestFramework):
             stakeinput["txid"][:9], stakeinput["txid"][-4:], stakeinput["vout"]))
 
         # Relay zerocoin spends
-        self.nodes[0].sendrawtransaction(tx_A0)
-        self.nodes[0].sendrawtransaction(tx_A1)
+        txid_A0  = self.nodes[0].sendrawtransaction(tx_A0)
+        txid_A1 = self.nodes[0].sendrawtransaction(tx_A1)
 
         # Stake 10 more blocks with node-0 and check balances
         self.log.info("Staking 10 more blocks with node 0...")
@@ -237,7 +237,8 @@ class ReorgStakeTest(PivxTestFramework):
         spent_coin_1 = mints[1]["denomination"]
         expected_zpiv_supply[str(spent_coin_0)] -= spent_coin_0
         expected_zpiv_supply[str(spent_coin_1)] -= spent_coin_1
-        expected_zpiv_supply["total"] -= (spent_coin_0 + spent_coin_1)
+        expected_zpiv_supply["total"] -= minted_amount
+        expected_money_supply += minted_amount
         self.check_money_supply(expected_money_supply, expected_zpiv_supply)
         self.log.info("Supply checks out.")
 

@@ -271,47 +271,45 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             double dPriority = 0;
             CAmount nTotalIn = 0;
             bool fMissingInputs = false;
-            bool hasZerocoinSpends = tx.HasZerocoinSpendInputs();
-            if (hasZerocoinSpends)
+
+            if (tx.HasZerocoinSpendInputs()) {
                 nTotalIn = tx.GetZerocoinSpent();
+            } else {
+                for (const CTxIn& txin : tx.vin) {
+                    // Read prev transaction
+                    if (!view.HaveCoin(txin.prevout)) {
+                        // This should never happen; all transactions in the memory
+                        // pool should connect to either transactions in the chain
+                        // or other transactions in the memory pool.
+                        if (!mempool.mapTx.count(txin.prevout.hash)) {
+                            LogPrintf("ERROR: mempool transaction missing input\n");
+                            fMissingInputs = true;
+                            if (porphan)
+                                vOrphan.pop_back();
+                            break;
+                        }
 
-            for (const CTxIn& txin : tx.vin) {
-                // Read prev transaction
-                if (!view.HaveCoin(txin.prevout)) {
-                    // This should never happen; all transactions in the memory
-                    // pool should connect to either transactions in the chain
-                    // or other transactions in the memory pool.
-                    if (!mempool.mapTx.count(txin.prevout.hash)) {
-                        LogPrintf("ERROR: mempool transaction missing input\n");
-                        fMissingInputs = true;
-                        if (porphan)
-                            vOrphan.pop_back();
-                        break;
+                        // Has to wait for dependencies
+                        if (!porphan) {
+                            // Use list for automatic deletion
+                            vOrphan.push_back(COrphan(&tx));
+                            porphan = &vOrphan.back();
+                        }
+                        mapDependers[txin.prevout.hash].push_back(porphan);
+                        porphan->setDependsOn.insert(txin.prevout.hash);
+                        nTotalIn += mempool.mapTx.find(txin.prevout.hash)->GetTx().vout[txin.prevout.n].nValue;
+                        continue;
                     }
 
-                    // Has to wait for dependencies
-                    if (!porphan) {
-                        // Use list for automatic deletion
-                        vOrphan.push_back(COrphan(&tx));
-                        porphan = &vOrphan.back();
-                    }
-                    mapDependers[txin.prevout.hash].push_back(porphan);
-                    porphan->setDependsOn.insert(txin.prevout.hash);
-                    nTotalIn += mempool.mapTx.find(txin.prevout.hash)->GetTx().vout[txin.prevout.n].nValue;
-                    continue;
+                    const Coin& coin = view.AccessCoin(txin.prevout);
+                    assert(!coin.IsSpent());
+
+                    CAmount nValueIn = coin.out.nValue;
+                    nTotalIn += nValueIn;
+
+                    int nConf = nHeight - coin.nHeight;
+                    dPriority = double_safe_addition(dPriority, ((double)nValueIn * nConf));
                 }
-
-                const Coin& coin = view.AccessCoin(txin.prevout);
-                assert(hasZerocoinSpends || !coin.IsSpent());
-
-                CAmount nValueIn = coin.out.nValue;
-                nTotalIn += nValueIn;
-
-                int nConf = nHeight - coin.nHeight;
-
-                // zPIV spends can have very large priority, use non-overflowing safe functions
-                dPriority = double_safe_addition(dPriority, ((double)nValueIn * nConf));
-
             }
             if (fMissingInputs) continue;
 

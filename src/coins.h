@@ -290,6 +290,16 @@ public:
      */
     int GetCoinDepthAtHeight(const COutPoint& output, int nHeight) const;
 
+    /*
+     * Return the sum of the value of all transaction outputs
+     */
+    CAmount GetTotalAmount() const;
+
+    /*
+     * Prune zerocoin mints and frozen outputs - do it once, after initialization
+     */
+    void PruneInvalidEntries();
+
 
 private:
     CCoinsMap::iterator FetchCoin(const COutPoint& outpoint) const;
