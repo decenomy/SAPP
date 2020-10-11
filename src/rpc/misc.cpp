@@ -138,12 +138,6 @@ UniValue getinfo(const JSONRPCRequest& request)
     obj.pushKV("difficulty", (double)GetDifficulty());
     obj.pushKV("testnet", Params().NetworkID() == CBaseChainParams::TESTNET);
 
-    // During inital block verification chainActive.Tip() might be not yet initialized
-    if (chainActive.Tip() == NULL) {
-        obj.pushKV("status", "Blockchain information not yet available");
-        return obj;
-    }
-
     FlushStateToDisk();
     obj.pushKV("moneysupply",ValueFromAmount(pcoinsTip->GetTotalAmount()));
     UniValue zpivObj(UniValue::VOBJ);
