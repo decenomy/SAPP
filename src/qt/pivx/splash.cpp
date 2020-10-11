@@ -23,8 +23,8 @@
 
 #include <iostream>
 
-Splash::Splash(Qt::WindowFlags f, const NetworkStyle* networkStyle) :
-    QWidget(0, f), ui(new Ui::Splash)
+Splash::Splash(const NetworkStyle* networkStyle) :
+    QWidget(nullptr), ui(new Ui::Splash)
 {
     ui->setupUi(this);
     QString titleText = tr("PIVX Core");
