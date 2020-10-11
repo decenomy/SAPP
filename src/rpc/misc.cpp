@@ -391,7 +391,7 @@ public:
         UniValue detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
         ret.pushKVs(detail);
         if (pwalletMain && pwalletMain->HasAddressBook(dest))
-            ret.pushKV("account", pwalletMain->GetNameForAddressBookEntry(dest));
+            ret.pushKV("label", pwalletMain->GetNameForAddressBookEntry(dest));
 #endif
         return ret;
     }
@@ -423,7 +423,7 @@ UniValue validateaddress(const JSONRPCRequest& request)
             "  \"hex\" : \"hex\",                (string, optional) The redeemscript for the P2SH address -only if standard address-\n"
             "  \"pubkey\" : \"publickeyhex\",    (string) The hex value of the raw public key -only if standard address-\n"
             "  \"iscompressed\" : true|false,    (boolean) If the address is compressed -only if standard address-\n"
-            "  \"account\" : \"account\"         (string) DEPRECATED. The account associated with the address, \"\" is the default account\n"
+            "  \"label\" : \"label\"             (string) The label associated with the address, \"\" is the default label\n"
             // Sapling
             "  \"payingkey\" : \"hex\",         (string) [sprout] The hex value of the paying key, a_pk -only if is sapling address-\n"
             "  \"transmissionkey\" : \"hex\",   (string) [sprout] The hex value of the transmission key, pk_enc -only if is sapling address-\n"
