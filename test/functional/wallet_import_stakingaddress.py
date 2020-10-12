@@ -75,7 +75,7 @@ class ImportStakingTest(PivxTestFramework):
             self.nodes[1].importaddress(sa, "label %d" % i, True)
             # !TODO: add watch-only support in the core (balance and txes)
             # Currently the only way to check the addressbook without the key here
-            # is to verify the account with validateaddress
+            # is to verify the label with validateaddress
             val = self.nodes[1].validateaddress(sa)
             assert_equal(val['ismine'], False)
             assert_equal(val['isstaking'], True)

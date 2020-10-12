@@ -20,12 +20,11 @@
 #include <zpiv/deterministicmint.h>
 
 #include <atomic>
+#include <fstream>
+#include <string>
+
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread.hpp>
-#include <fstream>
-
-
-static uint64_t nAccountingEntryNumber = 0;
 
 static std::atomic<unsigned int> nWalletDBUpdateCounter;
 
@@ -335,122 +334,33 @@ bool CWalletDB::WriteHDChain(const CHDChain& chain)
     return Write(key, chain);
 }
 
-bool CWalletDB::ReadAccount(const std::string& strAccount, CAccount& account)
-{
-    account.SetNull();
-    return Read(std::make_pair(std::string("acc"), strAccount), account);
-}
-
-bool CWalletDB::WriteAccount(const std::string& strAccount, const CAccount& account)
-{
-    return Write(std::make_pair(std::string("acc"), strAccount), account);
-}
-
-bool CWalletDB::EraseAccount(const std::string& strAccount)
-{
-    return Erase(std::make_pair(std::string("acc"), strAccount));
-}
-
-bool CWalletDB::WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccountingEntry& acentry)
-{
-    return Write(std::make_pair(std::string("acentry"), std::make_pair(acentry.strAccount, nAccEntryNum)), acentry);
-}
-
-bool CWalletDB::WriteAccountingEntry_Backend(const CAccountingEntry& acentry)
-{
-    return WriteAccountingEntry(++nAccountingEntryNumber, acentry);
-}
-
-CAmount CWalletDB::GetAccountCreditDebit(const std::string& strAccount)
-{
-    std::list<CAccountingEntry> entries;
-    ListAccountCreditDebit(strAccount, entries);
-
-    CAmount nCreditDebit = 0;
-    for (const CAccountingEntry& entry : entries)
-        nCreditDebit += entry.nCreditDebit;
-
-    return nCreditDebit;
-}
-
-void CWalletDB::ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& entries)
-{
-    bool fAllAccounts = (strAccount == "*");
-
-    Dbc* pcursor = GetCursor();
-    if (!pcursor)
-        throw std::runtime_error("CWalletDB::ListAccountCreditDebit() : cannot create DB cursor");
-    unsigned int fFlags = DB_SET_RANGE;
-    while (true) {
-        // Read next record
-        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
-        if (fFlags == DB_SET_RANGE)
-            ssKey << std::make_pair(std::string("acentry"), std::make_pair((fAllAccounts ? std::string("") : strAccount), uint64_t(0)));
-        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
-        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
-        fFlags = DB_NEXT;
-        if (ret == DB_NOTFOUND)
-            break;
-        else if (ret != 0) {
-            pcursor->close();
-            throw std::runtime_error("CWalletDB::ListAccountCreditDebit() : error scanning DB");
-        }
-
-        // Unserialize
-        std::string strType;
-        ssKey >> strType;
-        if (strType != "acentry")
-            break;
-        CAccountingEntry acentry;
-        ssKey >> acentry.strAccount;
-        if (!fAllAccounts && acentry.strAccount != strAccount)
-            break;
-
-        ssValue >> acentry;
-        ssKey >> acentry.nEntryNo;
-        entries.push_back(acentry);
-    }
-
-    pcursor->close();
-}
-
 DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
 {
     LOCK(pwallet->cs_wallet);
     // Old wallets didn't have any defined order for transactions
     // Probably a bad idea to change the output of this
 
-    // First: get all CWalletTx and CAccountingEntry into a sorted-by-time multimap.
-    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef std::multimap<int64_t, TxPair> TxItems;
+    // First: get all CWalletTx into a sorted-by-time multimap.
+    typedef std::multimap<int64_t, CWalletTx*> TxItems;
     TxItems txByTime;
 
     for (std::map<uint256, CWalletTx>::iterator it = pwallet->mapWallet.begin(); it != pwallet->mapWallet.end(); ++it) {
         CWalletTx* wtx = &((*it).second);
-        txByTime.emplace(wtx->nTimeReceived, TxPair(wtx, (CAccountingEntry*)0));
-    }
-    std::list<CAccountingEntry> acentries;
-    ListAccountCreditDebit("", acentries);
-    for (CAccountingEntry& entry : acentries) {
-        txByTime.emplace(entry.nTime, TxPair((CWalletTx*)0, &entry));
+        txByTime.insert(std::make_pair(wtx->nTimeReceived, wtx));
     }
 
     int64_t& nOrderPosNext = pwallet->nOrderPosNext;
     nOrderPosNext = 0;
     std::vector<int64_t> nOrderPosOffsets;
     for (TxItems::iterator it = txByTime.begin(); it != txByTime.end(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
-        CAccountingEntry* const pacentry = (*it).second.second;
-        int64_t& nOrderPos = (pwtx != 0) ? pwtx->nOrderPos : pacentry->nOrderPos;
+        CWalletTx *const pwtx = (*it).second;
+        int64_t& nOrderPos = pwtx->nOrderPos;
 
         if (nOrderPos == -1) {
             nOrderPos = nOrderPosNext++;
             nOrderPosOffsets.push_back(nOrderPos);
 
-            if (pwtx) {
-                if (!WriteTx(*pwtx))
-                    return DB_LOAD_FAIL;
-            } else if (!WriteAccountingEntry(pacentry->nEntryNo, *pacentry))
+            if (!WriteTx(*pwtx))
                 return DB_LOAD_FAIL;
         } else {
             int64_t nOrderPosOff = 0;
@@ -465,10 +375,7 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
                 continue;
 
             // Since we're changing the order, write it back
-            if (pwtx) {
-                if (!WriteTx(*pwtx))
-                    return DB_LOAD_FAIL;
-            } else if (!WriteAccountingEntry(pacentry->nEntryNo, *pacentry))
+            if (!WriteTx(*pwtx))
                 return DB_LOAD_FAIL;
         }
     }
@@ -532,9 +439,10 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 if (!ssValue.empty()) {
                     char fTmp;
                     char fUnused;
-                    ssValue >> fTmp >> fUnused >> wtx.strFromAccount;
-                    strErr = strprintf("LoadWallet() upgrading tx ver=%d %d '%s' %s",
-                        wtx.fTimeReceivedIsTxTime, fTmp, wtx.strFromAccount, hash.ToString());
+                    std::string unused_string;
+                    ssValue >> fTmp >> fUnused >> unused_string;
+                    strErr = strprintf("LoadWallet() upgrading tx ver=%d %d %s",
+                        wtx.fTimeReceivedIsTxTime, fTmp, hash.ToString());
                     wtx.fTimeReceivedIsTxTime = fTmp;
                 } else {
                     strErr = strprintf("LoadWallet() repairing tx ver=%d %s", wtx.fTimeReceivedIsTxTime, hash.ToString());
@@ -547,20 +455,6 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 wss.fAnyUnordered = true;
 
             pwallet->LoadToWallet(wtx);
-        } else if (strType == "acentry") {
-            std::string strAccount;
-            ssKey >> strAccount;
-            uint64_t nNumber;
-            ssKey >> nNumber;
-            if (nNumber > nAccountingEntryNumber)
-                nAccountingEntryNumber = nNumber;
-
-            if (!wss.fAnyUnordered) {
-                CAccountingEntry acentry;
-                ssValue >> acentry;
-                if (acentry.nOrderPos == -1)
-                    wss.fAnyUnordered = true;
-            }
         } else if (strType == "watchs") {
             CScript script;
             ssKey >> *(CScriptBase*)(&script);
@@ -898,12 +792,6 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 
     if (wss.fAnyUnordered)
         result = ReorderTransactions(pwallet);
-
-    pwallet->laccentries.clear();
-    ListAccountCreditDebit("*", pwallet->laccentries);
-    for (CAccountingEntry& entry : pwallet->laccentries) {
-        pwallet->wtxOrdered.emplace(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry));
-    }
 
     return result;
 }

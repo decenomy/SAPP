@@ -34,6 +34,13 @@ Notable Changes
 
 (Developers: add your notes here as part of your pull requests whenever possible)
 
+Account API Removed
+-------------------
+
+The 'account' API was deprecated in v4.2.0, and has been fully removed in v5.0.0.
+The 'label' API was introduced in v4.2.0 as a replacement for accounts.
+
+See the release notes from [v4.2.0](https://github.com/PIVX-Project/PIVX/blob/master/doc/release-notes/release-notes-4.2.0.md#label-and-account-apis-for-wallet) for a full description of the changes from the 'account' API to the 'label' API.
 
 *version* Change log
 ==============

@@ -534,7 +534,6 @@ void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> ran
         // nTimeReceived not copied on purpose
         copyTo->nTimeSmart = copyFrom->nTimeSmart;
         copyTo->fFromMe = copyFrom->fFromMe;
-        copyTo->strFromAccount = copyFrom->strFromAccount;
         // nOrderPos not copied on purpose
         // cached members not copied on purpose
     }
@@ -804,35 +803,6 @@ bool CWallet::IsKeyUsed(const CPubKey& vchPubKey) {
     return false;
 }
 
-bool CWallet::GetLabelDestination(CTxDestination& dest, const std::string& label, bool bForceNew)
-{
-    CWalletDB walletdb(strWalletFile);
-    CAccount account;
-    walletdb.ReadAccount(label, account);
-
-    if (!bForceNew) {
-        // Check if the key is invalid or has been used
-        bForceNew = !account.vchPubKey.IsValid() || IsKeyUsed(account.vchPubKey);
-    }
-
-    // Generate a new key
-    if (bForceNew) {
-        // double check for used keys. todo: research why we have sometimes used keys in the keypool..
-        do {
-            if (!GetKeyFromPool(account.vchPubKey))
-                return false;
-        } while (IsKeyUsed(account.vchPubKey));
-
-        dest = account.vchPubKey.GetID();
-        SetAddressBook(dest, label, AddressBook::AddressBookPurpose::RECEIVE);
-        walletdb.WriteAccount(label, account);
-    } else {
-        dest = account.vchPubKey.GetID();
-    }
-
-    return true;
-}
-
 void CWallet::MarkDirty()
 {
     {
@@ -856,7 +826,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFlushOnClose)
     if (fInsertedNew) {
         wtx.nTimeReceived = GetAdjustedTime();
         wtx.nOrderPos = IncOrderPosNext(&walletdb);
-        wtxOrdered.emplace(wtx.nOrderPos, TxPair(&wtx, (CAccountingEntry*)0));
+        wtxOrdered.emplace(wtx.nOrderPos, &wtx);
         wtx.UpdateTimeSmart();
         AddToSpends(hash);
     }
@@ -916,7 +886,7 @@ bool CWallet::LoadToWallet(const CWalletTx& wtxIn)
     mapWallet[hash] = wtxIn;
     CWalletTx& wtx = mapWallet[hash];
     wtx.BindWallet(this);
-    wtxOrdered.emplace(wtx.nOrderPos, TxPair(&wtx, (CAccountingEntry*)0));
+    wtxOrdered.emplace(wtx.nOrderPos, &wtx);
     AddToSpends(hash);
     for (const CTxIn& txin : wtx.vin) {
         if (mapWallet.count(txin.prevout.hash)) {
@@ -1389,13 +1359,11 @@ CAmount CWalletTx::GetAvailableWatchOnlyCredit(const bool& fUseCache) const
 void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
     std::list<COutputEntry>& listSent,
     CAmount& nFee,
-    std::string& strSentAccount,
     const isminefilter& filter) const
 {
     nFee = 0;
     listReceived.clear();
     listSent.clear();
-    strSentAccount = strFromAccount;
 
     // Compute fee:
     CAmount nDebit = GetDebit(filter);
@@ -1834,7 +1802,7 @@ CAmount CWallet::GetImmatureWatchOnlyBalance() const
 // wallet, and then subtracts the values of TxIns spending from the wallet. This
 // also has fewer restrictions on which unconfirmed transactions are considered
 // trusted.
-CAmount CWallet::GetLegacyBalance(const isminefilter& filter, int minDepth, const std::string* account) const
+CAmount CWallet::GetLegacyBalance(const isminefilter& filter, int minDepth) const
 {
     LOCK2(cs_main, cs_wallet);
 
@@ -1854,19 +1822,15 @@ CAmount CWallet::GetLegacyBalance(const isminefilter& filter, int minDepth, cons
         for (const CTxOut& out : wtx.vout) {
             if (outgoing && IsChange(out)) {
                 debit -= out.nValue;
-            } else if (IsMine(out) & filter && depth >= minDepth && (!account || *account == GetAccountName(out.scriptPubKey))) {
+            } else if (IsMine(out) & filter && depth >= minDepth) {
                 balance += out.nValue;
             }
         }
 
         // For outgoing txs, subtract amount debited.
-        if (outgoing && (!account || *account == wtx.strFromAccount)) {
+        if (outgoing) {
             balance -= debit;
         }
-    }
-
-    if (account) {
-        balance += CWalletDB(strWalletFile).GetAccountCreditDebit(*account);
     }
 
     return balance;
@@ -2927,18 +2891,6 @@ CWallet::CommitResult CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey&
     return res;
 }
 
-bool CWallet::AddAccountingEntry(const CAccountingEntry& acentry, CWalletDB & pwalletdb)
-{
-    if (!pwalletdb.WriteAccountingEntry_Backend(acentry))
-        return false;
-
-    laccentries.push_back(acentry);
-    CAccountingEntry & entry = laccentries.back();
-    wtxOrdered.emplace(entry.nOrderPos, TxPair((CWalletTx*)0, &entry));
-
-    return true;
-}
-
 CAmount CWallet::GetRequiredFee(unsigned int nTxBytes)
 {
     return std::max(minTxFee.GetFee(nTxBytes), ::minRelayTxFee.GetFee(nTxBytes));
@@ -3096,21 +3048,6 @@ void CWallet::LoadAddressBookName(const CTxDestination& dest, const std::string&
 void CWallet::LoadAddressBookPurpose(const CTxDestination& dest, const std::string& strPurpose)
 {
     mapAddressBook[dest].purpose = strPurpose;
-}
-
-const std::string& CWallet::GetAccountName(const CScript& scriptPubKey) const
-{
-    CTxDestination address;
-    if (ExtractDestination(scriptPubKey, address) && !scriptPubKey.IsUnspendable()) {
-        auto mi = mapAddressBook.find(address);
-        if (mi != mapAddressBook.end()) {
-            return mi->second.name;
-        }
-    }
-    // A scriptPubKey that doesn't have an entry in the address book is
-    // associated with the default account ("").
-    const static std::string DEFAULT_ACCOUNT_NAME;
-    return DEFAULT_ACCOUNT_NAME;
 }
 
 bool CWallet::HasAddressBook(const CTxDestination& address) const
@@ -3288,12 +3225,6 @@ std::set<std::set<CTxDestination> > CWallet::GetAddressGroupings()
     }
 
     return ret;
-}
-
-void CWallet::DeleteLabel(const std::string &label)
-{
-    CWalletDB walletdb(strWalletFile);
-    walletdb.EraseAccount(label);
 }
 
 std::set<CTxDestination> CWallet::GetLabelAddresses(const std::string& label) const
@@ -3781,7 +3712,7 @@ std::string CWallet::GetWalletHelpString(bool showDebug)
     strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), DEFAULT_WALLET_DAT));
     strUsage += HelpMessageOpt("-walletnotify=<cmd>", _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"));
     strUsage += HelpMessageOpt("-zapwallettxes=<mode>", _("Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup") +
-        " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
+        " " + _("(1 = keep tx meta data e.g. payment request information, 2 = drop tx meta data)"));
     strUsage += HelpMessageGroup(_("Mining/Staking options:"));
     strUsage += HelpMessageOpt("-coldstaking=<n>", strprintf(_("Enable cold staking functionality (0-1, default: %u). Disabled if staking=0"), DEFAULT_COLDSTAKING));
     strUsage += HelpMessageOpt("-gen", strprintf(_("Generate coins (default: %u)"), DEFAULT_GENERATE));
@@ -3958,7 +3889,6 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
                     copyTo->nTimeReceived = copyFrom->nTimeReceived;
                     copyTo->nTimeSmart = copyFrom->nTimeSmart;
                     copyTo->fFromMe = copyFrom->fFromMe;
-                    copyTo->strFromAccount = copyFrom->strFromAccount;
                     copyTo->nOrderPos = copyFrom->nOrderPos;
                     walletdb.WriteTx(*copyTo);
                 }
@@ -4367,7 +4297,6 @@ void CWalletTx::Init(const CWallet* pwalletIn)
     nTimeReceived = 0;
     nTimeSmart = 0;
     fFromMe = false;
-    strFromAccount.clear();
     fChangeCached = false;
     nChangeCached = 0;
     nOrderPos = -1;
