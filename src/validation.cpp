@@ -3291,7 +3291,7 @@ void CBlockIndex::BuildSkip()
         pskip = pprev->GetAncestor(GetSkipHeight(nHeight));
 }
 
-bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp, bool* fAccepted)
+bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const std::shared_ptr<const CBlock> pblock, CDiskBlockPos* dbp, bool* fAccepted)
 {
     AssertLockNotHeld(cs_main);
 
@@ -3335,12 +3335,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
         }
     }
 
-    //TODO: This copy is a major performance regression, but callers need updated to fix this
-    std::shared_ptr<const CBlock> block_ptr;
-    if (pblock)
-        block_ptr.reset(new CBlock(*pblock));
-
-    if (!ActivateBestChain(state, block_ptr, checked))
+    if (!ActivateBestChain(state, pblock, checked))
         return error("%s : ActivateBestChain failed", __func__);
 
     if (!fLiteMode) {
@@ -3801,7 +3796,8 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos* dbp)
                 // process in case the block isn't known yet
                 if (mapBlockIndex.count(hash) == 0 || (mapBlockIndex[hash]->nStatus & BLOCK_HAVE_DATA) == 0) {
                     CValidationState state;
-                    if (ProcessNewBlock(state, nullptr, &block, dbp))
+                    std::shared_ptr<const CBlock> block_ptr = std::make_shared<const CBlock>(block);
+                    if (ProcessNewBlock(state, nullptr, block_ptr, dbp))
                         nLoaded++;
                     if (state.IsError())
                         break;
@@ -3822,7 +3818,8 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos* dbp)
                             LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash().ToString(),
                                 head.ToString());
                             CValidationState dummy;
-                            if (ProcessNewBlock(dummy, nullptr, &block, &it->second)) {
+                            std::shared_ptr<const CBlock> block_ptr = std::make_shared<const CBlock>(block);
+                            if (ProcessNewBlock(dummy, nullptr, block_ptr, &it->second)) {
                                 nLoaded++;
                                 queue.push_back(block.GetHash());
                             }

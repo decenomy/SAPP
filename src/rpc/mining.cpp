@@ -169,7 +169,7 @@ UniValue generate(const JSONRPCRequest& request)
                                                        CreateNewBlock(CScript(), pwalletMain, true, &availableCoins) :
                                                        CreateNewBlockWithKey(reservekey, pwalletMain));
         if (!pblocktemplate.get()) break;
-        CBlock *pblock = &pblocktemplate->block;
+        std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>(pblocktemplate->block);
 
         if(!fPoS) {
             {
@@ -679,7 +679,8 @@ UniValue submitblock(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("submitblock", "\"mydata\"") + HelpExampleRpc("submitblock", "\"mydata\""));
 
-    CBlock block;
+    std::shared_ptr<CBlock> blockptr = std::make_shared<CBlock>();
+    CBlock& block = *blockptr;
     if (!DecodeHexBlk(block, request.params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
@@ -706,7 +707,7 @@ UniValue submitblock(const JSONRPCRequest& request)
     CValidationState state;
     submitblock_StateCatcher sc(block.GetHash());
     RegisterValidationInterface(&sc);
-    bool fAccepted = ProcessNewBlock(state, nullptr, &block, nullptr);
+    bool fAccepted = ProcessNewBlock(state, nullptr, blockptr, nullptr);
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
         if (fAccepted && !sc.found)

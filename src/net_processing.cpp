@@ -1581,18 +1581,18 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 
     else if (strCommand == NetMsgType::BLOCK && !fImporting && !fReindex) // Ignore blocks received while importing
     {
-        CBlock block;
-        vRecv >> block;
-        const uint256& hashBlock = block.GetHash();
+        std::shared_ptr<CBlock> pblock = std::make_shared<CBlock>();
+        vRecv >> *pblock;
+        const uint256& hashBlock = pblock->GetHash();
         CInv inv(MSG_BLOCK, hashBlock);
         LogPrint(BCLog::NET, "received block %s peer=%d\n", inv.hash.ToString(), pfrom->id);
 
         //sometimes we will be sent their most recent block and its not the one we want, in that case tell where we are
-        if (!mapBlockIndex.count(block.hashPrevBlock)) {
+        if (!mapBlockIndex.count(pblock->hashPrevBlock)) {
             if (find(pfrom->vBlockRequested.begin(), pfrom->vBlockRequested.end(), hashBlock) != pfrom->vBlockRequested.end()) {
                 //we already asked for this block, so lets work backwards and ask for the previous block
-                connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), block.hashPrevBlock));
-                pfrom->vBlockRequested.push_back(block.hashPrevBlock);
+                connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), pblock->hashPrevBlock));
+                pfrom->vBlockRequested.push_back(pblock->hashPrevBlock);
             } else {
                 //ask to sync to this block
                 connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), hashBlock));
@@ -1604,7 +1604,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (!mapBlockIndex.count(hashBlock)) {
                 WITH_LOCK(cs_main, MarkBlockAsReceived(hashBlock); );
                 bool fAccepted = true;
-                ProcessNewBlock(state, pfrom, &block, nullptr, &fAccepted);
+                ProcessNewBlock(state, pfrom, pblock, nullptr, &fAccepted);
                 if (!fAccepted) {
                     CheckBlockSpam(state, pfrom, hashBlock);
                 }
@@ -1622,7 +1622,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                 //disconnect this node if its old protocol version
                 pfrom->DisconnectOldProtocol(pfrom->nVersion, ActiveProtocol(), strCommand);
             } else {
-                LogPrint(BCLog::NET, "%s : Already processed block %s, skipping ProcessNewBlock()\n", __func__, block.GetHash().GetHex());
+                LogPrint(BCLog::NET, "%s : Already processed block %s, skipping ProcessNewBlock()\n", __func__, pblock->GetHash().GetHex());
             }
         }
     }
