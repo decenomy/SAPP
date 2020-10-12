@@ -1923,10 +1923,19 @@ static int64_t nTimeChainState = 0;
 static int64_t nTimePostConnect = 0;
 
 /**
+ * Used to track conflicted transactions removed from mempool and transactions
+ * applied to the UTXO state as a part of a single ActivateBestChainStep call.
+ */
+struct ConnectTrace {
+    std::list<CTransactionRef> txConflicted;
+    std::vector<std::tuple<CTransactionRef,CBlockIndex*,int>> txChanged;
+};
+
+/**
  * Connect a new block to chainActive. pblock is either NULL or a pointer to a CBlock
  * corresponding to pindexNew, to bypass loading it again from disk.
  */
-bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransactionRef> &txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>> &txChanged)
+bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
 {
     assert(pindexNew->pprev == chainActive.Tip());
 
@@ -1975,12 +1984,12 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CB
     LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs]\n", (nTime5 - nTime4) * 0.001, nTimeChainState * 0.000001);
 
     // Remove conflicting transactions from the mempool.
-    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
+    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, connectTrace.txConflicted, !IsInitialBlockDownload());
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
 
     for(unsigned int i=0; i < pblock->vtx.size(); i++) {
-        txChanged.emplace_back(*pblock->vtx[i], pindexNew, i);
+        connectTrace.txChanged.emplace_back(pblock->vtx[i], pindexNew, i);
     }
 
     int64_t nTime6 = GetTimeMicros();
@@ -2111,7 +2120,7 @@ static void PruneBlockIndexCandidates()
  * Try to make some progress towards making pindexMostWork the active block.
  * pblock is either NULL or a pointer to a CBlock corresponding to pindexMostWork.
  */
-static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransactionRef>& txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>>& txChanged)
+static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const CBlock* pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
 {
     AssertLockHeld(cs_main);
     if (pblock == NULL)
@@ -2147,7 +2156,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
 
         // Connect new blocks.
         BOOST_REVERSE_FOREACH (CBlockIndex* pindexConnect, vpindexToConnect) {
-            if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked, txConflicted, txChanged)) {
+            if (!ConnectTip(state, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL, fAlreadyChecked, connectTrace)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible())
@@ -2202,15 +2211,11 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
 
     CBlockIndex* pindexNewTip = nullptr;
     CBlockIndex* pindexMostWork = nullptr;
-    std::vector<std::tuple<CTransaction,CBlockIndex*,int>> txChanged;
-    if (pblock)
-        txChanged.reserve(pblock->vtx.size());
     do {
-        txChanged.clear();
         boost::this_thread::interruption_point();
 
         const CBlockIndex *pindexFork;
-        std::list<CTransactionRef> txConflicted;
+        ConnectTrace connectTrace;
         bool fInitialDownload;
         while (true) {
             TRY_LOCK(cs_main, lockMain);
@@ -2226,7 +2231,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             if (pindexMostWork == NULL || pindexMostWork == chainActive.Tip())
                 return true;
 
-            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked, txConflicted, txChanged))
+            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked, connectTrace))
                 return false;
 
             pindexNewTip = chainActive.Tip();
@@ -2234,12 +2239,12 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             fInitialDownload = IsInitialBlockDownload();
 
             // throw all transactions though the signal-interface
-            for (const auto &tx : txConflicted) {
+            for (const auto &tx : connectTrace.txConflicted) {
                 GetMainSignals().SyncTransaction(*tx, pindexNewTip, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
             }
             // ... and about transactions that got confirmed:
-            for (unsigned int i = 0; i < txChanged.size(); i++) {
-                GetMainSignals().SyncTransaction(std::get<0>(txChanged[i]), std::get<1>(txChanged[i]), std::get<2>(txChanged[i]));
+            for (unsigned int i = 0; i < connectTrace.txChanged.size(); i++) {
+                GetMainSignals().SyncTransaction(*std::get<0>(connectTrace.txChanged[i]), std::get<1>(connectTrace.txChanged[i]), std::get<2>(connectTrace.txChanged[i]));
             }
 
             break;
