@@ -44,8 +44,9 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
     if (strCommand == NetMsgType::IX) {
         //LogPrintf("ProcessMessageSwiftTX::ix\n");
         CDataStream vMsg(vRecv);
-        CTransaction tx;
-        vRecv >> tx;
+        CTransactionRef ptx;
+        vRecv >> ptx;
+        const CTransaction& tx = *ptx;
 
         CInv inv(MSG_TXLOCK_REQUEST, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
@@ -75,7 +76,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
         bool fAccepted = false;
         {
             LOCK(cs_main);
-            fAccepted = AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs);
+            fAccepted = AcceptToMemoryPool(mempool, state, ptx, true, &fMissingInputs);
         }
         if (fAccepted) {
             g_connman->RelayInv(inv);
@@ -260,7 +261,7 @@ int64_t CreateNewLock(CTransaction tx)
 }
 
 // check if we need to vote on this transaction
-void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
+void DoConsensusVote(const CTransaction& tx, int64_t nBlockHeight)
 {
     if (!fMasterNode) return;
 
@@ -400,7 +401,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
     return false;
 }
 
-bool CheckForConflictingLocks(CTransaction& tx)
+bool CheckForConflictingLocks(const CTransaction& tx)
 {
     /*
         It's possible (very unlikely though) to get 2 conflicting transaction locks approved by the network.

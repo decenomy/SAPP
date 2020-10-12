@@ -87,7 +87,7 @@ private:
     CAmount nFeesWithDescendants;  //! ... and total fees (all including us)
 
 public:
-    CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
+    CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
             int64_t _nTime, double _entryPriority, unsigned int _entryHeight,
             bool poolHasNoInputsOf, CAmount _inChainInputValue, bool _spendsCoinbaseOrCoinstake,
             unsigned int nSigOps);

@@ -19,22 +19,22 @@
 #include <boost/foreach.hpp>
 
 
-CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
+CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                                  int64_t _nTime, double _entryPriority,
                                  unsigned int _entryHeight, bool poolHasNoInputsOf, CAmount _inChainInputValue,
                                  bool _spendsCoinbaseOrCoinstake, unsigned int _sigOps) :
      tx(MakeTransactionRef(_tx)), nFee(_nFee), nTime(_nTime), entryPriority(_entryPriority), entryHeight(_entryHeight), hadNoDependencies(poolHasNoInputsOf), inChainInputValue(_inChainInputValue), spendsCoinbaseOrCoinstake(_spendsCoinbaseOrCoinstake), sigOpCount(_sigOps)
 {
-    nTxSize = ::GetSerializeSize(_tx, SER_NETWORK, PROTOCOL_VERSION);
-    nModSize = _tx.CalculateModifiedSize(nTxSize);
-    nUsageSize = _tx.DynamicMemoryUsage();
-    hasZerocoins = _tx.ContainsZerocoins();
-    m_isShielded = tx->hasSaplingData();
+    nTxSize = ::GetSerializeSize(*_tx, SER_NETWORK, PROTOCOL_VERSION);
+    nModSize = _tx->CalculateModifiedSize(nTxSize);
+    nUsageSize = _tx->DynamicMemoryUsage();
+    hasZerocoins = _tx->ContainsZerocoins();
+    m_isShielded = _tx->hasSaplingData();
 
     nCountWithDescendants = 1;
     nSizeWithDescendants = nTxSize;
     nFeesWithDescendants = nFee;
-    CAmount nValueIn = _tx.GetValueOut()+nFee;
+    CAmount nValueIn = _tx->GetValueOut()+nFee;
     assert(inChainInputValue <= nValueIn);
 
     feeDelta = 0;
