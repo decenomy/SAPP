@@ -2119,7 +2119,7 @@ static void PruneBlockIndexCandidates()
  * Try to make some progress towards making pindexMostWork the active block.
  * pblock is either NULL or a pointer to a CBlock corresponding to pindexMostWork.
  */
-static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const CBlock* pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
+static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const std::shared_ptr<const CBlock>& pblock, bool fAlreadyChecked, ConnectTrace& connectTrace)
 {
     AssertLockHeld(cs_main);
     if (pblock == NULL)
@@ -2155,8 +2155,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
 
         // Connect new blocks.
         BOOST_REVERSE_FOREACH (CBlockIndex* pindexConnect, vpindexToConnect) {
-            //TODO: The pblock copy is a major performance regression, but callers need updated to fix this
-            if (!ConnectTip(state, pindexConnect, (pblock && pindexConnect == pindexMostWork) ? std::make_shared<const CBlock>(*pblock) : std::shared_ptr<const CBlock>(), fAlreadyChecked, connectTrace)) {
+            if (!ConnectTip(state, pindexConnect, (pindexConnect == pindexMostWork) ? pblock : std::shared_ptr<const CBlock>(), fAlreadyChecked, connectTrace)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible())
@@ -2203,7 +2202,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
  * that is already loaded (to avoid loading it again from disk).
  */
 
-bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlreadyChecked)
+bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pblock, bool fAlreadyChecked)
 {
     // Note that while we're often called here from ProcessNewBlock, this is
     // far from a guarantee. Things in the P2P/RPC will often end up calling
@@ -2233,7 +2232,8 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             if (pindexMostWork == NULL || pindexMostWork == chainActive.Tip())
                 return true;
 
-            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL, fAlreadyChecked, connectTrace))
+            std::shared_ptr<const CBlock> nullBlockPtr;
+            if (!ActivateBestChainStep(state, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : nullBlockPtr, fAlreadyChecked, connectTrace))
                 return false;
 
             pindexNewTip = chainActive.Tip();
@@ -3335,7 +3335,12 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
         }
     }
 
-    if (!ActivateBestChain(state, pblock, checked))
+    //TODO: This copy is a major performance regression, but callers need updated to fix this
+    std::shared_ptr<const CBlock> block_ptr;
+    if (pblock)
+        block_ptr.reset(new CBlock(*pblock));
+
+    if (!ActivateBestChain(state, block_ptr, checked))
         return error("%s : ActivateBestChain failed", __func__);
 
     if (!fLiteMode) {
