@@ -264,9 +264,10 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
 {
     if (!fMasterNode) return;
 
-    if (activeMasternode.vin == nullopt)
+    if (activeMasternode.vin == nullopt) {
         LogPrint(BCLog::MASTERNODE, "%s: Active Masternode not initialized.", __func__);
         return;
+    }
 
     int n = mnodeman.GetMasternodeRank(*(activeMasternode.vin), nBlockHeight, MIN_SWIFTTX_PROTO_VERSION);
 
