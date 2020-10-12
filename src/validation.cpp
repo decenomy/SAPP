@@ -1892,7 +1892,7 @@ bool static DisconnectTip(CValidationState& state)
     for (const auto& txIn : block.vtx) {
         const CTransaction& tx = *txIn;
         // ignore validation errors in resurrected transactions
-        std::list<CTransaction> removed;
+        std::list<CTransactionRef> removed;
         CValidationState stateDummy;
         if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, nullptr, true)) {
             mempool.remove(tx, removed, true);
@@ -1926,7 +1926,7 @@ static int64_t nTimePostConnect = 0;
  * Connect a new block to chainActive. pblock is either NULL or a pointer to a CBlock
  * corresponding to pindexNew, to bypass loading it again from disk.
  */
-bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransaction> &txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>> &txChanged)
+bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransactionRef> &txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>> &txChanged)
 {
     assert(pindexNew->pprev == chainActive.Tip());
 
@@ -2111,7 +2111,7 @@ static void PruneBlockIndexCandidates()
  * Try to make some progress towards making pindexMostWork the active block.
  * pblock is either NULL or a pointer to a CBlock corresponding to pindexMostWork.
  */
-static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransaction>& txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>>& txChanged)
+static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMostWork, const CBlock* pblock, bool fAlreadyChecked, std::list<CTransactionRef>& txConflicted, std::vector<std::tuple<CTransaction,CBlockIndex*,int>>& txChanged)
 {
     AssertLockHeld(cs_main);
     if (pblock == NULL)
@@ -2210,7 +2210,7 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
         boost::this_thread::interruption_point();
 
         const CBlockIndex *pindexFork;
-        std::list<CTransaction> txConflicted;
+        std::list<CTransactionRef> txConflicted;
         bool fInitialDownload;
         while (true) {
             TRY_LOCK(cs_main, lockMain);
@@ -2234,11 +2234,11 @@ bool ActivateBestChain(CValidationState& state, const CBlock* pblock, bool fAlre
             fInitialDownload = IsInitialBlockDownload();
 
             // throw all transactions though the signal-interface
-            for (const CTransaction &tx : txConflicted) {
-                GetMainSignals().SyncTransaction(tx, pindexNewTip, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
+            for (const auto &tx : txConflicted) {
+                GetMainSignals().SyncTransaction(*tx, pindexNewTip, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
             }
             // ... and about transactions that got confirmed:
-            for(unsigned int i = 0; i < txChanged.size(); i++) {
+            for (unsigned int i = 0; i < txChanged.size(); i++) {
                 GetMainSignals().SyncTransaction(std::get<0>(txChanged[i]), std::get<1>(txChanged[i]), std::get<2>(txChanged[i]));
             }
 
