@@ -219,6 +219,7 @@ set(SERVER_SOURCES
         ./src/sporkdb.cpp
         ./src/timedata.cpp
         ./src/torcontrol.cpp
+        ./src/sapling/sapling_txdb.cpp
         ./src/txdb.cpp
         ./src/txmempool.cpp
         ./src/validation.cpp

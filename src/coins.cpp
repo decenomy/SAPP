@@ -6,6 +6,7 @@
 #include "coins.h"
 
 #include "consensus/consensus.h"
+#include "policy/fees.h"
 #include "invalid.h"
 #include "memusage.h"
 #include "random.h"
@@ -15,24 +16,49 @@
 bool CCoinsView::GetCoin(const COutPoint& outpoint, Coin& coin) const { return false; }
 bool CCoinsView::HaveCoin(const COutPoint& outpoint) const { return false; }
 uint256 CCoinsView::GetBestBlock() const { return UINT256_ZERO; }
-bool CCoinsView::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock) { return false; }
 CCoinsViewCursor *CCoinsView::Cursor() const { return 0; }
+
+bool CCoinsView::BatchWrite(CCoinsMap& mapCoins,
+                            const uint256& hashBlock,
+                            const uint256& hashSaplingAnchor,
+                            CAnchorsSaplingMap& mapSaplingAnchors,
+                            CNullifiersMap& mapSaplingNullifiers) { return false; }
+
+// Sapling
+bool CCoinsView::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &tree) const { return false; }
+bool CCoinsView::GetNullifier(const uint256 &nullifier) const { return false; }
+uint256 CCoinsView::GetBestAnchor() const { return uint256(); };
 
 CCoinsViewBacked::CCoinsViewBacked(CCoinsView* viewIn) : base(viewIn) {}
 bool CCoinsViewBacked::GetCoin(const COutPoint& outpoint, Coin& coin) const { return base->GetCoin(outpoint, coin); }
 bool CCoinsViewBacked::HaveCoin(const COutPoint& outpoint) const { return base->HaveCoin(outpoint); }
 uint256 CCoinsViewBacked::GetBestBlock() const { return base->GetBestBlock(); }
 void CCoinsViewBacked::SetBackend(CCoinsView& viewIn) { base = &viewIn; }
-bool CCoinsViewBacked::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock) { return base->BatchWrite(mapCoins, hashBlock); }
 CCoinsViewCursor *CCoinsViewBacked::Cursor() const { return base->Cursor(); }
 size_t CCoinsViewBacked::EstimateSize() const { return base->EstimateSize(); }
 
+bool CCoinsViewBacked::BatchWrite(CCoinsMap& mapCoins,
+                                  const uint256& hashBlock,
+                                  const uint256& hashSaplingAnchor,
+                                  CAnchorsSaplingMap& mapSaplingAnchors,
+                                  CNullifiersMap& mapSaplingNullifiers)
+{ return base->BatchWrite(mapCoins, hashBlock, hashSaplingAnchor, mapSaplingAnchors, mapSaplingNullifiers); }
+
+// Sapling
+bool CCoinsViewBacked::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &tree) const { return base->GetSaplingAnchorAt(rt, tree); }
+bool CCoinsViewBacked::GetNullifier(const uint256 &nullifier) const { return base->GetNullifier(nullifier); }
+uint256 CCoinsViewBacked::GetBestAnchor() const { return base->GetBestAnchor(); }
+
 SaltedOutpointHasher::SaltedOutpointHasher() : k0(GetRand(std::numeric_limits<uint64_t>::max())), k1(GetRand(std::numeric_limits<uint64_t>::max())) {}
+SaltedIdHasher::SaltedIdHasher() : k0(GetRand(std::numeric_limits<uint64_t>::max())), k1(GetRand(std::numeric_limits<uint64_t>::max())) {}
 
 CCoinsViewCache::CCoinsViewCache(CCoinsView *baseIn) : CCoinsViewBacked(baseIn), cachedCoinsUsage(0) {}
 
 size_t CCoinsViewCache::DynamicMemoryUsage() const {
-    return memusage::DynamicUsage(cacheCoins) + cachedCoinsUsage;
+    return memusage::DynamicUsage(cacheCoins) +
+           memusage::DynamicUsage(cacheSaplingAnchors) +
+           memusage::DynamicUsage(cacheSaplingNullifiers) +
+           cachedCoinsUsage;
 }
 
 CCoinsMap::iterator CCoinsViewCache::FetchCoin(const COutPoint& outpoint) const
@@ -147,7 +173,67 @@ void CCoinsViewCache::SetBestBlock(const uint256& hashBlockIn)
     hashBlock = hashBlockIn;
 }
 
-bool CCoinsViewCache::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlockIn) {
+template<typename Map, typename MapIterator, typename MapEntry>
+void BatchWriteAnchors(
+        Map &mapAnchors,
+        Map &cacheAnchors,
+        size_t &cachedCoinsUsage
+)
+{
+    for (MapIterator child_it = mapAnchors.begin(); child_it != mapAnchors.end();)
+    {
+        if (child_it->second.flags & MapEntry::DIRTY) {
+            MapIterator parent_it = cacheAnchors.find(child_it->first);
+
+            if (parent_it == cacheAnchors.end()) {
+                MapEntry& entry = cacheAnchors[child_it->first];
+                entry.entered = child_it->second.entered;
+                entry.tree = child_it->second.tree;
+                entry.flags = MapEntry::DIRTY;
+
+                cachedCoinsUsage += entry.tree.DynamicMemoryUsage();
+            } else {
+                if (parent_it->second.entered != child_it->second.entered) {
+                    // The parent may have removed the entry.
+                    parent_it->second.entered = child_it->second.entered;
+                    parent_it->second.flags |= MapEntry::DIRTY;
+                }
+            }
+        }
+
+        MapIterator itOld = child_it++;
+        mapAnchors.erase(itOld);
+    }
+}
+
+void BatchWriteNullifiers(CNullifiersMap &mapNullifiers, CNullifiersMap &cacheNullifiers)
+{
+    for (CNullifiersMap::iterator child_it = mapNullifiers.begin(); child_it != mapNullifiers.end();) {
+        if (child_it->second.flags & CNullifiersCacheEntry::DIRTY) { // Ignore non-dirty entries (optimization).
+            CNullifiersMap::iterator parent_it = cacheNullifiers.find(child_it->first);
+
+            if (parent_it == cacheNullifiers.end()) {
+                CNullifiersCacheEntry& entry = cacheNullifiers[child_it->first];
+                entry.entered = child_it->second.entered;
+                entry.flags = CNullifiersCacheEntry::DIRTY;
+            } else {
+                if (parent_it->second.entered != child_it->second.entered) {
+                    parent_it->second.entered = child_it->second.entered;
+                    parent_it->second.flags |= CNullifiersCacheEntry::DIRTY;
+                }
+            }
+        }
+        CNullifiersMap::iterator itOld = child_it++;
+        mapNullifiers.erase(itOld);
+    }
+}
+
+bool CCoinsViewCache::BatchWrite(CCoinsMap& mapCoins,
+                                 const uint256& hashBlockIn,
+                                 const uint256 &hashSaplingAnchorIn,
+                                 CAnchorsSaplingMap& mapSaplingAnchors,
+                                 CNullifiersMap& mapSaplingNullifiers)
+{
     for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();) {
         if (it->second.flags & CCoinsCacheEntry::DIRTY) { // Ignore non-dirty entries (optimization).
             CCoinsMap::iterator itUs = cacheCoins.find(it->first);
@@ -199,14 +285,26 @@ bool CCoinsViewCache::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlockIn
         CCoinsMap::iterator itOld = it++;
         mapCoins.erase(itOld);
     }
+
+    // Sapling
+    ::BatchWriteAnchors<CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, cacheSaplingAnchors, cachedCoinsUsage);
+    ::BatchWriteNullifiers(mapSaplingNullifiers, cacheSaplingNullifiers);
+    hashSaplingAnchor = hashSaplingAnchorIn;
+
     hashBlock = hashBlockIn;
     return true;
 }
 
 bool CCoinsViewCache::Flush()
 {
-    bool fOk = base->BatchWrite(cacheCoins, hashBlock);
+    bool fOk = base->BatchWrite(cacheCoins,
+            hashBlock,
+            hashSaplingAnchor,
+            cacheSaplingAnchors,
+            cacheSaplingNullifiers);
     cacheCoins.clear();
+    cacheSaplingAnchors.clear();
+    cacheSaplingNullifiers.clear();
     cachedCoinsUsage = 0;
     return fOk;
 }
@@ -238,6 +336,9 @@ CAmount CCoinsViewCache::GetValueIn(const CTransaction& tx) const
     for (unsigned int i = 0; i < tx.vin.size(); i++)
         nResult += AccessCoin(tx.vin[i].prevout).out.nValue;
 
+    // Sapling
+    nResult += tx.GetShieldedValueIn();
+
     return nResult;
 }
 
@@ -258,6 +359,16 @@ double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight, CAmount
     inChainInputValue = 0;
     if (tx.IsCoinBase() || tx.IsCoinStake())
         return 0.0;
+
+
+    // Shielded transfers do not reveal any information about the value or age of a note, so we
+    // cannot apply the priority algorithm used for transparent utxos.  Instead, we just
+    // use the maximum priority for all (partially or fully) shielded transactions.
+    // (Note that coinbase/coinstakes transactions cannot contain Sapling shielded Spends or Outputs.)
+    if (tx.hasSaplingData()) {
+        return INF_PRIORITY;
+    }
+
     double dResult = 0.0;
     for (const CTxIn& txin : tx.vin) {
         const Coin& coin = AccessCoin(txin.prevout);
@@ -322,3 +433,166 @@ const Coin& AccessByTxid(const CCoinsViewCache& view, const uint256& txid)
     return coinEmpty;
 }
 
+// Sapling
+
+bool CCoinsViewCache::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &tree) const {
+
+    CAnchorsSaplingMap::const_iterator it = cacheSaplingAnchors.find(rt);
+    if (it != cacheSaplingAnchors.end()) {
+        if (it->second.entered) {
+            tree = it->second.tree;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    if (!base->GetSaplingAnchorAt(rt, tree)) {
+        return false;
+    }
+
+    CAnchorsSaplingMap::iterator ret = cacheSaplingAnchors.insert(std::make_pair(rt, CAnchorsSaplingCacheEntry())).first;
+    ret->second.entered = true;
+    ret->second.tree = tree;
+    cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
+
+    return true;
+}
+
+bool CCoinsViewCache::GetNullifier(const uint256 &nullifier) const {
+    CNullifiersMap* cacheToUse = &cacheSaplingNullifiers;
+    CNullifiersMap::iterator it = cacheToUse->find(nullifier);
+    if (it != cacheToUse->end())
+        return it->second.entered;
+
+    CNullifiersCacheEntry entry;
+    bool tmp = base->GetNullifier(nullifier);
+    entry.entered = tmp;
+
+    cacheToUse->insert(std::make_pair(nullifier, entry));
+    return tmp;
+}
+
+template<typename Tree, typename Cache, typename CacheIterator, typename CacheEntry>
+void CCoinsViewCache::AbstractPushAnchor(
+        const Tree &tree,
+        Cache &cacheAnchors,
+        uint256 &hash
+)
+{
+    uint256 newrt = tree.root();
+
+    auto currentRoot = GetBestAnchor();
+
+    // We don't want to overwrite an anchor we already have.
+    // This occurs when a block doesn't modify mapAnchors at all,
+    // because there are no joinsplits. We could get around this a
+    // different way (make all blocks modify mapAnchors somehow)
+    // but this is simpler to reason about.
+    if (currentRoot != newrt) {
+        auto insertRet = cacheAnchors.insert(std::make_pair(newrt, CacheEntry()));
+        CacheIterator ret = insertRet.first;
+
+        ret->second.entered = true;
+        ret->second.tree = tree;
+        ret->second.flags = CacheEntry::DIRTY;
+
+        if (insertRet.second) {
+            // An insert took place
+            cachedCoinsUsage += ret->second.tree.DynamicMemoryUsage();
+        }
+
+        hash = newrt;
+    }
+}
+
+template<> void CCoinsViewCache::PushAnchor(const SaplingMerkleTree &tree)
+{
+    AbstractPushAnchor<SaplingMerkleTree, CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(
+            tree,
+            cacheSaplingAnchors,
+            hashSaplingAnchor
+    );
+}
+
+template<>
+void CCoinsViewCache::BringBestAnchorIntoCache(
+        const uint256 &currentRoot,
+        SaplingMerkleTree &tree
+)
+{
+    assert(GetSaplingAnchorAt(currentRoot, tree));
+}
+
+template<typename Tree, typename Cache, typename CacheEntry>
+void CCoinsViewCache::AbstractPopAnchor(
+        const uint256 &newrt,
+        Cache &cacheAnchors,
+        uint256 &hash
+)
+{
+    auto currentRoot = GetBestAnchor();
+
+    // Blocks might not change the commitment tree, in which
+    // case restoring the "old" anchor during a reorg must
+    // have no effect.
+    if (currentRoot != newrt) {
+        // Bring the current best anchor into our local cache
+        // so that its tree exists in memory.
+        {
+            Tree tree;
+            BringBestAnchorIntoCache(currentRoot, tree);
+        }
+
+        // Mark the anchor as unentered, removing it from view
+        cacheAnchors[currentRoot].entered = false;
+
+        // Mark the cache entry as dirty so it's propagated
+        cacheAnchors[currentRoot].flags = CacheEntry::DIRTY;
+
+        // Mark the new root as the best anchor
+        hash = newrt;
+    }
+}
+
+void CCoinsViewCache::PopAnchor(const uint256 &newrt) {
+    AbstractPopAnchor<SaplingMerkleTree, CAnchorsSaplingMap, CAnchorsSaplingCacheEntry>(
+            newrt,
+            cacheSaplingAnchors,
+            hashSaplingAnchor
+    );
+}
+
+void CCoinsViewCache::SetNullifiers(const CTransaction& tx, bool spent) {
+    if (tx.sapData) {
+        for (const SpendDescription& spendDescription : tx.sapData->vShieldedSpend) {
+            std::pair<CNullifiersMap::iterator, bool> ret = cacheSaplingNullifiers.insert(
+                    std::make_pair(spendDescription.nullifier, CNullifiersCacheEntry()));
+            ret.first->second.entered = spent;
+            ret.first->second.flags |= CNullifiersCacheEntry::DIRTY;
+        }
+    }
+}
+
+uint256 CCoinsViewCache::GetBestAnchor() const {
+    if (hashSaplingAnchor.IsNull())
+        hashSaplingAnchor = base->GetBestAnchor();
+    return hashSaplingAnchor;
+}
+
+bool CCoinsViewCache::HaveShieldedRequirements(const CTransaction& tx) const
+{
+    if (tx.hasSaplingData()) {
+        for (const SpendDescription &spendDescription : tx.sapData->vShieldedSpend) {
+            if (GetNullifier(spendDescription.nullifier)) // Prevent double spends
+                return false;
+
+            SaplingMerkleTree tree;
+            if (!GetSaplingAnchorAt(spendDescription.anchor, tree)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}

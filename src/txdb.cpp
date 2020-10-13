@@ -74,7 +74,11 @@ uint256 CCoinsViewDB::GetBestBlock() const
     return hashBestChain;
 }
 
-bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
+bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins,
+                              const uint256& hashBlock,
+                              const uint256& hashSaplingAnchor,
+                              CAnchorsSaplingMap& mapSaplingAnchors,
+                              CNullifiersMap& mapSaplingNullifiers)
 {
     CDBBatch batch;
     size_t count = 0;
@@ -92,6 +96,10 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
         CCoinsMap::iterator itOld = it++;
         mapCoins.erase(itOld);
     }
+
+    // Write Sapling
+    BatchWriteSapling(hashSaplingAnchor, mapSaplingAnchors, mapSaplingNullifiers, batch);
+
     if (!hashBlock.IsNull())
         batch.Write(DB_BEST_BLOCK, hashBlock);
 
