@@ -211,6 +211,7 @@ BITCOIN_CORE_H = \
   merkleblock.h \
   messagesigner.h \
   miner.h \
+  moneysupply.h \
   net.h \
   net_processing.h \
   netaddress.h \

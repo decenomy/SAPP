@@ -252,6 +252,7 @@ extern UniValue createrawzerocoinspend(const JSONRPCRequest& request);
 extern UniValue findserial(const JSONRPCRequest& request); // in rpc/blockchain.cpp
 extern UniValue getblockcount(const JSONRPCRequest& request);
 extern UniValue getbestblockhash(const JSONRPCRequest& request);
+extern UniValue getsupplyinfo(const JSONRPCRequest& request);
 extern UniValue waitfornewblock(const JSONRPCRequest& request);
 extern UniValue waitforblock(const JSONRPCRequest& request);
 extern UniValue waitforblockheight(const JSONRPCRequest& request);
