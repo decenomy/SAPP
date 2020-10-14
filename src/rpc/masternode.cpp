@@ -283,17 +283,18 @@ UniValue startmasternode (const JSONRPCRequest& request)
         if (strCommand == "start-disabled") strCommand = "disabled";
     }
 
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3 ||
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 4 ||
         (request.params.size() == 2 && (strCommand != "local" && strCommand != "all" && strCommand != "many" && strCommand != "missing" && strCommand != "disabled")) ||
-        (request.params.size() == 3 && strCommand != "alias"))
+        ( (request.params.size() == 3 || request.params.size() == 4) && strCommand != "alias"))
         throw std::runtime_error(
-            "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" )\n"
+            "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" reload_conf )\n"
             "\nAttempts to start one or more masternode(s)\n"
 
             "\nArguments:\n"
             "1. set         (string, required) Specify which set of masternode(s) to start.\n"
             "2. lockwallet  (boolean, required) Lock wallet after completion.\n"
             "3. alias       (string) Masternode alias. Required if using 'alias' as the set.\n"
+            "4. reload_conf (boolean) if true and \"alias\" was selected, reload the masternodes.conf data from disk"
 
             "\nResult: (for 'local' set):\n"
             "\"status\"     (string) Masternode status message\n"
@@ -367,6 +368,15 @@ UniValue startmasternode (const JSONRPCRequest& request)
 
     if (strCommand == "alias") {
         std::string alias = request.params[2].get_str();
+
+        // Check reload param
+        if(request.params[3].getBool()) {
+            masternodeConfig.clear();
+            std::string error;
+            if (!masternodeConfig.read(error)) {
+                throw std::runtime_error("Error reloading masternode.conf, " + error);
+            }
+        }
 
         bool found = false;
 
