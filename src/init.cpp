@@ -1809,46 +1809,7 @@ bool AppInit2()
 
     if (fMasterNode) {
         LogPrintf("IS MASTER NODE\n");
-        strMasterNodeAddr = gArgs.GetArg("-masternodeaddr", "");
-
-        LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
-
-        if (!strMasterNodeAddr.empty()) {
-            const CChainParams& params = Params();
-            int nPort;
-            int nDefaultPort = params.GetDefaultPort();
-            std::string strHost;
-            SplitHostPort(strMasterNodeAddr, nPort, strHost);
-
-            // Allow for the port number to be omitted here and just double check
-            // that if a port is supplied, it matches the required default port.
-            if (nPort == 0) nPort = nDefaultPort;
-            if (nPort != nDefaultPort && !params.IsRegTestNet()) {
-                return UIError(strprintf(_("Invalid -masternodeaddr port %d, only %d is supported on %s-net."),
-                    nPort, nDefaultPort, Params().NetworkIDString()));
-            }
-            CService addrTest(LookupNumeric(strHost.c_str(), nPort));
-            if (!addrTest.IsValid()) {
-                return UIError(strprintf(_("Invalid -masternodeaddr address: %s"), strMasterNodeAddr));
-            }
-        }
-
-        strMasterNodePrivKey = gArgs.GetArg("-masternodeprivkey", "");
-        if (!strMasterNodePrivKey.empty()) {
-            std::string errorMessage;
-
-            CKey key;
-            CPubKey pubkey;
-
-            if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, key, pubkey)) {
-                return UIError(_("Invalid masternodeprivkey. Please see documenation."));
-            }
-
-            activeMasternode.pubKeyMasternode = pubkey;
-
-        } else {
-            return UIError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
-        }
+        initMasternode(gArgs.GetArg("-masternodeprivkey", ""), gArgs.GetArg("-masternodeaddr", ""), true);
     }
 
     //get the mode of budget voting for this masternode
