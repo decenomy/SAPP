@@ -20,7 +20,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 5
-        self.extra_args = [[], [], [], [], []]
+        self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], []]
         self.setup_clean_chain = True
         self.enable_mocktime()
 
@@ -29,6 +29,9 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         self.ownerTwoPos = 2
         self.remoteTwoPos = 3
         self.minerPos = 4
+
+        self.mnOnePrivkey = "9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK"
+        self.mnTwoPrivkey = "92Hkebp3RHdDidGZ7ARgS4orxJAGyFUPDXNqtsYsiwho1HGVRbF"
 
     def check_mnsync_finished(self):
         for node in self.nodes:
@@ -43,7 +46,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             if (mnData["txhash"] == mnTxHash):
                 assert_equal(mnData["status"], status)
                 found = True
-        assert(found)
+        return found
 
     def check_mn_list_empty(self, node):
         assert(len(node.listmasternodes()) == 0)
@@ -54,7 +57,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             assert_true(len(node.mnfinalbudget("show")) == 1, "MN budget finalization not synced in node" + str(i))
 
     def start_masternode(self, mnOwner, masternodeAlias):
-        ret = mnOwner.startmasternode("alias", "false", masternodeAlias)
+        ret = mnOwner.startmasternode("alias", "false", masternodeAlias, True)
         assert_equal(ret["result"], "success")
 
     def broadcastbudgetfinalization(self, node):
@@ -63,6 +66,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
         self.log.info("confirming the budget finalization..")
         self.generate_two_blocks()
+        time.sleep(2)
         self.generate_two_blocks()
 
         self.log.info("broadcasting the budget finalization..")
@@ -78,43 +82,28 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         time.sleep(3)
 
     def check_mn_status(self, mnTxHash, status):
-        for node in self.nodes:
-            self.check_mn_status_in_mnlist(node, mnTxHash, status)
+        for i in range(len(self.nodes)):
+            node = self.nodes[i]
+            found = self.check_mn_status_in_mnlist(node, mnTxHash, status)
+            assert_true(found, "mn status invalid for node"+str(i))
 
     def setupMasternode(self,
                         mnOwner,
                         miner,
                         masternodeAlias,
                         mnOwnerDirPath,
-                        mnRemoteDirPath,
-                        mnRemotePos):
+                        mnRemotePos,
+                        masternodePrivKey):
         self.log.info("adding balance to the mn owner for " + masternodeAlias + "..")
-        mnOwnerAddr = mnOwner.getnewaddress()
-        # send to the owner the collateral tx cost
-        miner.sendtoaddress(mnOwnerAddr, Decimal('10001'))
-        sync_mempools(self.nodes)
-        # confirm the tx
-        self.generate(1)
-        self.sync_all()
-        # verify reception
-        assert_equal(mnOwner.getbalance(), Decimal('10001'))
-
-        # get the remote MN port
-        remotePort = p2p_port(mnRemotePos)
-
-        self.log.info("all good, creating the masternode " + masternodeAlias + "..")
-        ## Owner side
-
-        # Let's create the masternode
-        masternodePrivKey = mnOwner.createmasternodekey()
         mnAddress = mnOwner.getnewaddress(masternodeAlias)
-        collateralTxId = mnOwner.sendtoaddress(mnAddress, Decimal('10000'))
-
-        sync_mempools(self.nodes)
+        # send to the owner the collateral tx cost
+        collateralTxId = miner.sendtoaddress(mnAddress, Decimal('10000'))
+        # confirm and verify reception
         self.generate(1)
-        self.sync_all()
-        # check if tx got confirmed
+        assert_equal(mnOwner.getbalance(), Decimal('10000'))
         assert(mnOwner.getrawtransaction(collateralTxId, 1)["confirmations"] > 0)
+
+        self.log.info("all good, creating masternode " + masternodeAlias + "..")
 
         # get the collateral output using the RPC command
         mnCollateralOutput = mnOwner.getmasternodeoutputs()[0]
@@ -126,47 +115,15 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         # verify collateral confirmed
 
         # create the masternode.conf and add it
-        confData = masternodeAlias + " 127.0.0.1:" + str(remotePort) + " " + str(masternodePrivKey) + " " + str(mnCollateralOutput["txhash"]) + " " + str(mnCollateralOutputIndex)
+        confData = masternodeAlias + " 127.0.0.1:" + str(p2p_port(mnRemotePos)) + " " + str(masternodePrivKey) + " " + str(mnCollateralOutput["txhash"]) + " " + str(mnCollateralOutputIndex)
         destinationDirPath = mnOwnerDirPath
         destPath = os.path.join(destinationDirPath, "masternode.conf")
         with open(destPath, "a+") as file_object:
             file_object.write("\n")
             file_object.write(confData)
 
-        # change the .conf
-        destinationDirPath = mnRemoteDirPath
-        destPath = os.path.join(destinationDirPath, "pivx.conf")
-        with open(destPath, "a+") as file_object:
-            file_object.write("\n")
-            file_object.write("listen=1\n")
-            file_object.write("masternode=1\n")
-            file_object.write("externalip=127.0.0.1\n")
-            file_object.write("masternodeaddr=127.0.0.1:"+str(remotePort)+"\n")
-            file_object.write("masternodeprivkey=" + str(masternodePrivKey))
-
         # return the collateral id
         return collateralTxId
-
-    def connect_nodes_bi(self, nodes, a, b):
-        connect_nodes(nodes[a], b)
-        connect_nodes(nodes[b], a)
-
-    def connect_nodes_and_check_mnsync_finished(self):
-        r = len(self.nodes)
-        for i in range(0, r):
-            for j in range(i + 1, r):
-                self.connect_nodes_bi(self.nodes, i, j)
-        self.log.info("syncing tier two across recently started peers..")
-        # let the nodes sync the tier two
-        set_node_times(self.nodes, self.mocktime + 20)
-        time.sleep(5)
-        self.generate(1)
-        sync_blocks(self.nodes)
-
-        # wait a little bit until the tier two is synced.
-        set_node_times(self.nodes, self.mocktime + 5)
-        time.sleep(10)
-        self.check_mnsync_finished()
 
     def check_proposal_existence(self, proposalName, proposalHash):
         for node in self.nodes:
@@ -208,8 +165,8 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ownerTwoDir = os.path.join(self.options.tmpdir, "node2")
         remoteTwoDir = os.path.join(self.options.tmpdir, "node3")
 
-        self.log.info("generating 412 blocks..")
-        self.generate(412)
+        self.log.info("generating 415 blocks..")
+        self.generate(415)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
@@ -219,8 +176,8 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             miner,
             masternodeOneAlias,
             os.path.join(ownerOneDir, "regtest"),
-            remoteOneDir,
-            self.remoteOnePos)
+            self.remoteOnePos,
+            self.mnOnePrivkey)
 
         # setup second masternode node, corresponding to nodeTwo
         masternodeTwoAlias = "mntwo"
@@ -229,18 +186,27 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             miner,
             masternodeTwoAlias,
             os.path.join(ownerTwoDir, "regtest"),
-            remoteTwoDir,
-            self.remoteTwoPos)
+            self.remoteTwoPos,
+            self.mnTwoPrivkey)
 
-        self.log.info("masternodes setup completed, restarting them..")
-        # now that both are configured, let's restart them
-        # to activate the masternodes
-        self.stop_nodes()
-        self.start_nodes(self.extra_args)
-        set_node_times(self.nodes, self.mocktime)
+        self.log.info("masternodes setup completed, initializing them..")
+        # now both are configured,
+        # let's activate the masternodes
 
-        # # now need connection
-        self.connect_nodes_and_check_mnsync_finished()
+        set_node_times(self.nodes, self.mocktime + 10) # Advance a little bit in time.
+        # init masternodes at runtime
+        remoteOnePort = p2p_port(self.remoteTwoPos)
+        remoteTwoPort = p2p_port(self.remoteOnePos)
+        remoteOne.initmasternode(self.mnOnePrivkey, "127.0.0.1:"+str(remoteOnePort))
+        remoteTwo.initmasternode(self.mnTwoPrivkey, "127.0.0.1:"+str(remoteTwoPort))
+        set_node_times(self.nodes, self.mocktime + 5)
+        time.sleep(5)
+
+        # now need connection
+        self.generate(1)
+        set_node_times(self.nodes, self.mocktime + 15)
+
+        self.check_mnsync_finished()
         self.log.info("tier two synced! starting masternodes..")
         #
         # ## Now everything is set, can start both masternodes
@@ -280,10 +246,10 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             firstProposalAddress,
             firstProposalAmountPerCycle)
 
-        sync_mempools(self.nodes)
-        # generate 4 blocks to confirm the tx (waiting in-between to let nodes update the mnping)
+        # generate 3 blocks to confirm the tx (waiting in-between to let nodes update the mnping)
         self.generate_two_blocks()
-        self.generate_two_blocks()
+        self.generate(1)
+        time.sleep(2)
 
         txinfo = miner.gettransaction(proposalFeeTxId)
         assert_equal(txinfo['amount'], -50.00)
