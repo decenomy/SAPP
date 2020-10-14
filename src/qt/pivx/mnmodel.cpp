@@ -41,7 +41,7 @@ void MNModel::updateMNList()
             {
                 LOCK2(cs_main, pwalletMain->cs_wallet);
                 const CWalletTx *walletTx = pwalletMain->GetWalletTx(txHash);
-                if (walletTx && walletTx->GetDepthInMainChain() >= MASTERNODE_MIN_CONFIRMATIONS) {
+                if (walletTx && walletTx->GetDepthInMainChain() >= MasternodeCollateralMinConf()) {
                     txAccepted = true;
                 }
             }

@@ -1830,13 +1830,16 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         }
 
         if (found) {
-            //probably one the extensions
-            mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
-            budget.ProcessMessage(pfrom, strCommand, vRecv);
-            masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
-            ProcessMessageSwiftTX(pfrom, strCommand, vRecv);
-            sporkManager.ProcessSpork(pfrom, strCommand, vRecv);
-            masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
+            // Check if the dispatcher can process this message first. If not, try going with the old flow.
+            if (!masternodeSync.MessageDispatcher(pfrom, strCommand, vRecv)) {
+                //probably one the extensions
+                mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
+                budget.ProcessMessage(pfrom, strCommand, vRecv);
+                masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
+                ProcessMessageSwiftTX(pfrom, strCommand, vRecv);
+                sporkManager.ProcessSpork(pfrom, strCommand, vRecv);
+                masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
+            }
         } else {
             // Ignore unknown commands for extensibility
             LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->id);

@@ -118,6 +118,11 @@ public:
 
     bool SetPrivKey(std::string strPrivKey);
     std::string ToString() const;
+
+    // Process SPORK message
+    void ProcessSporkMsg(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    // Process GETSPORKS message
+    void ProcessGetSporks(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
 };
 
 #endif

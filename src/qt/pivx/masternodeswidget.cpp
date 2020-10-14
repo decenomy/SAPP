@@ -217,7 +217,7 @@ void MasterNodesWidget::onEditMNClicked()
             }
         } else {
             inform(tr("Cannot start masternode, the collateral transaction has not been confirmed by the network yet.\n"
-                    "Please wait few more minutes (masternode collaterals require %1 confirmations).").arg(MASTERNODE_MIN_CONFIRMATIONS));
+                    "Please wait few more minutes (masternode collaterals require %1 confirmations).").arg(MasternodeCollateralMinConf()));
         }
     }
 }

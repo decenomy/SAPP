@@ -14,15 +14,6 @@
 #include "timedata.h"
 #include "util.h"
 
-#define MASTERNODE_MIN_CONFIRMATIONS 15
-#define MASTERNODE_MIN_MNP_SECONDS (10 * 60)
-#define MASTERNODE_MIN_MNB_SECONDS (5 * 60)
-#define MASTERNODE_PING_SECONDS (5 * 60)
-#define MASTERNODE_EXPIRATION_SECONDS (120 * 60)
-#define MASTERNODE_REMOVAL_SECONDS (130 * 60)
-#define MASTERNODE_CHECK_SECONDS 5
-
-
 class CMasternode;
 class CMasternodeBroadcast;
 class CMasternodePing;
@@ -30,6 +21,12 @@ extern std::map<int64_t, uint256> mapCacheBlockHashes;
 
 bool GetBlockHash(uint256& hash, int nBlockHeight);
 
+int MasternodeMinPingSeconds();
+int MasternodeBroadcastSeconds();
+int MasternodeCollateralMinConf();
+int MasternodePingSeconds();
+int MasternodeExpirationSeconds();
+int MasternodeRemovalSeconds();
 
 //
 // The Masternode Ping Class : Contains a different serialize method for sending pings from masternodes throughout the network

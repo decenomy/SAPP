@@ -262,7 +262,7 @@ void CMasternodeSync::Process()
         /*
             Resync if we lose all masternodes from sleep/wake or failure to sync originally
         */
-        if (mnodeman.CountEnabled() == 0) {
+        if (mnodeman.CountEnabled() == 0 && !isRegTestNet) {
             Reset();
         } else
             return;
@@ -284,31 +284,24 @@ void CMasternodeSync::Process()
         RequestedMasternodeAssets > MASTERNODE_SYNC_SPORKS) return;
 
     CMasternodeSync* sync = this;
-    g_connman->ForEachNodeContinueIf([sync, isRegTestNet](CNode* pnode) {
-      return sync->SyncWithNode(pnode, isRegTestNet);
+
+    // New sync architecture, regtest only for now.
+    if (isRegTestNet) {
+        g_connman->ForEachNode([sync](CNode* pnode){
+            return sync->SyncRegtest(pnode);
+        });
+        return;
+    }
+
+    // Mainnet sync
+    g_connman->ForEachNodeContinueIf([sync](CNode* pnode){
+        return sync->SyncWithNode(pnode);
     });
 }
 
-bool CMasternodeSync::SyncWithNode(CNode* pnode, bool isRegTestNet)
+bool CMasternodeSync::SyncWithNode(CNode* pnode)
 {
     CNetMsgMaker msgMaker(pnode->GetSendVersion());
-    if (isRegTestNet) {
-        if (RequestedMasternodeAttempt <= 2) {
-            g_connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETSPORKS)); //get current network sporks
-        } else if (RequestedMasternodeAttempt < 4) {
-            mnodeman.DsegUpdate(pnode);
-        } else if (RequestedMasternodeAttempt < 6) {
-            int nMnCount = mnodeman.CountEnabled();
-
-            g_connman->PushMessage(pnode, msgMaker.Make(NetMsgType::GETMNWINNERS, nMnCount)); //sync payees
-            uint256 n;
-            g_connman->PushMessage(pnode, msgMaker.Make(NetMsgType::BUDGETVOTESYNC, n)); //sync masternode votes
-        } else {
-            RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
-        }
-        RequestedMasternodeAttempt++;
-        return false;
-    }
 
     //set to synced
     if (RequestedMasternodeAssets == MASTERNODE_SYNC_SPORKS) {

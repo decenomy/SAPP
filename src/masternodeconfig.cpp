@@ -83,7 +83,7 @@ bool CMasternodeConfig::read(std::string& strErr)
             return false;
         }
 
-        if (port != nDefaultPort) {
+        if (port != nDefaultPort && !Params().IsRegTestNet()) {
             strErr = strprintf(_("Invalid port %d detected in masternode.conf"), port) + "\n" +
                      strprintf(_("Line: %d"), linenumber) + "\n\"" + ip + "\"" + "\n" +
                      strprintf(_("(must be %d for %s-net)"), nDefaultPort, Params().NetworkIDString());

@@ -382,6 +382,7 @@ static const CRPCCommand vRPCCommands[] =
         {"pivx", "getbudgetinfo", &getbudgetinfo, true },
         {"pivx", "mnbudgetrawvote", &mnbudgetrawvote, true },
         {"pivx", "mnfinalbudget", &mnfinalbudget, true },
+        {"pivx", "mnfinalbudgetsuggest", &mnfinalbudgetsuggest, true},
         {"pivx", "checkbudgets", &checkbudgets, true },
         {"pivx", "mnsync", &mnsync, true },
         {"pivx", "spork", &spork, true },
