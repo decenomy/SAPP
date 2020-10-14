@@ -8,6 +8,67 @@
 #include "wallet/hdchain.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
+#include "sapling/incrementalmerkletree.hpp"
+
+class SaplingNoteData
+{
+public:
+
+    SaplingNoteData() : nullifier() { }
+    SaplingNoteData(const libzcash::SaplingIncomingViewingKey& _ivk) : ivk {_ivk}, nullifier() { }
+    SaplingNoteData(const libzcash::SaplingIncomingViewingKey& _ivk, const uint256& n) : ivk {_ivk}, nullifier(n) { }
+
+    std::list<SaplingWitness> witnesses;
+    libzcash::SaplingIncomingViewingKey ivk;
+
+    /**
+     * Block height corresponding to the most current witness.
+     *
+     * When we first create a SaplingNoteData in SaplingScriptPubKeyMan::FindMySaplingNotes, this is set to
+     * -1 as a placeholder. The next time CWallet::ChainTip is called, we can
+     * determine what height the witness cache for this note is valid for (even
+     * if no witnesses were cached), and so can set the correct value in
+     * SaplingScriptPubKeyMan::IncrementNoteWitnesses and SaplingScriptPubKeyMan::DecrementNoteWitnesses.
+     */
+    int witnessHeight{-1};
+
+    /**
+     * Cached note nullifier. May not be set if the wallet was not unlocked when
+     * this SaplingNoteData was created. If not set, we always assume that the
+     * note has not been spent.
+     *
+     * It's okay to cache the nullifier in the wallet, because we are storing
+     * the spending key there too, which could be used to derive this.
+     * If the wallet is encrypted, this means that someone with access to the
+     * locked wallet cannot spend notes, but can connect received notes to the
+     * transactions they are spent in. This is the same security semantics as
+     * for transparent addresses.
+     */
+    Optional<uint256> nullifier;
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action)
+    {
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH)) {
+            READWRITE(nVersion);
+        }
+        READWRITE(ivk);
+        READWRITE(nullifier);
+        READWRITE(witnesses);
+        READWRITE(witnessHeight);
+    }
+
+    friend bool operator==(const SaplingNoteData& a, const SaplingNoteData& b) {
+        return (a.ivk == b.ivk && a.nullifier == b.nullifier && a.witnessHeight == b.witnessHeight);
+    }
+
+    friend bool operator!=(const SaplingNoteData& a, const SaplingNoteData& b) {
+        return !(a == b);
+    }
+};
 
 enum KeyAddResult {
     SpendingKeyExists,
