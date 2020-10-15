@@ -6,8 +6,7 @@
 #ifndef SRC_MASTERNODECONFIG_H_
 #define SRC_MASTERNODECONFIG_H_
 
-#include "fs.h"
-
+#include "sync.h"
 #include <string>
 #include <vector>
 
@@ -40,15 +39,16 @@ public:
 
     CMasternodeConfig() { entries = std::vector<CMasternodeEntry>(); }
 
-    void clear() { entries.clear(); }
+    void clear() { LOCK(cs_entries); entries.clear(); }
     bool read(std::string& strErr);
     CMasternodeConfig::CMasternodeEntry* add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
     void remove(std::string alias);
 
-    std::vector<CMasternodeEntry>& getEntries() { return entries; }
+    std::vector<CMasternodeEntry> getEntries() { LOCK(cs_entries); return entries; }
 
     int getCount()
     {
+        LOCK(cs_entries);
         int c = -1;
         for (const auto& e : entries) {
             if (!e.getAlias().empty()) c++;
@@ -58,6 +58,7 @@ public:
 
 private:
     std::vector<CMasternodeEntry> entries;
+    Mutex cs_entries;
 };
 
 
