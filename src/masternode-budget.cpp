@@ -681,6 +681,8 @@ bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight, int& nCountThreshold
     int nFivePercent = nCountEnabled / 20;
     // threshold for highest finalized budgets (highest vote count - 10% of active masternodes)
     nCountThreshold = nHighestCount - (nCountEnabled / 10);
+    // reduce the threshold if there are less than 10 enabled masternodes
+    if (nCountThreshold == nHighestCount) nCountThreshold--;
 
     LogPrint(BCLog::MNBUDGET,"%s: nHighestCount: %lli, 5%% of Masternodes: %lli.\n",
             __func__, nHighestCount, nFivePercent);
