@@ -35,7 +35,7 @@ static const CAmount PROPOSAL_FEE_TX = (50 * COIN);
 static const CAmount BUDGET_FEE_TX_OLD = (50 * COIN);
 static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
-static std::map<uint256, int> mapPayment_History;
+static std::map<uint256, std::pair<uint256,int> > mapPayment_History;   // proposal hash --> (block hash, block height)
 
 extern CBudgetManager budget;
 void DumpBudgets();
@@ -303,7 +303,7 @@ public:
 
     bool UpdateProposal(const CBudgetVote& vote, CNode* pfrom, std::string& strError);
     bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError);
-    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const;
+    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     std::string GetRequiredPaymentsString(int nBlockHeight);
     bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
@@ -450,8 +450,8 @@ public:
     int GetBlockEnd() const { return nBlockStart + (int)(vecBudgetPayments.size() - 1); }
     const uint256& GetFeeTXHash() const { return nFeeTXHash;  }
     int GetVoteCount() const { return (int)mapVotes.size(); }
-    bool IsPaidAlready(uint256 nProposalHash, int nBlockHeight) const;
-    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const;
+    bool IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const;
+    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment) const;
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 

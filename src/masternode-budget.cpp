@@ -697,7 +697,7 @@ bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight) const
     return IsBudgetPaymentBlock(nBlockHeight, nCountThreshold);
 }
 
-TrxValidationStatus CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const
+TrxValidationStatus CBudgetManager::IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const
 {
     int nCountThreshold = 0;
     if (!IsBudgetPaymentBlock(nBlockHeight, nCountThreshold)) {
@@ -716,7 +716,7 @@ TrxValidationStatus CBudgetManager::IsTransactionValid(const CTransaction& txNew
                     __func__, pfb->GetName(), pfb->GetProposalsStr(), nVoteCount, nCountThreshold);
             if (nVoteCount > nCountThreshold) {
                 fThreshold = true;
-                if (pfb->IsTransactionValid(txNew, nBlockHeight) == TrxValidationStatus::Valid) {
+                if (pfb->IsTransactionValid(txNew, nBlockHash, nBlockHeight) == TrxValidationStatus::Valid) {
                     return TrxValidationStatus::Valid;
                 }
                 // tx not valid. keep looking.
@@ -1989,15 +1989,14 @@ bool CFinalizedBudget::UpdateValid(int nCurrentHeight)
     return true;
 }
 
-bool CFinalizedBudget::IsPaidAlready(uint256 nProposalHash, int nBlockHeight) const
+bool CFinalizedBudget::IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const
 {
     // Remove budget-payments from former/future payment cycles
-    std::map<uint256, int>::iterator it = mapPayment_History.begin();
     int nPaidBlockHeight = 0;
     uint256 nOldProposalHash;
 
-    for(it = mapPayment_History.begin(); it != mapPayment_History.end(); /* No incrementation needed */ ) {
-        nPaidBlockHeight = (*it).second;
+    for(auto it = mapPayment_History.begin(); it != mapPayment_History.end(); /* No incrementation needed */ ) {
+        nPaidBlockHeight = (*it).second.second;
         if((nPaidBlockHeight < GetBlockStart()) || (nPaidBlockHeight > GetBlockEnd())) {
             nOldProposalHash = (*it).first;
             LogPrint(BCLog::MNBUDGET, "%s: Budget Proposal %s, Block %d from old cycle deleted\n",
@@ -2011,16 +2010,29 @@ bool CFinalizedBudget::IsPaidAlready(uint256 nProposalHash, int nBlockHeight) co
     // Now that we only have payments from the current payment cycle check if this budget was paid already
     if(mapPayment_History.count(nProposalHash) == 0) {
         // New proposal payment, insert into map for checks with later blocks from this cycle
-        mapPayment_History.emplace(nProposalHash, nBlockHeight);
-        LogPrint(BCLog::MNBUDGET, "%s: Budget Proposal %s, Block %d added to payment history\n",
-                __func__, nProposalHash.ToString().c_str(), nBlockHeight);
+        mapPayment_History.emplace(std::piecewise_construct,
+                                   std::forward_as_tuple(nProposalHash),
+                                   std::forward_as_tuple(nBlockHash, nBlockHeight));
+        LogPrint(BCLog::MNBUDGET, "%s: Budget Proposal %s, Block %d (%s) added to payment history (size=%d)\n",
+                __func__, nProposalHash.ToString(), nBlockHeight, nBlockHash.ToString(), mapPayment_History.size());
         return false;
     }
-    // This budget was paid already -> reject transaction so it gets paid to a masternode instead
-    return true;
+    // This budget payment was already checked/paid
+    const uint256& nPaidBlockHash = mapPayment_History.at(nProposalHash).first;
+
+    // If we are checking a different block, and the paid one is on chain
+    // -> reject transaction so it gets paid to a masternode instead
+    if (nBlockHash != nPaidBlockHash) {
+        LOCK(cs_main);
+        auto it = mapBlockIndex.find(nPaidBlockHash);
+        return it != mapBlockIndex.end() && chainActive.Contains(it->second);
+    }
+
+    // Re-checking same block. Not a double payment.
+    return false;
 }
 
-TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const
+TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const
 {
     const int nBlockEnd = GetBlockEnd();
     if (nBlockHeight > nBlockEnd) {
@@ -2040,7 +2052,7 @@ TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txN
     }
 
     // Check if this proposal was paid already. If so, pay a masternode instead
-    if(IsPaidAlready(vecBudgetPayments[nCurrentBudgetPayment].nProposalHash, nBlockHeight)) {
+    if(IsPaidAlready(vecBudgetPayments[nCurrentBudgetPayment].nProposalHash, nBlockHash, nBlockHeight)) {
         LogPrint(BCLog::MNBUDGET,"%s: Double Budget Payment of %d for proposal %d detected. Paying a masternode instead.\n",
                 __func__, vecBudgetPayments[nCurrentBudgetPayment].nAmount, vecBudgetPayments[nCurrentBudgetPayment].nProposalHash.GetHex());
         // No matter what we've found before, stop all checks here. In future releases there might be more than one budget payment

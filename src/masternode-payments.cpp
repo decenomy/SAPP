@@ -265,7 +265,7 @@ bool IsBlockPayeeValid(const CBlock& block, int nBlockHeight)
     //check if it's a budget block
     if (sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS)) {
         if (budget.IsBudgetPaymentBlock(nBlockHeight)) {
-            transactionStatus = budget.IsTransactionValid(txNew, nBlockHeight);
+            transactionStatus = budget.IsTransactionValid(txNew, block.GetHash(), nBlockHeight);
             if (transactionStatus == TrxValidationStatus::Valid) {
                 return true;
             }
