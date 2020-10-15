@@ -674,10 +674,13 @@ bool CBudgetManager::GetFinalizedBudget(const uint256& nHash, CFinalizedBudget& 
     return false;
 }
 
-bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight, int& nHighestCount, int& nFivePercent) const
+bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight, int& nCountThreshold) const
 {
-    nHighestCount = GetHighestVoteCount(nBlockHeight);
-    nFivePercent = mnodeman.CountEnabled(ActiveProtocol()) / 20;
+    int nHighestCount = GetHighestVoteCount(nBlockHeight);
+    int nCountEnabled = mnodeman.CountEnabled(ActiveProtocol());
+    int nFivePercent = nCountEnabled / 20;
+    // threshold for highest finalized budgets (highest vote count - 10% of active masternodes)
+    nCountThreshold = nHighestCount - (nCountEnabled / 10);
 
     LogPrint(BCLog::MNBUDGET,"%s: nHighestCount: %lli, 5%% of Masternodes: %lli.\n",
             __func__, nHighestCount, nFivePercent);
@@ -688,21 +691,20 @@ bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight, int& nHighestCount, 
 
 bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight) const
 {
-    int nHighestCount, nFivePercent;
-    return IsBudgetPaymentBlock(nBlockHeight, nHighestCount, nFivePercent);
+    int nCountThreshold;
+    return IsBudgetPaymentBlock(nBlockHeight, nCountThreshold);
 }
 
 TrxValidationStatus CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const
 {
-    int nHighestCount = 0, nFivePercent = 0;
-    if (!IsBudgetPaymentBlock(nBlockHeight, nHighestCount, nFivePercent)) {
+    int nCountThreshold = 0;
+    if (!IsBudgetPaymentBlock(nBlockHeight, nCountThreshold)) {
         // If budget doesn't have 5% of the network votes, then we should pay a masternode instead
         return TrxValidationStatus::InValid;
     }
 
-    // check the highest finalized budgets (+/- 10% to assist in consensus)
+    // check the highest finalized budgets (- 10% to assist in consensus)
     bool fThreshold = false;
-    int nCountThreshold = nHighestCount - 2 * nFivePercent;
     {
         LOCK(cs_budgets);
         for (const auto& it: mapFinalizedBudgets) {
