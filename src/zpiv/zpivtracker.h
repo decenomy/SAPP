@@ -38,10 +38,9 @@ public:
     CMintMeta Get(const uint256& hashSerial);
     CMintMeta GetMetaFromPubcoin(const uint256& hashPubcoin);
     bool GetMetaFromStakeHash(const uint256& hashStake, CMintMeta& meta) const;
-    CAmount GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) const;
+    CAmount GetBalance() const;
     std::vector<uint256> GetSerialHashes();
     std::vector<CMintMeta> GetMints(bool fConfirmedOnly) const;
-    CAmount GetUnconfirmedBalance() const;
     std::set<CMintMeta> ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus, bool fWrongSeed = false, bool fExcludeV1 = false);
     void RemovePending(const uint256& txid);
     void SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid);
