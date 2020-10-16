@@ -222,6 +222,7 @@ set(SERVER_SOURCES
         ./src/sapling/sapling_txdb.cpp
         ./src/txdb.cpp
         ./src/txmempool.cpp
+        ./src/sapling/sapling_validation.cpp
         ./src/validation.cpp
         ./src/validationinterface.cpp
         ./src/zpivchain.cpp
@@ -455,6 +456,7 @@ set(SAPLING_SOURCES
         ./src/sapling/zip32.cpp
         ./src/sapling/crypter_sapling.cpp
         ./src/sapling/incrementalmerkletree.cpp
+        ./src/sapling/transaction_builder.cpp
         ./src/sapling/saplingscriptpubkeyman.cpp
         )
 

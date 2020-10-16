@@ -22,10 +22,8 @@ void clean()
     bitdb.Reset();
 }
 
-WalletTestingSetup::WalletTestingSetup(): TestingSetup()
+WalletTestingSetup::WalletTestingSetup(): SaplingTestingSetup()
 {
-    initZKSNARKS(); // init zk-snarks lib
-
     clean(); // todo: research why we have an initialized bitdb here.
     bitdb.MakeMock();
     walletRegisterRPCCommands();

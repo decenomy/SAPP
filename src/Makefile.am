@@ -137,7 +137,8 @@ LIBSAPLING_H = \
   sapling/saplingscriptpubkeyman.h \
   sapling/proof.hpp \
   sapling/sapling_transaction.h \
-  sapling/incrementalmerkletree.hpp
+  sapling/incrementalmerkletree.hpp \
+  sapling/transaction_builder.h
 
 .PHONY: FORCE cargo-build check-symbols check-security
 # pivx core #
@@ -201,6 +202,7 @@ BITCOIN_CORE_H = \
   limitedmap.h \
   logging.h \
   legacy/validation_zerocoin_legacy.h \
+  sapling/sapling_validation.h \
   memusage.h \
   masternode.h \
   masternode-payments.h \
@@ -314,6 +316,7 @@ libbitcoin_server_a_SOURCES = \
   init.cpp \
   dbwrapper.cpp \
   legacy/validation_zerocoin_legacy.cpp \
+  sapling/sapling_validation.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \
@@ -554,7 +557,8 @@ libsapling_a_SOURCES = \
   sapling/crypter_sapling.cpp \
   sapling/saplingscriptpubkeyman.cpp \
   sapling/proof.cpp \
-  sapling/incrementalmerkletree.cpp
+  sapling/incrementalmerkletree.cpp \
+  sapling/transaction_builder.cpp
 
 if GLIBC_BACK_COMPAT
 libsapling_a_SOURCES += compat/glibc_compat.cpp

@@ -55,8 +55,12 @@ GenerateHeaders(${JSON_TEST_FILES})
 set(BITCOIN_TEST_SUITE
         ${CMAKE_CURRENT_SOURCE_DIR}/test_pivx.h
         ${CMAKE_CURRENT_SOURCE_DIR}/test_pivx.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/sapling_test_fixture.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/sapling_test_fixture.cpp
         ${CMAKE_SOURCE_DIR}/src/wallet/test/wallet_test_fixture.h
         ${CMAKE_SOURCE_DIR}/src/wallet/test/wallet_test_fixture.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/utiltest.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/utiltest.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/json_test_vectors.h
         )
 
@@ -76,6 +80,7 @@ set(BITCOIN_TESTS
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/zip32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/wallet_zkeys_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/librust/merkletree_tests.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/librust/transaction_builder_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base32_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base58_tests.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/base64_tests.cpp

@@ -4,6 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "test/test_pivx.h"
+#include "test/librust/utiltest.h"
 
 #include "sapling/address.hpp"
 #include "sapling/sapling_util.h"
@@ -14,13 +15,6 @@
 
 // In script_tests.cpp
 extern UniValue read_json(const std::string& jsondata);
-
-// todo: Move to a sapling tests utils in the future
-libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey() {
-    std::vector<unsigned char, secure_allocator<unsigned char>> rawSeed(32);
-    HDSeed seed(rawSeed);
-    return libzcash::SaplingExtendedSpendingKey::Master(seed);
-}
 
 BOOST_FIXTURE_TEST_SUITE(sapling_keystore_tests, BasicTestingSetup)
 
