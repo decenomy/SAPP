@@ -118,10 +118,8 @@ public:
         READWRITE(nSequence);
     }
 
-    bool IsFinal() const
-    {
-        return (nSequence == std::numeric_limits<uint32_t>::max());
-    }
+    bool IsFinal() const { return nSequence == std::numeric_limits<uint32_t>::max(); }
+    bool IsNull() const { return prevout.IsNull() && scriptSig.empty() && IsFinal(); }
 
     bool IsZerocoinSpend() const;
     bool IsZerocoinPublicSpend() const;
