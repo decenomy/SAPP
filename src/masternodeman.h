@@ -78,6 +78,10 @@ private:
     // Memory Only. Cache last block hashes. Used to verify mn pings and winners.
     CyclingVector<uint256> cvLastBlockHashes;
 
+    // Return the banning score (0 if no ban score increase is needed).
+    int ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb);
+    int ProcessMNPing(CNode* pfrom, CMasternodePing& mnp);
+
 public:
     // Keep track of all broadcasts I've seen
     std::map<uint256, CMasternodeBroadcast> mapSeenMasternodeBroadcast;

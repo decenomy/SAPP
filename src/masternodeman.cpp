@@ -639,6 +639,66 @@ std::vector<std::pair<int64_t, CMasternode>> CMasternodeMan::GetMasternodeRanks(
     return vecMasternodeScores;
 }
 
+int CMasternodeMan::ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb)
+{
+    if (mapSeenMasternodeBroadcast.count(mnb.GetHash())) { //seen
+        masternodeSync.AddedMasternodeList(mnb.GetHash());
+        return 0;
+    }
+    mapSeenMasternodeBroadcast.emplace(mnb.GetHash(), mnb);
+
+    int nDoS = 0;
+    if (!mnb.CheckAndUpdate(nDoS)) {
+        return nDoS;
+    }
+
+    // make sure the vout that was signed is related to the transaction that spawned the Masternode
+    //  - this is expensive, so it's only done once per Masternode
+    if (!mnb.IsInputAssociatedWithPubkey()) {
+        LogPrintf("CMasternodeMan::ProcessMessage() : mnb - Got mismatched pubkey and vin\n");
+        return 33;
+    }
+
+    // make sure it's still unspent
+    //  - this is checked later by .check() in many places and by ThreadCheckObfuScationPool()
+    if (mnb.CheckInputsAndAdd(nDoS)) {
+        // use this as a peer
+        g_connman->AddNewAddress(CAddress(mnb.addr, NODE_NETWORK), pfrom->addr, 2 * 60 * 60);
+        masternodeSync.AddedMasternodeList(mnb.GetHash());
+    } else {
+        LogPrint(BCLog::MASTERNODE,"mnb - Rejected Masternode entry %s\n", mnb.vin.prevout.hash.ToString());
+        return nDoS;
+    }
+    // All good
+    return 0;
+}
+
+int CMasternodeMan::ProcessMNPing(CNode* pfrom, CMasternodePing& mnp)
+{
+    if (mapSeenMasternodePing.count(mnp.GetHash())) return 0; //seen
+    mapSeenMasternodePing.emplace(mnp.GetHash(), mnp);
+
+    int nDoS = 0;
+    if (mnp.CheckAndUpdate(nDoS)) return 0;
+
+    if (nDoS > 0) {
+        // if anything significant failed, mark that node
+        return nDoS;
+    } else {
+        // if nothing significant failed, search existing Masternode list
+        CMasternode* pmn = Find(mnp.vin);
+        // if it's known, don't ask for the mnb, just return
+        if (pmn != NULL) return 0;
+    }
+
+    // something significant is broken or mn is unknown,
+    // we might have to ask for a masternode entry once
+    AskForMN(pfrom, mnp.vin);
+
+    // All good
+    return 0;
+}
+
 void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
     if (fLiteMode) return; //disable all Masternode related functionality
@@ -646,48 +706,13 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
     LOCK(cs_process_message);
 
-    if (strCommand == NetMsgType::MNBROADCAST) { //Masternode Broadcast
+    if (strCommand == NetMsgType::MNBROADCAST) {
         CMasternodeBroadcast mnb;
         vRecv >> mnb;
-
-        if (mapSeenMasternodeBroadcast.count(mnb.GetHash())) { //seen
-            masternodeSync.AddedMasternodeList(mnb.GetHash());
-            return;
-        }
-        mapSeenMasternodeBroadcast.emplace(mnb.GetHash(), mnb);
-
-        int nDoS = 0;
-        if (!mnb.CheckAndUpdate(nDoS)) {
-            if (nDoS > 0) {
-                LOCK(cs_main);
-                Misbehaving(pfrom->GetId(), nDoS);
-            }
-            //failed
-            return;
-        }
-
-        // make sure the vout that was signed is related to the transaction that spawned the Masternode
-        //  - this is expensive, so it's only done once per Masternode
-        if (!mnb.IsInputAssociatedWithPubkey()) {
-            LogPrintf("CMasternodeMan::ProcessMessage() : mnb - Got mismatched pubkey and vin\n");
+        int banScore = ProcessMNBroadcast(pfrom, mnb);
+        if (banScore > 0) {
             LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), 33);
-            return;
-        }
-
-        // make sure it's still unspent
-        //  - this is checked later by .check() in many places and by ThreadCheckObfuScationPool()
-        if (mnb.CheckInputsAndAdd(nDoS)) {
-            // use this as a peer
-            g_connman->AddNewAddress(CAddress(mnb.addr, NODE_NETWORK), pfrom->addr, 2 * 60 * 60);
-            masternodeSync.AddedMasternodeList(mnb.GetHash());
-        } else {
-            LogPrint(BCLog::MASTERNODE,"mnb - Rejected Masternode entry %s\n", mnb.vin.prevout.hash.ToString());
-
-            if (nDoS > 0) {
-                LOCK(cs_main);
-                Misbehaving(pfrom->GetId(), nDoS);
-            }
+            Misbehaving(pfrom->GetId(), banScore);
         }
     }
 
@@ -697,26 +722,11 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         LogPrint(BCLog::MNPING, "mnp - Masternode ping, vin: %s\n", mnp.vin.prevout.hash.ToString());
 
-        if (mapSeenMasternodePing.count(mnp.GetHash())) return; //seen
-        mapSeenMasternodePing.emplace(mnp.GetHash(), mnp);
-
-        int nDoS = 0;
-        if (mnp.CheckAndUpdate(nDoS)) return;
-
-        if (nDoS > 0) {
-            // if anything significant failed, mark that node
+        int banScore = ProcessMNPing(pfrom, mnp);
+        if (banScore > 0) {
             LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), nDoS);
-        } else {
-            // if nothing significant failed, search existing Masternode list
-            CMasternode* pmn = Find(mnp.vin);
-            // if it's known, don't ask for the mnb, just return
-            if (pmn != NULL) return;
+            Misbehaving(pfrom->GetId(), banScore);
         }
-
-        // something significant is broken or mn is unknown,
-        // we might have to ask for a masternode entry once
-        AskForMN(pfrom, mnp.vin);
 
     } else if (strCommand == NetMsgType::GETMNLIST) { //Get Masternode list or specific entry
         ProcessGetMNList(pfrom, strCommand, vRecv);
