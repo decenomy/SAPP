@@ -753,44 +753,40 @@ int CMasternodeMan::ProcessGetMNList(CNode* pfrom, CTxIn& vin)
 
 void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
-    if (fLiteMode) return; //disable all Masternode related functionality
-    if (!masternodeSync.IsBlockchainSynced()) return;
+    int banScore = ProcessMessageInner(pfrom, strCommand, vRecv);
+    if (banScore > 0) {
+        LOCK(cs_main);
+        Misbehaving(pfrom->GetId(), banScore);
+    }
+}
+
+int CMasternodeMan::ProcessMessageInner(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+{
+    if (fLiteMode) return 0; //disable all Masternode related functionality
+    if (!masternodeSync.IsBlockchainSynced()) return 0;
 
     LOCK(cs_process_message);
 
     if (strCommand == NetMsgType::MNBROADCAST) {
         CMasternodeBroadcast mnb;
         vRecv >> mnb;
-        int banScore = ProcessMNBroadcast(pfrom, mnb);
-        if (banScore > 0) {
-            LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), banScore);
-        }
-    }
+        return ProcessMNBroadcast(pfrom, mnb);
 
-    else if (strCommand == NetMsgType::MNPING) {
+    } else if (strCommand == NetMsgType::MNPING) {
         //Masternode Ping
         CMasternodePing mnp;
         vRecv >> mnp;
-
         LogPrint(BCLog::MNPING, "mnp - Masternode ping, vin: %s\n", mnp.vin.prevout.hash.ToString());
-
-        int banScore = ProcessMNPing(pfrom, mnp);
-        if (banScore > 0) {
-            LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), banScore);
-        }
+        return ProcessMNPing(pfrom, mnp);
 
     } else if (strCommand == NetMsgType::GETMNLIST) {
         //Get Masternode list or specific entry
         CTxIn vin;
         vRecv >> vin;
-        int banScore = ProcessGetMNList(pfrom, vin);
-        if (banScore > 0) {
-            LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), banScore);
-        }
+        return ProcessGetMNList(pfrom, vin);
     }
+    // Nothing to report
+    return 0;
 }
 
 void CMasternodeMan::Remove(CTxIn vin)
