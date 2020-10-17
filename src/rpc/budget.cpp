@@ -908,17 +908,20 @@ UniValue checkbudgets(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
-    { "pivx",               "preparebudget",          &preparebudget,          true  },
-    { "pivx",               "submitbudget",           &submitbudget,           true  },
-    { "pivx",               "mnbudgetvote",           &mnbudgetvote,           true  },
-    { "pivx",               "getbudgetvotes",         &getbudgetvotes,         true  },
-    { "pivx",               "getnextsuperblock",      &getnextsuperblock,      true  },
-    { "pivx",               "getbudgetprojection",    &getbudgetprojection,    true  },
-    { "pivx",               "getbudgetinfo",          &getbudgetinfo,          true  },
-    { "pivx",               "mnbudgetrawvote",        &mnbudgetrawvote,        true  },
-    { "pivx",               "mnfinalbudgetsuggest",   &mnfinalbudgetsuggest,   true  },
-    { "pivx",               "mnfinalbudget",          &mnfinalbudget,          true  },
-    { "pivx",               "checkbudgets",           &checkbudgets,           true  },
+    { "budget",             "preparebudget",          &preparebudget,          true  },
+    { "budget",             "submitbudget",           &submitbudget,           true  },
+    { "budget",             "mnbudgetvote",           &mnbudgetvote,           true  },
+    { "budget",             "getbudgetvotes",         &getbudgetvotes,         true  },
+    { "budget",             "getnextsuperblock",      &getnextsuperblock,      true  },
+    { "budget",             "getbudgetprojection",    &getbudgetprojection,    true  },
+    { "budget",             "getbudgetinfo",          &getbudgetinfo,          true  },
+    { "budget",             "mnbudgetrawvote",        &mnbudgetrawvote,        true  },
+    { "budget",             "mnfinalbudget",          &mnfinalbudget,          true  },
+    { "budget",             "checkbudgets",           &checkbudgets,           true  },
+
+    /* Not shown in help */
+    { "hidden",             "mnfinalbudgetsuggest",   &mnfinalbudgetsuggest,   true  },
+
 };
 
 void RegisterBudgetRPCCommands(CRPCTable &tableRPC)

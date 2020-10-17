@@ -728,12 +728,12 @@ static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
     { "control",            "getinfo",                &getinfo,                true  }, /* uses wallet if enabled */
+    { "control",            "mnsync",                 &mnsync,                 true  },
+    { "control",            "spork",                  &spork,                  true  },
     { "util",               "validateaddress",        &validateaddress,        true  }, /* uses wallet if enabled */
     { "util",               "createmultisig",         &createmultisig,         true  },
     { "util",               "logging",                &logging,                true  },
     { "util",               "verifymessage",          &verifymessage,          true  },
-    { "pivx",               "mnsync",                 &mnsync,                 true  },
-    { "pivx",               "spork",                  &spork,                  true  },
 
     /* Not shown in help */
     { "hidden",             "setmocktime",            &setmocktime,            true  },
