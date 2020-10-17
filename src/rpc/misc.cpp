@@ -724,68 +724,6 @@ UniValue logging(const JSONRPCRequest& request)
     return result;
 }
 
-#ifdef ENABLE_WALLET
-UniValue getstakingstatus(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            "getstakingstatus\n"
-            "\nReturns an object containing various staking information.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"staking_status\": true|false,      (boolean) whether the wallet is staking or not\n"
-            "  \"staking_enabled\": true|false,     (boolean) whether staking is enabled/disabled in pivx.conf\n"
-            "  \"coldstaking_enabled\": true|false, (boolean) whether cold-staking is enabled/disabled in pivx.conf\n"
-            "  \"haveconnections\": true|false,     (boolean) whether network connections are present\n"
-            "  \"mnsync\": true|false,              (boolean) whether the required masternode/spork data is synced\n"
-            "  \"walletunlocked\": true|false,      (boolean) whether the wallet is unlocked\n"
-            "  \"stakeablecoins\": n                (numeric) number of stakeable UTXOs\n"
-            "  \"stakingbalance\": d                (numeric) PIV value of the stakeable coins (minus reserve balance, if any)\n"
-            "  \"stakesplitthreshold\": d           (numeric) value of the current threshold for stake split\n"
-            "  \"lastattempt_age\": n               (numeric) seconds since last stake attempt\n"
-            "  \"lastattempt_depth\": n             (numeric) depth of the block on top of which the last stake attempt was made\n"
-            "  \"lastattempt_hash\": xxx            (hex string) hash of the block on top of which the last stake attempt was made\n"
-            "  \"lastattempt_coins\": n             (numeric) number of stakeable coins available during last stake attempt\n"
-            "  \"lastattempt_tries\": n             (numeric) number of stakeable coins checked during last stake attempt\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
-
-
-    if (!pwalletMain)
-        throw JSONRPCError(RPC_IN_WARMUP, "Try again after active chain is loaded");
-    {
-        LOCK2(cs_main, &pwalletMain->cs_wallet);
-        UniValue obj(UniValue::VOBJ);
-        obj.pushKV("staking_status", pwalletMain->pStakerStatus->IsActive());
-        obj.pushKV("staking_enabled", gArgs.GetBoolArg("-staking", DEFAULT_STAKING));
-        bool fColdStaking = gArgs.GetBoolArg("-coldstaking", true);
-        obj.pushKV("coldstaking_enabled", fColdStaking);
-        obj.pushKV("haveconnections", (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0));
-        obj.pushKV("mnsync", !masternodeSync.NotCompleted());
-        obj.pushKV("walletunlocked", !pwalletMain->IsLocked());
-        std::vector<CStakeableOutput> vCoins;
-        pwalletMain->StakeableCoins(&vCoins);
-        obj.pushKV("stakeablecoins", (int)vCoins.size());
-        obj.pushKV("stakingbalance", ValueFromAmount(pwalletMain->GetStakingBalance(fColdStaking)));
-        obj.pushKV("stakesplitthreshold", ValueFromAmount(pwalletMain->nStakeSplitThreshold));
-        CStakerStatus* ss = pwalletMain->pStakerStatus;
-        if (ss) {
-            obj.pushKV("lastattempt_age", (int)(GetTime() - ss->GetLastTime()));
-            obj.pushKV("lastattempt_depth", (chainActive.Height() - ss->GetLastHeight()));
-            obj.pushKV("lastattempt_hash", ss->GetLastHash().GetHex());
-            obj.pushKV("lastattempt_coins", ss->GetLastCoins());
-            obj.pushKV("lastattempt_tries", ss->GetLastTries());
-        }
-        return obj;
-    }
-
-
-}
-#endif // ENABLE_WALLET
-
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
@@ -796,11 +734,6 @@ static const CRPCCommand commands[] =
     { "util",               "verifymessage",          &verifymessage,          true  },
     { "pivx",               "mnsync",                 &mnsync,                 true  },
     { "pivx",               "spork",                  &spork,                  true  },
-
-#ifdef ENABLE_WALLET
-    { "wallet",             "getstakingstatus",       &getstakingstatus,       false },
-#endif // ENABLE_WALLET
-
 
     /* Not shown in help */
     { "hidden",             "setmocktime",            &setmocktime,            true  },
