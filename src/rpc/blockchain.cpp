@@ -1626,7 +1626,6 @@ static const CRPCCommand commands[] =
     { "blockchain",         "getblockhash",           &getblockhash,           true  },
     { "blockchain",         "getblockheader",         &getblockheader,         false },
     { "blockchain",         "getchaintips",           &getchaintips,           true  },
-    { "blockchain",         "getfeeinfo",             &getfeeinfo,             true  },
     { "blockchain",         "getdifficulty",          &getdifficulty,          true  },
     { "blockchain",         "getfeeinfo",             &getfeeinfo,             true  },
     { "blockchain",         "getmempoolinfo",         &getmempoolinfo,         true  },
@@ -1634,8 +1633,6 @@ static const CRPCCommand commands[] =
     { "blockchain",         "getrawmempool",          &getrawmempool,          true  },
     { "blockchain",         "gettxout",               &gettxout,               true  },
     { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        true  },
-    { "blockchain",         "invalidateblock",        &invalidateblock,        true  },
-    { "blockchain",         "reconsiderblock",        &reconsiderblock,        true  },
     { "blockchain",         "verifychain",            &verifychain,            true  },
 
     /* Not shown in help */

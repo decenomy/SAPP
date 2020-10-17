@@ -795,22 +795,23 @@ UniValue estimatesmartfee(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
-    { "mining",             "getblocktemplate",       &getblocktemplate,       true  },
-    { "mining",             "getmininginfo",          &getmininginfo,          true  },
-    { "mining",             "getnetworkhashps",       &getnetworkhashps,       true  },
     { "mining",             "prioritisetransaction",  &prioritisetransaction,  true  },
-    { "mining",             "submitblock",            &submitblock,            true  },
-
-#ifdef ENABLE_WALLET
-    { "generating",         "getgenerate",            &getgenerate,            true  },
-    { "generating",         "gethashespersec",        &gethashespersec,        true  },
-    { "generating",         "setgenerate",            &setgenerate,            true  },
-    { "generating",         "generate",               &generate,               true  },
-#endif // ENABLE_WALLET
-
     { "util",               "estimatefee",            &estimatefee,            true  },
     { "util",               "estimatesmartfee",       &estimatesmartfee,       true  },
-};
+
+    /* Not shown in help */
+    { "hidden",             "getblocktemplate",       &getblocktemplate,       true  },
+    { "hidden",             "getnetworkhashps",       &getnetworkhashps,       true  },
+    { "hidden",             "submitblock",            &submitblock,            true  },
+    { "hidden",             "getmininginfo",          &getmininginfo,          true  },
+#ifdef ENABLE_WALLET
+    { "hidden",             "getgenerate",            &getgenerate,            true  },
+    { "hidden",             "gethashespersec",        &gethashespersec,        true  },
+    { "hidden",             "setgenerate",            &setgenerate,            true  },
+    { "hidden",             "generate",               &generate,               true  },
+#endif // ENABLE_WALLET
+
+    };
 
 void RegisterMiningRPCCommands(CRPCTable &tableRPC)
 {

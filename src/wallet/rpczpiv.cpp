@@ -1226,7 +1226,6 @@ static const CRPCCommand commands[] =
     { "zerocoin",           "listmintedzerocoins",      &listmintedzerocoins,      false },
     { "zerocoin",           "listspentzerocoins",       &listspentzerocoins,       false },
     { "zerocoin",           "listzerocoinamounts",      &listzerocoinamounts,      false },
-    { "zerocoin",           "mintzerocoin",             &mintzerocoin,             false },
     { "zerocoin",           "spendzerocoin",            &spendzerocoin,            false },
     { "zerocoin",           "spendrawzerocoin",         &spendrawzerocoin,         true  },
     { "zerocoin",           "spendzerocoinmints",       &spendzerocoinmints,       false },
@@ -1241,6 +1240,9 @@ static const CRPCCommand commands[] =
     { "zerocoin",           "generatemintlist",         &generatemintlist,         false },
     { "zerocoin",           "searchdzpiv",              &searchdzpiv,              false },
     { "zerocoin",           "dzpivstate",               &dzpivstate,               false },
+
+    /* Not shown in help */
+    { "hidden",             "mintzerocoin",             &mintzerocoin,             false },
 };
 
 void RegisterZPIVRPCCommands(CRPCTable &tableRPC)
