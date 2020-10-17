@@ -1112,48 +1112,6 @@ UniValue getchaintips(const JSONRPCRequest& request)
     return res;
 }
 
-UniValue getfeeinfo(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 1)
-        throw std::runtime_error(
-            "getfeeinfo blocks\n"
-            "\nReturns details of transaction fees over the last n blocks.\n"
-
-            "\nArguments:\n"
-            "1. blocks     (int, required) the number of blocks to get transaction data from\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"txcount\": xxxxx                (numeric) Current tx count\n"
-            "  \"txbytes\": xxxxx                (numeric) Sum of all tx sizes\n"
-            "  \"ttlfee\": xxxxx                 (numeric) Sum of all fees\n"
-            "  \"feeperkb\": xxxxx               (numeric) Average fee per kb over the block range\n"
-            "  \"rec_highpriorityfee_perkb\": xxxxx    (numeric) Recommended fee per kb to use for a high priority tx\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getfeeinfo", "5") + HelpExampleRpc("getfeeinfo", "5"));
-
-    int nBlocks = request.params[0].get_int();
-    int nBestHeight;
-    {
-        LOCK(cs_main);
-        nBestHeight = chainActive.Height();
-    }
-    int nStartHeight = nBestHeight - nBlocks;
-    if (nBlocks < 0 || nStartHeight <= 0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "invalid start height");
-
-    JSONRPCRequest newRequest;
-    UniValue newParams(UniValue::VARR);
-    newParams.push_back(UniValue(nStartHeight));
-    newParams.push_back(UniValue(nBlocks));
-    newParams.push_back(UniValue(true));    // fFeeOnly
-    newRequest.params = newParams;
-
-    return getblockindexstats(newRequest);
-}
-
 UniValue mempoolInfoToJSON()
 {
     UniValue ret(UniValue::VOBJ);
@@ -1300,7 +1258,7 @@ UniValue findserial(const JSONRPCRequest& request)
     return ret;
 }
 
-void validaterange(const UniValue& params, int& heightStart, int& heightEnd, int minHeightStart)
+void validaterange(const UniValue& params, int& heightStart, int& heightEnd, int minHeightStart = 1)
 {
     if (params.size() < 2) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Not enough parameters in validaterange");
@@ -1611,6 +1569,85 @@ UniValue getblockindexstats(const JSONRPCRequest& request) {
     ret.pushKV("feeperkb", FormatMoney(nFeeRate.GetFeePerK()));
 
     return ret;
-
 }
 
+UniValue getfeeinfo(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 1)
+        throw std::runtime_error(
+            "getfeeinfo blocks\n"
+            "\nReturns details of transaction fees over the last n blocks.\n"
+
+            "\nArguments:\n"
+            "1. blocks     (int, required) the number of blocks to get transaction data from\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"txcount\": xxxxx                (numeric) Current tx count\n"
+            "  \"txbytes\": xxxxx                (numeric) Sum of all tx sizes\n"
+            "  \"ttlfee\": xxxxx                 (numeric) Sum of all fees\n"
+            "  \"feeperkb\": xxxxx               (numeric) Average fee per kb over the block range\n"
+            "  \"rec_highpriorityfee_perkb\": xxxxx    (numeric) Recommended fee per kb to use for a high priority tx\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getfeeinfo", "5") + HelpExampleRpc("getfeeinfo", "5"));
+
+    int nBlocks = request.params[0].get_int();
+    int nBestHeight;
+    {
+        LOCK(cs_main);
+        nBestHeight = chainActive.Height();
+    }
+    int nStartHeight = nBestHeight - nBlocks;
+    if (nBlocks < 0 || nStartHeight <= 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "invalid start height");
+
+    JSONRPCRequest newRequest;
+    UniValue newParams(UniValue::VARR);
+    newParams.push_back(UniValue(nStartHeight));
+    newParams.push_back(UniValue(nBlocks));
+    newParams.push_back(UniValue(true));    // fFeeOnly
+    newRequest.params = newParams;
+
+    return getblockindexstats(newRequest);
+}
+
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         okSafeMode
+  //  --------------------- ------------------------  -----------------------  ----------
+    { "blockchain",         "findserial",             &findserial,             true  },
+    { "blockchain",         "getblockindexstats",     &getblockindexstats,     true  },
+    { "blockchain",         "getserials",             &getserials,             true  },
+    { "blockchain",         "getblockchaininfo",      &getblockchaininfo,      true  },
+    { "blockchain",         "getbestblockhash",       &getbestblockhash,       true  },
+    { "blockchain",         "getblockcount",          &getblockcount,          true  },
+    { "blockchain",         "getblock",               &getblock,               true  },
+    { "blockchain",         "getblockhash",           &getblockhash,           true  },
+    { "blockchain",         "getblockheader",         &getblockheader,         false },
+    { "blockchain",         "getchaintips",           &getchaintips,           true  },
+    { "blockchain",         "getfeeinfo",             &getfeeinfo,             true  },
+    { "blockchain",         "getdifficulty",          &getdifficulty,          true  },
+    { "blockchain",         "getfeeinfo",             &getfeeinfo,             true  },
+    { "blockchain",         "getmempoolinfo",         &getmempoolinfo,         true  },
+    { "blockchain",         "getsupplyinfo",          &getsupplyinfo,          true  },
+    { "blockchain",         "getrawmempool",          &getrawmempool,          true  },
+    { "blockchain",         "gettxout",               &gettxout,               true  },
+    { "blockchain",         "gettxoutsetinfo",        &gettxoutsetinfo,        true  },
+    { "blockchain",         "invalidateblock",        &invalidateblock,        true  },
+    { "blockchain",         "reconsiderblock",        &reconsiderblock,        true  },
+    { "blockchain",         "verifychain",            &verifychain,            true  },
+
+    /* Not shown in help */
+    { "hidden",             "invalidateblock",        &invalidateblock,        true  },
+    { "hidden",             "reconsiderblock",        &reconsiderblock,        true  },
+    { "hidden",             "waitfornewblock",        &waitfornewblock,        true  },
+    { "hidden",             "waitforblock",           &waitforblock,           true  },
+    { "hidden",             "waitforblockheight",     &waitforblockheight,     true  },
+};
+
+void RegisterBlockchainRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

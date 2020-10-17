@@ -3531,6 +3531,70 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
     return retObj;
 }
 
+UniValue DoZpivSpend(const CAmount nAmount, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
+{
+    int64_t nTimeStart = GetTimeMillis();
+    CTxDestination address{CNoDestination()}; // Optional sending address. Dummy initialization here.
+    CWalletTx wtx;
+    CZerocoinSpendReceipt receipt;
+    bool fSuccess;
+
+    std::list<std::pair<CTxDestination, CAmount>> outputs;
+    if(address_str != "") { // Spend to supplied destination address
+        bool isStaking = false;
+        address = DecodeDestination(address_str, isStaking);
+        if(!IsValidDestination(address) || isStaking)
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
+        outputs.emplace_back(address, nAmount);
+    }
+
+    EnsureWalletIsUnlocked();
+    fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, outputs, nullptr);
+
+    if (!fSuccess)
+        throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
+
+    CAmount nValueIn = 0;
+    UniValue arrSpends(UniValue::VARR);
+    for (CZerocoinSpend spend : receipt.GetSpends()) {
+        UniValue obj(UniValue::VOBJ);
+        obj.pushKV("denomination", spend.GetDenomination());
+        obj.pushKV("pubcoin", spend.GetPubCoin().GetHex());
+        obj.pushKV("serial", spend.GetSerial().GetHex());
+        uint32_t nChecksum = spend.GetAccumulatorChecksum();
+        obj.pushKV("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum)));
+        arrSpends.push_back(obj);
+        nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
+    }
+
+    CAmount nValueOut = 0;
+    UniValue vout(UniValue::VARR);
+    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
+        const CTxOut& txout = wtx.vout[i];
+        UniValue out(UniValue::VOBJ);
+        out.pushKV("value", ValueFromAmount(txout.nValue));
+        nValueOut += txout.nValue;
+
+        CTxDestination dest;
+        if(txout.IsZerocoinMint())
+            out.pushKV("address", "zerocoinmint");
+        else if(ExtractDestination(txout.scriptPubKey, dest))
+            out.pushKV("address", EncodeDestination(dest));
+        vout.push_back(out);
+    }
+
+    //construct JSON to return
+    UniValue ret(UniValue::VOBJ);
+    ret.pushKV("txid", wtx.GetHash().ToString());
+    ret.pushKV("bytes", (int64_t)GetSerializeSize(wtx, SER_NETWORK, CTransaction::CURRENT_VERSION));
+    ret.pushKV("fee", ValueFromAmount(nValueIn - nValueOut));
+    ret.pushKV("duration_millis", (GetTimeMillis() - nTimeStart));
+    ret.pushKV("spends", arrSpends);
+    ret.pushKV("outputs", vout);
+
+    return ret;
+}
+
 UniValue spendzerocoin(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 2 || request.params.size() < 1)
@@ -3582,7 +3646,6 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     std::vector<CZerocoinMint> vMintsSelected;
     return DoZpivSpend(nAmount, vMintsSelected, address_str);
 }
-
 
 UniValue spendzerocoinmints(const JSONRPCRequest& request)
 {
@@ -3658,72 +3721,6 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
 
     return DoZpivSpend(nAmount, vMintsSelected, address_str);
 }
-
-
-extern UniValue DoZpivSpend(const CAmount nAmount, std::vector<CZerocoinMint>& vMintsSelected, std::string address_str)
-{
-    int64_t nTimeStart = GetTimeMillis();
-    CTxDestination address{CNoDestination()}; // Optional sending address. Dummy initialization here.
-    CWalletTx wtx;
-    CZerocoinSpendReceipt receipt;
-    bool fSuccess;
-
-    std::list<std::pair<CTxDestination, CAmount>> outputs;
-    if(address_str != "") { // Spend to supplied destination address
-        bool isStaking = false;
-        address = DecodeDestination(address_str, isStaking);
-        if(!IsValidDestination(address) || isStaking)
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
-        outputs.emplace_back(address, nAmount);
-    }
-
-    EnsureWalletIsUnlocked();
-    fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, outputs, nullptr);
-
-    if (!fSuccess)
-        throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
-
-    CAmount nValueIn = 0;
-    UniValue arrSpends(UniValue::VARR);
-    for (CZerocoinSpend spend : receipt.GetSpends()) {
-        UniValue obj(UniValue::VOBJ);
-        obj.pushKV("denomination", spend.GetDenomination());
-        obj.pushKV("pubcoin", spend.GetPubCoin().GetHex());
-        obj.pushKV("serial", spend.GetSerial().GetHex());
-        uint32_t nChecksum = spend.GetAccumulatorChecksum();
-        obj.pushKV("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum)));
-        arrSpends.push_back(obj);
-        nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
-    }
-
-    CAmount nValueOut = 0;
-    UniValue vout(UniValue::VARR);
-    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
-        const CTxOut& txout = wtx.vout[i];
-        UniValue out(UniValue::VOBJ);
-        out.pushKV("value", ValueFromAmount(txout.nValue));
-        nValueOut += txout.nValue;
-
-        CTxDestination dest;
-        if(txout.IsZerocoinMint())
-            out.pushKV("address", "zerocoinmint");
-        else if(ExtractDestination(txout.scriptPubKey, dest))
-            out.pushKV("address", EncodeDestination(dest));
-        vout.push_back(out);
-    }
-
-    //construct JSON to return
-    UniValue ret(UniValue::VOBJ);
-    ret.pushKV("txid", wtx.GetHash().ToString());
-    ret.pushKV("bytes", (int64_t)GetSerializeSize(wtx, SER_NETWORK, CTransaction::CURRENT_VERSION));
-    ret.pushKV("fee", ValueFromAmount(nValueIn - nValueOut));
-    ret.pushKV("duration_millis", (GetTimeMillis() - nTimeStart));
-    ret.pushKV("spends", arrSpends);
-    ret.pushKV("outputs", vout);
-
-    return ret;
-}
-
 
 UniValue resetmintzerocoin(const JSONRPCRequest& request)
 {
@@ -4430,90 +4427,109 @@ extern UniValue importaddress(const JSONRPCRequest& request);
 extern UniValue importpubkey(const JSONRPCRequest& request);
 extern UniValue dumpwallet(const JSONRPCRequest& request);
 extern UniValue importwallet(const JSONRPCRequest& request);
+extern UniValue bip38encrypt(const JSONRPCRequest& request);
+extern UniValue bip38decrypt(const JSONRPCRequest& request);
 
 extern UniValue exportsaplingkey(const JSONRPCRequest& request);
 extern UniValue importsaplingkey(const JSONRPCRequest& request);
 extern UniValue importsaplingviewingkey(const JSONRPCRequest& request);
 extern UniValue exportsaplingviewingkey(const JSONRPCRequest& request);
 
-const CRPCCommand vWalletRPCCommands[] =
-{       //  category              name                        actor (function)           okSafeMode
-        //  --------------------- ------------------------    -----------------------    ----------
-        //{ "rawtransactions",    "fundrawtransaction",       &fundrawtransaction,       false },
-        { "wallet",             "autocombinerewards",       &autocombinerewards,       false },
-        { "wallet",             "abandontransaction",       &abandontransaction,       false },
-        { "wallet",             "addmultisigaddress",       &addmultisigaddress,       true  },
-        { "wallet",             "backupwallet",             &backupwallet,             true  },
-        { "wallet",             "delegatestake",            &delegatestake,            false },
-        { "wallet",             "dumpprivkey",              &dumpprivkey,              true  },
-        { "wallet",             "dumpwallet",               &dumpwallet,               true  },
-        { "wallet",             "encryptwallet",            &encryptwallet,            true  },
-        { "wallet",             "getbalance",               &getbalance,               false },
-        { "wallet",             "getcoldstakingbalance",    &getcoldstakingbalance,    false },
-        { "wallet",             "getdelegatedbalance",      &getdelegatedbalance,      false },
-        { "wallet",             "upgradewallet",            &upgradewallet,            true  },
-        { "wallet",             "sethdseed",                &sethdseed,                true  },
-        { "wallet",             "getnewaddress",            &getnewaddress,            true  },
-        { "wallet",             "getnewstakingaddress",     &getnewstakingaddress,     true  },
-        { "wallet",             "getrawchangeaddress",      &getrawchangeaddress,      true  },
-        { "wallet",             "getreceivedbyaddress",     &getreceivedbyaddress,     false },
-        { "wallet",             "gettransaction",           &gettransaction,           false },
-        { "wallet",             "getstakesplitthreshold",   &getstakesplitthreshold,   false },
-        { "wallet",             "getunconfirmedbalance",    &getunconfirmedbalance,    false },
-        { "wallet",             "getwalletinfo",            &getwalletinfo,            false },
-        { "wallet",             "importprivkey",            &importprivkey,            true  },
-        { "wallet",             "importwallet",             &importwallet,             true  },
-        { "wallet",             "importaddress",            &importaddress,            true  },
-        { "wallet",             "importpubkey",             &importpubkey,             true  },
-        { "wallet",             "keypoolrefill",            &keypoolrefill,            true  },
-        { "wallet",             "listaddressgroupings",     &listaddressgroupings,     false },
-        { "wallet",             "listdelegators",           &listdelegators,           false },
-        { "wallet",             "liststakingaddresses",     &liststakingaddresses,     false },
-        { "wallet",             "listcoldutxos",            &listcoldutxos,            false },
-        { "wallet",             "listlockunspent",          &listlockunspent,          false },
-        { "wallet",             "listreceivedbyaddress",    &listreceivedbyaddress,    false },
-        { "wallet",             "listsinceblock",           &listsinceblock,           false },
-        { "wallet",             "listtransactions",         &listtransactions,         false },
-        { "wallet",             "listunspent",              &listunspent,              false },
-        { "wallet",             "lockunspent",              &lockunspent,              true  },
-        { "wallet",             "rawdelegatestake",         &rawdelegatestake,         false },
-        { "wallet",             "sendmany",                 &sendmany,                 false },
-        { "wallet",             "sendtoaddress",            &sendtoaddress,            false },
-        { "wallet",             "sendtoaddressix",          &sendtoaddressix,          false },
-        { "wallet",             "settxfee",                 &settxfee,                 true  },
-        { "wallet",             "setstakesplitthreshold",   &setstakesplitthreshold,   false },
-        { "wallet",             "signmessage",              &signmessage,              true  },
-        { "wallet",             "walletlock",               &walletlock,               true  },
-        { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true  },
-        { "wallet",             "walletpassphrase",         &walletpassphrase,         true  },
-        { "wallet",             "delegatoradd",             &delegatoradd,             true  },
-        { "wallet",             "delegatorremove",          &delegatorremove,          true  },
+static const CRPCCommand commands[] =
+{ //  category              name                        actor (function)           okSafeMode
+  //  --------------------- ------------------------    -----------------------    ----------
+    { "wallet",             "getaddressinfo",           &getaddressinfo,           true  },
+    { "wallet",             "autocombinerewards",       &autocombinerewards,       false },
+    { "wallet",             "abandontransaction",       &abandontransaction,       false },
+    { "wallet",             "addmultisigaddress",       &addmultisigaddress,       true  },
+    { "wallet",             "backupwallet",             &backupwallet,             true  },
+    { "wallet",             "delegatestake",            &delegatestake,            false },
+    { "wallet",             "dumpprivkey",              &dumpprivkey,              true  },
+    { "wallet",             "dumpwallet",               &dumpwallet,               true  },
+    { "wallet",             "encryptwallet",            &encryptwallet,            true  },
+    { "wallet",             "getbalance",               &getbalance,               false },
+    { "wallet",             "getcoldstakingbalance",    &getcoldstakingbalance,    false },
+    { "wallet",             "getdelegatedbalance",      &getdelegatedbalance,      false },
+    { "wallet",             "upgradewallet",            &upgradewallet,            true  },
+    { "wallet",             "sethdseed",                &sethdseed,                true  },
+    { "wallet",             "getnewaddress",            &getnewaddress,            true  },
+    { "wallet",             "getnewstakingaddress",     &getnewstakingaddress,     true  },
+    { "wallet",             "getrawchangeaddress",      &getrawchangeaddress,      true  },
+    { "wallet",             "getreceivedbyaddress",     &getreceivedbyaddress,     false },
+    { "wallet",             "gettransaction",           &gettransaction,           false },
+    { "wallet",             "getstakesplitthreshold",   &getstakesplitthreshold,   false },
+    { "wallet",             "getunconfirmedbalance",    &getunconfirmedbalance,    false },
+    { "wallet",             "getwalletinfo",            &getwalletinfo,            false },
+    { "wallet",             "importprivkey",            &importprivkey,            true  },
+    { "wallet",             "importwallet",             &importwallet,             true  },
+    { "wallet",             "importaddress",            &importaddress,            true  },
+    { "wallet",             "importpubkey",             &importpubkey,             true  },
+    { "wallet",             "keypoolrefill",            &keypoolrefill,            true  },
+    { "wallet",             "listaddressgroupings",     &listaddressgroupings,     false },
+    { "wallet",             "listdelegators",           &listdelegators,           false },
+    { "wallet",             "liststakingaddresses",     &liststakingaddresses,     false },
+    { "wallet",             "listcoldutxos",            &listcoldutxos,            false },
+    { "wallet",             "listlockunspent",          &listlockunspent,          false },
+    { "wallet",             "listreceivedbyaddress",    &listreceivedbyaddress,    false },
+    { "wallet",             "listsinceblock",           &listsinceblock,           false },
+    { "wallet",             "listtransactions",         &listtransactions,         false },
+    { "wallet",             "listunspent",              &listunspent,              false },
+    { "wallet",             "lockunspent",              &lockunspent,              true  },
+    { "wallet",             "rawdelegatestake",         &rawdelegatestake,         false },
+    { "wallet",             "sendmany",                 &sendmany,                 false },
+    { "wallet",             "sendtoaddress",            &sendtoaddress,            false },
+    { "wallet",             "sendtoaddressix",          &sendtoaddressix,          false },
+    { "wallet",             "settxfee",                 &settxfee,                 true  },
+    { "wallet",             "setstakesplitthreshold",   &setstakesplitthreshold,   false },
+    { "wallet",             "signmessage",              &signmessage,              true  },
+    { "wallet",             "walletlock",               &walletlock,               true  },
+    { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true  },
+    { "wallet",             "walletpassphrase",         &walletpassphrase,         true  },
+    { "wallet",             "delegatoradd",             &delegatoradd,             true  },
+    { "wallet",             "delegatorremove",          &delegatorremove,          true  },
+    { "wallet",             "bip38encrypt",             &bip38encrypt,             true  },
+    { "wallet",             "bip38decrypt",             &bip38decrypt,             true  },
+    { "wallet",             "multisend",                &multisend,                false },
 
-        /** Sapling functions */
-        { "wallet",             "getnewshieldedaddress",    &getnewshieldedaddress,    true  },
-        { "wallet",             "listshieldedaddresses",    &listshieldedaddresses,    false },
-        { "wallet",             "exportsaplingkey",         &exportsaplingkey,         true  },
-        { "wallet",             "importsaplingkey",         &importsaplingkey,         true  },
-        { "wallet",             "importsaplingviewingkey",  &importsaplingviewingkey,  true  },
-        { "wallet",             "exportsaplingviewingkey",  &exportsaplingviewingkey,  true  },
+    /** Sapling functions */
+    { "wallet",             "getnewshieldedaddress",    &getnewshieldedaddress,    true  },
+    { "wallet",             "listshieldedaddresses",    &listshieldedaddresses,    false },
+    { "wallet",             "exportsaplingkey",         &exportsaplingkey,         true  },
+    { "wallet",             "importsaplingkey",         &importsaplingkey,         true  },
+    { "wallet",             "importsaplingviewingkey",  &importsaplingviewingkey,  true  },
+    { "wallet",             "exportsaplingviewingkey",  &exportsaplingviewingkey,  true  },
 
-        /** Label functions (to replace non-balance account functions) */
-        { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },
-        { "wallet",             "getreceivedbylabel",       &getreceivedbylabel,       false },
-        { "wallet",             "listlabels",               &listlabels,               false },
-        { "wallet",             "listreceivedbylabel",      &listreceivedbylabel,      false },
-        { "wallet",             "setlabel",                 &setlabel,                 true  },
+    /** Label functions (to replace non-balance account functions) */
+    { "wallet",             "getaddressesbylabel",      &getaddressesbylabel,      true  },
+    { "wallet",             "getreceivedbylabel",       &getreceivedbylabel,       false },
+    { "wallet",             "listlabels",               &listlabels,               false },
+    { "wallet",             "listreceivedbylabel",      &listreceivedbylabel,      false },
+    { "wallet",             "setlabel",                 &setlabel,                 true  },
 
+    /** Zerocoin functions (to be removed post-5.0) */
+    { "zerocoin",           "getzerocoinbalance",       &getzerocoinbalance,       false },
+    { "zerocoin",           "listmintedzerocoins",      &listmintedzerocoins,      false },
+    { "zerocoin",           "listspentzerocoins",       &listspentzerocoins,       false },
+    { "zerocoin",           "listzerocoinamounts",      &listzerocoinamounts,      false },
+    { "zerocoin",           "mintzerocoin",             &mintzerocoin,             false },
+    { "zerocoin",           "spendzerocoin",            &spendzerocoin,            false },
+    { "zerocoin",           "spendrawzerocoin",         &spendrawzerocoin,         true  },
+    { "zerocoin",           "spendzerocoinmints",       &spendzerocoinmints,       false },
+    { "zerocoin",           "resetmintzerocoin",        &resetmintzerocoin,        false },
+    { "zerocoin",           "resetspentzerocoin",       &resetspentzerocoin,       false },
+    { "zerocoin",           "getarchivedzerocoin",      &getarchivedzerocoin,      false },
+    { "zerocoin",           "importzerocoins",          &importzerocoins,          false },
+    { "zerocoin",           "exportzerocoins",          &exportzerocoins,          false },
+    { "zerocoin",           "reconsiderzerocoins",      &reconsiderzerocoins,      false },
+    { "zerocoin",           "getzpivseed",              &getzpivseed,              false },
+    { "zerocoin",           "setzpivseed",              &setzpivseed,              false },
+    { "zerocoin",           "generatemintlist",         &generatemintlist,         false },
+    { "zerocoin",           "searchdzpiv",              &searchdzpiv,              false },
+    { "zerocoin",           "dzpivstate",               &dzpivstate,               false },
 };
 
-void walletRegisterRPCCommands()
+void RegisterWalletRPCCommands(CRPCTable &tableRPC)
 {
-    unsigned int vcidx;
-    for (vcidx = 0; vcidx < ARRAYLEN(vWalletRPCCommands); vcidx++)
-    {
-        const CRPCCommand *pcmd;
-
-        pcmd = &vWalletRPCCommands[vcidx];
-        tableRPC.appendCommand(pcmd->name, pcmd);
-    }
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
 }

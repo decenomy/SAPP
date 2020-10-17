@@ -31,6 +31,8 @@
 
 extern std::vector<CSporkDef> sporkDefs;
 
+/** getinfo depends on getsupplyinfo defined in rpc/blockchain.cpp */
+UniValue getsupplyinfo(const JSONRPCRequest& request);
 
 /**
  * @note Do not add or change anything in the information returned by this
@@ -783,3 +785,29 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
 
 }
 #endif // ENABLE_WALLET
+
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         okSafeMode
+  //  --------------------- ------------------------  -----------------------  ----------
+    { "control",            "getinfo",                &getinfo,                true  }, /* uses wallet if enabled */
+    { "util",               "validateaddress",        &validateaddress,        true  }, /* uses wallet if enabled */
+    { "util",               "createmultisig",         &createmultisig,         true  },
+    { "util",               "logging",                &logging,                true  },
+    { "util",               "verifymessage",          &verifymessage,          true  },
+    { "pivx",               "mnsync",                 &mnsync,                 true  },
+    { "pivx",               "spork",                  &spork,                  true  },
+
+#ifdef ENABLE_WALLET
+    { "wallet",             "getstakingstatus",       &getstakingstatus,       false },
+#endif // ENABLE_WALLET
+
+
+    /* Not shown in help */
+    { "hidden",             "setmocktime",            &setmocktime,            true  },
+};
+
+void RegisterMiscRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

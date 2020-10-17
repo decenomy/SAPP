@@ -791,3 +791,29 @@ UniValue estimatesmartfee(const JSONRPCRequest& request)
     result.pushKV("blocks", answerFound);
     return result;
 }
+
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         okSafeMode
+  //  --------------------- ------------------------  -----------------------  ----------
+    { "mining",             "getblocktemplate",       &getblocktemplate,       true  },
+    { "mining",             "getmininginfo",          &getmininginfo,          true  },
+    { "mining",             "getnetworkhashps",       &getnetworkhashps,       true  },
+    { "mining",             "prioritisetransaction",  &prioritisetransaction,  true  },
+    { "mining",             "submitblock",            &submitblock,            true  },
+
+#ifdef ENABLE_WALLET
+    { "generating",         "getgenerate",            &getgenerate,            true  },
+    { "generating",         "gethashespersec",        &gethashespersec,        true  },
+    { "generating",         "setgenerate",            &setgenerate,            true  },
+    { "generating",         "generate",               &generate,               true  },
+#endif // ENABLE_WALLET
+
+    { "util",               "estimatefee",            &estimatefee,            true  },
+    { "util",               "estimatesmartfee",       &estimatesmartfee,       true  },
+};
+
+void RegisterMiningRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

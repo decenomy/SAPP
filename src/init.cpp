@@ -36,6 +36,7 @@
 #include "net_processing.h"
 #include "policy/policy.h"
 #include "reverse_iterate.h"
+#include "rpc/register.h"
 #include "rpc/server.h"
 #include "script/sigcache.h"
 #include "script/standard.h"
@@ -1078,6 +1079,7 @@ bool AppInit2()
 
     setvbuf(stdout, NULL, _IOLBF, 0); /// ***TODO*** do we still need this after -printtoconsole is gone?
 
+    RegisterAllCoreRPCCommands(tableRPC);
     // Staking needs a CWallet instance, so make sure wallet is enabled
 #ifdef ENABLE_WALLET
     bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", false);
@@ -1088,7 +1090,7 @@ bool AppInit2()
 #ifdef ENABLE_WALLET
     } else {
         // Register wallet RPC commands
-        walletRegisterRPCCommands();
+        RegisterWalletRPCCommands(tableRPC);
     }
 #endif
 

@@ -906,3 +906,29 @@ UniValue relaymasternodebroadcast(const JSONRPCRequest& request)
 
     return strprintf("Masternode broadcast sent (service %s, vin %s)", mnb.addr.ToString(), mnb.vin.ToString());
 }
+
+static const CRPCCommand commands[] =
+{ //  category              name                         actor (function)            okSafeMode
+  //  --------------------- ---------------------------  --------------------------  ----------
+    { "pivx",               "listmasternodes",           &listmasternodes,           true  },
+    { "pivx",               "getmasternodecount",        &getmasternodecount,        true  },
+    { "pivx",               "masternodecurrent",         &masternodecurrent,         true  },
+    { "pivx",               "startmasternode",           &startmasternode,           true  },
+    { "pivx",               "createmasternodekey",       &createmasternodekey,       true  },
+    { "pivx",               "getmasternodeoutputs",      &getmasternodeoutputs,      true  },
+    { "pivx",               "listmasternodeconf",        &listmasternodeconf,        true  },
+    { "pivx",               "getmasternodestatus",       &getmasternodestatus,       true  },
+    { "pivx",               "getmasternodewinners",      &getmasternodewinners,      true  },
+    { "pivx",               "getmasternodescores",       &getmasternodescores,       true  },
+    { "pivx",               "createmasternodebroadcast", &createmasternodebroadcast, true  },
+    { "pivx",               "decodemasternodebroadcast", &decodemasternodebroadcast, true  },
+    { "pivx",               "relaymasternodebroadcast",  &relaymasternodebroadcast,  true  },
+
+    { "pivx",               "getcachedblockhashes",      &getcachedblockhashes,      true  },
+};
+
+void RegisterMasternodeRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}
