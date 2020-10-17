@@ -20,7 +20,7 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 5
-        self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], []]
+        self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
         self.setup_clean_chain = True
         self.enable_mocktime()
 
@@ -51,10 +51,14 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
     def check_mn_list_empty(self, node):
         assert(len(node.listmasternodes()) == 0)
 
-    def check_budget_finalization_sync(self):
+    def check_budget_finalization_sync(self, votesCount, status):
         for i in range(0, len(self.nodes)):
             node = self.nodes[i]
-            assert_true(len(node.mnfinalbudget("show")) == 1, "MN budget finalization not synced in node" + str(i))
+            budFin = node.mnfinalbudget("show")
+            assert_true(len(budFin) == 1, "MN budget finalization not synced in node" + str(i))
+            budget = budFin[next(iter(budFin))]
+            assert_equal(budget["VoteCount"], votesCount)
+            assert_equal(budget["Status"], status)
 
     def start_masternode(self, mnOwner, masternodeAlias):
         ret = mnOwner.startmasternode("alias", "false", masternodeAlias, True)
@@ -66,11 +70,11 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
         self.log.info("confirming the budget finalization..")
         self.generate_two_blocks()
-        time.sleep(2)
+        time.sleep(3)
         self.generate_two_blocks()
 
         self.log.info("broadcasting the budget finalization..")
-        node.mnfinalbudgetsuggest()
+        return node.mnfinalbudgetsuggest()
 
     def generate_two_blocks(self):
         # create two blocks (mocktime +120 sec) + sleep 5 seconds on every block
@@ -78,8 +82,12 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         for i in range(0, 2):
             self.generate(1)
             time.sleep(5)
+
+    def generate_two_blocks_and_wait_for_ping(self):
+        self.generate_two_blocks()
         set_node_times(self.nodes, self.mocktime + 15)
         time.sleep(3)
+
 
     def check_mn_status(self, mnTxHash, status):
         for i in range(len(self.nodes)):
@@ -165,8 +173,8 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ownerTwoDir = os.path.join(self.options.tmpdir, "node2")
         remoteTwoDir = os.path.join(self.options.tmpdir, "node3")
 
-        self.log.info("generating 415 blocks..")
-        self.generate(415)
+        self.log.info("generating 413 blocks..")
+        self.generate(413)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
@@ -216,11 +224,11 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         time.sleep(7) # sleep to have everyone updated.
         self.check_mn_status(mnOneTxHash, "ACTIVE")
         self.check_mn_status(mnTwoTxHash, "ACTIVE")
-        set_node_times(self.nodes, self.mocktime + 10)
+        set_node_times(self.nodes, self.mocktime + 5)
         time.sleep(5)
 
         self.log.info("masternodes started, waiting until both gets enabled..")
-        self.generate_two_blocks()
+        self.generate_two_blocks_and_wait_for_ping()
 
         # check masternode enabled
         self.check_mn_status(mnOneTxHash, "ENABLED")
@@ -247,9 +255,18 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             firstProposalAmountPerCycle)
 
         # generate 3 blocks to confirm the tx (waiting in-between to let nodes update the mnping)
-        self.generate_two_blocks()
+        self.generate_two_blocks_and_wait_for_ping()
+
+        set_node_times(self.nodes, self.mocktime + 31)
+        time.sleep(7) # ping
+
+        # activate sporks
+        self.activate_spork(self.minerPos, "SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT")
+        self.activate_spork(self.minerPos, "SPORK_9_MASTERNODE_BUDGET_ENFORCEMENT")
+        self.activate_spork(self.minerPos, "SPORK_13_ENABLE_SUPERBLOCKS")
+
         self.generate(1)
-        time.sleep(2)
+        time.sleep(5)
 
         txinfo = miner.gettransaction(proposalFeeTxId)
         assert_equal(txinfo['amount'], -50.00)
@@ -272,24 +289,30 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
         # now let's vote for the proposal with the first MN
         self.log.info("broadcasting votes for the proposal now..")
-        ownerOne.mnbudgetvote("alias", proposalHash, "yes", masternodeOneAlias)
+        voteResult = ownerOne.mnbudgetvote("alias", proposalHash, "yes", masternodeOneAlias)
+        assert_equal(voteResult["detail"][0]["result"], "success")
         time.sleep(5)
         # check that the vote was accepted everywhere
         self.check_vote_existence(firstProposalName, mnOneTxHash, "YES")
         self.log.info("all good, MN1 vote accepted everywhere!")
 
         # now let's vote for the proposal with the second MN
-        ownerTwo.mnbudgetvote("alias", proposalHash, "yes", masternodeTwoAlias)
+        self.check_mn_status(mnTwoTxHash, "ENABLED")
+        voteResult = ownerTwo.mnbudgetvote("alias", proposalHash, "yes", masternodeTwoAlias)
+        assert_equal(voteResult["detail"][0]["result"], "success")
         time.sleep(5)
         # check that the vote was accepted everywhere
         self.check_vote_existence(firstProposalName, mnTwoTxHash, "YES")
         self.log.info("all good, MN2 vote accepted everywhere!")
 
         # Quick block count check.
-        assert_equal(ownerOne.getblockcount(), 423)
+        assert_equal(ownerOne.getblockcount(), 421)
+
         # Proposal needs to be on the chain > 5 min.
         self.generate_two_blocks()
-        self.generate_two_blocks()
+        time.sleep(3)
+        self.generate(1)
+        time.sleep(3)
 
         self.log.info("starting budget finalization sync test..")
         # Now let's submit a budget finalization, next superblock will occur at block 432
@@ -297,14 +320,35 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         # assert that there is no budget finalization first.
         assert_true(len(ownerOne.mnfinalbudget("show")) == 0)
 
-        # suggest the budget finalization and confirm the tx.
-        self.broadcastbudgetfinalization(miner)
+        # suggest the budget finalization and confirm the tx (+4 blocks).
+        budgetFinHash = self.broadcastbudgetfinalization(miner)
         time.sleep(5)
 
         self.log.info("checking budget finalization sync..")
-        self.check_budget_finalization_sync()
+        self.check_budget_finalization_sync(0, "OK")
 
-        self.log.info("budget finalization synced!")
+        self.log.info("budget finalization synced!, now voting for the budget finalization..")
+
+        ownerOne.mnfinalbudget("vote-many", budgetFinHash)
+        ownerTwo.mnfinalbudget("vote-many", budgetFinHash)
+        time.sleep(3)
+        self.generate_two_blocks()
+
+        self.log.info("checking finalization votes..")
+        self.check_budget_finalization_sync(2, "OK")
+
+        self.generate_two_blocks()
+        set_node_times(self.nodes, self.mocktime + 31)
+        time.sleep(7) # ping
+        self.generate_two_blocks()
+        set_node_times(self.nodes, self.mocktime + 31)
+        time.sleep(7) # ping
+        self.generate_two_blocks()
+        addrInfo = miner.listreceivedbyaddress(0, False, False, firstProposalAddress)
+        assert_equal(addrInfo[0]["amount"], firstProposalAmountPerCycle)
+
+        self.log.info("budget proposal paid!, all good")
+
 
 
 
