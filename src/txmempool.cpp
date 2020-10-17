@@ -10,7 +10,6 @@
 #include "policy/fees.h"
 #include "streams.h"
 #include "timedata.h"
-#include "consensus/tx_verify.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utiltime.h"
@@ -20,22 +19,22 @@
 #include <boost/foreach.hpp>
 
 
-CTxMemPoolEntry::CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
+CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                                  int64_t _nTime, double _entryPriority,
                                  unsigned int _entryHeight, bool poolHasNoInputsOf, CAmount _inChainInputValue,
                                  bool _spendsCoinbaseOrCoinstake, unsigned int _sigOps) :
-     tx(_tx), nFee(_nFee), nTime(_nTime), entryPriority(_entryPriority), entryHeight(_entryHeight), hadNoDependencies(poolHasNoInputsOf), inChainInputValue(_inChainInputValue), spendsCoinbaseOrCoinstake(_spendsCoinbaseOrCoinstake), sigOpCount(_sigOps)
+     tx(MakeTransactionRef(_tx)), nFee(_nFee), nTime(_nTime), entryPriority(_entryPriority), entryHeight(_entryHeight), hadNoDependencies(poolHasNoInputsOf), inChainInputValue(_inChainInputValue), spendsCoinbaseOrCoinstake(_spendsCoinbaseOrCoinstake), sigOpCount(_sigOps)
 {
-    nTxSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
-    nModSize = tx.CalculateModifiedSize(nTxSize);
-    nUsageSize = tx.DynamicMemoryUsage();
-    hasZerocoins = tx.ContainsZerocoins();
-    m_isShielded = tx.hasSaplingData();
+    nTxSize = ::GetSerializeSize(*_tx, SER_NETWORK, PROTOCOL_VERSION);
+    nModSize = _tx->CalculateModifiedSize(nTxSize);
+    nUsageSize = _tx->DynamicMemoryUsage();
+    hasZerocoins = _tx->ContainsZerocoins();
+    m_isShielded = _tx->hasSaplingData();
 
     nCountWithDescendants = 1;
     nSizeWithDescendants = nTxSize;
     nFeesWithDescendants = nFee;
-    CAmount nValueIn = tx.GetValueOut()+nFee;
+    CAmount nValueIn = _tx->GetValueOut()+nFee;
     assert(inChainInputValue <= nValueIn);
 
     feeDelta = 0;
@@ -177,14 +176,14 @@ void CTxMemPool::UpdateTransactionsFromBlock(const std::vector<uint256> &vHashes
 bool CTxMemPool::CalculateMemPoolAncestors(const CTxMemPoolEntry &entry, setEntries &setAncestors, uint64_t limitAncestorCount, uint64_t limitAncestorSize, uint64_t limitDescendantCount, uint64_t limitDescendantSize, std::string &errString, bool fSearchForParents /* = true */)
 {
     setEntries parentHashes;
-    const CTransaction &tx = entry.GetTx();
+    const auto &tx = entry.GetSharedTx();
 
     if (fSearchForParents) {
         // Get parents of this transaction that are in the mempool
         // GetMemPoolParents() is only valid for entries in the mempool, so we
         // iterate mapTx to find parents.
-        for (unsigned int i = 0; i < tx.vin.size(); i++) {
-            txiter piter = mapTx.find(tx.vin[i].prevout.hash);
+        for (unsigned int i = 0; i < tx->vin.size(); i++) {
+            txiter piter = mapTx.find(tx->vin[i].prevout.hash);
             if (piter != mapTx.end()) {
                 parentHashes.insert(piter);
                 if (parentHashes.size() + 1 > limitAncestorCount) {
@@ -456,7 +455,7 @@ void CTxMemPool::CalculateDescendants(txiter entryit, setEntries &setDescendants
     }
 }
 
-void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransaction>& removed, bool fRecursive)
+void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransactionRef>& removed, bool fRecursive)
 {
     // Remove transaction from memory pool
     {
@@ -488,7 +487,7 @@ void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransaction>& rem
             setAllRemoves.swap(txToRemove);
         }
         for (const txiter& it : setAllRemoves) {
-            removed.push_back(it->GetTx());
+            removed.emplace_back(it->GetSharedTx());
         }
         RemoveStaged(setAllRemoves);
     }
@@ -518,12 +517,12 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
         }
     }
     for (const CTransaction& tx : transactionsToRemove) {
-        std::list<CTransaction> removed;
+        std::list<CTransactionRef> removed;
         remove(tx, removed, true);
     }
 }
 
-void CTxMemPool::removeConflicts(const CTransaction& tx, std::list<CTransaction>& removed)
+void CTxMemPool::removeConflicts(const CTransaction& tx, std::list<CTransactionRef>& removed)
 {
     // Remove transactions which depend on inputs of tx, recursively
     std::list<CTransaction> result;
@@ -542,7 +541,7 @@ void CTxMemPool::removeConflicts(const CTransaction& tx, std::list<CTransaction>
 /**
  * Called when a block is connected. Removes from mempool and updates the miner fee estimator.
  */
-void CTxMemPool::removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight, std::list<CTransaction>& conflicts, bool fCurrentEstimate)
+void CTxMemPool::removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight, std::list<CTransactionRef>& conflicts, bool fCurrentEstimate)
 {
     LOCK(cs);
     std::vector<CTxMemPoolEntry> entries;
@@ -553,7 +552,7 @@ void CTxMemPool::removeForBlock(const std::vector<CTransactionRef>& vtx, unsigne
             entries.push_back(*i);
     }
     for (const auto& tx : vtx) {
-        std::list<CTransaction> dummy;
+        std::list<CTransactionRef> dummy;
         remove(*tx, dummy, false);
         removeConflicts(*tx, conflicts);
         ClearPrioritisation(tx->GetHash());

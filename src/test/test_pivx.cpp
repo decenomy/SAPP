@@ -78,10 +78,10 @@ TestingSetup::~TestingSetup()
 }
 
 CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(CMutableTransaction &tx, CTxMemPool *pool) {
-    CTransaction txn(tx);
+    const CTransactionRef txn = MakeTransactionRef(tx); // todo: move to the caller side..
     bool hasNoDependencies = pool ? pool->HasNoInputsOf(tx) : hadNoDependencies;
     // Hack to assume either its completely dependent on other mempool txs or not at all
-    CAmount inChainValue = hasNoDependencies ? txn.GetValueOut() : 0;
+    CAmount inChainValue = hasNoDependencies ? txn->GetValueOut() : 0;
 
     return CTxMemPoolEntry(txn, nFee, nTime, dPriority, nHeight,
                            hasNoDependencies, inChainValue, spendsCoinbaseOrCoinstake, sigOpCount);

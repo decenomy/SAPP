@@ -8,6 +8,7 @@
 #define BITCOIN_TXMEMPOOL_H
 
 #include <list>
+#include <memory>
 #include <set>
 
 #include "amount.h"
@@ -59,7 +60,7 @@ class CTxMemPool;
 class CTxMemPoolEntry
 {
 private:
-    CTransaction tx;
+    CTransactionRef tx;
     CAmount nFee;         //! Cached to avoid expensive parent-transaction lookups
     size_t nTxSize;       //! ... and avoid recomputing tx size
     size_t nModSize;      //! ... and modified size for priority
@@ -86,13 +87,14 @@ private:
     CAmount nFeesWithDescendants;  //! ... and total fees (all including us)
 
 public:
-    CTxMemPoolEntry(const CTransaction& _tx, const CAmount& _nFee,
+    CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
             int64_t _nTime, double _entryPriority, unsigned int _entryHeight,
             bool poolHasNoInputsOf, CAmount _inChainInputValue, bool _spendsCoinbaseOrCoinstake,
             unsigned int nSigOps);
     CTxMemPoolEntry(const CTxMemPoolEntry& other);
 
-    const CTransaction& GetTx() const { return this->tx; }
+    const CTransaction& GetTx() const { return *this->tx; }
+    std::shared_ptr<const CTransaction> GetSharedTx() const { return this->tx; }
     /**
      * Fast calculation of lower bound of current priority as update
      * from entry priority. Only inputs that were originally in-chain will age.
@@ -463,10 +465,10 @@ public:
     // then invoke the second version.
     bool addUnchecked(const uint256& hash, const CTxMemPoolEntry& entry, bool fCurrentEstimate = true);
     bool addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry, setEntries &setAncestors, bool fCurrentEstimate = true);
-    void remove(const CTransaction& tx, std::list<CTransaction>& removed, bool fRecursive = false);
+    void remove(const CTransaction& tx, std::list<CTransactionRef>& removed, bool fRecursive = false);
     void removeForReorg(const CCoinsViewCache* pcoins, unsigned int nMemPoolHeight, int flags);
-    void removeConflicts(const CTransaction& tx, std::list<CTransaction>& removed);
-    void removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight, std::list<CTransaction>& conflicts, bool fCurrentEstimate = true);
+    void removeConflicts(const CTransaction& tx, std::list<CTransactionRef>& removed);
+    void removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight, std::list<CTransactionRef>& conflicts, bool fCurrentEstimate = true);
     void clear();
     void _clear();  // lock-free
     void queryHashes(std::vector<uint256>& vtxid);

@@ -172,7 +172,7 @@ static const uint64_t nMinDiskSpace = 52428800;
  * @param[out]  fAccepted  Whether the block is accepted or not
  * @return True if state.IsValid()
  */
-bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp, bool* fAccepted = nullptr);
+bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const std::shared_ptr<const CBlock> pblock, CDiskBlockPos* dbp, bool* fAccepted = nullptr);
 /** Check whether enough disk space is available for an incoming block */
 bool CheckDiskSpace(uint64_t nAdditionalBytes = 0);
 /** Open a block file (blk?????.dat) */
@@ -207,7 +207,7 @@ double ConvertBitsToDouble(unsigned int nBits);
 int64_t GetMasternodePayment();
 
 /** Find the best known block, and make it the tip of the block chain */
-bool ActivateBestChain(CValidationState& state, const CBlock* pblock = NULL, bool fAlreadyChecked = false);
+bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pblock = std::shared_ptr<const CBlock>(), bool fAlreadyChecked = false);
 CAmount GetBlockValue(int nHeight);
 
 /** Create a new block index entry for a given block hash */
@@ -217,7 +217,7 @@ void FlushStateToDisk();
 
 
 /** (try to) add transaction to memory pool **/
-bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fOverrideMempoolLimit = false, bool fRejectInsaneFee = false, bool ignoreFees = false);
+bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransactionRef& tx, bool fLimitFree, bool* pfMissingInputs, bool fOverrideMempoolLimit = false, bool fRejectInsaneFee = false, bool ignoreFees = false);
 
 int GetIXConfirmations(uint256 nTXHash);
 
