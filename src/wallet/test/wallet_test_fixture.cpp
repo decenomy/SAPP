@@ -27,6 +27,7 @@ WalletTestingSetup::WalletTestingSetup(): SaplingTestingSetup()
     clean(); // todo: research why we have an initialized bitdb here.
     bitdb.MakeMock();
     RegisterWalletRPCCommands(tableRPC);
+    RegisterZPIVRPCCommands(tableRPC);
 
     bool fFirstRun;
     pwalletMain = new CWallet("test_wallet.dat");

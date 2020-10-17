@@ -1091,6 +1091,8 @@ bool AppInit2()
     } else {
         // Register wallet RPC commands
         RegisterWalletRPCCommands(tableRPC);
+        // Register zPIV RPC commands
+        RegisterZPIVRPCCommands(tableRPC);
     }
 #endif
 
