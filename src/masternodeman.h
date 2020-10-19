@@ -156,8 +156,8 @@ public:
 
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
 
-    // Process GETMNLIST message
-    void ProcessGetMNList(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    // Process GETMNLIST message, returning the banning score (if 0, no ban score increase is needed)
+    int ProcessGetMNList(CNode* pfrom, CTxIn& vin);
 
     /// Return the number of (unique) Masternodes
     int size() { return vMasternodes.size(); }

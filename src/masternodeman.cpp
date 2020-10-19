@@ -716,7 +716,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
     }
 
-    else if (strCommand == NetMsgType::MNPING) { //Masternode Ping
+    else if (strCommand == NetMsgType::MNPING) {
+        //Masternode Ping
         CMasternodePing mnp;
         vRecv >> mnp;
 
@@ -728,16 +729,20 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             Misbehaving(pfrom->GetId(), banScore);
         }
 
-    } else if (strCommand == NetMsgType::GETMNLIST) { //Get Masternode list or specific entry
-        ProcessGetMNList(pfrom, strCommand, vRecv);
+    } else if (strCommand == NetMsgType::GETMNLIST) {
+        //Get Masternode list or specific entry
+        CTxIn vin;
+        vRecv >> vin;
+        int banScore = ProcessGetMNList(pfrom, vin);
+        if (banScore > 0) {
+            LOCK(cs_main);
+            Misbehaving(pfrom->GetId(), banScore);
+        }
     }
 }
 
-void CMasternodeMan::ProcessGetMNList(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+int CMasternodeMan::ProcessGetMNList(CNode* pfrom, CTxIn& vin)
 {
-    CTxIn vin;
-    vRecv >> vin;
-
     if (vin == CTxIn()) { //only should ask for this once
         //local network
         bool isLocal = (pfrom->addr.IsRFC1918() || pfrom->addr.IsLocal());
@@ -748,16 +753,13 @@ void CMasternodeMan::ProcessGetMNList(CNode* pfrom, std::string& strCommand, CDa
                 int64_t t = (*i).second;
                 if (GetTime() < t) {
                     LogPrintf("CMasternodeMan::ProcessMessage() : dseg - peer already asked me for the list\n");
-                    LOCK(cs_main);
-                    Misbehaving(pfrom->GetId(), 34);
-                    return;
+                    return 34;
                 }
             }
             int64_t askAgain = GetTime() + MASTERNODES_DSEG_SECONDS;
             mAskedUsForMasternodeList[pfrom->addr] = askAgain;
         }
     } //else, asking for a specific node which is ok
-
 
     int nInvCount = 0;
 
@@ -776,7 +778,7 @@ void CMasternodeMan::ProcessGetMNList(CNode* pfrom, std::string& strCommand, CDa
 
                 if (vin == mn.vin) {
                     LogPrint(BCLog::MASTERNODE, "dseg - Sent 1 Masternode entry to peer %i\n", pfrom->GetId());
-                    return;
+                    return 0;
                 }
             }
         }
@@ -786,6 +788,9 @@ void CMasternodeMan::ProcessGetMNList(CNode* pfrom, std::string& strCommand, CDa
         g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::SYNCSTATUSCOUNT, MASTERNODE_SYNC_LIST, nInvCount));
         LogPrint(BCLog::MASTERNODE, "dseg - Sent %d Masternode entries to peer %i\n", nInvCount, pfrom->GetId());
     }
+
+    // All good
+    return 0;
 }
 
 void CMasternodeMan::Remove(CTxIn vin)
