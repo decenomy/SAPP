@@ -284,7 +284,7 @@ public:
     const CBudgetProposal* FindProposalByName(const std::string& strProposalName) const;
 
     static CAmount GetTotalBudget(int nHeight);
-    std::vector<CBudgetProposal*> GetBudget();
+    std::vector<CBudgetProposal> GetBudget();
     std::vector<CBudgetProposal*> GetAllProposals();
     std::vector<CFinalizedBudget*> GetFinalizedBudgets();
     bool IsBudgetPaymentBlock(int nBlockHeight) const;
@@ -460,7 +460,7 @@ public:
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 
     // Check finalized budget proposals. Masternodes only (when voting on finalized budgets)
-    bool CheckProposals(std::vector<CBudgetProposal*>& vBudget) const;
+    bool CheckProposals(std::vector<CBudgetProposal>& vBudget) const;
     // Total amount paid out by this budget
     CAmount GetTotalPayout() const;
 

@@ -41,11 +41,11 @@ void budgetToJSON(const CBudgetProposal* pbudgetProposal, UniValue& bObj, int nC
     bObj.pushKV("TotalPayment", ValueFromAmount(pbudgetProposal->GetAmount() * pbudgetProposal->GetTotalPaymentCount()));
     bObj.pushKV("MonthlyPayment", ValueFromAmount(pbudgetProposal->GetAmount()));
     bObj.pushKV("IsEstablished", pbudgetProposal->IsEstablished());
-
     bool fValid = pbudgetProposal->IsValid();
     bObj.pushKV("IsValid", fValid);
     if (!fValid)
         bObj.pushKV("IsInvalidReason", pbudgetProposal->IsInvalidReason());
+    bObj.pushKV("Alloted", ValueFromAmount(pbudgetProposal->GetAllotted()));
 }
 
 void checkBudgetInputs(const UniValue& params, std::string &strProposalName, std::string &strURL,
@@ -557,18 +557,12 @@ UniValue getbudgetprojection(const JSONRPCRequest& request)
     UniValue resultObj(UniValue::VOBJ);
     CAmount nTotalAllotted = 0;
 
-    std::vector<CBudgetProposal*> winningProps = g_budgetman.GetBudget();
-    for (CBudgetProposal* pbudgetProposal : winningProps) {
-        nTotalAllotted += pbudgetProposal->GetAllotted();
-
-        CTxDestination address1;
-        ExtractDestination(pbudgetProposal->GetPayee(), address1);
-
+    std::vector<CBudgetProposal> winningProps = g_budgetman.GetBudget();
+    for (const CBudgetProposal& p : winningProps) {
         UniValue bObj(UniValue::VOBJ);
-        budgetToJSON(pbudgetProposal, bObj, g_budgetman.GetBestHeight());
-        bObj.pushKV("Alloted", ValueFromAmount(pbudgetProposal->GetAllotted()));
+        budgetToJSON(&p, bObj, g_budgetman.GetBestHeight());;
+        nTotalAllotted += p.GetAllotted();
         bObj.pushKV("TotalBudgetAlloted", ValueFromAmount(nTotalAllotted));
-
         ret.push_back(bObj);
     }
 

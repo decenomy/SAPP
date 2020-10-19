@@ -172,15 +172,15 @@ uint256 CBudgetManager::SubmitFinalBudget()
         return UINT256_ZERO;
     }
 
-    std::vector<CBudgetProposal*> vBudgetProposals = GetBudget();
+    std::vector<CBudgetProposal> vBudgetProposals = GetBudget();
     std::string strBudgetName = "main";
     std::vector<CTxBudgetPayment> vecTxBudgetPayments;
 
-    for (auto & vBudgetProposal : vBudgetProposals) {
+    for (const auto& p : vBudgetProposals) {
         CTxBudgetPayment txBudgetPayment;
-        txBudgetPayment.nProposalHash = vBudgetProposal->GetHash();
-        txBudgetPayment.payee = vBudgetProposal->GetPayee();
-        txBudgetPayment.nAmount = vBudgetProposal->GetAllotted();
+        txBudgetPayment.nProposalHash = p.GetHash();
+        txBudgetPayment.payee = p.GetPayee();
+        txBudgetPayment.nAmount = p.GetAllotted();
         vecTxBudgetPayments.push_back(txBudgetPayment);
     }
 
@@ -710,7 +710,7 @@ void CBudgetManager::VoteOnFinalizedBudgets()
         return;
     }
 
-    std::vector<CBudgetProposal*> vBudget = GetBudget();
+    std::vector<CBudgetProposal> vBudget = GetBudget();
     // Vector containing the hash of finalized budgets to save
     std::vector<uint256> vBudgetHashes;
     {
@@ -890,13 +890,13 @@ std::vector<CBudgetProposal*> CBudgetManager::GetAllProposals()
 }
 
 //Need to review this function
-std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
+std::vector<CBudgetProposal> CBudgetManager::GetBudget()
 {
     LOCK(cs_proposals);
 
     int nHeight = GetBestHeight();
     if (nHeight <= 0)
-        return std::vector<CBudgetProposal*>();
+        return std::vector<CBudgetProposal>();
 
     // ------- Sort budgets by net Yes Count
     std::vector<CBudgetProposal*> vBudgetPorposalsSort;
@@ -907,7 +907,7 @@ std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
     std::sort(vBudgetPorposalsSort.begin(), vBudgetPorposalsSort.end(), CBudgetProposal::PtrHigherYes);
 
     // ------- Grab The Budgets In Order
-    std::vector<CBudgetProposal*> vBudgetProposalsRet;
+    std::vector<CBudgetProposal> vBudgetProposalsRet;
     CAmount nBudgetAllocated = 0;
 
     const int nBlocksPerCycle = Params().GetConsensus().nBudgetCycleBlocks;
@@ -927,7 +927,7 @@ std::vector<CBudgetProposal*> CBudgetManager::GetBudget()
             if (pbudgetProposal->GetAmount() + nBudgetAllocated <= nTotalBudget) {
                 pbudgetProposal->SetAllotted(pbudgetProposal->GetAmount());
                 nBudgetAllocated += pbudgetProposal->GetAmount();
-                vBudgetProposalsRet.push_back(pbudgetProposal);
+                vBudgetProposalsRet.push_back(*pbudgetProposal);
                 LogPrint(BCLog::MNBUDGET,"%s:  -     Check 2 passed: Budget added\n", __func__);
             } else {
                 pbudgetProposal->SetAllotted(0);
@@ -1938,10 +1938,10 @@ struct sortProposalsByHash  {
     }
 };
 
-bool CFinalizedBudget::CheckProposals(std::vector<CBudgetProposal*>& vBudget) const
+bool CFinalizedBudget::CheckProposals(std::vector<CBudgetProposal>& vBudget) const
 {
     // Sort proposals by hash
-    std::sort(vBudget.begin(), vBudget.end(), CBudgetProposal::PtrGreater);
+    std::sort(vBudget.begin(), vBudget.end(), std::greater<CBudgetProposal>());
 
     // Sort copy payments by hash (descending)
     std::vector<CTxBudgetPayment> vecBudgetPaymentsSortedByHash(vecBudgetPayments);
@@ -1954,9 +1954,9 @@ bool CFinalizedBudget::CheckProposals(std::vector<CBudgetProposal*>& vBudget) co
     }
 
     for (unsigned int i = 0; i < vBudget.size(); i++) {
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %d %s\n", __func__, i, vBudget[i]->GetHash().ToString());
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %d %s\n", __func__, i, HexStr(vBudget[i]->GetPayee()));
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %d %lli\n", __func__, i, vBudget[i]->GetAmount());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %d %s\n", __func__, i, vBudget[i].GetHash().ToString());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %d %s\n", __func__, i, HexStr(vBudget[i].GetPayee()));
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %d %lli\n", __func__, i, vBudget[i].GetAmount());
     }
 
     if (vBudget.size() == 0) {
@@ -1977,21 +1977,21 @@ bool CFinalizedBudget::CheckProposals(std::vector<CBudgetProposal*>& vBudget) co
             return false;
         }
 
-        if (vecBudgetPaymentsSortedByHash[i].nProposalHash != vBudget[i]->GetHash()) {
+        if (vecBudgetPaymentsSortedByHash[i].nProposalHash != vBudget[i].GetHash()) {
             LogPrint(BCLog::MNBUDGET,"%s: item #%d doesn't match %s %s\n", __func__,
-                    i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString(), vBudget[i]->GetHash().ToString());
+                    i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString(), vBudget[i].GetHash().ToString());
             return false;
         }
 
-        if (HexStr(vecBudgetPaymentsSortedByHash[i].payee) != HexStr(vBudget[i]->GetPayee())) {
+        if (HexStr(vecBudgetPaymentsSortedByHash[i].payee) != HexStr(vBudget[i].GetPayee())) {
             LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %s %s\n", __func__,
-                    i, HexStr(vecBudgetPaymentsSortedByHash[i].payee), HexStr(vBudget[i]->GetPayee()));
+                    i, HexStr(vecBudgetPaymentsSortedByHash[i].payee), HexStr(vBudget[i].GetPayee()));
             return false;
         }
 
-        if (vecBudgetPaymentsSortedByHash[i].nAmount != vBudget[i]->GetAmount()) {
+        if (vecBudgetPaymentsSortedByHash[i].nAmount != vBudget[i].GetAmount()) {
             LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %lli %lli\n", __func__,
-                    i, vecBudgetPaymentsSortedByHash[i].nAmount, vBudget[i]->GetAmount());
+                    i, vecBudgetPaymentsSortedByHash[i].nAmount, vBudget[i].GetAmount());
             return false;
         }
     }
