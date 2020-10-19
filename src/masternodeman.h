@@ -146,8 +146,8 @@ public:
         Check();
         return vMasternodes;
     }
-
-    std::vector<std::pair<int, CMasternode> > GetMasternodeRanks(int64_t nBlockHeight, int minProtocol = 0);
+    // Retrieve the known masternodes ordered by scoring without checking them. (Only used for listmasternodes RPC call)
+    std::vector<std::pair<int64_t, CMasternode>> GetMasternodeRanks(int nBlockHeight);
     int GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, int minProtocol = 0, bool fOnlyActive = true);
 
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);

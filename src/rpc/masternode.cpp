@@ -81,8 +81,9 @@ UniValue listmasternodes(const JSONRPCRequest& request)
     int nHeight = WITH_LOCK(cs_main, return chainActive.Height());
     if (nHeight < 0) return "[]";
 
-    std::vector<std::pair<int, CMasternode> > vMasternodeRanks = mnodeman.GetMasternodeRanks(nHeight);
-    for (PAIRTYPE(int, CMasternode) & s : vMasternodeRanks) {
+    std::vector<std::pair<int64_t, CMasternode>> vMasternodeRanks = mnodeman.GetMasternodeRanks(nHeight);
+    for (int pos=0; pos < (int) vMasternodeRanks.size(); pos++) {
+        const auto& s = vMasternodeRanks[pos];
         UniValue obj(UniValue::VOBJ);
         std::string strVin = s.second.vin.prevout.ToStringShort();
         std::string strTxHash = s.second.vin.prevout.hash.ToString();
@@ -103,7 +104,7 @@ UniValue listmasternodes(const JSONRPCRequest& request)
             LookupHost(strHost.c_str(), node, false);
             std::string strNetwork = GetNetworkName(node.GetNetwork());
 
-            obj.pushKV("rank", (strStatus == "ENABLED" ? s.first : 0));
+            obj.pushKV("rank", (strStatus == "ENABLED" ? pos : 0));
             obj.pushKV("network", strNetwork);
             obj.pushKV("txhash", strTxHash);
             obj.pushKV("outidx", (uint64_t)oIdx);
