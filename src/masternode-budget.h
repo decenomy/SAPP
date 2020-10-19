@@ -35,13 +35,10 @@ static const CAmount PROPOSAL_FEE_TX = (50 * COIN);
 static const CAmount BUDGET_FEE_TX_OLD = (50 * COIN);
 static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
-static std::map<uint256, int> mapPayment_History;
+static std::map<uint256, std::pair<uint256,int> > mapPayment_History;   // proposal hash --> (block hash, block height)
 
 extern CBudgetManager budget;
 void DumpBudgets();
-
-//Check the collateral transaction for the budget proposal/finalized budget
-bool IsBudgetCollateralValid(const uint256& nTxCollateralHash, const uint256& nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization=false);
 
 //
 // CBudgetVote - Allow a masternode node to vote and broadcast throughout the network
@@ -204,7 +201,8 @@ public:
 class CBudgetManager
 {
 private:
-    //hold txes until they mature enough to use
+    // map budget hash --> CollTx hash.
+    // hold finalized-budgets collateral txes until they mature enough to use
     std::map<uint256, uint256> mapCollateralTxids;
 
     std::map<uint256, CBudgetProposal> mapProposals;                        // guarded by cs_proposals
@@ -216,10 +214,6 @@ private:
     std::map<uint256, CBudgetVote> mapOrphanProposalVotes;                  // guarded by cs_votes
     std::map<uint256, CFinalizedBudgetVote> mapSeenFinalizedBudgetVotes;    // guarded by cs_finalizedvotes
     std::map<uint256, CFinalizedBudgetVote> mapOrphanFinalizedBudgetVotes;  // guarded by cs_finalizedvotes
-
-    // Memory only
-    std::vector<CBudgetProposalBroadcast> vecImmatureProposals;             // guarded by cs_proposals
-    std::vector<CFinalizedBudgetBroadcast> vecImmatureFinalizedBudgets;     // guarded by cs_budgets
 
     // Memory Only. Updated in NewBlock (blocks arrive in order)
     std::atomic<int> nBestHeight;
@@ -302,16 +296,16 @@ public:
     std::vector<CBudgetProposal*> GetAllProposals();
     std::vector<CFinalizedBudget*> GetFinalizedBudgets();
     bool IsBudgetPaymentBlock(int nBlockHeight) const;
-    bool IsBudgetPaymentBlock(int nBlockHeight, int& nHighestCount, int& nFivePercent) const;
+    bool IsBudgetPaymentBlock(int nBlockHeight, int& nCountThreshold) const;
     bool AddProposal(CBudgetProposal& budgetProposal);
     bool AddFinalizedBudget(CFinalizedBudget& finalizedBudget);
     void SubmitFinalBudget();
 
     bool UpdateProposal(const CBudgetVote& vote, CNode* pfrom, std::string& strError);
     bool UpdateFinalizedBudget(CFinalizedBudgetVote& vote, CNode* pfrom, std::string& strError);
-    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const;
+    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     std::string GetRequiredPaymentsString(int nBlockHeight);
-    void FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
+    bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
 
     void CheckOrphanVotes();
     void Clear()
@@ -410,6 +404,12 @@ private:
     bool fValid;
     std::string strInvalid;
 
+    // Functions used inside IsWellFormed/UpdateValid - setting strInvalid
+    bool IsExpired(int nCurrentHeight);
+    bool CheckStartEnd();
+    bool CheckAmount(const CAmount& nTotalBudget);
+    bool CheckName();
+
 protected:
     std::map<uint256, CFinalizedBudgetVote> mapVotes;
     std::string strBudgetName;
@@ -419,6 +419,7 @@ protected:
     std::string strProposals;
 
 public:
+    // Set in CBudgetManager::AddFinalizedBudget via CheckCollateral
     int64_t nTime;
 
     CFinalizedBudget();
@@ -433,9 +434,12 @@ public:
     void SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) const;
 
     // sets fValid and strInvalid, returns fValid
-    bool UpdateValid(int nHeight, bool fCheckCollateral = true);
+    bool UpdateValid(int nHeight);
+    // Static checks that should be done only once - sets strInvalid
+    bool IsWellFormed(const CAmount& nTotalBudget);
     bool IsValid() const  { return fValid; }
     std::string IsInvalidReason() const { return strInvalid; }
+    std::string IsInvalidLogStr() const { return strprintf("[%s (%s)]: %s", GetName(), GetProposalsStr(), IsInvalidReason()); }
 
     void SetProposalsStr(const std::string _strProposals) { strProposals = _strProposals; }
 
@@ -446,8 +450,8 @@ public:
     int GetBlockEnd() const { return nBlockStart + (int)(vecBudgetPayments.size() - 1); }
     const uint256& GetFeeTXHash() const { return nFeeTXHash;  }
     int GetVoteCount() const { return (int)mapVotes.size(); }
-    bool IsPaidAlready(uint256 nProposalHash, int nBlockHeight) const;
-    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, int nBlockHeight) const;
+    bool IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const;
+    TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment) const;
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 
@@ -478,6 +482,7 @@ public:
         READWRITE(vecBudgetPayments);
         READWRITE(fAutoChecked);
         READWRITE(mapVotes);
+        READWRITE(strProposals);
     }
 
     // compare finalized budget by votes (sort tie with feeHash)
@@ -506,6 +511,7 @@ public:
         first.vecBudgetPayments.swap(second.vecBudgetPayments);
         swap(first.nFeeTXHash, second.nFeeTXHash);
         swap(first.nTime, second.nTime);
+        swap(first.strProposals, second.strProposals);
     }
 
     CFinalizedBudgetBroadcast& operator=(CFinalizedBudgetBroadcast from)
@@ -540,6 +546,13 @@ private:
     bool fValid;
     std::string strInvalid;
 
+    // Functions used inside UpdateValid()/IsWellFormed - setting strInvalid
+    bool IsHeavilyDownvoted();
+    bool IsExpired(int nCurrentHeight);
+    bool CheckStartEnd();
+    bool CheckAmount(const CAmount& nTotalBudget);
+    bool CheckAddress();
+
 protected:
     std::map<uint256, CBudgetVote> mapVotes;
     std::string strProposalName;
@@ -551,6 +564,7 @@ protected:
     uint256 nFeeTXHash;
 
 public:
+    // Set in CBudgetManager::AddProposal via CheckCollateral
     int64_t nTime;
 
     CBudgetProposal();
@@ -565,9 +579,12 @@ public:
     void SyncVotes(CNode* pfrom, bool fPartial, int& nInvCount) const;
 
     // sets fValid and strInvalid, returns fValid
-    bool UpdateValid(int nHeight, bool fCheckCollateral = true);
+    bool UpdateValid(int nHeight);
+    // Static checks that should be done only once - sets strInvalid
+    bool IsWellFormed(const CAmount& nTotalBudget);
     bool IsValid() const  { return fValid; }
     std::string IsInvalidReason() const { return strInvalid; }
+    std::string IsInvalidLogStr() const { return strprintf("[%s]: %s", GetName(), IsInvalidReason()); }
 
     bool IsEstablished() const;
     bool IsPassing(int nBlockStartBudget, int nBlockEndBudget, int mnCount) const;
@@ -613,7 +630,6 @@ public:
         //for syncing with other clients
         READWRITE(LIMITED_STRING(strProposalName, 20));
         READWRITE(LIMITED_STRING(strURL, 64));
-        READWRITE(nTime);
         READWRITE(nBlockStart);
         READWRITE(nBlockEnd);
         READWRITE(nAmount);

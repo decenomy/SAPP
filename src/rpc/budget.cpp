@@ -134,23 +134,14 @@ UniValue preparebudget(const JSONRPCRequest& request)
 
     // create transaction 15 minutes into the future, to allow for confirmation time
     CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, UINT256_ZERO);
-    const uint256& proposalHash = budgetProposalBroadcast.GetHash();
+    if (!budgetProposalBroadcast.IsWellFormed(budget.GetTotalBudget(budgetProposalBroadcast.GetBlockStart())))
+        throw std::runtime_error("Proposal is not valid " + budgetProposalBroadcast.IsInvalidReason());
 
-    int nChainHeight = chainActive.Height();
-    if (!budgetProposalBroadcast.UpdateValid(nChainHeight, false))
-        throw std::runtime_error("Proposal is not valid - " + proposalHash.ToString() + " - " + budgetProposalBroadcast.IsInvalidReason());
-
-    bool useIX = false; //true;
-    // if (request.params.size() > 7) {
-    //     if(request.params[7].get_str() != "false" && request.params[7].get_str() != "true")
-    //         return "Invalid use_ix, must be true or false";
-    //     useIX = request.params[7].get_str() == "true" ? true : false;
-    // }
-
+    bool useIX = false;
     CWalletTx wtx;
     // make our change address
     CReserveKey keyChange(pwalletMain);
-    if (!pwalletMain->CreateBudgetFeeTX(wtx, proposalHash, keyChange, false)) { // 50 PIV collateral for proposal
+    if (!pwalletMain->CreateBudgetFeeTX(wtx, budgetProposalBroadcast.GetHash(), keyChange, false)) { // 50 PIV collateral for proposal
         throw std::runtime_error("Error making collateral transaction for proposal. Please check your wallet balance.");
     }
 
@@ -199,25 +190,22 @@ UniValue submitbudget(const JSONRPCRequest& request)
 
     uint256 hash = ParseHashV(request.params[6], "parameter 1");
 
-    //create the proposal incase we're the first to make it
-    CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
-
-    std::string strError = "";
-    int nConf = 0;
-    if (!IsBudgetCollateralValid(hash, budgetProposalBroadcast.GetHash(), strError, budgetProposalBroadcast.nTime, nConf)) {
-        throw std::runtime_error("Proposal FeeTX is not valid - " + hash.ToString() + " - " + strError);
-    }
-
     if (!masternodeSync.IsBlockchainSynced()) {
         throw std::runtime_error("Must wait for client to sync with masternode network. Try again in a minute or so.");
     }
 
+    //create the proposal incase we're the first to make it
+    CBudgetProposalBroadcast budgetProposalBroadcast(strProposalName, strURL, nPaymentCount, scriptPubKey, nAmount, nBlockStart, hash);
+
+    if(!budget.AddProposal(budgetProposalBroadcast)) {
+        std::string strError = strprintf("invalid budget proposal - %s", budgetProposalBroadcast.IsInvalidReason());
+        throw std::runtime_error(strError);
+    }
+
     budget.AddSeenProposal(budgetProposalBroadcast);
     budgetProposalBroadcast.Relay();
-    if(budget.AddProposal(budgetProposalBroadcast)) {
-        return budgetProposalBroadcast.GetHash().ToString();
-    }
-    throw std::runtime_error("Invalid proposal, see debug.log for details.");
+
+    return budgetProposalBroadcast.GetHash().ToString();
 }
 
 UniValue mnbudgetvote(const JSONRPCRequest& request)

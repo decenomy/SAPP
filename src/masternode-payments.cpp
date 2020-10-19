@@ -265,7 +265,7 @@ bool IsBlockPayeeValid(const CBlock& block, int nBlockHeight)
     //check if it's a budget block
     if (sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS)) {
         if (budget.IsBudgetPaymentBlock(nBlockHeight)) {
-            transactionStatus = budget.IsTransactionValid(txNew, nBlockHeight);
+            transactionStatus = budget.IsTransactionValid(txNew, block.GetHash(), nBlockHeight);
             if (transactionStatus == TrxValidationStatus::Valid) {
                 return true;
             }
@@ -301,9 +301,10 @@ void FillBlockPayee(CMutableTransaction& txNew, const CBlockIndex* pindexPrev, b
 {
     if (!pindexPrev) return;
 
-    if (sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) && budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1)) {
-        budget.FillBlockPayee(txNew, fProofOfStake);
-    } else {
+    if (!sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS) ||  // if superblocks are not enabled
+            !budget.IsBudgetPaymentBlock(pindexPrev->nHeight + 1) || // or this is not a superblock
+            !budget.FillBlockPayee(txNew, fProofOfStake) ) {         // or there's no budget with enough votes
+        // pay a masternode
         masternodePayments.FillBlockPayee(txNew, pindexPrev, fProofOfStake);
     }
 }
