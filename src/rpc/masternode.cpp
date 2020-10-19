@@ -85,39 +85,37 @@ UniValue listmasternodes(const JSONRPCRequest& request)
     for (int pos=0; pos < (int) vMasternodeRanks.size(); pos++) {
         const auto& s = vMasternodeRanks[pos];
         UniValue obj(UniValue::VOBJ);
-        std::string strVin = s.second.vin.prevout.ToStringShort();
-        std::string strTxHash = s.second.vin.prevout.hash.ToString();
-        uint32_t oIdx = s.second.vin.prevout.n;
+        CMasternode mn = s.second;
 
-        CMasternode* mn = mnodeman.Find(s.second.vin);
+        std::string strVin = mn.vin.prevout.ToStringShort();
+        std::string strTxHash = mn.vin.prevout.hash.ToString();
+        uint32_t oIdx = mn.vin.prevout.n;
 
-        if (mn != NULL) {
-            if (strFilter != "" && strTxHash.find(strFilter) == std::string::npos &&
-                mn->Status().find(strFilter) == std::string::npos &&
-                EncodeDestination(mn->pubKeyCollateralAddress.GetID()).find(strFilter) == std::string::npos) continue;
+        if (strFilter != "" && strTxHash.find(strFilter) == std::string::npos &&
+            mn.Status().find(strFilter) == std::string::npos &&
+            EncodeDestination(mn.pubKeyCollateralAddress.GetID()).find(strFilter) == std::string::npos) continue;
 
-            std::string strStatus = mn->Status();
-            std::string strHost;
-            int port;
-            SplitHostPort(mn->addr.ToString(), port, strHost);
-            CNetAddr node;
-            LookupHost(strHost.c_str(), node, false);
-            std::string strNetwork = GetNetworkName(node.GetNetwork());
+        std::string strStatus = mn.Status();
+        std::string strHost;
+        int port;
+        SplitHostPort(mn.addr.ToString(), port, strHost);
+        CNetAddr node;
+        LookupHost(strHost.c_str(), node, false);
+        std::string strNetwork = GetNetworkName(node.GetNetwork());
 
-            obj.pushKV("rank", (strStatus == "ENABLED" ? pos : 0));
-            obj.pushKV("network", strNetwork);
-            obj.pushKV("txhash", strTxHash);
-            obj.pushKV("outidx", (uint64_t)oIdx);
-            obj.pushKV("pubkey", HexStr(mn->pubKeyMasternode));
-            obj.pushKV("status", strStatus);
-            obj.pushKV("addr", EncodeDestination(mn->pubKeyCollateralAddress.GetID()));
-            obj.pushKV("version", mn->protocolVersion);
-            obj.pushKV("lastseen", (int64_t)mn->lastPing.sigTime);
-            obj.pushKV("activetime", (int64_t)(mn->lastPing.sigTime - mn->sigTime));
-            obj.pushKV("lastpaid", (int64_t)mn->GetLastPaid());
+        obj.pushKV("rank", (strStatus == "ENABLED" ? pos : 0));
+        obj.pushKV("network", strNetwork);
+        obj.pushKV("txhash", strTxHash);
+        obj.pushKV("outidx", (uint64_t)oIdx);
+        obj.pushKV("pubkey", HexStr(mn.pubKeyMasternode));
+        obj.pushKV("status", strStatus);
+        obj.pushKV("addr", EncodeDestination(mn.pubKeyCollateralAddress.GetID()));
+        obj.pushKV("version", mn.protocolVersion);
+        obj.pushKV("lastseen", (int64_t)mn.lastPing.sigTime);
+        obj.pushKV("activetime", (int64_t)(mn.lastPing.sigTime - mn.sigTime));
+        obj.pushKV("lastpaid", (int64_t)mn.GetLastPaid());
 
-            ret.push_back(obj);
-        }
+        ret.push_back(obj);
     }
 
     return ret;
