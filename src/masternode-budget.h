@@ -611,8 +611,6 @@ public:
 
     // compare proposals by proposal hash
     inline bool operator>(const CBudgetProposal& other) const { return GetHash() > other.GetHash(); }
-    // compare proposals pointers by hash
-    static inline bool PtrGreater(CBudgetProposal* a, CBudgetProposal* b) { return *a > *b; }
     // compare proposals pointers by net yes count (solve tie with feeHash)
     static bool PtrHigherYes(CBudgetProposal* a, CBudgetProposal* b);
 
