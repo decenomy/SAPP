@@ -711,7 +711,16 @@ void CBudgetManager::VoteOnFinalizedBudgets()
     }
 
     std::vector<CBudgetProposal> vBudget = GetBudget();
-    // Vector containing the hash of finalized budgets to save
+    if (vBudget.empty()) {
+        LogPrint(BCLog::MNBUDGET,"%s: No proposal can be finalized\n", __func__);
+        return;
+    }
+
+    std::map<uint256, CBudgetProposal> mapWinningProposals;
+    for (const CBudgetProposal& p: vBudget) {
+        mapWinningProposals.emplace(p.GetHash(), p);
+    }
+    // Vector containing the hash of finalized budgets to sign
     std::vector<uint256> vBudgetHashes;
     {
         LOCK(cs_budgets);
@@ -722,8 +731,8 @@ void CBudgetManager::VoteOnFinalizedBudgets()
             pfb->SetAutoChecked(true);
             //only vote for exact matches
             if (strBudgetMode == "auto") {
-                // sort proposals and payments by votes and compare.
-                if (!pfb->CheckProposals(vBudget)) {
+                // compare budget payements with winning proposals
+                if (!pfb->CheckProposals(mapWinningProposals)) {
                     continue;
                 }
             }
@@ -1938,63 +1947,50 @@ struct sortProposalsByHash  {
     }
 };
 
-bool CFinalizedBudget::CheckProposals(std::vector<CBudgetProposal>& vBudget) const
+bool CFinalizedBudget::CheckProposals(const std::map<uint256, CBudgetProposal>& mapWinningProposals) const
 {
-    // Sort proposals by hash
-    std::sort(vBudget.begin(), vBudget.end(), std::greater<CBudgetProposal>());
-
-    // Sort copy payments by hash (descending)
-    std::vector<CTxBudgetPayment> vecBudgetPaymentsSortedByHash(vecBudgetPayments);
-    std::sort(vecBudgetPaymentsSortedByHash.begin(), vecBudgetPaymentsSortedByHash.end(), std::greater<CTxBudgetPayment>());
-
-    for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nProp %d %s\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString());
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - Payee %d %s\n", __func__, i, HexStr(vecBudgetPaymentsSortedByHash[i].payee));
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nAmount %d %lli\n", __func__, i, vecBudgetPaymentsSortedByHash[i].nAmount);
-    }
-
-    for (unsigned int i = 0; i < vBudget.size(); i++) {
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %d %s\n", __func__, i, vBudget[i].GetHash().ToString());
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %d %s\n", __func__, i, HexStr(vBudget[i].GetPayee()));
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %d %lli\n", __func__, i, vBudget[i].GetAmount());
-    }
-
-    if (vBudget.size() == 0) {
+    if (mapWinningProposals.empty()) {
         LogPrint(BCLog::MNBUDGET,"%s: No Budget-Proposals found, aborting\n", __func__);
         return false;
     }
 
-    if (vBudget.size() != vecBudgetPaymentsSortedByHash.size()) {
-        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposal length (%ld) doesn't match Budget-Payment length (%ld).\n", __func__,
-                vBudget.size(), vecBudgetPaymentsSortedByHash.size());
+    if (mapWinningProposals.size() != vecBudgetPayments.size()) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposal length (%ld) doesn't match Budget-Payment length (%ld).\n",
+                __func__, mapWinningProposals.size(), vecBudgetPayments.size());
         return false;
     }
 
-    for (unsigned int i = 0; i < vecBudgetPaymentsSortedByHash.size(); i++) {
-        if (i > vBudget.size() - 1) {
-            LogPrint(BCLog::MNBUDGET,"%s: Proposal size mismatch, i=%d > (vBudgetProposals.size() - 1)=%d\n",
-                    __func__, i, vBudget.size() - 1);
+    for (unsigned int i = 0; i < vecBudgetPayments.size(); i++) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nProp %d %s\n", __func__, i, vecBudgetPayments[i].nProposalHash.ToString());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - Payee %d %s\n", __func__, i, HexStr(vecBudgetPayments[i].payee));
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Payments - nAmount %d %lli\n", __func__, i, vecBudgetPayments[i].nAmount);
+    }
+
+    for (const auto& it: mapWinningProposals) {
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nProp %s\n", __func__, (it.first).ToString());
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - Payee %s\n", __func__, HexStr((it.second).GetPayee()));
+        LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %lli\n", __func__, (it.second).GetAmount());
+    }
+
+    for (const CTxBudgetPayment& p: vecBudgetPayments) {
+        const auto& it = mapWinningProposals.find(p.nProposalHash);
+        if (it == mapWinningProposals.end()) {
+            LogPrint(BCLog::MNBUDGET,"%s: Proposal %s not found\n", __func__, p.nProposalHash.ToString());
             return false;
         }
 
-        if (vecBudgetPaymentsSortedByHash[i].nProposalHash != vBudget[i].GetHash()) {
-            LogPrint(BCLog::MNBUDGET,"%s: item #%d doesn't match %s %s\n", __func__,
-                    i, vecBudgetPaymentsSortedByHash[i].nProposalHash.ToString(), vBudget[i].GetHash().ToString());
+        const CBudgetProposal& prop = it->second;
+        if (p.payee != prop.GetPayee()) {
+            LogPrint(BCLog::MNBUDGET,"%s: payee doesn't match %s != %s\n", __func__, HexStr(p.payee), HexStr(prop.GetPayee()));
             return false;
         }
 
-        if (HexStr(vecBudgetPaymentsSortedByHash[i].payee) != HexStr(vBudget[i].GetPayee())) {
-            LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %s %s\n", __func__,
-                    i, HexStr(vecBudgetPaymentsSortedByHash[i].payee), HexStr(vBudget[i].GetPayee()));
-            return false;
-        }
-
-        if (vecBudgetPaymentsSortedByHash[i].nAmount != vBudget[i].GetAmount()) {
-            LogPrint(BCLog::MNBUDGET,"%s: item #%d payee doesn't match %lli %lli\n", __func__,
-                    i, vecBudgetPaymentsSortedByHash[i].nAmount, vBudget[i].GetAmount());
+        if (p.nAmount != prop.GetAmount()) {
+            LogPrint(BCLog::MNBUDGET,"%s: payee amount doesn't match %lli != %lli\n", __func__, p.nAmount, prop.GetAmount());
             return false;
         }
     }
+
     LogPrint(BCLog::MNBUDGET,"%s: Finalized Budget Matches! Submitting Vote.\n", __func__);
     return true;
 }
