@@ -24,14 +24,23 @@ UniValue initmasternode(const JSONRPCRequest& request)
         throw std::runtime_error(
                 "initmasternode ( \"masternodePrivKey\" \"masternodeAddr\" )\n"
                 "\nInitialize masternode on demand if it's not already initialized.\n"
-        );
+                "\nArguments:\n"
+                "1. masternodePrivKey          (string, required) The masternode private key.\n"
+                "2. masternodeAddr             (string, required) The IP:Port of this masternode.\n"
+
+                "\nResult:\n"
+                " success                      (string) if the masternode initialization succeeded.\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("initmasternode", "\"9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK\" \"187.24.32.124:51472\"") +
+                HelpExampleRpc("initmasternode", "\"9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK\" \"187.24.32.124:51472\""));
     }
 
     std::string _strMasterNodePrivKey = request.params[0].get_str();
     std::string _strMasterNodeAddr = request.params[1].get_str();
     auto res = initMasternode(_strMasterNodePrivKey, _strMasterNodeAddr, false);
     if (!res) throw std::runtime_error(*res.error);
-    return NullUniValue;
+    return "success";
 }
 
 UniValue getcachedblockhashes(const JSONRPCRequest& request)
