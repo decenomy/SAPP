@@ -61,7 +61,6 @@ BITCOIN_TESTS =\
   test/librust/wallet_zkeys_tests.cpp \
   test/librust/merkletree_tests.cpp \
   test/librust/transaction_builder_tests.cpp \
-  test/librust/sapling_wallet_tests.cpp \
   test/base32_tests.cpp \
   test/base58_tests.cpp \
   test/base64_tests.cpp \
@@ -117,7 +116,8 @@ if ENABLE_WALLET
 BITCOIN_TESTS += \
   test/librust/sapling_rpc_wallet_tests.cpp \
   wallet/test/wallet_tests.cpp \
-  wallet/test/crypto_tests.cpp
+  wallet/test/crypto_tests.cpp \
+  test/librust/sapling_wallet_tests.cpp
 endif
 
 test_test_pivx_SOURCES = $(BITCOIN_TEST_SUITE) $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
