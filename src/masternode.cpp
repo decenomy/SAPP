@@ -348,7 +348,7 @@ bool CMasternodeBroadcast::Create(const std::string& strService,
         return false;
     }
 
-    int nPort;
+    int nPort = 0;
     int nDefaultPort = Params().GetDefaultPort();
     std::string strHost;
     SplitHostPort(strService, nPort, strHost);

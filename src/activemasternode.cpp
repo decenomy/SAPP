@@ -37,7 +37,7 @@ void initMasternode(const std::string& _strMasterNodePrivKey, const std::string&
 
     // Address parsing.
     const CChainParams& params = Params();
-    int nPort;
+    int nPort = 0;
     int nDefaultPort = params.GetDefaultPort();
     std::string strHost;
     SplitHostPort(strMasterNodeAddr, nPort, strHost);
@@ -118,7 +118,7 @@ void CActiveMasternode::ManageStatus()
                 return;
             }
         } else {
-            int nPort;
+            int nPort = 0;
             std::string strHost;
             SplitHostPort(strMasterNodeAddr, nPort, strHost);
             service = LookupNumeric(strHost.c_str(), nPort);
