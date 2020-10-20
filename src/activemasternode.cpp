@@ -14,21 +14,26 @@
 #include "netbase.h"
 #include "protocol.h"
 
-void initMasternode(const std::string& _strMasterNodePrivKey, const std::string& _strMasterNodeAddr, bool isFromInit)
+OperationResult errorOut(const std::string& errorStr)
+{
+    return OperationResult(false, errorStr);
+}
+
+OperationResult initMasternode(const std::string& _strMasterNodePrivKey, const std::string& _strMasterNodeAddr, bool isFromInit)
 {
     if (!isFromInit && fMasterNode) {
-        throw std::runtime_error("ERROR: Masternode already initialized.\n");
+        return errorOut( "ERROR: Masternode already initialized.");
     }
 
     LOCK(cs_main); // Lock cs_main so the node doesn't perform any action while we setup the Masternode
     LogPrintf("Initializing masternode, addr %s..\n", _strMasterNodeAddr.c_str());
 
     if (_strMasterNodePrivKey.empty()) {
-        throw std::runtime_error("ERROR: Masternode priv key cannot be empty.\n");
+        return errorOut("ERROR: Masternode priv key cannot be empty.");
     }
 
     if (_strMasterNodeAddr.empty()) {
-        throw std::runtime_error("ERROR: Empty masternodeaddr\n");
+        return errorOut("ERROR: Empty masternodeaddr");
     }
 
     // Global params set
@@ -46,22 +51,23 @@ void initMasternode(const std::string& _strMasterNodePrivKey, const std::string&
     // that if a port is supplied, it matches the required default port.
     if (nPort == 0) nPort = nDefaultPort;
     if (nPort != nDefaultPort && !params.IsRegTestNet()) {
-        throw std::runtime_error(strprintf(_("Invalid -masternodeaddr port %d, only %d is supported on %s-net."),
+        return errorOut(strprintf(_("Invalid -masternodeaddr port %d, only %d is supported on %s-net."),
                                            nPort, nDefaultPort, Params().NetworkIDString()));
     }
     CService addrTest(LookupNumeric(strHost.c_str(), nPort));
     if (!addrTest.IsValid()) {
-        throw std::runtime_error(strprintf(_("Invalid -masternodeaddr address: %s"), strMasterNodeAddr));
+        return errorOut(strprintf(_("Invalid -masternodeaddr address: %s"), strMasterNodeAddr));
     }
 
     CKey key;
     CPubKey pubkey;
 
     if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, key, pubkey)) {
-        throw std::runtime_error(_("Invalid masternodeprivkey. Please see documenation."));
+        return errorOut(_("Invalid masternodeprivkey. Please see the documentation."));
     }
     activeMasternode.pubKeyMasternode = pubkey;
     fMasterNode = true;
+    return OperationResult(true);
 }
 
 //

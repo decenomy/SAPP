@@ -18,8 +18,19 @@
 #define ACTIVE_MASTERNODE_NOT_CAPABLE 3
 #define ACTIVE_MASTERNODE_STARTED 4
 
+class OperationResult
+{
+public:
+    OperationResult(bool _res, const std::string& _error) : res(_res), error(_error) { }
+    OperationResult(bool _res) : res(_res) { }
+
+    bool res{false};
+    Optional<std::string> error{nullopt};
+    explicit operator bool() const { return res; }
+};
+
 // Responsible for initializing the masternode
-void initMasternode(const std::string& strMasterNodePrivKey, const std::string& strMasterNodeAddr, bool isFromInit);
+OperationResult initMasternode(const std::string& strMasterNodePrivKey, const std::string& strMasterNodeAddr, bool isFromInit);
 
 // Responsible for activating the Masternode and pinging the network
 class CActiveMasternode
