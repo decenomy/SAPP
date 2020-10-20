@@ -202,10 +202,10 @@ void DumpMasternodes()
     LogPrint(BCLog::MASTERNODE,"Masternode dump finished  %dms\n", GetTimeMillis() - nStart);
 }
 
-CMasternodeMan::CMasternodeMan()
-{
-    nDsqCount = 0;
-}
+CMasternodeMan::CMasternodeMan():
+        cvLastBlockHashes(CACHED_BLOCK_HASHES, UINT256_ZERO),
+        nDsqCount(0)
+{}
 
 bool CMasternodeMan::Add(CMasternode& mn)
 {
@@ -528,11 +528,12 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
     int nTenthNetwork = CountEnabled() / 10;
     int nCountTenth = 0;
     uint256 nHigh;
+    const uint256& hash = GetHashAtHeight(nBlockHeight - 101);
     for (PAIRTYPE(int64_t, CTxIn) & s : vecMasternodeLastPaid) {
         CMasternode* pmn = Find(s.second);
         if (!pmn) break;
 
-        uint256 n = pmn->CalculateScore(1, nBlockHeight - 100);
+        const uint256& n = pmn->CalculateScore(hash);
         if (n > nHigh) {
             nHigh = n;
             pBestMasternode = pmn;
@@ -547,6 +548,7 @@ CMasternode* CMasternodeMan::GetCurrentMasterNode(int mod, int64_t nBlockHeight,
 {
     int64_t score = 0;
     CMasternode* winner = NULL;
+    const uint256& hash = GetHashAtHeight(nBlockHeight - 1);
 
     // scan for winner
     for (CMasternode& mn : vMasternodes) {
@@ -554,7 +556,7 @@ CMasternode* CMasternodeMan::GetCurrentMasterNode(int mod, int64_t nBlockHeight,
         if (mn.protocolVersion < minProtocol || !mn.IsEnabled()) continue;
 
         // calculate the score for each Masternode
-        uint256 n = mn.CalculateScore(mod, nBlockHeight);
+        uint256 n = mn.CalculateScore(hash);
         int64_t n2 = n.GetCompact(false);
 
         // determine the winner
@@ -573,9 +575,9 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
     int64_t nMasternode_Min_Age = MN_WINNER_MINIMUM_AGE;
     int64_t nMasternode_Age = 0;
 
-    //make sure we know about this block
-    uint256 hash;
-    if (!GetBlockHash(hash, nBlockHeight)) return -1;
+    const uint256& hash = GetHashAtHeight(nBlockHeight - 1);
+    // height outside range
+    if (!hash) return -1;
 
     // scan for winner
     for (CMasternode& mn : vMasternodes) {
@@ -595,7 +597,7 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
             mn.Check();
             if (!mn.IsEnabled()) continue;
         }
-        uint256 n = mn.CalculateScore(1, nBlockHeight);
+        uint256 n = mn.CalculateScore(hash);
         int64_t n2 = n.GetCompact(false);
 
         vecMasternodeScores.emplace_back(n2, mn.vin);
@@ -619,9 +621,9 @@ std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int
     std::vector<std::pair<int64_t, CMasternode> > vecMasternodeScores;
     std::vector<std::pair<int, CMasternode> > vecMasternodeRanks;
 
-    //make sure we know about this block
-    uint256 hash;
-    if (!GetBlockHash(hash, nBlockHeight)) return vecMasternodeRanks;
+    const uint256& hash = GetHashAtHeight(nBlockHeight - 1);
+    // height outside range
+    if (!hash) return vecMasternodeRanks;
 
     // scan for winner
     for (CMasternode& mn : vMasternodes) {
@@ -634,7 +636,7 @@ std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int
             continue;
         }
 
-        uint256 n = mn.CalculateScore(1, nBlockHeight);
+        uint256 n = mn.CalculateScore(hash);
         int64_t n2 = n.GetCompact(false);
 
         vecMasternodeScores.emplace_back(n2, mn);
@@ -829,6 +831,59 @@ std::string CMasternodeMan::ToString() const
     info << "Masternodes: " << (int)vMasternodes.size() << ", peers who asked us for Masternode list: " << (int)mAskedUsForMasternodeList.size() << ", peers we asked for Masternode list: " << (int)mWeAskedForMasternodeList.size() << ", entries in Masternode list we asked for: " << (int)mWeAskedForMasternodeListEntry.size();
 
     return info.str();
+}
+
+void CMasternodeMan::CacheBlockHash(const CBlockIndex* pindex)
+{
+    cvLastBlockHashes.Set(pindex->nHeight, pindex->GetBlockHash());
+}
+
+void CMasternodeMan::UncacheBlockHash(const CBlockIndex* pindex)
+{
+    cvLastBlockHashes.Set(pindex->nHeight, UINT256_ZERO);
+}
+
+uint256 CMasternodeMan::GetHashAtHeight(int nHeight) const
+{
+    // return zero if outside bounds
+    if (nHeight < 0) {
+        LogPrint(BCLog::MASTERNODE, "%s: Negative height. Returning 0\n",  __func__);
+        return UINT256_ZERO;
+    }
+    int nCurrentHeight = GetBestHeight();
+    if (nHeight > nCurrentHeight) {
+        LogPrint(BCLog::MASTERNODE, "%s: height %d over current height %d. Returning 0\n",
+                __func__, nHeight, nCurrentHeight);
+        return UINT256_ZERO;
+    }
+
+    if (nHeight > nCurrentHeight - (int) CACHED_BLOCK_HASHES) {
+        // Use cached hash
+        return cvLastBlockHashes.Get(nHeight);
+    } else {
+        // Use chainActive
+        LOCK(cs_main);
+        return chainActive[nHeight]->GetBlockHash();
+    }
+}
+
+bool CMasternodeMan::IsWithinDepth(const uint256& nHash, int depth) const
+{
+    // Sanity checks
+    if (nHash.IsNull()) {
+        return error("%s: Called with null hash\n", __func__);
+    }
+    if (depth < 0 || (unsigned) depth >= CACHED_BLOCK_HASHES) {
+        return error("%s: Invalid depth %d. Cached block hashes: %d\n", __func__, depth, CACHED_BLOCK_HASHES);
+    }
+    // Check last depth blocks to find one with matching hash
+    const int nCurrentHeight = GetBestHeight();
+    int nStopHeight = std::max(0, nCurrentHeight - depth);
+    for (int i = nCurrentHeight; i >= nStopHeight; i--) {
+        if (GetHashAtHeight(i) == nHash)
+            return true;
+    }
+    return false;
 }
 
 void ThreadCheckMasternodes()

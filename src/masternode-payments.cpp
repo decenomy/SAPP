@@ -413,12 +413,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
 
         if (pfrom->nVersion < ActiveProtocol()) return;
 
-        int nHeight;
-        {
-            TRY_LOCK(cs_main, locked);
-            if (!locked || chainActive.Tip() == NULL) return;
-            nHeight = chainActive.Tip()->nHeight;
-        }
+        int nHeight = mnodeman.GetBestHeight();
 
         if (masternodePayments.mapMasternodePayeeVotes.count(winner.GetHash())) {
             LogPrint(BCLog::MASTERNODE, "mnw - Already seen - %s bestHeight %d\n", winner.GetHash().ToString().c_str(), nHeight);
@@ -487,12 +482,7 @@ bool CMasternodePayments::IsScheduled(CMasternode& mn, int nNotBlockHeight)
 {
     LOCK(cs_mapMasternodeBlocks);
 
-    int nHeight;
-    {
-        TRY_LOCK(cs_main, locked);
-        if (!locked || chainActive.Tip() == NULL) return false;
-        nHeight = chainActive.Tip()->nHeight;
-    }
+    int nHeight = mnodeman.GetBestHeight();
 
     CScript mnpayee;
     mnpayee = GetScriptForDestination(mn.pubKeyCollateralAddress.GetID());
@@ -514,8 +504,8 @@ bool CMasternodePayments::IsScheduled(CMasternode& mn, int nNotBlockHeight)
 
 bool CMasternodePayments::AddWinningMasternode(CMasternodePaymentWinner& winnerIn)
 {
-    uint256 blockHash;
-    if (!GetBlockHash(blockHash, winnerIn.nBlockHeight - 100)) {
+    // check winner height
+    if (winnerIn.nBlockHeight - 100 > mnodeman.GetBestHeight() + 1) {
         return false;
     }
 
@@ -628,12 +618,7 @@ void CMasternodePayments::CleanPaymentList()
 {
     LOCK2(cs_mapMasternodePayeeVotes, cs_mapMasternodeBlocks);
 
-    int nHeight;
-    {
-        TRY_LOCK(cs_main, locked);
-        if (!locked || chainActive.Tip() == NULL) return;
-        nHeight = chainActive.Tip()->nHeight;
-    }
+    int nHeight = mnodeman.GetBestHeight();
 
     //keep up to five cycles for historical sake
     int nLimit = std::max(int(mnodeman.size() * 1.25), 1000);
@@ -661,7 +646,6 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
         return error("%s: Active Masternode not initialized.", __func__);
 
     //reference node - hybrid mode
-
     int n = mnodeman.GetMasternodeRank(*(activeMasternode.vin), nBlockHeight - 100, ActiveProtocol());
 
     if (n == -1) {
@@ -731,13 +715,7 @@ void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
 {
     LOCK(cs_mapMasternodePayeeVotes);
 
-    int nHeight;
-    {
-        TRY_LOCK(cs_main, locked);
-        if (!locked || chainActive.Tip() == NULL) return;
-        nHeight = chainActive.Tip()->nHeight;
-    }
-
+    int nHeight = mnodeman.GetBestHeight();
     int nCount = (mnodeman.CountEnabled() * 1.25);
     if (nCountNeeded > nCount) nCountNeeded = nCount;
 

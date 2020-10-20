@@ -86,6 +86,7 @@ BASE_SCRIPTS= [
     'mining_pos_fakestake.py',                  # ~ 113 sec
     'feature_reindex.py',                       # ~ 110 sec
     'interface_http.py',                        # ~ 105 sec
+    'feature_blockhashcache.py',                # ~ 100 sec
     'wallet_listtransactions.py',               # ~ 97 sec
     'mempool_reorg.py',                         # ~ 92 sec
     'sapling_wallet_persistence.py',            # ~ 90 sec

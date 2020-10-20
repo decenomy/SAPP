@@ -32,46 +32,7 @@
 
 // keep track of the scanning errors I've seen
 std::map<uint256, int> mapSeenMasternodeScanningErrors;
-// cache block hashes as we calculate them
-std::map<int64_t, uint256> mapCacheBlockHashes;
 
-//Get the last hash that matches the modulus given. Processed in reverse order
-bool GetBlockHash(uint256& hash, int nBlockHeight)
-{
-    const CBlockIndex* tipIndex = GetChainTip();
-    if (!tipIndex || !tipIndex->nHeight) return false;
-
-    if (nBlockHeight == 0)
-        nBlockHeight = tipIndex->nHeight;
-
-    if (mapCacheBlockHashes.count(nBlockHeight)) {
-        hash = mapCacheBlockHashes[nBlockHeight];
-        return true;
-    }
-
-    int nBlocksAgo = 0;
-    if (nBlockHeight > 0) nBlocksAgo = (tipIndex->nHeight + 1) - nBlockHeight;
-    if (nBlocksAgo < 0) return false;
-
-    const CBlockIndex* BlockReading = tipIndex;
-    int n = 0;
-    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-        if (n >= nBlocksAgo) {
-            hash = BlockReading->GetBlockHash();
-            mapCacheBlockHashes[nBlockHeight] = hash;
-            return true;
-        }
-        n++;
-
-        if (BlockReading->pprev == NULL) {
-            assert(BlockReading);
-            break;
-        }
-        BlockReading = BlockReading->pprev;
-    }
-
-    return false;
-}
 
 int MasternodeMinPingSeconds()
 {
@@ -102,6 +63,7 @@ int MasternodeRemovalSeconds()
 {
     return Params().IsRegTestNet() ? MASTERNODE_REMOVAL_SECONDS_REGTEST : MASTERNODE_REMOVAL_SECONDS;
 }
+
 
 CMasternode::CMasternode() :
         CSignedMessage()
@@ -194,33 +156,19 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb)
 // the proof of work for that block. The further away they are the better, the furthest will win the election
 // and get paid this block
 //
-uint256 CMasternode::CalculateScore(int mod, int64_t nBlockHeight)
+uint256 CMasternode::CalculateScore(const uint256& hash) const
 {
-    {
-        LOCK(cs_main);
-        if (!chainActive.Tip()) return UINT256_ZERO;
-    }
-
-    uint256 hash;
-    uint256 aux = vin.prevout.hash + vin.prevout.n;
-
-    if (!GetBlockHash(hash, nBlockHeight)) {
-        LogPrint(BCLog::MASTERNODE,"CalculateScore ERROR - nHeight %d - Returned 0\n", nBlockHeight);
-        return UINT256_ZERO;
-    }
-
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     ss << hash;
-    uint256 hash2 = ss.GetHash();
+    const uint256& hash2 = ss.GetHash();
 
     CHashWriter ss2(SER_GETHASH, PROTOCOL_VERSION);
     ss2 << hash;
+    const uint256& aux = vin.prevout.hash + vin.prevout.n;
     ss2 << aux;
-    uint256 hash3 = ss2.GetHash();
+    const uint256& hash3 = ss2.GetHash();
 
-    uint256 r = (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
-
-    return r;
+    return (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
 }
 
 void CMasternode::Check(bool forceCheck)
@@ -366,7 +314,13 @@ CMasternodeBroadcast::CMasternodeBroadcast(const CMasternode& mn) :
         CMasternode(mn)
 { }
 
-bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast& mnbRet, bool fOffline)
+bool CMasternodeBroadcast::Create(const std::string& strService,
+                                  const std::string& strKeyMasternode,
+                                  const std::string& strTxHash,
+                                  const std::string& strOutputIndex,
+                                  std::string& strErrorRet,
+                                  CMasternodeBroadcast& mnbRet,
+                                  bool fOffline)
 {
     CTxIn txin;
     CPubKey pubKeyCollateralAddressNew;
@@ -408,7 +362,14 @@ bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMast
     return Create(txin, _service, keyCollateralAddressNew, pubKeyCollateralAddressNew, keyMasternodeNew, pubKeyMasternodeNew, strErrorRet, mnbRet);
 }
 
-bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollateralAddressNew, CPubKey pubKeyCollateralAddressNew, CKey keyMasternodeNew, CPubKey pubKeyMasternodeNew, std::string& strErrorRet, CMasternodeBroadcast& mnbRet)
+bool CMasternodeBroadcast::Create(const CTxIn& txin,
+                                  const CService& service,
+                                  const CKey& keyCollateralAddressNew,
+                                  const CPubKey& pubKeyCollateralAddressNew,
+                                  const CKey& keyMasternodeNew,
+                                  const CPubKey& pubKeyMasternodeNew,
+                                  std::string& strErrorRet,
+                                  CMasternodeBroadcast& mnbRet)
 {
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
@@ -417,7 +378,9 @@ bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollater
              EncodeDestination(pubKeyCollateralAddressNew.GetID()),
         pubKeyMasternodeNew.GetID().ToString());
 
-    CMasternodePing mnp(txin);
+    // Get block hash to ping (TODO: move outside of this function)
+    const uint256& nBlockHashToPing = mnodeman.GetBlockHashToPing();
+    CMasternodePing mnp(txin, nBlockHashToPing);
     if (!mnp.Sign(keyMasternodeNew, pubKeyMasternodeNew)) {
         strErrorRet = strprintf("Failed to sign ping, masternode=%s", txin.prevout.hash.ToString());
         LogPrint(BCLog::MASTERNODE,"CMasternodeBroadcast::Create -- %s\n", strErrorRet);
@@ -692,19 +655,12 @@ CMasternodePing::CMasternodePing() :
         sigTime(GetAdjustedTime())
 { }
 
-CMasternodePing::CMasternodePing(CTxIn& newVin) :
+CMasternodePing::CMasternodePing(const CTxIn& newVin, const uint256& nBlockHash) :
         CSignedMessage(),
         vin(newVin),
+        blockHash(nBlockHash),
         sigTime(GetAdjustedTime())
-{
-    int nHeight;
-    {
-        LOCK(cs_main);
-        nHeight = chainActive.Height();
-        if (nHeight > 12)
-            blockHash = chainActive[nHeight - 12]->GetBlockHash();
-    }
-}
+{ }
 
 uint256 CMasternodePing::GetHash() const
 {
@@ -764,23 +720,11 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
                 return false;
             }
 
-            // Check if the ping block hash exists in disk
-            BlockMap::iterator mi = mapBlockIndex.find(blockHash);
-            if (mi == mapBlockIndex.end() || !(*mi).second) {
-                LogPrint(BCLog::MNPING,"%s: ping block not in disk. Masternode %s block hash %s\n", __func__, vin.prevout.hash.ToString(), blockHash.ToString());
+            // Check if the ping block hash exists and it's within 24 blocks from the tip
+            if (!mnodeman.IsWithinDepth(blockHash, 2 * MNPING_DEPTH)) {
+                LogPrint(BCLog::MNPING,"%s: Masternode %s block hash %s is too old or has an invalid block hash\n",
+                                                __func__, vin.prevout.hash.ToString(), blockHash.ToString());
                 return false;
-            }
-
-            // Verify ping block hash in main chain and in the [ tip > x > tip - 24 ] range.
-            {
-                LOCK(cs_main);
-                if (!chainActive.Contains((*mi).second) || (chainActive.Height() - (*mi).second->nHeight > 24)) {
-                    LogPrint(BCLog::MNPING,"%s: Masternode %s block hash %s is too old or has an invalid block hash\n",
-                            __func__, vin.prevout.hash.ToString(), blockHash.ToString());
-                    // Do nothing here (no Masternode update, no mnping relay)
-                    // Let this node to be visible but fail to accept mnping
-                    return false;
-                }
             }
 
             pmn->lastPing = *this;

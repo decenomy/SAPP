@@ -1906,6 +1906,14 @@ bool static DisconnectTip(CValidationState& state)
     // UpdateTransactionsFromBlock finds descendants of any transactions in this
     // block that were added back and cleans up the mempool state.
     mempool.UpdateTransactionsFromBlock(vHashUpdate);
+    // Update MN manager cache
+    // replace the cached hash of pindexDelete with the hash of the block
+    // at depth CACHED_BLOCK_HASHES if it exists, or empty hash otherwise.
+    if ((unsigned) pindexDelete->nHeight >= CACHED_BLOCK_HASHES) {
+        mnodeman.CacheBlockHash(chainActive[pindexDelete->nHeight - CACHED_BLOCK_HASHES]);
+    } else {
+        mnodeman.UncacheBlockHash(pindexDelete);
+    }
     // Update chainActive and related variables.
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
@@ -1994,6 +2002,8 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const st
     mempool.removeForBlock(blockConnecting.vtx, pindexNew->nHeight, connectTrace.txConflicted, !IsInitialBlockDownload());
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
+    // Update MN manager cache
+    mnodeman.CacheBlockHash(pindexNew);
 
     int64_t nTime6 = GetTimeMicros();
     nTimePostConnect += nTime6 - nTime5;
@@ -3343,6 +3353,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const std::shared_pt
         return error("%s : ActivateBestChain failed", __func__);
 
     if (!fLiteMode) {
+        mnodeman.SetBestHeight(newHeight);
         budget.NewBlock(newHeight);
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
             masternodePayments.ProcessBlock(newHeight + 10);
