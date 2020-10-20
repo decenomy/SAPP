@@ -167,7 +167,6 @@ bool SaplingScriptPubKeyMan::AddSaplingSpendingKey(
         CSecureDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
         ss << sk;
         CKeyingMaterial vchSecret(ss.begin(), ss.end());
-        auto address = sk.DefaultAddress();
         auto extfvk = sk.ToXFVK();
         if (!EncryptSecret(wallet->GetEncryptionKey(), vchSecret, extfvk.fvk.GetFingerprint(), vchCryptedSecret)) {
             return false;
