@@ -6,7 +6,6 @@
 #ifndef BITCOIN_BLOOM_H
 #define BITCOIN_BLOOM_H
 
-#include "libzerocoin/bignum.h"
 #include "serialize.h"
 
 #include <vector>
@@ -81,8 +80,6 @@ public:
         READWRITE(nTweak);
         READWRITE(nFlags);
     }
-
-    void setNotFull();
 
     void insert(const std::vector<unsigned char>& vKey);
     void insert(const COutPoint& outpoint);
