@@ -70,7 +70,7 @@ bool WalletModel::isColdStakingNetworkelyEnabled() const
 
 bool WalletModel::isStakingStatusActive() const
 {
-    return wallet->pStakerStatus->IsActive();
+    return wallet && wallet->pStakerStatus && wallet->pStakerStatus->IsActive();
 }
 
 bool WalletModel::isHDEnabled() const
