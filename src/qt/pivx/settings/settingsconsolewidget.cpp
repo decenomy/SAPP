@@ -4,7 +4,7 @@
 
 #include "qt/pivx/settings/settingsconsolewidget.h"
 #include "qt/pivx/settings/forms/ui_settingsconsolewidget.h"
-#include "QGraphicsDropShadowEffect"
+
 #include "qt/pivx/qtutils.h"
 
 #include "clientmodel.h"
@@ -14,6 +14,8 @@
 #include "rpc/client.h"
 #include "rpc/server.h"
 #include "util.h"
+#include "utilitydialog.h"
+
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
 #endif // ENABLE_WALLET
@@ -27,6 +29,7 @@
 #endif
 
 #include <QDir>
+#include <QGraphicsDropShadowEffect>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QScrollBar>
@@ -35,8 +38,6 @@
 #include <QTime>
 #include <QTimer>
 #include <QStringList>
-#include "qt/pivx/qtutils.h"
-#include "utilitydialog.h"
 
 const int CONSOLE_HISTORY = 50;
 
