@@ -8,6 +8,7 @@
 
 #include "chain.h"
 #include "chainparams.h"
+#include "reverse_iterate.h"
 #include "uint256.h"
 #include "validation.h"
 

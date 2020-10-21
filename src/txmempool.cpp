@@ -8,6 +8,7 @@
 
 #include "clientversion.h"
 #include "policy/fees.h"
+#include "reverse_iterate.h"
 #include "streams.h"
 #include "timedata.h"
 #include "util.h"

@@ -37,6 +37,7 @@
 #include "net_processing.h"
 #include "policy/policy.h"
 #include "pow.h"
+#include "reverse_iterate.h"
 #include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"

@@ -35,6 +35,7 @@
 #include "netbase.h"
 #include "net_processing.h"
 #include "policy/policy.h"
+#include "reverse_iterate.h"
 #include "rpc/server.h"
 #include "script/sigcache.h"
 #include "script/standard.h"

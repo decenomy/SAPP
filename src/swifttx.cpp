@@ -13,6 +13,7 @@
 #include "messagesigner.h"
 #include "net.h"
 #include "protocol.h"
+#include "reverse_iterate.h"
 #include "spork.h"
 #include "sync.h"
 #include "util.h"
