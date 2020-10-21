@@ -139,11 +139,24 @@ jobs:
         HOST=x86_64-unknown-linux-gnu
         PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools libqt5svg5-dev libqt5charts5-dev libqrencode-dev protobuf-compiler libdbus-1-dev libharfbuzz-dev libprotobuf-dev"
         DEP_OPTS="NO_QT=1 NO_UPNP=1 DEBUG=1 ALLOW_HOST_PACKAGES=1"
+        RUN_UNIT_TESTS=false
         RUN_FUNCTIONAL_TESTS=true
         #TEST_RUNNER_EXTRA="--coverage --extended"  # Run extended tests so that coverage does not fail, but exclude the very slow dbcrash
         GOAL="install"
         BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-online-rust --with-params-dir=$PARAMS_DIR"
         BUILD_TIMEOUT=540
+
+    - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [only unit tests]'
+      env: >-
+        HOST=x86_64-unknown-linux-gnu
+        PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools libqt5svg5-dev libqt5charts5-dev libqrencode-dev protobuf-compiler libdbus-1-dev libharfbuzz-dev libprotobuf-dev"
+        DEP_OPTS="NO_QT=1 NO_UPNP=1 DEBUG=1 ALLOW_HOST_PACKAGES=1"
+        RUN_UNIT_TESTS=true
+        RUN_FUNCTIONAL_TESTS=false
+        GOAL="install"
+        BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports --disable-online-rust --with-params-dir=$PARAMS_DIR"
+        BUILT_TIMEOUT=1200
 
     - stage: test
       name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no GUI, no unit tests - only functional tests on legacy pre-HD wallets]'
