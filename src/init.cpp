@@ -1026,9 +1026,9 @@ bool AppInit2()
 
     // Now remove the logging categories which were explicitly excluded
     for (const std::string& cat : gArgs.GetArgs("-debugexclude")) {
-            if (!g_logger->DisableCategory(cat)) {
-                UIWarning(strprintf(_("Unsupported logging category %s=%s."), "-debugexclude", cat));
-            }
+        if (!g_logger->DisableCategory(cat)) {
+            UIWarning(strprintf(_("Unsupported logging category %s=%s."), "-debugexclude", cat));
+        }
     }
 
     // Check for -debugnet
@@ -1363,11 +1363,11 @@ bool AppInit2()
     }
 
     for (const auto& net : gArgs.GetArgs("-whitelist")) {
-            CSubNet subnet;
-            LookupSubNet(net.c_str(), subnet);
-            if (!subnet.IsValid())
-                return UIError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
-            connman.AddWhitelistedRange(subnet);
+        CSubNet subnet;
+        LookupSubNet(net.c_str(), subnet);
+        if (!subnet.IsValid())
+            return UIError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
+        connman.AddWhitelistedRange(subnet);
     }
 
     // Check for host lookup allowed before parsing any network related parameters
@@ -1422,18 +1422,18 @@ bool AppInit2()
     bool fBound = false;
     if (fListen) {
         for (const std::string& strBind : gArgs.GetArgs("-bind")) {
-                CService addrBind;
-                if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
-                    return UIError(ResolveErrMsg("bind", strBind));
-                fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
+            CService addrBind;
+            if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
+                return UIError(ResolveErrMsg("bind", strBind));
+            fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
         }
         for (const std::string& strBind : gArgs.GetArgs("-whitebind")) {
-                CService addrBind;
-                if (!Lookup(strBind.c_str(), addrBind, 0, false))
-                    return UIError(ResolveErrMsg("whitebind", strBind));
-                if (addrBind.GetPort() == 0)
-                    return UIError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
-                fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
+            CService addrBind;
+            if (!Lookup(strBind.c_str(), addrBind, 0, false))
+                return UIError(ResolveErrMsg("whitebind", strBind));
+            if (addrBind.GetPort() == 0)
+                return UIError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
+            fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
         }
         if (!gArgs.IsArgSet("-bind") && !gArgs.IsArgSet("-whitebind")) {
             struct in_addr inaddr_any;
@@ -1446,11 +1446,11 @@ bool AppInit2()
     }
 
     for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
-            CService addrLocal;
-            if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
-                AddLocal(addrLocal,LOCAL_MANUAL);
-            else
-                return UIError(ResolveErrMsg("externalip", strAddr));
+        CService addrLocal;
+        if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
+            AddLocal(addrLocal, LOCAL_MANUAL);
+        else
+            return UIError(ResolveErrMsg("externalip", strAddr));
     }
 
     if (gArgs.IsArgSet("-seednode")) {
