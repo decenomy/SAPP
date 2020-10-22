@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_encrypted_wallet_sapzkeys)
     strWalletPass.reserve(100);
     strWalletPass = "hello";
 
-    PushCurrentDirectory push_dir(GetArg("-datadir","/tmp/thisshouldnothappen"));
+    PushCurrentDirectory push_dir(gArgs.GetArg("-datadir","/tmp/thisshouldnothappen"));
     BOOST_CHECK(pwalletMain->EncryptWallet(strWalletPass));
 
     // Verify we can still list the keys imported

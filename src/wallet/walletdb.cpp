@@ -747,7 +747,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
                     fNoncriticalErrors = true; // ... but do warn the user there is something wrong.
                     if (strType == "tx")
                         // Rescan if there is a bad transaction record:
-                        SoftSetBoolArg("-rescan", true);
+                        gArgs.SoftSetBoolArg("-rescan", true);
                 }
             }
             if (!strErr.empty())
@@ -881,7 +881,7 @@ void ThreadFlushWalletDB()
     if (fOneThread)
         return;
     fOneThread = true;
-    if (!GetBoolArg("-flushwallet", DEFAULT_FLUSHWALLET))
+    if (!gArgs.GetBoolArg("-flushwallet", DEFAULT_FLUSHWALLET))
         return;
 
     unsigned int nLastSeen = CWalletDB::GetUpdateCounter();
@@ -941,7 +941,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
     if (!wallet.fFileBacked) {
         return false;
     } else if(fEnableCustom) {
-        pathWithFile = GetArg("-backuppath", "");
+        pathWithFile = gArgs.GetArg("-backuppath", "");
         if(!pathWithFile.empty()) {
             if(!pathWithFile.has_extension()) {
                 pathCustom = pathWithFile;
@@ -977,7 +977,7 @@ bool BackupWallet(const CWallet& wallet, const fs::path& strDest, bool fEnableCu
                 bool defaultPath = AttemptBackupWallet(wallet, pathSrc.string(), pathDest.string());
 
                 if(defaultPath && !pathCustom.empty()) {
-                    int nThreshold = GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
+                    int nThreshold = gArgs.GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
                     if (nThreshold > 0) {
 
                         typedef std::multimap<std::time_t, fs::path> folder_set_t;

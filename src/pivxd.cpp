@@ -63,13 +63,13 @@ bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/pivx.conf are parsed in qt/pivx.cpp's main()
-    ParseParameters(argc, argv);
+    gArgs.ParseParameters(argc, argv);
 
     // Process help and version before taking care about datadir
-    if (IsArgSet("-?") || IsArgSet("-h") || IsArgSet("-help") || IsArgSet("-version")) {
+    if (gArgs.IsArgSet("-?") || gArgs.IsArgSet("-h") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
         std::string strUsage = _("Pivx Core Daemon") + " " + _("version") + " " + FormatFullVersion() + "\n";
 
-        if (IsArgSet("-version")) {
+        if (gArgs.IsArgSet("-version")) {
             strUsage += LicenseInfo();
         } else {
             strUsage += "\n" + _("Usage:") + "\n" +
@@ -84,11 +84,11 @@ bool AppInit(int argc, char* argv[])
 
     try {
         if (!fs::is_directory(GetDataDir(false))) {
-            fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", GetArg("-datadir", "").c_str());
+            fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "").c_str());
             return false;
         }
         try {
-            ReadConfigFile();
+            gArgs.ReadConfigFile();
         } catch (const std::exception& e) {
             fprintf(stderr, "Error reading configuration file: %s\n", e.what());
             return false;
@@ -117,7 +117,7 @@ bool AppInit(int argc, char* argv[])
             exit(1);
         }
 #ifndef WIN32
-        fDaemon = GetBoolArg("-daemon", false);
+        fDaemon = gArgs.GetBoolArg("-daemon", false);
         if (fDaemon) {
             fprintf(stdout, "PIVX server starting\n");
 
@@ -138,7 +138,7 @@ bool AppInit(int argc, char* argv[])
                 fprintf(stderr, "Error: setsid() returned %d errno %d\n", sid, errno);
         }
 #endif
-        SoftSetBoolArg("-server", true);
+        gArgs.SoftSetBoolArg("-server", true);
 
         // Set this early so that parameter interactions go to console
         InitLogging();

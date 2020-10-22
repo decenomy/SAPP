@@ -47,7 +47,7 @@ TestingSetup::TestingSetup()
         ClearDatadirCache();
         pathTemp = GetTempPath() / strprintf("test_pivx_%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(100000)));
         fs::create_directories(pathTemp);
-        ForceSetArg("-datadir", pathTemp.string());
+        gArgs.ForceSetArg("-datadir", pathTemp.string());
         pblocktree = new CBlockTreeDB(1 << 20, true);
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);

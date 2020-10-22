@@ -380,14 +380,14 @@ void OnRPCPreCommand(const CRPCCommand& cmd)
 {
     // Observe safe mode
     std::string strWarning = GetWarnings("rpc");
-    if (strWarning != "" && !GetBoolArg("-disablesafemode", DEFAULT_DISABLE_SAFEMODE) &&
+    if (strWarning != "" && !gArgs.GetBoolArg("-disablesafemode", DEFAULT_DISABLE_SAFEMODE) &&
         !cmd.okSafeMode)
         throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, std::string("Safe mode: ") + strWarning);
 }
 
 std::string HelpMessage(HelpMessageMode mode)
 {
-    const bool showDebug = GetBoolArg("-help-debug", false);
+    const bool showDebug = gArgs.GetBoolArg("-help-debug", false);
 
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
     std::string strUsage = HelpMessageGroup(_("Options:"));
@@ -593,7 +593,7 @@ static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex
     if (initialSync || !pBlockIndex)
         return;
 
-    std::string strCmd = GetArg("-blocknotify", "");
+    std::string strCmd = gArgs.GetArg("-blocknotify", "");
 
     if (!strCmd.empty()) {
         boost::replace_all(strCmd, "%s", pBlockIndex->GetBlockHash().GetHex());
@@ -604,7 +604,7 @@ static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex
 
 static void BlockSizeNotifyCallback(int size, const uint256& hashNewTip)
 {
-    std::string strCmd = GetArg("-blocksizenotify", "");
+    std::string strCmd = gArgs.GetArg("-blocksizenotify", "");
 
     boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
     boost::replace_all(strCmd, "%d", std::to_string(size));
@@ -698,7 +698,7 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
         }
     }
 
-    if (GetBoolArg("-stopafterblockimport", DEFAULT_STOPAFTERBLOCKIMPORT)) {
+    if (gArgs.GetBoolArg("-stopafterblockimport", DEFAULT_STOPAFTERBLOCKIMPORT)) {
         LogPrintf("Stopping after block import\n");
         StartShutdown();
     }
@@ -761,7 +761,7 @@ bool AppInitServers()
         return false;
     if (!StartHTTPRPC())
         return false;
-    if (GetBoolArg("-rest", DEFAULT_REST_ENABLE) && !StartREST())
+    if (gArgs.GetBoolArg("-rest", DEFAULT_REST_ENABLE) && !StartREST())
         return false;
     if (!StartHTTPServer())
         return false;
@@ -811,9 +811,9 @@ bool AppInitBasicSetup()
         return UIError("Error: Initializing networking failed");
 
 #ifndef WIN32
-    if (GetBoolArg("-sysperms", false)) {
+    if (gArgs.GetBoolArg("-sysperms", false)) {
 #ifdef ENABLE_WALLET
-        if (!GetBoolArg("-disablewallet", false))
+        if (!gArgs.GetBoolArg("-disablewallet", false))
             return UIError("Error: -sysperms is not allowed in combination with enabled wallet functionality");
 #endif
     } else {
@@ -839,64 +839,64 @@ bool AppInitBasicSetup()
 // Parameter interaction based on rules
 void InitParameterInteraction()
 {
-    if (IsArgSet("-bind") || IsArgSet("-whitebind")) {
+    if (gArgs.IsArgSet("-bind") || gArgs.IsArgSet("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
         // even when -connect or -proxy is specified
-        if (SoftSetBoolArg("-listen", true))
+        if (gArgs.SoftSetBoolArg("-listen", true))
             LogPrintf("%s : parameter interaction: -bind or -whitebind set -> setting -listen=1\n", __func__);
     }
 
     if (gArgs.IsArgSet("-connect")) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
-        if (SoftSetBoolArg("-dnsseed", false))
+        if (gArgs.SoftSetBoolArg("-dnsseed", false))
             LogPrintf("%s : parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
-        if (SoftSetBoolArg("-listen", false))
+        if (gArgs.SoftSetBoolArg("-listen", false))
             LogPrintf("%s : parameter interaction: -connect set -> setting -listen=0\n", __func__);
     }
 
-    if (IsArgSet("-proxy")) {
+    if (gArgs.IsArgSet("-proxy")) {
         // to protect privacy, do not listen by default if a default proxy server is specified
-        if (SoftSetBoolArg("-listen", false))
+        if (gArgs.SoftSetBoolArg("-listen", false))
             LogPrintf("%s: parameter interaction: -proxy set -> setting -listen=0\n", __func__);
         // to protect privacy, do not use UPNP when a proxy is set. The user may still specify -listen=1
         // to listen locally, so don't rely on this happening through -listen below.
-        if (SoftSetBoolArg("-upnp", false))
+        if (gArgs.SoftSetBoolArg("-upnp", false))
             LogPrintf("%s: parameter interaction: -proxy set -> setting -upnp=0\n", __func__);
         // to protect privacy, do not discover addresses by default
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("%s : parameter interaction: -proxy set -> setting -discover=0\n", __func__);
     }
 
-    if (!GetBoolArg("-listen", DEFAULT_LISTEN)) {
+    if (!gArgs.GetBoolArg("-listen", DEFAULT_LISTEN)) {
         // do not map ports or try to retrieve public IP when not listening (pointless)
-        if (SoftSetBoolArg("-upnp", false))
+        if (gArgs.SoftSetBoolArg("-upnp", false))
             LogPrintf("%s : parameter interaction: -listen=0 -> setting -upnp=0\n", __func__);
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("%s : parameter interaction: -listen=0 -> setting -discover=0\n", __func__);
-        if (SoftSetBoolArg("-listenonion", false))
+        if (gArgs.SoftSetBoolArg("-listenonion", false))
             LogPrintf("%s : parameter interaction: -listen=0 -> setting -listenonion=0\n", __func__);
     }
 
-    if (IsArgSet("-externalip")) {
+    if (gArgs.IsArgSet("-externalip")) {
         // if an explicit public IP is specified, do not try to find others
-        if (SoftSetBoolArg("-discover", false))
+        if (gArgs.SoftSetBoolArg("-discover", false))
             LogPrintf("%s : parameter interaction: -externalip set -> setting -discover=0\n", __func__);
     }
 
-    if (GetBoolArg("-salvagewallet", false)) {
+    if (gArgs.GetBoolArg("-salvagewallet", false)) {
         // Rewrite just private keys: rescan to find transactions
-        if (SoftSetBoolArg("-rescan", true))
+        if (gArgs.SoftSetBoolArg("-rescan", true))
             LogPrintf("%s : parameter interaction: -salvagewallet=1 -> setting -rescan=1\n", __func__);
     }
 
     // -zapwallettx implies a rescan
-    if (GetBoolArg("-zapwallettxes", false)) {
-        if (SoftSetBoolArg("-rescan", true))
+    if (gArgs.GetBoolArg("-zapwallettxes", false)) {
+        if (gArgs.SoftSetBoolArg("-rescan", true))
             LogPrintf("%s : parameter interaction: -zapwallettxes=<mode> -> setting -rescan=1\n", __func__);
     }
 
-    if (!GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
-        if (SoftSetArg("-swifttxdepth", "0"))
+    if (!gArgs.GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
+        if (gArgs.SoftSetArg("-swifttxdepth", "0"))
             LogPrintf("%s : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n", __func__);
     }
 }
@@ -968,7 +968,7 @@ void InitLogging()
     g_logger->m_log_timestamps = gArgs.GetBoolArg("-logtimestamps", DEFAULT_LOGTIMESTAMPS);
     g_logger->m_log_time_micros = gArgs.GetBoolArg("-logtimemicros", DEFAULT_LOGTIMEMICROS);
 
-    fLogIPs = GetBoolArg("-logips", DEFAULT_LOGIPS);
+    fLogIPs = gArgs.GetBoolArg("-logips", DEFAULT_LOGIPS);
 
     std::string version_string = FormatFullVersion();
 #ifdef DEBUG
@@ -998,7 +998,7 @@ bool AppInit2()
     }
 
     int nBind = std::max(nUserBind, size_t(1));
-    int nUserMaxConnections = GetArg("-maxconnections", DEFAULT_MAX_PEER_CONNECTIONS);
+    int nUserMaxConnections = gArgs.GetArg("-maxconnections", DEFAULT_MAX_PEER_CONNECTIONS);
     int nMaxConnections = std::max(nUserMaxConnections, 0);
 
     // Trim requested connection counts, to fit into system limitations
@@ -1014,7 +1014,7 @@ bool AppInit2()
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
     const std::vector<std::string>& categories = gArgs.GetArgs("-debug");
 
-    if (!(GetBoolArg("-nodebug", false) ||
+    if (!(gArgs.GetBoolArg("-nodebug", false) ||
             find(categories.begin(), categories.end(), std::string("0")) != categories.end())) {
         for (const auto& cat : categories) {
             if (!g_logger->EnableCategory(cat)) {
@@ -1031,44 +1031,44 @@ bool AppInit2()
     }
 
     // Check for -debugnet
-    if (GetBoolArg("-debugnet", false))
+    if (gArgs.GetBoolArg("-debugnet", false))
         UIWarning(_("Warning: Unsupported argument -debugnet ignored, use -debug=net."));
     // Check for -socks - as this is a privacy risk to continue, exit here
-    if (IsArgSet("-socks"))
+    if (gArgs.IsArgSet("-socks"))
         return UIError(_("Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported."));
     // Check for -tor - as this is a privacy risk to continue, exit here
-    if (GetBoolArg("-tor", false))
+    if (gArgs.GetBoolArg("-tor", false))
         return UIError(_("Error: Unsupported argument -tor found, use -onion."));
     // Check level must be 4 for zerocoin checks
-    if (IsArgSet("-checklevel"))
+    if (gArgs.IsArgSet("-checklevel"))
         return UIError(_("Error: Unsupported argument -checklevel found. Checklevel must be level 4."));
     // Exit early if -masternode=1 and -listen=0
-    if (GetBoolArg("-masternode", DEFAULT_MASTERNODE) && !GetBoolArg("-listen", DEFAULT_LISTEN))
+    if (gArgs.GetBoolArg("-masternode", DEFAULT_MASTERNODE) && !gArgs.GetBoolArg("-listen", DEFAULT_LISTEN))
         return UIError(_("Error: -listen must be true if -masternode is set."));
     // Exit early if -masternode=1 and -port is not the default port
-    if (GetBoolArg("-masternode", DEFAULT_MASTERNODE) && (GetListenPort() != Params().GetDefaultPort() && !Params().IsRegTestNet()))
+    if (gArgs.GetBoolArg("-masternode", DEFAULT_MASTERNODE) && (GetListenPort() != Params().GetDefaultPort() && !Params().IsRegTestNet()))
         return UIError(strprintf(_("Error: Invalid port %d for running a masternode."), GetListenPort()) + "\n\n" +
                        strprintf(_("Masternodes are required to run on port %d for %s-net"), Params().GetDefaultPort(), Params().NetworkIDString()));
 
-    if (GetBoolArg("-benchmark", false))
+    if (gArgs.GetBoolArg("-benchmark", false))
         UIWarning(_("Warning: Unsupported argument -benchmark ignored, use -debug=bench."));
 
     // Checkmempool and checkblockindex default to true in regtest mode
-    int ratio = std::min<int>(std::max<int>(GetArg("-checkmempool", Params().DefaultConsistencyChecks() ? 1 : 0), 0), 1000000);
+    int ratio = std::min<int>(std::max<int>(gArgs.GetArg("-checkmempool", Params().DefaultConsistencyChecks() ? 1 : 0), 0), 1000000);
     if (ratio != 0) {
         mempool.setSanityCheck(1.0 / ratio);
     }
-    fCheckBlockIndex = GetBoolArg("-checkblockindex", Params().DefaultConsistencyChecks());
-    Checkpoints::fEnabled = GetBoolArg("-checkpoints", DEFAULT_CHECKPOINTS_ENABLED);
+    fCheckBlockIndex = gArgs.GetBoolArg("-checkblockindex", Params().DefaultConsistencyChecks());
+    Checkpoints::fEnabled = gArgs.GetBoolArg("-checkpoints", DEFAULT_CHECKPOINTS_ENABLED);
 
     // -mempoollimit limits
-    int64_t nMempoolSizeLimit = GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
-    int64_t nMempoolDescendantSizeLimit = GetArg("-limitdescendantsize", DEFAULT_DESCENDANT_SIZE_LIMIT) * 1000;
+    int64_t nMempoolSizeLimit = gArgs.GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
+    int64_t nMempoolDescendantSizeLimit = gArgs.GetArg("-limitdescendantsize", DEFAULT_DESCENDANT_SIZE_LIMIT) * 1000;
     if (nMempoolSizeLimit < 0 || nMempoolSizeLimit < nMempoolDescendantSizeLimit * 40)
-        return UIError(strprintf(_("Error: -maxmempool must be at least %d MB"), GetArg("-limitdescendantsize", DEFAULT_DESCENDANT_SIZE_LIMIT) / 25));
+        return UIError(strprintf(_("Error: -maxmempool must be at least %d MB"), gArgs.GetArg("-limitdescendantsize", DEFAULT_DESCENDANT_SIZE_LIMIT) / 25));
 
     // -par=0 means autodetect, but nScriptCheckThreads==0 means no concurrency
-    nScriptCheckThreads = GetArg("-par", DEFAULT_SCRIPTCHECK_THREADS);
+    nScriptCheckThreads = gArgs.GetArg("-par", DEFAULT_SCRIPTCHECK_THREADS);
     if (nScriptCheckThreads <= 0)
         nScriptCheckThreads += GetNumCores();
     if (nScriptCheckThreads <= 1)
@@ -1080,10 +1080,10 @@ bool AppInit2()
 
     // Staking needs a CWallet instance, so make sure wallet is enabled
 #ifdef ENABLE_WALLET
-    bool fDisableWallet = GetBoolArg("-disablewallet", false);
+    bool fDisableWallet = gArgs.GetBoolArg("-disablewallet", false);
     if (fDisableWallet) {
 #endif
-        if (SoftSetBoolArg("-staking", false))
+        if (gArgs.SoftSetBoolArg("-staking", false))
             LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
 #ifdef ENABLE_WALLET
     } else {
@@ -1092,7 +1092,7 @@ bool AppInit2()
     }
 #endif
 
-    nConnectTimeout = GetArg("-timeout", DEFAULT_CONNECT_TIMEOUT);
+    nConnectTimeout = gArgs.GetArg("-timeout", DEFAULT_CONNECT_TIMEOUT);
     if (nConnectTimeout <= 0)
         nConnectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
@@ -1102,30 +1102,30 @@ bool AppInit2()
     // a transaction spammer can cheaply fill blocks using
     // 1-satoshi-fee transactions. It should be set above the real
     // cost to you of processing a transaction.
-    if (IsArgSet("-minrelaytxfee")) {
+    if (gArgs.IsArgSet("-minrelaytxfee")) {
         CAmount n = 0;
-        if (ParseMoney(GetArg("-minrelaytxfee", ""), n) && n > 0)
+        if (ParseMoney(gArgs.GetArg("-minrelaytxfee", ""), n) && n > 0)
             ::minRelayTxFee = CFeeRate(n);
         else
-            return UIError(AmountErrMsg("minrelaytxfee", GetArg("-minrelaytxfee", "")));
+            return UIError(AmountErrMsg("minrelaytxfee", gArgs.GetArg("-minrelaytxfee", "")));
     }
 
 #ifdef ENABLE_WALLET
-    std::string strWalletFile = GetArg("-wallet", DEFAULT_WALLET_DAT);
+    std::string strWalletFile = gArgs.GetArg("-wallet", DEFAULT_WALLET_DAT);
     if (!CWallet::ParameterInteraction())
         return false;
 #endif // ENABLE_WALLET
 
-    fIsBareMultisigStd = GetBoolArg("-permitbaremultisig", DEFAULT_PERMIT_BAREMULTISIG);
-    nMaxDatacarrierBytes = GetArg("-datacarriersize", nMaxDatacarrierBytes);
+    fIsBareMultisigStd = gArgs.GetBoolArg("-permitbaremultisig", DEFAULT_PERMIT_BAREMULTISIG);
+    nMaxDatacarrierBytes = gArgs.GetArg("-datacarriersize", nMaxDatacarrierBytes);
 
     ServiceFlags nLocalServices = NODE_NETWORK;
     ServiceFlags nRelevantServices = NODE_NETWORK;
 
-    if (GetBoolArg("-peerbloomfilters", DEFAULT_PEERBLOOMFILTERS))
+    if (gArgs.GetBoolArg("-peerbloomfilters", DEFAULT_PEERBLOOMFILTERS))
         nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
-    nMaxTipAge = GetArg("-maxtipage", DEFAULT_MAX_TIP_AGE);
+    nMaxTipAge = gArgs.GetArg("-maxtipage", DEFAULT_MAX_TIP_AGE);
 
     if (!InitNUParams())
         return false;
@@ -1157,7 +1157,7 @@ bool AppInit2()
     CreatePidFile(GetPidFile(), getpid());
 #endif
     if (g_logger->m_print_to_file) {
-        if (GetBoolArg("-shrinkdebugfile", g_logger->DefaultShrinkDebugFile()))
+        if (gArgs.GetBoolArg("-shrinkdebugfile", g_logger->DefaultShrinkDebugFile()))
             g_logger->ShrinkDebugFile();
         if (!g_logger->OpenDebugLog())
             return UIError(strprintf("Could not open debug log file %s", g_logger->m_file_path.string()));
@@ -1181,9 +1181,9 @@ bool AppInit2()
             threadGroup.create_thread(&ThreadScriptCheck);
     }
 
-    if (IsArgSet("-sporkkey")) // spork priv key
+    if (gArgs.IsArgSet("-sporkkey")) // spork priv key
     {
-        if (!sporkManager.SetPrivKey(GetArg("-sporkkey", "")))
+        if (!sporkManager.SetPrivKey(gArgs.GetArg("-sporkkey", "")))
             return UIError(_("Unable to sign spork message, wrong key?"));
     }
 
@@ -1199,7 +1199,7 @@ bool AppInit2()
      * that the server is there and will be ready later).  Warmup mode will
      * be disabled when initialisation is finished.
      */
-    if (GetBoolArg("-server", false)) {
+    if (gArgs.GetBoolArg("-server", false)) {
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
         if (!AppInitServers())
             return UIError(_("Unable to start HTTP server. See debug log for details."));
@@ -1213,7 +1213,7 @@ bool AppInit2()
             // Always create backup folder to not confuse the operating system's file browser
             fs::create_directories(backupDir);
         }
-        nWalletBackups = GetArg("-createwalletbackups", DEFAULT_CREATEWALLETBACKUPS);
+        nWalletBackups = gArgs.GetArg("-createwalletbackups", DEFAULT_CREATEWALLETBACKUPS);
         nWalletBackups = std::max(0, std::min(10, nWalletBackups));
         if (nWalletBackups > 0) {
             if (fs::exists(backupDir)) {
@@ -1276,7 +1276,7 @@ bool AppInit2()
             }
         }
 
-        if (GetBoolArg("-resync", false)) {
+        if (gArgs.GetBoolArg("-resync", false)) {
             uiInterface.InitMessage(_("Preparing for resync..."));
             // Delete the local blockchain folders to force a resync from scratch to get a consitent blockchain-state
             fs::path blocksDir = GetDataDir() / "blocks";
@@ -1370,12 +1370,12 @@ bool AppInit2()
     }
 
     // Check for host lookup allowed before parsing any network related parameters
-    fNameLookup = GetBoolArg("-dns", DEFAULT_NAME_LOOKUP);
+    fNameLookup = gArgs.GetBoolArg("-dns", DEFAULT_NAME_LOOKUP);
 
-    bool proxyRandomize = GetBoolArg("-proxyrandomize", DEFAULT_PROXYRANDOMIZE);
+    bool proxyRandomize = gArgs.GetBoolArg("-proxyrandomize", DEFAULT_PROXYRANDOMIZE);
     // -proxy sets a proxy for all outgoing network traffic
     // -noproxy (or -proxy=0) as well as the empty string can be used to not set a proxy, this is the default
-    std::string proxyArg = GetArg("-proxy", "");
+    std::string proxyArg = gArgs.GetArg("-proxy", "");
     SetLimited(NET_TOR);
     if (proxyArg != "" && proxyArg != "0") {
         CService proxyAddr;
@@ -1397,7 +1397,7 @@ bool AppInit2()
     // -onion can be used to set only a proxy for .onion, or override normal proxy for .onion addresses
     // -noonion (or -onion=0) disables connecting to .onion entirely
     // An empty string is used to not override the onion proxy (in which case it defaults to -proxy set above, or none)
-    std::string onionArg = GetArg("-onion", "");
+    std::string onionArg = gArgs.GetArg("-onion", "");
     if (onionArg != "") {
         if (onionArg == "0") { // Handle -noonion/-onion=0
             SetLimited(NET_TOR); // set onions as unreachable
@@ -1415,8 +1415,8 @@ bool AppInit2()
     }
 
     // see Step 2: parameter interactions for more information about these
-    fListen = GetBoolArg("-listen", DEFAULT_LISTEN);
-    fDiscover = GetBoolArg("-discover", true);
+    fListen = gArgs.GetBoolArg("-listen", DEFAULT_LISTEN);
+    fDiscover = gArgs.GetBoolArg("-discover", true);
 
     bool fBound = false;
     if (fListen) {
@@ -1467,17 +1467,17 @@ bool AppInit2()
 
     // ********************************************************* Step 7: load block chain
 
-    fReindex = GetBoolArg("-reindex", false);
+    fReindex = gArgs.GetBoolArg("-reindex", false);
 
     // Create blocks directory if it doesn't already exist
     fs::create_directories(GetDataDir() / "blocks");
 
     // cache size calculations
-    int64_t nTotalCache = (GetArg("-dbcache", nDefaultDbCache) << 20);
+    int64_t nTotalCache = (gArgs.GetArg("-dbcache", nDefaultDbCache) << 20);
     nTotalCache = std::max(nTotalCache, nMinDbCache << 20); // total cache cannot be less than nMinDbCache
     nTotalCache = std::min(nTotalCache, nMaxDbCache << 20); // total cache cannot be greater than nMaxDbcache
     int64_t nBlockTreeDBCache = nTotalCache / 8;
-    if (nBlockTreeDBCache > (1 << 21) && !GetBoolArg("-txindex", DEFAULT_TXINDEX))
+    if (nBlockTreeDBCache > (1 << 21) && !gArgs.GetBoolArg("-txindex", DEFAULT_TXINDEX))
         nBlockTreeDBCache = (1 << 21); // block tree db cache shouldn't be larger than 2 MiB
     nTotalCache -= nBlockTreeDBCache;
     int64_t nCoinDBCache = std::min(nTotalCache / 2, (nTotalCache / 4) + (1 << 23)); // use 25%-50% of the remainder for disk cache
@@ -1555,7 +1555,7 @@ bool AppInit2()
                 }
 
                 // Check for changed -txindex state
-                if (fTxIndex != GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+                if (fTxIndex != gArgs.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
                     strLoadError = _("You need to rebuild the database using -reindex to change -txindex");
                     break;
                 }
@@ -1564,7 +1564,7 @@ bool AppInit2()
                 invalid_out::LoadOutpoints();
                 invalid_out::LoadSerials();
 
-                bool fReindexZerocoin = GetBoolArg("-reindexzerocoin", false);
+                bool fReindexZerocoin = gArgs.GetBoolArg("-reindexzerocoin", false);
 
                 int chainHeight;
                 bool fZerocoinActive;
@@ -1634,7 +1634,7 @@ bool AppInit2()
                     }
 
                     // Zerocoin must check at level 4
-                    if (!CVerifyDB().VerifyDB(pcoinsdbview, 4, GetArg("-checkblocks", DEFAULT_CHECKBLOCKS))) {
+                    if (!CVerifyDB().VerifyDB(pcoinsdbview, 4, gArgs.GetArg("-checkblocks", DEFAULT_CHECKBLOCKS))) {
                         strLoadError = _("Corrupted block database detected");
                         fVerifyingBlocks = false;
                         break;
@@ -1706,10 +1706,10 @@ bool AppInit2()
         fHaveGenesis = true;
     }
 
-    if (IsArgSet("-blocknotify"))
+    if (gArgs.IsArgSet("-blocknotify"))
         uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
 
-    if (IsArgSet("-blocksizenotify"))
+    if (gArgs.IsArgSet("-blocksizenotify"))
         uiInterface.NotifyBlockSize.connect(BlockSizeNotifyCallback);
 
     // scan for better chains in the block chain database, that are not yet connected in the active best chain
@@ -1801,7 +1801,7 @@ bool AppInit2()
             LogPrintf("file format is unknown or invalid, please fix it manually\n");
     }
 
-    fMasterNode = GetBoolArg("-masternode", DEFAULT_MASTERNODE);
+    fMasterNode = gArgs.GetBoolArg("-masternode", DEFAULT_MASTERNODE);
 
     if ((fMasterNode || masternodeConfig.getCount() > -1) && fTxIndex == false) {
         return UIError("Enabling Masternode support requires turning on transaction indexing."
@@ -1810,7 +1810,7 @@ bool AppInit2()
 
     if (fMasterNode) {
         LogPrintf("IS MASTER NODE\n");
-        strMasterNodeAddr = GetArg("-masternodeaddr", "");
+        strMasterNodeAddr = gArgs.GetArg("-masternodeaddr", "");
 
         LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
 
@@ -1834,7 +1834,7 @@ bool AppInit2()
             }
         }
 
-        strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
+        strMasterNodePrivKey = gArgs.GetArg("-masternodeprivkey", "");
         if (!strMasterNodePrivKey.empty()) {
             std::string errorMessage;
 
@@ -1853,9 +1853,9 @@ bool AppInit2()
     }
 
     //get the mode of budget voting for this masternode
-    strBudgetMode = GetArg("-budgetvotemode", "auto");
+    strBudgetMode = gArgs.GetArg("-budgetvotemode", "auto");
 
-    if (GetBoolArg("-mnconflock", DEFAULT_MNCONFLOCK) && pwalletMain) {
+    if (gArgs.GetBoolArg("-mnconflock", DEFAULT_MNCONFLOCK) && pwalletMain) {
         LOCK(pwalletMain->cs_wallet);
         LogPrintf("Locking Masternodes:\n");
         uint256 mnTxHash;
@@ -1867,12 +1867,12 @@ bool AppInit2()
         }
     }
 
-    fEnableSwiftTX = GetBoolArg("-enableswifttx", fEnableSwiftTX);
-    nSwiftTXDepth = GetArg("-swifttxdepth", nSwiftTXDepth);
+    fEnableSwiftTX = gArgs.GetBoolArg("-enableswifttx", fEnableSwiftTX);
+    nSwiftTXDepth = gArgs.GetArg("-swifttxdepth", nSwiftTXDepth);
     nSwiftTXDepth = std::min(std::max(nSwiftTXDepth, 0), 60);
 
     //lite mode disables all Masternode related functionality
-    fLiteMode = GetBoolArg("-litemode", false);
+    fLiteMode = gArgs.GetBoolArg("-litemode", false);
     if (fMasterNode && fLiteMode) {
         return UIError("You can not start a masternode in litemode");
     }
@@ -1907,13 +1907,13 @@ bool AppInit2()
     }
 #endif
 
-    if (GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
+    if (gArgs.GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
         StartTorControl(threadGroup);
 
     Discover(threadGroup);
 
     // Map ports with UPnP
-    MapPort(GetBoolArg("-upnp", DEFAULT_UPNP));
+    MapPort(gArgs.GetBoolArg("-upnp", DEFAULT_UPNP));
 
     std::string strNodeError;
     CConnman::Options connOptions;
@@ -1924,8 +1924,8 @@ bool AppInit2()
     connOptions.nMaxFeeler = 1;
     connOptions.nBestHeight = chainActive.Height();
     connOptions.uiInterface = &uiInterface;
-    connOptions.nSendBufferMaxSize = 1000*GetArg("-maxsendbuffer", DEFAULT_MAXSENDBUFFER);
-    connOptions.nReceiveFloodSize = 1000*GetArg("-maxreceivebuffer", DEFAULT_MAXRECEIVEBUFFER);
+    connOptions.nSendBufferMaxSize = 1000*gArgs.GetArg("-maxsendbuffer", DEFAULT_MAXSENDBUFFER);
+    connOptions.nReceiveFloodSize = 1000*gArgs.GetArg("-maxreceivebuffer", DEFAULT_MAXRECEIVEBUFFER);
 
     if (!connman.Start(scheduler, strNodeError, connOptions))
         return UIError(strNodeError);
@@ -1933,7 +1933,7 @@ bool AppInit2()
 #ifdef ENABLE_WALLET
     // Generate coins in the background
     if (pwalletMain)
-        GenerateBitcoins(GetBoolArg("-gen", DEFAULT_GENERATE), pwalletMain, GetArg("-genproclimit", DEFAULT_GENERATE_PROCLIMIT));
+        GenerateBitcoins(gArgs.GetBoolArg("-gen", DEFAULT_GENERATE), pwalletMain, gArgs.GetArg("-genproclimit", DEFAULT_GENERATE_PROCLIMIT));
 #endif
 
     // ********************************************************* Step 12: finished
@@ -1946,7 +1946,7 @@ bool AppInit2()
         pwalletMain->postInitProcess(threadGroup);
 
         // StakeMiner thread disabled by default on regtest
-        if (GetBoolArg("-staking", !Params().IsRegTestNet() && DEFAULT_STAKING)) {
+        if (gArgs.GetBoolArg("-staking", !Params().IsRegTestNet() && DEFAULT_STAKING)) {
             threadGroup.create_thread(boost::bind(&ThreadStakeMinter));
         }
     }

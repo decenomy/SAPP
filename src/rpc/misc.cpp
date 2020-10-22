@@ -758,8 +758,8 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
         LOCK2(cs_main, &pwalletMain->cs_wallet);
         UniValue obj(UniValue::VOBJ);
         obj.pushKV("staking_status", pwalletMain->pStakerStatus->IsActive());
-        obj.pushKV("staking_enabled", GetBoolArg("-staking", DEFAULT_STAKING));
-        bool fColdStaking = GetBoolArg("-coldstaking", true);
+        obj.pushKV("staking_enabled", gArgs.GetBoolArg("-staking", DEFAULT_STAKING));
+        bool fColdStaking = gArgs.GetBoolArg("-coldstaking", true);
         obj.pushKV("coldstaking_enabled", fColdStaking);
         obj.pushKV("haveconnections", (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) > 0));
         obj.pushKV("mnsync", !masternodeSync.NotCompleted());
