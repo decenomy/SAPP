@@ -846,7 +846,7 @@ void InitParameterInteraction()
             LogPrintf("%s : parameter interaction: -bind or -whitebind set -> setting -listen=1\n", __func__);
     }
 
-    if (gArgs.IsArgSet("-connect") && gArgs.GetArgs("-connect").size() > 0) {
+    if (gArgs.IsArgSet("-connect")) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
         if (SoftSetBoolArg("-dnsseed", false))
             LogPrintf("%s : parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
@@ -908,10 +908,9 @@ bool InitNUParams()
         if (Params().NetworkIDString() != "regtest") {
             return UIError("Network upgrade parameters may only be overridden on regtest.");
         }
-        const std::vector<std::string>& deployments = gArgs.GetArgs("-nuparams");
-        for (auto i : deployments) {
+        for (const std::string& strDeployment : gArgs.GetArgs("-nuparams")) {
             std::vector<std::string> vDeploymentParams;
-            boost::split(vDeploymentParams, i, boost::is_any_of(":"));
+            boost::split(vDeploymentParams, strDeployment, boost::is_any_of(":"));
             if (vDeploymentParams.size() != 2) {
                 return UIError("Network upgrade parameters malformed, expecting hexBranchId:activationHeight");
             }
@@ -1021,9 +1020,8 @@ bool AppInit2()
     }
 
     // Now remove the logging categories which were explicitly excluded
-    if (gArgs.IsArgSet("-debugexclude") > 0) {
-        const std::vector<std::string>& excludedCategories = gArgs.GetArgs("-debugexclude");
-        for (const auto& cat : excludedCategories) {
+    if (gArgs.IsArgSet("-debugexclude")) {
+        for (const std::string& cat : gArgs.GetArgs("-debugexclude")) {
             if (!g_logger->DisableCategory(cat)) {
                 UIWarning(strprintf(_("Unsupported logging category %s=%s."), "-debugexclude", cat));
             }
