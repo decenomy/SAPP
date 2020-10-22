@@ -992,7 +992,9 @@ bool AppInit2()
 
     // ********************************************************* Step 2: parameter interactions
     // Make sure enough file descriptors are available
-    int nBind = std::max((int)mapArgs.count("-bind") + (int)mapArgs.count("-whitebind"), 1);
+    int nBind = std::max(
+        (mapMultiArgs.count("-bind") ? mapMultiArgs.at("-bind").size() : 0) +
+        (mapMultiArgs.count("-whitebind") ? mapMultiArgs.at("-whitebind").size() : 0), size_t(1));
     int nUserMaxConnections = GetArg("-maxconnections", DEFAULT_MAX_PEER_CONNECTIONS);
     int nMaxConnections = std::max(nUserMaxConnections, 0);
 
@@ -1102,10 +1104,10 @@ bool AppInit2()
     // cost to you of processing a transaction.
     if (IsArgSet("-minrelaytxfee")) {
         CAmount n = 0;
-        if (ParseMoney(mapArgs["-minrelaytxfee"], n) && n > 0)
+        if (ParseMoney(GetArg("-minrelaytxfee", ""), n) && n > 0)
             ::minRelayTxFee = CFeeRate(n);
         else
-            return UIError(AmountErrMsg("minrelaytxfee", mapArgs["-minrelaytxfee"]));
+            return UIError(AmountErrMsg("minrelaytxfee", GetArg("-minrelaytxfee", "")));
     }
 
 #ifdef ENABLE_WALLET

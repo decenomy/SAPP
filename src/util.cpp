@@ -371,7 +371,7 @@ const fs::path &ZC_GetParamsDir()
     path = fs::system_complete(PARAMS_DIR);
 #else
     if (IsArgSet("-paramsdir")) {
-        path = fs::system_complete(mapArgs["-paramsdir"]);
+        path = fs::system_complete(GetArg("-paramsdir", ""));
         if (!fs::is_directory(path)) {
             path = "";
             return path;
@@ -434,7 +434,7 @@ const fs::path& GetDataDir(bool fNetSpecific)
         return path;
 
     if (IsArgSet("-datadir")) {
-        path = fs::system_complete(mapArgs["-datadir"]);
+        path = fs::system_complete(GetArg("-datadir", ""));
         if (!fs::is_directory(path)) {
             path = "";
             return path;

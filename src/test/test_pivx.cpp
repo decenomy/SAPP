@@ -24,6 +24,8 @@ CClientUIInterface uiInterface;
 uint256 insecure_rand_seed = GetRandHash();
 FastRandomContext insecure_rand_ctx(insecure_rand_seed);
 
+extern std::map<std::string, std::string> mapArgs;
+
 extern bool fPrintToConsole;
 extern void noui_connect();
 

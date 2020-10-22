@@ -50,7 +50,6 @@ extern int keysLoaded;
 extern bool fSucessfullyLoaded;
 extern std::string strBudgetMode;
 
-extern std::map<std::string, std::string> mapArgs;
 extern const std::map<std::string, std::vector<std::string> >& mapMultiArgs;
 
 extern std::string strMiscWarning;
