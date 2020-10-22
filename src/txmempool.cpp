@@ -17,7 +17,6 @@
 #include "version.h"
 #include "validation.h"
 
-#include <boost/foreach.hpp>
 
 
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,

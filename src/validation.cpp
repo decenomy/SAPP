@@ -53,7 +53,6 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
-#include <boost/foreach.hpp>
 #include <atomic>
 #include <queue>
 
