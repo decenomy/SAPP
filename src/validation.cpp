@@ -3551,7 +3551,7 @@ bool static LoadBlockIndexDB(std::string& strError)
         vSortedByHeight.emplace_back(pindex->nHeight, pindex);
     }
     std::sort(vSortedByHeight.begin(), vSortedByHeight.end());
-    for (const PAIRTYPE(int, CBlockIndex*) & item : vSortedByHeight) {
+    for (const std::pair<int, CBlockIndex*> & item : vSortedByHeight) {
         // Stop if shutdown was requested
         if (ShutdownRequested()) return false;
 
