@@ -462,8 +462,7 @@ fs::path GetMasternodeConfigFile()
     return AbsPathForConfigVal(pathConfigFile);
 }
 
-void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
-    std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet)
+void ReadConfigFile()
 {
     fs::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good()) {
@@ -482,9 +481,9 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
         std::string strKey = std::string("-") + it->string_key;
         std::string strValue = it->value[0];
         InterpretNegativeSetting(strKey, strValue);
-        if (mapSettingsRet.count(strKey) == 0)
-            mapSettingsRet[strKey] = strValue;
-        mapMultiSettingsRet[strKey].push_back(strValue);
+        if (mapArgs.count(strKey) == 0)
+            mapArgs[strKey] = strValue;
+        mapMultiArgs[strKey].push_back(strValue);
     }
     // If datadir is changed in .conf file:
     ClearDatadirCache();

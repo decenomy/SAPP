@@ -592,7 +592,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     try {
-        ReadConfigFile(mapArgs, mapMultiArgs);
+        ReadConfigFile();
     } catch (const std::exception& e) {
         QMessageBox::critical(0, QObject::tr("PIVX Core"),
             QObject::tr("Error: Cannot parse configuration file: %1. Only use key=value syntax.").arg(e.what()));
