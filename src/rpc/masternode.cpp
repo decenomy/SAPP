@@ -18,6 +18,37 @@
 
 #include <boost/tokenizer.hpp>
 
+UniValue mnping(const JSONRPCRequest& request)
+{
+    if (request.fHelp || !request.params.empty()) {
+        throw std::runtime_error(
+            "mnping \n"
+            "\nSend masternode ping. Only for remote masternodes on Regtest\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"sent\":           (string YES|NO) Whether the ping was sent and, if not, the error.\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("mnping", "") + HelpExampleRpc("mnping", ""));
+    }
+
+    if (!Params().IsRegTestNet()) {
+        throw JSONRPCError(RPC_MISC_ERROR, "command available only for RegTest network");
+    }
+
+    if (!fMasterNode) {
+        throw JSONRPCError(RPC_MISC_ERROR, "this is not a masternode");
+    }
+
+    UniValue ret(UniValue::VOBJ);
+    std::string strError;
+    ret.pushKV("sent", activeMasternode.SendMasternodePing(strError) ?
+                       "YES" : strprintf("NO (%s)", strError));
+    return ret;
+}
+
 UniValue initmasternode(const JSONRPCRequest& request)
 {
     if (request.fHelp || (request.params.empty() || request.params.size() > 2)) {
@@ -962,6 +993,7 @@ static const CRPCCommand commands[] =
 
     /* Not shown in help */
     { "hidden",             "getcachedblockhashes",      &getcachedblockhashes,      true  },
+    { "hidden",             "mnping",                    &mnping,                    true  },
 };
 
 void RegisterMasternodeRPCCommands(CRPCTable &tableRPC)

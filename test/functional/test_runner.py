@@ -144,6 +144,12 @@ BASE_SCRIPTS= [
 
 ]
 
+TIERTWO_SCRIPTS = [
+    'tiertwo_masternode_activation.py',
+    'tiertwo_governance_sync_basic.py',
+
+]
+
 EXTENDED_SCRIPTS = [
     # These tests are not run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
@@ -223,6 +229,7 @@ def main():
     parser.add_argument('--keepcache', '-k', action='store_true', help='the default behavior is to flush the cache directory on startup. --keepcache retains the cache from the previous testrun.')
     parser.add_argument('--quiet', '-q', action='store_true', help='only print dots, results summary and failure logs')
     parser.add_argument('--legacywallet', '-w', action='store_true', help='create pre-HD wallets only')
+    parser.add_argument('--tiertwo', '-m', action='store_true', help='run tier two tests only')
     parser.add_argument('--tmpdirprefix', '-t', default=tempfile.gettempdir(), help="Root directory for datadirs")
     args, unknown_args = parser.parse_known_args()
 
@@ -238,6 +245,8 @@ def main():
     passon_args.append("--configfile=%s" % configfile)
     if args.legacywallet:
         passon_args.append("--legacywallet")
+    if args.tiertwo:
+        passon_args.append("--tiertwo")
 
     # Set up logging
     logging_level = logging.INFO if args.quiet else logging.DEBUG
@@ -276,13 +285,17 @@ def main():
             else:
                 print("{}WARNING!{} Test '{}' not found in full test list.".format(BOLD[1], BOLD[0], t))
     else:
-        # No individual tests have been specified.
-        # Run all base tests, and optionally run extended tests.
-        test_list = BASE_SCRIPTS
-        if args.extended:
-            # place the EXTENDED_SCRIPTS first since the three longest ones
-            # are there and the list is shorter
-            test_list = EXTENDED_SCRIPTS + test_list
+        if args.tiertwo:
+            # If --tiertwo, only run the tier two tests
+            test_list = TIERTWO_SCRIPTS
+        else:
+            # No individual tests have been specified.
+            # Run all base tests, and optionally run extended tests.
+            test_list = BASE_SCRIPTS
+            if args.extended:
+                # place the EXTENDED_SCRIPTS first since the three longest ones
+                # are there and the list is shorter
+                test_list = EXTENDED_SCRIPTS + test_list
 
     # Remove the test cases that the user has explicitly asked to exclude.
     if args.exclude:

@@ -173,6 +173,19 @@ jobs:
         BUILD_TIMEOUT=800
 
     - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no GUI, no unit tests - only tier two functional tests]'
+      env: >-
+        HOST=x86_64-unknown-linux-gnu
+        PACKAGES="python3-zmq protobuf-compiler libdbus-1-dev libharfbuzz-dev libprotobuf-dev"
+        DEP_OPTS="NO_QT=1 NO_UPNP=1 DEBUG=1 ALLOW_HOST_PACKAGES=1"
+        RUN_UNIT_TESTS=false
+        RUN_FUNCTIONAL_TESTS=true
+        TEST_RUNNER_EXTRA="--tiertwo"  # Run tier two functional tests only.
+        GOAL="install"
+        BITCOIN_CONFIG="--with-gui=no --enable-glibc-back-compat --enable-reduce-exports --disable-online-rust --with-params-dir=$PARAMS_DIR"
+        BUILD_TIMEOUT=800
+
+    - stage: test
       name: 'x86_64 Linux  [GOAL: install]  [xenial]  [no depends, only system libs]'
       env: >-
         HOST=x86_64-unknown-linux-gnu

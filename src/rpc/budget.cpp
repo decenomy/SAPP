@@ -712,7 +712,7 @@ UniValue mnfinalbudgetsuggest(const JSONRPCRequest& request)
                 "returns the budget hash if it was broadcasted sucessfully");
 
     if (!Params().IsRegTestNet()) {
-        throw std::runtime_error("mnfinalbudgetsuggest enabled only in regtest");
+        throw JSONRPCError(RPC_MISC_ERROR, "command available only for RegTest network");
     }
 
     uint256 budgetHash = budget.SubmitFinalBudget();
