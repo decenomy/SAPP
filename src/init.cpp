@@ -846,7 +846,7 @@ void InitParameterInteraction()
             LogPrintf("%s : parameter interaction: -bind or -whitebind set -> setting -listen=1\n", __func__);
     }
 
-    if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0) {
+    if (mapMultiArgs.count("-connect") && mapMultiArgs.at("-connect").size() > 0) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
         if (SoftSetBoolArg("-dnsseed", false))
             LogPrintf("%s : parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
@@ -903,12 +903,12 @@ void InitParameterInteraction()
 
 bool InitNUParams()
 {
-    if (!mapMultiArgs["-nuparams"].empty()) {
+    if (mapMultiArgs.count("-nuparams")) {
         // Allow overriding network upgrade parameters for testing
         if (Params().NetworkIDString() != "regtest") {
             return UIError("Network upgrade parameters may only be overridden on regtest.");
         }
-        const std::vector<std::string>& deployments = mapMultiArgs["-nuparams"];
+        const std::vector<std::string>& deployments = mapMultiArgs.at("-nuparams");
         for (auto i : deployments) {
             std::vector<std::string> vDeploymentParams;
             boost::split(vDeploymentParams, i, boost::is_any_of(":"));
@@ -1007,7 +1007,7 @@ bool AppInit2()
     // ********************************************************* Step 3: parameter-to-internal-flags
 
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
-    const std::vector<std::string>& categories = mapMultiArgs["-debug"];
+    const std::vector<std::string>& categories = mapMultiArgs.at("-debug");
 
     if (!(GetBoolArg("-nodebug", false) ||
             find(categories.begin(), categories.end(), std::string("0")) != categories.end())) {
@@ -1331,7 +1331,7 @@ bool AppInit2()
 
     // sanitize comments per BIP-0014, format user agent and check total size
     std::vector<std::string> uacomments;
-    for (const std::string& cmt : mapMultiArgs["-uacomment"]) {
+    for (const std::string& cmt : mapMultiArgs.at("-uacomment")) {
         if (cmt != SanitizeString(cmt, SAFE_CHARS_UA_COMMENT))
             return UIError(strprintf(_("User Agent comment (%s) contains unsafe characters."), cmt));
         uacomments.push_back(cmt);
@@ -1344,9 +1344,9 @@ bool AppInit2()
             strSubVersion.size(), MAX_SUBVERSION_LENGTH));
     }
 
-    if (mapArgs.count("-onlynet")) {
+    if (mapMultiArgs.count("-onlynet")) {
         std::set<enum Network> nets;
-        for (std::string snet : mapMultiArgs["-onlynet"]) {
+        for (const std::string& snet : mapMultiArgs.at("-onlynet")) {
             enum Network net = ParseNetwork(snet);
             if (net == NET_UNROUTABLE)
                 return UIError(strprintf(_("Unknown network specified in -onlynet: '%s'"), snet));
@@ -1359,8 +1359,8 @@ bool AppInit2()
         }
     }
 
-    if (mapArgs.count("-whitelist")) {
-        for (const std::string& net : mapMultiArgs["-whitelist"]) {
+    if (mapMultiArgs.count("-whitelist")) {
+        for (const std::string& net : mapMultiArgs.at("-whitelist")) {
             CSubNet subnet;
             LookupSubNet(net.c_str(), subnet);
             if (!subnet.IsValid())
@@ -1420,14 +1420,16 @@ bool AppInit2()
 
     bool fBound = false;
     if (fListen) {
-        if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
-            for (std::string strBind : mapMultiArgs["-bind"]) {
+        if (mapMultiArgs.count("-bind")) {
+            for (const std::string& strBind : mapMultiArgs.at("-bind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
                     return UIError(ResolveErrMsg("bind", strBind));
                 fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
             }
-            for (std::string strBind : mapMultiArgs["-whitebind"]) {
+        }
+        if (mapMultiArgs.count("-whitebind")) {
+            for (const std::string& strBind : mapMultiArgs.at("-whitebind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, 0, false))
                     return UIError(ResolveErrMsg("whitebind", strBind));
@@ -1435,7 +1437,8 @@ bool AppInit2()
                     return UIError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
                 fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
             }
-        } else {
+        }
+        if (!mapMultiArgs.count("-bind") && !mapMultiArgs.count("-whitebind")) {
             struct in_addr inaddr_any;
             inaddr_any.s_addr = INADDR_ANY;
             fBound |= Bind(connman, CService((in6_addr)IN6ADDR_ANY_INIT, GetListenPort()), BF_NONE);
@@ -1445,8 +1448,8 @@ bool AppInit2()
             return UIError(_("Failed to listen on any port. Use -listen=0 if you want this."));
     }
 
-    if (mapArgs.count("-externalip")) {
-        for (std::string strAddr : mapMultiArgs["-externalip"]) {
+    if (mapMultiArgs.count("-externalip")) {
+        for (const std::string& strAddr : mapMultiArgs.at("-externalip")) {
             CService addrLocal;
             if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
                 AddLocal(addrLocal,LOCAL_MANUAL);
@@ -1455,8 +1458,10 @@ bool AppInit2()
         }
     }
 
-    for (const std::string& strDest : mapMultiArgs["-seednode"])
-        connman.AddOneShot(strDest);
+    if (mapMultiArgs.count("-seednode")) {
+        for (const std::string& strDest : mapMultiArgs.at("-seednode"))
+            connman.AddOneShot(strDest);
+    }
 
 #if ENABLE_ZMQ
     pzmqNotificationInterface = CZMQNotificationInterface::CreateWithArguments(mapArgs);
@@ -1727,8 +1732,8 @@ bool AppInit2()
     }
 
     std::vector<fs::path> vImportFiles;
-    if (mapArgs.count("-loadblock")) {
-        for (std::string strFile : mapMultiArgs["-loadblock"])
+    if (mapMultiArgs.count("-loadblock")) {
+        for (const std::string& strFile : mapMultiArgs.at("-loadblock"))
             vImportFiles.push_back(strFile);
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));

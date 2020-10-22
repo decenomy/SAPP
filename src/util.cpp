@@ -106,7 +106,8 @@ bool fSucessfullyLoaded = false;
 std::string strBudgetMode = "";
 
 std::map<std::string, std::string> mapArgs;
-std::map<std::string, std::vector<std::string> > mapMultiArgs;
+static std::map<std::string, std::vector<std::string> > _mapMultiArgs;
+const std::map<std::string, std::vector<std::string> >& mapMultiArgs = _mapMultiArgs;
 
 bool fDaemon = false;
 std::string strMiscWarning;
@@ -182,7 +183,7 @@ static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
 void ParseParameters(int argc, const char* const argv[])
 {
     mapArgs.clear();
-    mapMultiArgs.clear();
+    _mapMultiArgs.clear();
 
     for (int i = 1; i < argc; i++) {
         std::string str(argv[i]);
@@ -208,7 +209,7 @@ void ParseParameters(int argc, const char* const argv[])
         InterpretNegativeSetting(str, strValue);
 
         mapArgs[str] = strValue;
-        mapMultiArgs[str].push_back(strValue);
+        _mapMultiArgs[str].push_back(strValue);
     }
 }
 
@@ -483,7 +484,7 @@ void ReadConfigFile()
         InterpretNegativeSetting(strKey, strValue);
         if (mapArgs.count(strKey) == 0)
             mapArgs[strKey] = strValue;
-        mapMultiArgs[strKey].push_back(strValue);
+        _mapMultiArgs[strKey].push_back(strValue);
     }
     // If datadir is changed in .conf file:
     ClearDatadirCache();

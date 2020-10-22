@@ -533,7 +533,7 @@ void JSONRPCRequest::parse(const UniValue& valRequest)
 
 bool IsDeprecatedRPCEnabled(const std::string& method)
 {
-    const std::vector<std::string> enabled_methods = mapMultiArgs["-deprecatedrpc"];
+    const std::vector<std::string> enabled_methods = mapMultiArgs.at("-deprecatedrpc");
 
     return find(enabled_methods.begin(), enabled_methods.end(), method) != enabled_methods.end();
 }
