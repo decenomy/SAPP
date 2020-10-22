@@ -19,6 +19,7 @@
 #include "fs.h"
 #include "logging.h"
 #include "compat.h"
+#include "sync.h"
 #include "tinyformat.h"
 #include "utiltime.h"
 #include "util/threadnames.h"
@@ -68,7 +69,6 @@ bool error(const char* fmt, const Args&... args)
 double double_safe_addition(double fValue, double fIncrement);
 double double_safe_multiplication(double fValue, double fmultiplicator);
 void PrintExceptionContinue(const std::exception* pex, const char* pszThread);
-void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);
 bool TruncateFile(FILE* file, unsigned int length);
 int RaiseFileDescriptorLimit(int nMinFD);
@@ -88,7 +88,6 @@ fs::path GetMasternodeConfigFile();
 fs::path GetPidFile();
 void CreatePidFile(const fs::path& path, pid_t pid);
 #endif
-void ReadConfigFile();
 #ifdef WIN32
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
@@ -105,61 +104,121 @@ inline bool IsSwitchChar(char c)
 #endif
 }
 
-/**
- * Return true if the given argument has been manually set
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @return true if the argument has been set
- */
-bool IsArgSet(const std::string& strArg);
+class ArgsManager
+{
+protected:
+    RecursiveMutex cs_args;
+    std::map<std::string, std::string> mapArgs;
 
-/**
- * Return string argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. "1")
- * @return command-line argument or default value
- */
-std::string GetArg(const std::string& strArg, const std::string& strDefault);
+public:
+    void ParseParameters(int argc, const char* const argv[]);
+    void ReadConfigFile();
+    std::vector<std::string> GetArgs(const std::string& strArg);
 
-/**
- * Return integer argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. 1)
- * @return command-line argument (0 if invalid number) or default value
- */
-int64_t GetArg(const std::string& strArg, int64_t nDefault);
+    /**
+    * Return true if the given argument has been manually set
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @return true if the argument has been set
+    */
+    bool IsArgSet(const std::string& strArg);
 
-/**
- * Return boolean argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (true or false)
- * @return command-line argument or default value
- */
-bool GetBoolArg(const std::string& strArg, bool fDefault);
+    /**
+    * Return string argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (e.g. "1")
+    * @return command-line argument or default value
+    */
+    std::string GetArg(const std::string& strArg, const std::string& strDefault);
 
-/**
- * Set an argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param strValue Value (e.g. "1")
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetArg(const std::string& strArg, const std::string& strValue);
+    /**
+    * Return integer argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (e.g. 1)
+    * @return command-line argument (0 if invalid number) or default value
+    */
+    int64_t GetArg(const std::string& strArg, int64_t nDefault);
 
-/**
- * Set a boolean argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param fValue Value (e.g. false)
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+    /**
+    * Return boolean argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (true or false)
+    * @return command-line argument or default value
+    */
+    bool GetBoolArg(const std::string& strArg, bool fDefault);
 
-// Forces a arg setting, used only in testing
-void ForceSetArg(const std::string& strArg, const std::string& strValue);
+    /**
+    * Set an argument if it doesn't already have a value
+    *
+    * @param strArg Argument to set (e.g. "-foo")
+    * @param strValue Value (e.g. "1")
+    * @return true if argument gets set, false if it already had a value
+    */
+    bool SoftSetArg(const std::string& strArg, const std::string& strValue);
+
+    /**
+    * Set a boolean argument if it doesn't already have a value
+    *
+    * @param strArg Argument to set (e.g. "-foo")
+    * @param fValue Value (e.g. false)
+    * @return true if argument gets set, false if it already had a value
+    */
+    bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+
+    // Forces a arg setting, used only in testing
+    void ForceSetArg(const std::string& strArg, const std::string& strValue);
+};
+
+extern ArgsManager gArgs;
+
+// wrappers using the global ArgsManager:
+static inline void ParseParameters(int argc, const char*const argv[])
+{
+    gArgs.ParseParameters(argc, argv);
+}
+
+static inline void ReadConfigFile()
+{
+    gArgs.ReadConfigFile();
+}
+
+static inline bool SoftSetArg(const std::string& strArg, const std::string& strValue)
+{
+    return gArgs.SoftSetArg(strArg, strValue);
+}
+
+static inline void ForceSetArg(const std::string& strArg, const std::string& strValue)
+{
+    gArgs.ForceSetArg(strArg, strValue);
+}
+
+static inline bool IsArgSet(const std::string& strArg)
+{
+    return gArgs.IsArgSet(strArg);
+}
+
+static inline std::string GetArg(const std::string& strArg, const std::string& strDefault)
+{
+    return gArgs.GetArg(strArg, strDefault);
+}
+
+static inline int64_t GetArg(const std::string& strArg, int64_t nDefault)
+{
+    return gArgs.GetArg(strArg, nDefault);
+}
+
+static inline bool GetBoolArg(const std::string& strArg, bool fDefault)
+{
+    return gArgs.GetBoolArg(strArg, fDefault);
+}
+
+static inline bool SoftSetBoolArg(const std::string& strArg, bool fValue)
+{
+    return gArgs.SoftSetBoolArg(strArg, fValue);
+}
 
 /**
  * Format a string to be used as group of options in help messages
