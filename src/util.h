@@ -51,8 +51,6 @@ extern int keysLoaded;
 extern bool fSucessfullyLoaded;
 extern std::string strBudgetMode;
 
-extern const std::map<std::string, std::vector<std::string> >& mapMultiArgs;
-
 extern std::string strMiscWarning;
 
 
@@ -109,6 +107,7 @@ class ArgsManager
 protected:
     RecursiveMutex cs_args;
     std::map<std::string, std::string> mapArgs;
+    std::map<std::string, std::vector<std::string> > mapMultiArgs;
 
 public:
     void ParseParameters(int argc, const char* const argv[]);

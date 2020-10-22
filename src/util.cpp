@@ -105,8 +105,6 @@ bool fSucessfullyLoaded = false;
 std::string strBudgetMode = "";
 
 ArgsManager gArgs;
-static std::map<std::string, std::vector<std::string> > _mapMultiArgs;
-const std::map<std::string, std::vector<std::string> >& mapMultiArgs = _mapMultiArgs;
 
 bool fDaemon = false;
 std::string strMiscWarning;
@@ -183,7 +181,7 @@ void ArgsManager::ParseParameters(int argc, const char* const argv[])
 {
     LOCK(cs_args);
     mapArgs.clear();
-    _mapMultiArgs.clear();
+    mapMultiArgs.clear();
 
     for (int i = 1; i < argc; i++) {
         std::string str(argv[i]);
@@ -209,7 +207,7 @@ void ArgsManager::ParseParameters(int argc, const char* const argv[])
         InterpretNegativeSetting(str, strValue);
 
         mapArgs[str] = strValue;
-        _mapMultiArgs[str].push_back(strValue);
+        mapMultiArgs[str].push_back(strValue);
     }
 }
 
@@ -254,7 +252,7 @@ bool ArgsManager::SoftSetArg(const std::string& strArg, const std::string& strVa
     LOCK(cs_args);
     if (mapArgs.count(strArg))
         return false;
-    mapArgs[strArg] = strValue;
+    ForceSetArg(strArg, strValue);
     return true;
 }
 
@@ -270,6 +268,7 @@ void ArgsManager::ForceSetArg(const std::string& strArg, const std::string& strV
 {
     LOCK(cs_args);
     mapArgs[strArg] = strValue;
+    mapMultiArgs[strArg].push_back(strValue);
 }
 
 static const int screenWidth = 79;
@@ -510,7 +509,7 @@ void ArgsManager::ReadConfigFile()
             InterpretNegativeSetting(strKey, strValue);
             if (mapArgs.count(strKey) == 0)
                 mapArgs[strKey] = strValue;
-            _mapMultiArgs[strKey].push_back(strValue);
+            mapMultiArgs[strKey].push_back(strValue);
         }
     }
     // If datadir is changed in .conf file:
