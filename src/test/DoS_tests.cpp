@@ -34,7 +34,6 @@ struct COrphanTx {
 };
 extern std::map<uint256, COrphanTx> mapOrphanTransactions;
 extern std::map<uint256, std::set<uint256> > mapOrphanTransactionsByPrev;
-extern std::map<std::string, std::string> mapArgs;
 
 CService ip(uint32_t i)
 {
@@ -88,7 +87,7 @@ BOOST_AUTO_TEST_CASE(DoS_banscore)
     std::atomic<bool> interruptDummy(false);
 
     connman->ClearBanned();
-    mapArgs["-banscore"] = "111"; // because 11 is my favorite number
+    ForceSetArg("-banscore", "111"); // because 11 is my favorite number
     CAddress addr1(ip(0xa0b0c001), NODE_NONE);
     CNode dummyNode1(id++, NODE_NETWORK, 0, INVALID_SOCKET, addr1, 3, 1, "", true);
     dummyNode1.SetSendVersion(PROTOCOL_VERSION);
@@ -104,7 +103,7 @@ BOOST_AUTO_TEST_CASE(DoS_banscore)
     misbehave(dummyNode1.GetId(), 1);
     SendMessages(&dummyNode1, *connman, interruptDummy);
     BOOST_CHECK(connman->IsBanned(addr1));
-    mapArgs.erase("-banscore");
+    ForceSetArg("-banscore", std::to_string(DEFAULT_BANSCORE_THRESHOLD));
 }
 
 BOOST_AUTO_TEST_CASE(DoS_bantime)

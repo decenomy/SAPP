@@ -24,8 +24,6 @@ CClientUIInterface uiInterface;
 uint256 insecure_rand_seed = GetRandHash();
 FastRandomContext insecure_rand_ctx(insecure_rand_seed);
 
-extern std::map<std::string, std::string> mapArgs;
-
 extern bool fPrintToConsole;
 extern void noui_connect();
 
@@ -49,7 +47,7 @@ TestingSetup::TestingSetup()
         ClearDatadirCache();
         pathTemp = GetTempPath() / strprintf("test_pivx_%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(100000)));
         fs::create_directories(pathTemp);
-        mapArgs["-datadir"] = pathTemp.string();
+        ForceSetArg("-datadir", pathTemp.string());
         pblocktree = new CBlockTreeDB(1 << 20, true);
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);
