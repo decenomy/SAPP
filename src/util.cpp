@@ -105,6 +105,7 @@ int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
 std::string strBudgetMode = "";
 
+RecursiveMutex cs_args;
 std::map<std::string, std::string> mapArgs;
 static std::map<std::string, std::vector<std::string> > _mapMultiArgs;
 const std::map<std::string, std::vector<std::string> >& mapMultiArgs = _mapMultiArgs;
@@ -182,6 +183,7 @@ static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
 
 void ParseParameters(int argc, const char* const argv[])
 {
+    LOCK(cs_args);
     mapArgs.clear();
     _mapMultiArgs.clear();
 
@@ -215,11 +217,13 @@ void ParseParameters(int argc, const char* const argv[])
 
 bool IsArgSet(const std::string& strArg)
 {
+    LOCK(cs_args);
     return mapArgs.count(strArg);
 }
 
 std::string GetArg(const std::string& strArg, const std::string& strDefault)
 {
+    LOCK(cs_args);
     if (mapArgs.count(strArg))
         return mapArgs[strArg];
     return strDefault;
@@ -227,6 +231,7 @@ std::string GetArg(const std::string& strArg, const std::string& strDefault)
 
 int64_t GetArg(const std::string& strArg, int64_t nDefault)
 {
+    LOCK(cs_args);
     if (mapArgs.count(strArg))
         return atoi64(mapArgs[strArg]);
     return nDefault;
@@ -234,6 +239,7 @@ int64_t GetArg(const std::string& strArg, int64_t nDefault)
 
 bool GetBoolArg(const std::string& strArg, bool fDefault)
 {
+    LOCK(cs_args);
     if (mapArgs.count(strArg))
         return InterpretBool(mapArgs[strArg]);
     return fDefault;
@@ -241,6 +247,7 @@ bool GetBoolArg(const std::string& strArg, bool fDefault)
 
 bool SoftSetArg(const std::string& strArg, const std::string& strValue)
 {
+    LOCK(cs_args);
     if (mapArgs.count(strArg))
         return false;
     mapArgs[strArg] = strValue;
@@ -452,6 +459,8 @@ const fs::path& GetDataDir(bool fNetSpecific)
 
 void ClearDatadirCache()
 {
+    LOCK(csPathCached);
+
     pathCached = fs::path();
     pathCachedNetSpecific = fs::path();
 }
@@ -479,17 +488,20 @@ void ReadConfigFile()
         return; // Nothing to read, so just return
     }
 
-    std::set<std::string> setOptions;
-    setOptions.insert("*");
+    {
+        LOCK(cs_args);
+        std::set<std::string> setOptions;
+        setOptions.insert("*");
 
-    for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
-        // Don't overwrite existing settings so command line settings override pivx.conf
-        std::string strKey = std::string("-") + it->string_key;
-        std::string strValue = it->value[0];
-        InterpretNegativeSetting(strKey, strValue);
-        if (mapArgs.count(strKey) == 0)
-            mapArgs[strKey] = strValue;
-        _mapMultiArgs[strKey].push_back(strValue);
+        for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
+            // Don't overwrite existing settings so command line settings override pivx.conf
+            std::string strKey = std::string("-") + it->string_key;
+            std::string strValue = it->value[0];
+            InterpretNegativeSetting(strKey, strValue);
+            if (mapArgs.count(strKey) == 0)
+                mapArgs[strKey] = strValue;
+            _mapMultiArgs[strKey].push_back(strValue);
+        }
     }
     // If datadir is changed in .conf file:
     ClearDatadirCache();
