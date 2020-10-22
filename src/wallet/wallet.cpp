@@ -543,14 +543,14 @@ void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> ran
 
 bool CWallet::ParameterInteraction()
 {
-    if (mapArgs.count("-mintxfee")) {
+    if (IsArgSet("-mintxfee")) {
         CAmount n = 0;
         if (ParseMoney(mapArgs["-mintxfee"], n) && n > 0)
             CWallet::minTxFee = CFeeRate(n);
         else
             return UIError(AmountErrMsg("mintxfee", mapArgs["-mintxfee"]));
     }
-    if (mapArgs.count("-paytxfee")) {
+    if (IsArgSet("-paytxfee")) {
         CAmount nFeePerK = 0;
         if (!ParseMoney(mapArgs["-paytxfee"], nFeePerK))
             return UIError(AmountErrMsg("paytxfee", mapArgs["-paytxfee"]));
@@ -562,7 +562,7 @@ bool CWallet::ParameterInteraction()
                                        mapArgs["-paytxfee"], ::minRelayTxFee.ToString()));
         }
     }
-    if (mapArgs.count("-maxtxfee")) {
+    if (IsArgSet("-maxtxfee")) {
         CAmount nMaxFee = 0;
         if (!ParseMoney(mapArgs["-maxtxfee"], nMaxFee))
             return UIError(AmountErrMsg("maxtxfee", mapArgs["-maxtxfee"]));
@@ -574,7 +574,7 @@ bool CWallet::ParameterInteraction()
                                        mapArgs["-maxtxfee"], ::minRelayTxFee.ToString()));
         }
     }
-    if (mapArgs.count("-minstakesplit")) {
+    if (IsArgSet("-minstakesplit")) {
         CAmount n = 0;
         if (ParseMoney(mapArgs["-minstakesplit"], n) && n > 0)
             CWallet::minStakeSplitThreshold = n;

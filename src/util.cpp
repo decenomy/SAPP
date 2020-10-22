@@ -213,6 +213,11 @@ void ParseParameters(int argc, const char* const argv[])
     }
 }
 
+bool IsArgSet(const std::string& strArg)
+{
+    return mapArgs.count(strArg);
+}
+
 std::string GetArg(const std::string& strArg, const std::string& strDefault)
 {
     if (mapArgs.count(strArg))
@@ -365,7 +370,7 @@ const fs::path &ZC_GetParamsDir()
 #ifdef USE_CUSTOM_PARAMS
     path = fs::system_complete(PARAMS_DIR);
 #else
-    if (mapArgs.count("-paramsdir")) {
+    if (IsArgSet("-paramsdir")) {
         path = fs::system_complete(mapArgs["-paramsdir"]);
         if (!fs::is_directory(path)) {
             path = "";
@@ -428,7 +433,7 @@ const fs::path& GetDataDir(bool fNetSpecific)
     if (!path.empty())
         return path;
 
-    if (mapArgs.count("-datadir")) {
+    if (IsArgSet("-datadir")) {
         path = fs::system_complete(mapArgs["-datadir"]);
         if (!fs::is_directory(path)) {
             path = "";
