@@ -562,7 +562,7 @@ void CoinControlDialog::updateLabels()
     // nPayAmount
     CAmount nPayAmount = 0;
     bool fDust = false;
-    Q_FOREACH (const CAmount& amount, payAmounts) {
+    for (const CAmount& amount : payAmounts) {
         nPayAmount += amount;
         if (amount > 0) {
             CTxOut txout(amount, (CScript)std::vector<unsigned char>(24, 0));
