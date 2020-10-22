@@ -1613,7 +1613,7 @@ void CConnman::ProcessOneShot()
 void CConnman::ThreadOpenConnections()
 {
     // Connect to specific addresses
-    if (gArgs.IsArgSet("-connect") && !gArgs.GetArgs("-connect").empty()) {
+    if (gArgs.IsArgSet("-connect")) {
         for (int64_t nLoop = 0;; nLoop++) {
             ProcessOneShot();
             for (const std::string& strAddr : gArgs.GetArgs("-connect")) {
@@ -1811,8 +1811,7 @@ void CConnman::ThreadOpenAddedConnections()
 {
     {
         LOCK(cs_vAddedNodes);
-        if (gArgs.IsArgSet("-addnode"))
-            vAddedNodes = gArgs.GetArgs("-addnode");
+        vAddedNodes = gArgs.GetArgs("-addnode");
     }
 
     for (unsigned int i = 0; true; i++) {

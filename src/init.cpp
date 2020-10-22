@@ -991,9 +991,14 @@ bool AppInit2()
 
     // ********************************************************* Step 2: parameter interactions
     // Make sure enough file descriptors are available
-    int nBind = std::max(
-        (gArgs.IsArgSet("-bind") ? gArgs.GetArgs("-bind").size() : 0) +
-        (gArgs.IsArgSet("-whitebind") ? gArgs.GetArgs("-whitebind").size() : 0), size_t(1));
+
+    // -bind and -whitebind can't be set when not listening
+    size_t nUserBind = gArgs.GetArgs("-bind").size() + gArgs.GetArgs("-whitebind").size();
+    if (nUserBind != 0 && !gArgs.GetBoolArg("-listen", DEFAULT_LISTEN)) {
+        return UIError(_("Cannot set -bind or -whitebind together with -listen=0"));
+    }
+
+    int nBind = std::max(nUserBind, size_t(1));
     int nUserMaxConnections = GetArg("-maxconnections", DEFAULT_MAX_PEER_CONNECTIONS);
     int nMaxConnections = std::max(nUserMaxConnections, 0);
 
@@ -1020,12 +1025,10 @@ bool AppInit2()
     }
 
     // Now remove the logging categories which were explicitly excluded
-    if (gArgs.IsArgSet("-debugexclude")) {
-        for (const std::string& cat : gArgs.GetArgs("-debugexclude")) {
+    for (const std::string& cat : gArgs.GetArgs("-debugexclude")) {
             if (!g_logger->DisableCategory(cat)) {
                 UIWarning(strprintf(_("Unsupported logging category %s=%s."), "-debugexclude", cat));
             }
-        }
     }
 
     // Check for -debugnet
@@ -1359,14 +1362,12 @@ bool AppInit2()
         }
     }
 
-    if (gArgs.IsArgSet("-whitelist")) {
-        for (const std::string& net : gArgs.GetArgs("-whitelist")) {
+    for (const auto& net : gArgs.GetArgs("-whitelist")) {
             CSubNet subnet;
             LookupSubNet(net.c_str(), subnet);
             if (!subnet.IsValid())
                 return UIError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
             connman.AddWhitelistedRange(subnet);
-        }
     }
 
     // Check for host lookup allowed before parsing any network related parameters
@@ -1420,23 +1421,19 @@ bool AppInit2()
 
     bool fBound = false;
     if (fListen) {
-        if (gArgs.IsArgSet("-bind")) {
-            for (const std::string& strBind : gArgs.GetArgs("-bind")) {
+        for (const std::string& strBind : gArgs.GetArgs("-bind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
                     return UIError(ResolveErrMsg("bind", strBind));
                 fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
-            }
         }
-        if (gArgs.IsArgSet("-whitebind")) {
-            for (const std::string& strBind : gArgs.GetArgs("-whitebind")) {
+        for (const std::string& strBind : gArgs.GetArgs("-whitebind")) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, 0, false))
                     return UIError(ResolveErrMsg("whitebind", strBind));
                 if (addrBind.GetPort() == 0)
                     return UIError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
                 fBound |= Bind(connman, addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
-            }
         }
         if (!gArgs.IsArgSet("-bind") && !gArgs.IsArgSet("-whitebind")) {
             struct in_addr inaddr_any;
@@ -1448,14 +1445,12 @@ bool AppInit2()
             return UIError(_("Failed to listen on any port. Use -listen=0 if you want this."));
     }
 
-    if (gArgs.IsArgSet("-externalip")) {
-        for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
+    for (const std::string& strAddr : gArgs.GetArgs("-externalip")) {
             CService addrLocal;
             if (Lookup(strAddr.c_str(), addrLocal, GetListenPort(), fNameLookup) && addrLocal.IsValid())
                 AddLocal(addrLocal,LOCAL_MANUAL);
             else
                 return UIError(ResolveErrMsg("externalip", strAddr));
-        }
     }
 
     if (gArgs.IsArgSet("-seednode")) {
@@ -1732,9 +1727,8 @@ bool AppInit2()
     }
 
     std::vector<fs::path> vImportFiles;
-    if (gArgs.IsArgSet("-loadblock")) {
-        for (const std::string& strFile : gArgs.GetArgs("-loadblock"))
-            vImportFiles.push_back(strFile);
+    for (const std::string& strFile : gArgs.GetArgs("-loadblock")) {
+        vImportFiles.push_back(strFile);;
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
 
