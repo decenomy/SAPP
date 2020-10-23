@@ -278,6 +278,10 @@ bool CBlockTreeDB::LoadBlockIndexGuts(boost::function<CBlockIndex*(const uint256
                 pindexNew->nStatus = diskindex.nStatus;
                 pindexNew->nTx = diskindex.nTx;
 
+                // sapling
+                pindexNew->nSaplingValue  = diskindex.nSaplingValue;
+                pindexNew->hashFinalSaplingRoot = diskindex.hashFinalSaplingRoot;
+
                 //zerocoin
                 pindexNew->nAccumulatorCheckpoint = diskindex.nAccumulatorCheckpoint;
 

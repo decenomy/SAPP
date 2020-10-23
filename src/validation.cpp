@@ -1434,6 +1434,22 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return state.DoS(100, error("ConnectBlock() : PoW period ended"),
             REJECT_INVALID, "PoW-ended");
 
+    // Sapling
+    // Reject a block that results in a negative shielded value pool balance.
+    // Description under ZIP209 turnstile violation.
+
+    // If we've reached ConnectBlock, we have all transactions of
+    // parents and can expect nChainSaplingValue not to be boost::none.
+    // However, the miner and mining RPCs may not have populated this
+    // value and will call `TestBlockValidity`. So, we act
+    // conditionally.
+    if (pindex->nChainSaplingValue) {
+        if (*pindex->nChainSaplingValue < 0) {
+            return state.DoS(100, error("ConnectBlock(): turnstile violation in Sapling shielded value pool"),
+                             REJECT_INVALID, "turnstile-violation-sapling-shielded-pool");
+        }
+    }
+
     bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate();
 
     // If scripts won't be checked anyways, don't bother seeing if CLTV is activated
@@ -1827,6 +1843,7 @@ void FlushStateToDisk()
 /** Update chainActive and related internal data structures. */
 void static UpdateTip(CBlockIndex* pindexNew)
 {
+    AssertLockHeld(cs_main);
     chainActive.SetTip(pindexNew);
     g_IsSaplingActive = Params().GetConsensus().NetworkUpgradeActive(pindexNew->nHeight, Consensus::UPGRADE_V5_DUMMY);
 
@@ -1868,8 +1885,9 @@ void static UpdateTip(CBlockIndex* pindexNew)
 }
 
 /** Disconnect chainActive's tip. You probably want to call mempool.removeForReorg and manually re-limit mempool size after this, with cs_main held. */
-bool static DisconnectTip(CValidationState& state)
+bool static DisconnectTip(CValidationState& state, const CChainParams& chainparams)
 {
+    AssertLockHeld(cs_main);
     CBlockIndex* pindexDelete = chainActive.Tip();
     assert(pindexDelete);
     // Read block from disk.
@@ -1921,6 +1939,12 @@ bool static DisconnectTip(CValidationState& state)
     for (const auto& tx : block.vtx) {
         GetMainSignals().SyncTransaction(*tx, pindexDelete->pprev, CMainSignals::SYNC_TRANSACTION_NOT_IN_BLOCK);
     }
+
+    if (chainparams.GetConsensus().NetworkUpgradeActive(pindexDelete->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // Update Sapling cached incremental witnesses
+        GetMainSignals().ChainTip(pindexDelete, &block, nullopt);
+    }
+
     return true;
 }
 
@@ -1965,6 +1989,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const st
         connectTrace.blocksConnected.emplace_back(pindexNew, pblock);
     }
     const CBlock& blockConnecting = *connectTrace.blocksConnected.back().second;
+
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros();
     nTimeReadFromDisk += nTime2 - nTime1;
@@ -2013,7 +2038,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, const st
     return true;
 }
 
-bool DisconnectBlocks(int nBlocks)
+bool DisconnectBlocks(int nBlocks, const CChainParams& chainparams)
 {
     LOCK(cs_main);
 
@@ -2021,12 +2046,12 @@ bool DisconnectBlocks(int nBlocks)
 
     LogPrintf("%s: Got command to replay %d blocks\n", __func__, nBlocks);
     for (int i = 0; i <= nBlocks; i++)
-        DisconnectTip(state);
+        DisconnectTip(state, chainparams);
 
     return true;
 }
 
-void ReprocessBlocks(int nBlocks)
+void ReprocessBlocks(int nBlocks, const CChainParams& chainparams)
 {
     std::map<uint256, int64_t>::iterator it = mapRejectedBlocks.begin();
     while (it != mapRejectedBlocks.end()) {
@@ -2049,7 +2074,7 @@ void ReprocessBlocks(int nBlocks)
     CValidationState state;
     {
         LOCK(cs_main);
-        DisconnectBlocks(nBlocks);
+        DisconnectBlocks(nBlocks, chainparams);
     }
 
     if (state.IsValid()) {
@@ -2145,7 +2170,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
     // Disconnect active blocks which are no longer in the best chain.
     bool fBlocksDisconnected = false;
     while (chainActive.Tip() && chainActive.Tip() != pindexFork) {
-        if (!DisconnectTip(state))
+        if (!DisconnectTip(state, Params()))
             return false;
         fBlocksDisconnected = true;
     }
@@ -2265,6 +2290,22 @@ bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pb
                 for (unsigned int i = 0; i < block.vtx.size(); i++) {
                     GetMainSignals().SyncTransaction(*block.vtx[i], pair.first, i);
                 }
+
+                // Sapling: notify wallet about the connected blocks ordered
+                // Get prev block tree anchor
+                CBlockIndex* pprev = pair.first->pprev;
+                SaplingMerkleTree oldSaplingTree;
+                bool isSaplingActive = (pprev) != nullptr &&
+                                       Params().GetConsensus().NetworkUpgradeActive(pprev->nHeight,
+                                                                                    Consensus::UPGRADE_V5_DUMMY);
+                if (isSaplingActive) {
+                    assert(pcoinsTip->GetSaplingAnchorAt(pprev->hashFinalSaplingRoot, oldSaplingTree));
+                } else {
+                    assert(pcoinsTip->GetSaplingAnchorAt(SaplingMerkleTree::empty_root(), oldSaplingTree));
+                }
+
+                // Sapling: Update cached incremental witnesses
+                GetMainSignals().ChainTip(pair.first, &block, oldSaplingTree);
             }
 
             break;
@@ -2300,10 +2341,9 @@ bool ActivateBestChain(CValidationState& state, std::shared_ptr<const CBlock> pb
     return true;
 }
 
-bool InvalidateBlock(CValidationState& state, CBlockIndex* pindex)
+bool InvalidateBlock(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindex)
 {
     AssertLockHeld(cs_main);
-
     // Mark the block itself as invalid.
     pindex->nStatus |= BLOCK_FAILED_VALID;
     setDirtyBlockIndex.insert(pindex);
@@ -2316,7 +2356,7 @@ bool InvalidateBlock(CValidationState& state, CBlockIndex* pindex)
         setBlockIndexCandidates.erase(pindexWalk);
         // ActivateBestChain considers blocks already in chainActive
         // unconditionally valid already, so force disconnect away from it.
-        if (!DisconnectTip(state)) {
+        if (!DisconnectTip(state, chainparams)) {
             mempool.removeForReorg(pcoinsTip, chainActive.Tip()->nHeight + 1, STANDARD_LOCKTIME_VERIFY_FLAGS);
             return false;
         }
@@ -2424,6 +2464,21 @@ bool ReceivedBlockTransactions(const CBlock& block, CValidationState& state, CBl
         pindexNew->SetProofOfStake();
     pindexNew->nTx = block.vtx.size();
     pindexNew->nChainTx = 0;
+
+    // Sapling
+    CAmount saplingValue = 0;
+    for (const auto& tx : block.vtx) {
+        if (tx->isSapling() && tx->hasSaplingData()) {
+            // Negative valueBalance "takes" money from the transparent value pool
+            // and adds it to the Sapling value pool. Positive valueBalance "gives"
+            // money to the transparent value pool, removing from the Sapling value
+            // pool. So we invert the sign here.
+            saplingValue += -tx->sapData->valueBalance;
+        }
+    }
+    pindexNew->nSaplingValue = saplingValue;
+    pindexNew->nChainSaplingValue = nullopt;
+
     pindexNew->nFile = pos.nFile;
     pindexNew->nDataPos = pos.nPos;
     pindexNew->nUndoPos = 0;
@@ -2441,6 +2496,10 @@ bool ReceivedBlockTransactions(const CBlock& block, CValidationState& state, CBl
             CBlockIndex* pindex = queue.front();
             queue.pop_front();
             pindex->nChainTx = (pindex->pprev ? pindex->pprev->nChainTx : 0) + pindex->nTx;
+
+            // Sapling, update chain value
+            pindex->SetChainSaplingValue();
+
             {
                 LOCK(cs_nBlockSequenceId);
                 pindex->nSequenceId = nBlockSequenceId++;
@@ -3501,12 +3560,21 @@ bool static LoadBlockIndexDB(std::string& strError)
             if (pindex->pprev) {
                 if (pindex->pprev->nChainTx) {
                     pindex->nChainTx = pindex->pprev->nChainTx + pindex->nTx;
+                    // Sapling, calculate chain index value
+                    if (pindex->pprev->nChainSaplingValue) {
+                        pindex->nChainSaplingValue = *pindex->pprev->nChainSaplingValue + pindex->nSaplingValue;
+                    } else {
+                        pindex->nChainSaplingValue = nullopt;
+                    }
+
                 } else {
                     pindex->nChainTx = 0;
+                    pindex->nChainSaplingValue = nullopt;
                     mapBlocksUnlinked.emplace(pindex->pprev, pindex);
                 }
             } else {
                 pindex->nChainTx = pindex->nTx;
+                pindex->nChainSaplingValue = pindex->nSaplingValue;
             }
         }
         if (pindex->IsValid(BLOCK_VALID_TRANSACTIONS) && (pindex->nChainTx || pindex->pprev == NULL))

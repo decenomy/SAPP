@@ -11,6 +11,7 @@
 #define BITCOIN_CHAIN_H
 
 #include "chainparams.h"
+#include "optional.h"
 #include "pow.h"
 #include "primitives/block.h"
 #include "timedata.h"
@@ -217,9 +218,19 @@ public:
     std::vector<unsigned char> vStakeModifier{};
     unsigned int nFlags{0};
 
+    //! Change in value held by the Sapling circuit over this block.
+    //! Not a Optional because this was added before Sapling activated, so we can
+    //! rely on the invariant that every block before this was added had nSaplingValue = 0.
+    CAmount nSaplingValue{0};
+
+    //! (memory only) Total value held by the Sapling circuit up to and including this block.
+    //! Will be nullopt if nChainTx is zero.
+   Optional<CAmount> nChainSaplingValue{nullopt};
+
     //! block header
     int nVersion{0};
     uint256 hashMerkleRoot{};
+    uint256 hashFinalSaplingRoot{};
     unsigned int nTime{0};
     unsigned int nBits{0};
     unsigned int nNonce{0};
@@ -257,6 +268,9 @@ public:
     void SetNewStakeModifier(const uint256& prevoutId);     // generates and sets new v2 modifier
     uint64_t GetStakeModifierV1() const;
     uint256 GetStakeModifierV2() const;
+
+    // Update Sapling chain value
+    void SetChainSaplingValue();
 
     //! Check whether this block index entry is valid up to the passed validity level.
     bool IsValid(enum BlockStatus nUpTo = BLOCK_VALID_TRANSACTIONS) const;
@@ -322,6 +336,12 @@ public:
             READWRITE(nNonce);
             if(this->nVersion > 3 && this->nVersion < 7)
                 READWRITE(nAccumulatorCheckpoint);
+
+            // Sapling blocks
+            if (this->nVersion >= 8) {
+                READWRITE(hashFinalSaplingRoot);
+                READWRITE(nSaplingValue);
+            }
 
         } else if (nSerVersion > DBI_OLD_SER_VERSION && ser_action.ForRead()) {
             // Serialization with CLIENT_VERSION = 4009901
@@ -393,6 +413,8 @@ public:
         block.nNonce = nNonce;
         if (nVersion > 3 && nVersion < 7)
             block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
+        if (nVersion >= 8)
+            block.hashFinalSaplingRoot = hashFinalSaplingRoot;
         return block.GetHash();
     }
 

@@ -76,6 +76,16 @@ double GetDifficulty(const CBlockIndex* blockindex)
     return dDiff;
 }
 
+static UniValue ValuePoolDesc(
+        const Optional<CAmount> chainValue,
+        const Optional<CAmount> valueDelta)
+{
+    UniValue rv(UniValue::VOBJ);
+    rv.pushKV("chainValue",  ValueFromAmount(chainValue ? *chainValue : 0));
+    rv.pushKV("valueDelta",  ValueFromAmount(valueDelta ? *valueDelta : 0));
+    return rv;
+}
+
 UniValue blockheaderToJSON(const CBlockIndex* blockindex)
 {
     UniValue result(UniValue::VOBJ);
@@ -95,7 +105,8 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
     result.pushKV("difficulty", GetDifficulty(blockindex));
     result.pushKV("chainwork", blockindex->nChainWork.GetHex());
     result.pushKV("acc_checkpoint", blockindex->nAccumulatorCheckpoint.GetHex());
-
+    // Sapling shielded pool value
+    result.pushKV("shielded_pool_value", ValuePoolDesc(blockindex->nChainSaplingValue, blockindex->nSaplingValue));
     if (blockindex->pprev)
         result.pushKV("previousblockhash", blockindex->pprev->GetBlockHash().GetHex());
     CBlockIndex *pnext = chainActive.Next(blockindex);
@@ -118,6 +129,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.pushKV("version", block.nVersion);
     result.pushKV("merkleroot", block.hashMerkleRoot.GetHex());
     result.pushKV("acc_checkpoint", block.nAccumulatorCheckpoint.GetHex());
+    result.pushKV("finalsaplingroot", block.hashFinalSaplingRoot.GetHex());
     UniValue txs(UniValue::VARR);
     for (const auto& txIn : block.vtx) {
         const CTransaction& tx = *txIn;
@@ -492,6 +504,7 @@ UniValue getblock(const JSONRPCRequest& request)
             "  \"height\" : n,          (numeric) The block height or index\n"
             "  \"version\" : n,         (numeric) The block version\n"
             "  \"merkleroot\" : \"xxxx\", (string) The merkle root\n"
+            "  \"finalsaplingroot\" : \"xxxx\", (string) The root of the Sapling commitment tree after applying this block\n"
             "  \"tx\" : [               (array of string) The transaction ids\n"
             "     \"transactionid\"     (string) The transaction id\n"
             "     ,...\n"
@@ -564,6 +577,12 @@ UniValue getblockheader(const JSONRPCRequest& request)
             "  \"mediantime\" : ttt,    (numeric) The median block time in seconds since epoch (Jan 1 1970 GMT)\n"
             "  \"nonce\" : n,           (numeric) The nonce\n"
             "  \"bits\" : \"1d00ffff\", (string) The bits\n"
+            "  \"shielded_pool_value\": (object) Block shielded pool value\n"
+            "  {\n"
+            "     \"chainValue\":        (numeric) Total value held by the Sapling circuit up to and including this block\n"
+            "     \"valueDelta\":        (numeric) Change in value held by the Sapling circuit over this block\n"
+            "  }\n"
+            "}"
             "}\n"
 
             "\nResult (for verbose=false):\n"
@@ -937,6 +956,11 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
             "  \"difficulty\": xxxxxx,     (numeric) the current difficulty\n"
             "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
             "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
+            "  \"shielded_pool_value\": (object) Chain tip shielded pool value\n"
+            "  {\n"
+            "     \"chainValue\":        (numeric) Total value held by the Sapling circuit up to and including the chain tip\n"
+            "     \"valueDelta\":        (numeric) Change in value held by the Sapling circuit over the chain tip block\n"
+            "  }\n"
             "  \"softforks\": [            (array) status of softforks in progress\n"
             "     {\n"
             "        \"id\": \"xxxx\",        (string) name of softfork\n"
@@ -971,6 +995,8 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
     obj.pushKV("difficulty", (double)GetDifficulty());
     obj.pushKV("verificationprogress", Checkpoints::GuessVerificationProgress(pChainTip));
     obj.pushKV("chainwork", pChainTip ? pChainTip->nChainWork.GetHex() : "");
+    // Sapling shielded pool value
+    obj.pushKV("shielded_pool_value", ValuePoolDesc(pChainTip->nChainSaplingValue, pChainTip->nSaplingValue));
     UniValue softforks(UniValue::VARR);
     softforks.push_back(SoftForkDesc("bip65", 5, pChainTip));
     obj.pushKV("softforks",             softforks);
@@ -1181,7 +1207,7 @@ UniValue invalidateblock(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
 
         CBlockIndex* pblockindex = mapBlockIndex[hash];
-        InvalidateBlock(state, pblockindex);
+        InvalidateBlock(state, Params(), pblockindex);
     }
 
     if (state.IsValid()) {
