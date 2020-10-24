@@ -38,6 +38,7 @@
 #include "policy/policy.h"
 #include "pow.h"
 #include "reverse_iterate.h"
+#include "sapling/sapling_validation.h"
 #include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"
@@ -317,7 +318,8 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
         return state.DoS(10, error("%s : Zerocoin transactions are temporarily disabled for maintenance",
                 __func__), REJECT_INVALID, "bad-tx");
 
-    const Consensus::Params& consensus = Params().GetConsensus();
+    const CChainParams& params = Params();
+    const Consensus::Params& consensus = params.GetConsensus();
 
     // Check transaction
     int chainHeight = chainActive.Height();
@@ -326,6 +328,13 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
     if (!CheckTransaction(tx, consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC),
             true, state, isBlockBetweenFakeSerialAttackRange(chainHeight), fColdStakingActive, fSaplingActive))
         return error("%s : transaction checks for %s failed with %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
+
+    // Sapling
+    int nextBlockHeight = chainHeight + 1;
+    // Check transaction contextually against the set of consensus rules which apply in the next block to be mined.
+    if (!SaplingValidation::ContextualCheckTransaction(tx, state, params, nextBlockHeight, false, IsInitialBlockDownload())) {
+        return error("AcceptToMemoryPool: ContextualCheckTransaction failed");
+    }
 
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
@@ -3056,12 +3065,20 @@ bool IsTransactionInChain(const uint256& txId, int& nHeightTx)
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIndex* const pindexPrev)
 {
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
+    const CChainParams& chainparams = Params();
 
     // Check that all transactions are finalized
-    for (const auto& tx : block.vtx)
+    for (const auto& tx : block.vtx) {
+
+        // Sapling: Check transaction contextually against consensus rules at block height
+        if (!SaplingValidation::ContextualCheckTransaction(*tx, state, chainparams, nHeight, true, IsInitialBlockDownload())) {
+            return false; // Failure reason has been set in validation state object
+        }
+
         if (!IsFinalTx(*tx, nHeight, block.GetBlockTime())) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
         }
+    }
 
     // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
     if (pindexPrev) { // pindexPrev is only null on the first block which is a version 1 block.

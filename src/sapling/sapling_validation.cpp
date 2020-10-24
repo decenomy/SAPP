@@ -124,7 +124,6 @@ bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidatio
 *    being in Initial Block Download mode.
 * 4. The isInitBlockDownload argument is a function parameter to assist with testing.
 *
-* todo: For now, this is NOT connected, only used in unit tests.
 */
 bool ContextualCheckTransaction(
         const CTransaction& tx,
@@ -145,16 +144,14 @@ bool ContextualCheckTransaction(
     auto dosLevelPotentiallyRelaxing = isMined ? DOS_LEVEL_BLOCK : (
             isInitBlockDownload ? 0 : DOS_LEVEL_MEMPOOL);
 
-    // If Sapling is not active return quickly
+    // If Sapling is not active return quickly and don't perform any check here.
+    // basic data checks are performed in CheckTransaction which is ALWAYS called before ContextualCheckTransaction.
     if (!chainparams.GetConsensus().NetworkUpgradeActive(nHeight, Consensus::UPGRADE_V5_DUMMY)) {
-        return state.DoS(
-                dosLevelConstricting,
-                error("%s: Sapling not active", __func__ ),
-                REJECT_INVALID, "bad-tx-sapling-not-active");
+        return true;
     }
 
     // Reject transactions with invalid version
-    if (tx.nVersion < CTransaction::SAPLING_VERSION ) {
+    if (tx.nVersion < CTransaction::SAPLING_VERSION && tx.hasSaplingData()) {
         return state.DoS(
                 dosLevelConstricting,
                 error("%s: Sapling version too low", __func__ ),
@@ -162,7 +159,7 @@ bool ContextualCheckTransaction(
     }
 
     // Reject transactions with invalid version
-    if (tx.nVersion > CTransaction::SAPLING_VERSION ) {
+    if (tx.nVersion > CTransaction::SAPLING_VERSION) {
         return state.DoS(
                 dosLevelPotentiallyRelaxing,
                 error("%s: Sapling version too high", __func__),

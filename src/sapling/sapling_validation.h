@@ -20,6 +20,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state, CAmount& 
 bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidationState &state, CAmount& nValueOut);
 
 /** Check a transaction contextually against a set of consensus rules */
+// Note: if v5 upgrade wasn't enforced, this method returns true without performing any check.
 bool ContextualCheckTransaction(const CTransaction &tx, CValidationState &state,
                                 const CChainParams &chainparams, int nHeight, bool isMined,
                                 bool sInitBlockDownload);
