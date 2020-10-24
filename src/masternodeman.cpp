@@ -909,11 +909,12 @@ void ThreadCheckMasternodes()
             if (masternodeSync.IsBlockchainSynced()) {
                 c++;
 
-            // check if we should activate or ping every few minutes,
-            // start right after sync is considered to be done
-            if (c % MasternodePingSeconds() == 1) activeMasternode.ManageStatus();
+                // check if we should activate or ping every few minutes,
+                // start right after sync is considered to be done
+                if (c % (MasternodePingSeconds()/2) == 0)
+                    activeMasternode.ManageStatus();
 
-                if (c % 60 == 0) {
+                if (c % (MasternodePingSeconds()/5) == 0) {
                     mnodeman.CheckAndRemove();
                     masternodePayments.CleanPaymentList();
                 }

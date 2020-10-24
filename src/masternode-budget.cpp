@@ -1600,6 +1600,7 @@ void CBudgetProposal::SetSynced(bool synced)
 // If masternode voted for a proposal, but is now invalid -- remove the vote
 void CBudgetProposal::CleanAndRemove()
 {
+    LogPrint(BCLog::MNBUDGET, "Cleaning budget votes for %s. Before: YES=%d, NO=%d\n", GetName(), GetYeas(), GetNays());
     std::map<uint256, CBudgetVote>::iterator it = mapVotes.begin();
 
     while (it != mapVotes.end()) {
@@ -1607,6 +1608,7 @@ void CBudgetProposal::CleanAndRemove()
         (*it).second.SetValid(pmn != nullptr);
         ++it;
     }
+    LogPrint(BCLog::MNBUDGET, "Cleaned budget votes for %s. After: YES=%d, NO=%d\n", GetName(), GetYeas(), GetNays());
 }
 
 double CBudgetProposal::GetRatio() const

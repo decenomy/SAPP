@@ -19,6 +19,7 @@ Test checking:
 class MasternodeGovernanceBasicTest(PivxTestFramework):
 
     def set_test_params(self):
+        self.setup_clean_chain = True
         self.num_nodes = 5
         self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
         self.setup_clean_chain = True
@@ -33,20 +34,17 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         self.mnOnePrivkey = "9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK"
         self.mnTwoPrivkey = "92Hkebp3RHdDidGZ7ARgS4orxJAGyFUPDXNqtsYsiwho1HGVRbF"
 
-    def check_mnsync_finished(self):
+    def wait_until_mnsync_finished(self, _timeout):
         for node in self.nodes:
-            status = node.mnsync("status")["RequestedMasternodeAssets"]
-            assert_equal(status, 999) # sync finished
+            wait_until(lambda: node.mnsync("status")["RequestedMasternodeAssets"] == 999,
+                       timeout=_timeout, mocktime=self.advance_mocktime)
 
-    def check_mn_status_in_mnlist(self, node, mnTxHash, status):
-        listMNs = node.listmasternodes()
-        assert(len(listMNs) > 0)
-        found = False
-        for mnData in listMNs:
-            if (mnData["txhash"] == mnTxHash):
-                assert_equal(mnData["status"], status)
-                found = True
-        return found
+    def get_mn_status(self, node, mnTxHash):
+        mnData = node.listmasternodes(mnTxHash)
+        if len(mnData) == 0:
+            self.log.warn("Masternode not found in the list")
+            return ""
+        return mnData[0]["status"]
 
     def check_mn_list_empty(self, node):
         assert(len(node.listmasternodes()) == 0)
@@ -64,36 +62,36 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ret = mnOwner.startmasternode("alias", "false", masternodeAlias, True)
         assert_equal(ret["result"], "success")
 
-    def broadcastbudgetfinalization(self, node):
+    def broadcastbudgetfinalization(self, node, with_ping_mns=[]):
         self.log.info("suggesting the budget finalization..")
-        node.mnfinalbudgetsuggest()
+        assert (node.mnfinalbudgetsuggest() is not None)
 
         self.log.info("confirming the budget finalization..")
-        self.generate_two_blocks()
-        time.sleep(3)
-        self.generate_two_blocks()
+        time.sleep(1)
+        self.stake(4, with_ping_mns)
 
         self.log.info("broadcasting the budget finalization..")
         return node.mnfinalbudgetsuggest()
 
-    def generate_two_blocks(self):
-        # create two blocks (mocktime +120 sec) + sleep 5 seconds on every block
-        # so the node has time to broadcast the mnping.
-        for i in range(0, 2):
+    def stake(self, num_blocks, with_ping_mns=[]):
+        # stake blocks and send mn pings in between
+        for i in range(num_blocks):
             self.generate(1)
-            time.sleep(5)
+            if len(with_ping_mns) > 0:
+                self.send_pings(with_ping_mns)
 
-    def generate_two_blocks_and_wait_for_ping(self):
-        self.generate_two_blocks()
-        set_node_times(self.nodes, self.mocktime + 15)
-        time.sleep(3)
+    def send_pings(self, mnodes):
+        for node in mnodes:
+            sent = node.mnping()["sent"]
+            if sent != "YES" and "Too early to send Masternode Ping" not in sent:
+                raise AssertionError("Unable to send ping: \"sent\" = %s" % sent)
+            time.sleep(1)
 
 
-    def check_mn_status(self, mnTxHash, status):
-        for i in range(len(self.nodes)):
-            node = self.nodes[i]
-            found = self.check_mn_status_in_mnlist(node, mnTxHash, status)
-            assert_true(found, "mn status invalid for node"+str(i))
+    def wait_until_mn_enabled(self, mnTxHash, _timeout):
+        for node in self.nodes:
+            wait_until(lambda: self.get_mn_status(node, mnTxHash) == "ENABLED",
+                       timeout=_timeout, mocktime=self.advance_mocktime)
 
     def setupMasternode(self,
                         mnOwner,
@@ -153,15 +151,18 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
 
     def generate(self, gen):
-        for i in range(0, gen):
-            self.mocktime = self.generate_pow(self.minerPos, self.mocktime)
-            set_node_times(self.nodes, self.mocktime)
+        for i in range(gen):
+            self.mocktime = self.generate_pos(self.minerPos, self.mocktime)
         sync_blocks(self.nodes)
+        time.sleep(1)
+
+    def advance_mocktime(self, secs):
+        self.mocktime += secs
+        set_node_times(self.nodes, self.mocktime)
+        time.sleep(1)
 
     def run_test(self):
-        # init time
-        set_node_times(self.nodes, self.mocktime)
-
+        self.enable_mocktime()
         ownerOne = self.nodes[self.ownerOnePos]
         remoteOne = self.nodes[self.remoteOnePos]
         ownerTwo = self.nodes[self.ownerTwoPos]
@@ -173,8 +174,13 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         ownerTwoDir = os.path.join(self.options.tmpdir, "node2")
         remoteTwoDir = os.path.join(self.options.tmpdir, "node3")
 
-        self.log.info("generating 413 blocks..")
-        self.generate(413)
+        self.log.info("generating 259 blocks..")
+        # First mine 250 PoW blocks
+        for i in range(250):
+            self.mocktime = self.generate_pow(self.minerPos, self.mocktime)
+        sync_blocks(self.nodes)
+        # Then start staking
+        self.generate(9)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
@@ -201,38 +207,36 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
         # now both are configured,
         # let's activate the masternodes
 
-        set_node_times(self.nodes, self.mocktime + 10) # Advance a little bit in time.
+        self.advance_mocktime(10)
+
         # init masternodes at runtime
         remoteOnePort = p2p_port(self.remoteTwoPos)
         remoteTwoPort = p2p_port(self.remoteOnePos)
         remoteOne.initmasternode(self.mnOnePrivkey, "127.0.0.1:"+str(remoteOnePort))
         remoteTwo.initmasternode(self.mnTwoPrivkey, "127.0.0.1:"+str(remoteTwoPort))
-        set_node_times(self.nodes, self.mocktime + 5)
-        time.sleep(5)
+
+        self.advance_mocktime(3)
 
         # now need connection
-        self.generate(1)
-        set_node_times(self.nodes, self.mocktime + 15)
-
-        self.check_mnsync_finished()
+        self.stake(1)
+        self.wait_until_mnsync_finished(15)
         self.log.info("tier two synced! starting masternodes..")
         #
         # ## Now everything is set, can start both masternodes
         self.start_masternode(ownerOne, masternodeOneAlias)
         self.start_masternode(ownerTwo, masternodeTwoAlias)
 
-        time.sleep(7) # sleep to have everyone updated.
-        self.check_mn_status(mnOneTxHash, "ACTIVE")
-        self.check_mn_status(mnTwoTxHash, "ACTIVE")
-        set_node_times(self.nodes, self.mocktime + 5)
-        time.sleep(5)
+        self.advance_mocktime(30)
+        self.send_pings([remoteOne, remoteTwo])
 
         self.log.info("masternodes started, waiting until both gets enabled..")
-        self.generate_two_blocks_and_wait_for_ping()
 
-        # check masternode enabled
-        self.check_mn_status(mnOneTxHash, "ENABLED")
-        self.check_mn_status(mnTwoTxHash, "ENABLED")
+        self.stake(1, [remoteOne, remoteTwo])
+        self.advance_mocktime(30)
+        self.send_pings([remoteOne, remoteTwo])
+        time.sleep(2)
+        self.wait_until_mn_enabled(mnOneTxHash, 60)
+        self.wait_until_mn_enabled(mnTwoTxHash, 60)
 
         #
         self.log.info("masternodes enabled and running properly!")
@@ -254,19 +258,13 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             firstProposalAddress,
             firstProposalAmountPerCycle)
 
-        # generate 3 blocks to confirm the tx (waiting in-between to let nodes update the mnping)
-        self.generate_two_blocks_and_wait_for_ping()
-
-        set_node_times(self.nodes, self.mocktime + 31)
-        time.sleep(7) # ping
+        # generate 3 blocks to confirm the tx (and update the mnping)
+        self.stake(3, [remoteOne, remoteTwo])
 
         # activate sporks
         self.activate_spork(self.minerPos, "SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT")
         self.activate_spork(self.minerPos, "SPORK_9_MASTERNODE_BUDGET_ENFORCEMENT")
         self.activate_spork(self.minerPos, "SPORK_13_ENABLE_SUPERBLOCKS")
-
-        self.generate(1)
-        time.sleep(5)
 
         txinfo = miner.gettransaction(proposalFeeTxId)
         assert_equal(txinfo['amount'], -50.00)
@@ -283,46 +281,46 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
             proposalFeeTxId)
 
         # let's wait a little bit and see if all nodes are sync
-        time.sleep(5)
+        time.sleep(1)
         self.check_proposal_existence(firstProposalName, proposalHash)
         self.log.info("proposal broadcast succeed!")
+
+        # Proposal is established after 5 minutes. Mine 7 blocks
+        # Proposal needs to be on the chain > 5 min.
+        self.stake(7, [remoteOne, remoteTwo])
 
         # now let's vote for the proposal with the first MN
         self.log.info("broadcasting votes for the proposal now..")
         voteResult = ownerOne.mnbudgetvote("alias", proposalHash, "yes", masternodeOneAlias)
         assert_equal(voteResult["detail"][0]["result"], "success")
-        time.sleep(5)
+
         # check that the vote was accepted everywhere
+        self.stake(1, [remoteOne, remoteTwo])
         self.check_vote_existence(firstProposalName, mnOneTxHash, "YES")
         self.log.info("all good, MN1 vote accepted everywhere!")
 
         # now let's vote for the proposal with the second MN
-        self.check_mn_status(mnTwoTxHash, "ENABLED")
         voteResult = ownerTwo.mnbudgetvote("alias", proposalHash, "yes", masternodeTwoAlias)
         assert_equal(voteResult["detail"][0]["result"], "success")
-        time.sleep(5)
+
         # check that the vote was accepted everywhere
+        self.stake(1, [remoteOne, remoteTwo])
         self.check_vote_existence(firstProposalName, mnTwoTxHash, "YES")
         self.log.info("all good, MN2 vote accepted everywhere!")
 
         # Quick block count check.
-        assert_equal(ownerOne.getblockcount(), 421)
-
-        # Proposal needs to be on the chain > 5 min.
-        self.generate_two_blocks()
-        time.sleep(3)
-        self.generate(1)
-        time.sleep(3)
+        assert_equal(ownerOne.getblockcount(), 275)
 
         self.log.info("starting budget finalization sync test..")
-        # Now let's submit a budget finalization, next superblock will occur at block 432
+        self.stake(5, [remoteOne, remoteTwo])
 
         # assert that there is no budget finalization first.
         assert_true(len(ownerOne.mnfinalbudget("show")) == 0)
 
         # suggest the budget finalization and confirm the tx (+4 blocks).
-        budgetFinHash = self.broadcastbudgetfinalization(miner)
-        time.sleep(5)
+        budgetFinHash = self.broadcastbudgetfinalization(miner, with_ping_mns=[remoteOne, remoteTwo])
+        assert (budgetFinHash != "")
+        time.sleep(1)
 
         self.log.info("checking budget finalization sync..")
         self.check_budget_finalization_sync(0, "OK")
@@ -331,19 +329,12 @@ class MasternodeGovernanceBasicTest(PivxTestFramework):
 
         ownerOne.mnfinalbudget("vote-many", budgetFinHash)
         ownerTwo.mnfinalbudget("vote-many", budgetFinHash)
-        time.sleep(3)
-        self.generate_two_blocks()
+        self.stake(2, [remoteOne, remoteTwo])
 
         self.log.info("checking finalization votes..")
         self.check_budget_finalization_sync(2, "OK")
 
-        self.generate_two_blocks()
-        set_node_times(self.nodes, self.mocktime + 31)
-        time.sleep(7) # ping
-        self.generate_two_blocks()
-        set_node_times(self.nodes, self.mocktime + 31)
-        time.sleep(7) # ping
-        self.generate_two_blocks()
+        self.stake(8, [remoteOne, remoteTwo])
         addrInfo = miner.listreceivedbyaddress(0, False, False, firstProposalAddress)
         assert_equal(addrInfo[0]["amount"], firstProposalAmountPerCycle)
 
