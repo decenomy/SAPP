@@ -53,9 +53,6 @@ BOOST_FIXTURE_TEST_SUITE(sapling_rpc_wallet_tests, WalletTestingSetup)
 BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_validateaddress)
 {
     SelectParams(CBaseChainParams::MAIN);
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
     UniValue retValue;
 
     // Check number of args
@@ -87,8 +84,11 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_validateaddress)
 
 BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importkey_paymentaddress) {
     SelectParams(CBaseChainParams::MAIN);
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-    pwalletMain->SetupSPKM(false);
+    {
+        LOCK(pwalletMain->cs_wallet);
+        pwalletMain->SetMinVersion(FEATURE_SAPLING);
+        pwalletMain->SetupSPKM(false);
+    }
 
     auto testAddress = [](const std::string& key) {
         UniValue ret;
@@ -113,8 +113,11 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importkey_paymentaddress) {
  */
 BOOST_AUTO_TEST_CASE(rpc_wallet_sapling_importexport)
 {
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-    pwalletMain->SetupSPKM(false);
+    {
+        LOCK(pwalletMain->cs_wallet);
+        pwalletMain->SetMinVersion(FEATURE_SAPLING);
+        pwalletMain->SetupSPKM(false);
+    }
     UniValue retValue;
     int n1 = 1000; // number of times to import/export
     int n2 = 1000; // number of addresses to create and list
@@ -204,9 +207,9 @@ void CheckHaveAddr(const libzcash::PaymentAddress& addr) {
 
 BOOST_AUTO_TEST_CASE(rpc_wallet_getnewshieldedaddress) {
     UniValue addr;
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-    if (!pwalletMain->HasSaplingSPKM()) {
+    {
+        LOCK(pwalletMain->cs_wallet);
+        pwalletMain->SetMinVersion(FEATURE_SAPLING);
         pwalletMain->SetupSPKM(false);
     }
 
@@ -219,11 +222,12 @@ BOOST_AUTO_TEST_CASE(rpc_wallet_getnewshieldedaddress) {
 
 BOOST_AUTO_TEST_CASE(rpc_wallet_encrypted_wallet_sapzkeys)
 {
-    LOCK2(cs_main, pwalletMain->cs_wallet);
     UniValue retValue;
     int n = 100;
 
-    if(!pwalletMain->HasSaplingSPKM()) {
+    {
+        LOCK(pwalletMain->cs_wallet);
+        pwalletMain->SetMinVersion(FEATURE_SAPLING);
         pwalletMain->SetupSPKM(false);
     }
 

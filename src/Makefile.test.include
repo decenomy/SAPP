@@ -116,7 +116,8 @@ if ENABLE_WALLET
 BITCOIN_TESTS += \
   test/librust/sapling_rpc_wallet_tests.cpp \
   wallet/test/wallet_tests.cpp \
-  wallet/test/crypto_tests.cpp
+  wallet/test/crypto_tests.cpp \
+  test/librust/sapling_wallet_tests.cpp
 endif
 
 test_test_pivx_SOURCES = $(BITCOIN_TEST_SUITE) $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
@@ -167,8 +168,10 @@ if EMBEDDED_UNIVALUE
 endif
 
 %.cpp.test: %.cpp
-	@echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $<
-	$(AM_V_at)$(TEST_BINARY) -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" > $<.log 2>&1 || (cat $<.log && false)
+	@echo "" && echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $<
+	$(AM_V_at)$(TEST_BINARY) -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" > $<.log 2>&1 || (cat $<.log && false) & echo "$$!" > "$<.pid"
+	@while kill -0 `cat $<.pid` > /dev/null 2>&1; do echo -n "." > /dev/tty | sleep 0.5; done
+	@echo -e "\r\033[1A\033[0K" | rm $<.pid
 
 %.json.h: %.json
 	@$(MKDIR_P) $(@D)

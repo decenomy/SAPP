@@ -101,6 +101,7 @@ class CScript;
 class CWalletTx;
 class ScriptPubKeyMan;
 class SaplingScriptPubKeyMan;
+class SaplingNoteData;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature {
@@ -276,6 +277,9 @@ private:
     std::map<CTxDestination, AddressBook::CAddressBookData>::iterator itEnd;
 };
 
+template <class T>
+using TxSpendMap = std::multimap<T, uint256>;
+
 /**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
@@ -306,7 +310,7 @@ private:
      * detect and report conflicts (double-spends or
      * mutated transactions where the mutant gets mined).
      */
-    typedef std::multimap<COutPoint, uint256> TxSpends;
+    typedef TxSpendMap<COutPoint> TxSpends;
     TxSpends mapTxSpends;
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
     void AddToSpends(const uint256& wtxid);
@@ -314,7 +318,9 @@ private:
     /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
     void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
 
-    void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
+    template <class T>
+    void SyncMetaData(std::pair<typename TxSpendMap<T>::iterator, typename TxSpendMap<T>::iterator> range);
+    void ChainTipAdded(const CBlockIndex *pindex, const CBlock *pblock, SaplingMerkleTree saplingTree);
 
     bool IsKeyUsed(const CPubKey& vchPubKey);
 
@@ -357,7 +363,7 @@ public:
     ScriptPubKeyMan* GetScriptPubKeyMan() const;
     SaplingScriptPubKeyMan* GetSaplingScriptPubKeyMan() const { return m_sspk_man.get(); }
 
-    bool HasSaplingSPKM();
+    bool HasSaplingSPKM() const;
 
     /*
      * Main wallet lock.
@@ -422,6 +428,9 @@ public:
 
     int64_t nTimeFirstKey;
 
+    // Public SyncMetadata interface used for the sapling spent nullifier map.
+    void SyncMetaDataN(std::pair<TxSpendMap<uint256>::iterator, TxSpendMap<uint256>::iterator> range);
+
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 
     std::vector<CWalletTx> getWalletTxs();
@@ -475,6 +484,16 @@ public:
 
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
+
+    //! pindex is the new tip being connected.
+    void IncrementNoteWitnesses(const CBlockIndex* pindex,
+                                const CBlock* pblock,
+                                SaplingMerkleTree& saplingTree);
+
+    //! pindex is the old tip being disconnected.
+    void DecrementNoteWitnesses(const CBlockIndex* pindex);
+
+
     //! Adds Sapling spending key to the store, and saves it to disk
     bool AddSaplingZKey(const libzcash::SaplingExtendedSpendingKey &key);
     bool AddSaplingIncomingViewingKeyW(
@@ -665,7 +684,16 @@ public:
     CAmount GetDebit(const CTransaction& tx, const isminefilter& filter) const;
     CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const;
     CAmount GetChange(const CTransaction& tx) const;
+
+    //! Sapling merkle tree update
+    void ChainTip(const CBlockIndex *pindex,
+            const CBlock *pblock,
+            Optional<SaplingMerkleTree> added);
+
     void SetBestChain(const CBlockLocator& loc);
+    void SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc); // only public for testing purposes, must never be called directly in any other situation
+    // Force balance recomputation if any transaction got conflicted
+    void MarkAffectedTransactionsDirty(const CTransaction& tx); // only public for testing purposes, must never be called directly in any other situation
 
     DBErrors LoadWallet(bool& fFirstRunRet);
     DBErrors ZapWalletTx(std::vector<CWalletTx>& vWtx);
@@ -917,6 +945,9 @@ public:
     void setAbandoned() { hashBlock = ABANDON_HASH; }
 };
 
+// Sapling map
+typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
+
 /**
  * A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
@@ -928,6 +959,7 @@ private:
 
 public:
     mapValue_t mapValue;
+    mapSaplingNoteData_t mapSaplingNoteData;
     std::vector<std::pair<std::string, std::string> > vOrderForm;
     unsigned int fTimeReceivedIsTxTime;
     unsigned int nTimeReceived; //! time received by this node
@@ -982,6 +1014,10 @@ public:
         READWRITE(fFromMe);
         READWRITE(fSpent);
 
+        if (this->nVersion >= CTransaction::SAPLING_VERSION) {
+            READWRITE(mapSaplingNoteData);
+        }
+
         if (ser_action.ForRead()) {
             ReadOrderPos(nOrderPos, mapValue);
 
@@ -999,6 +1035,9 @@ public:
     void MarkDirty();
 
     void BindWallet(CWallet* pwalletIn);
+
+    void SetSaplingNoteData(mapSaplingNoteData_t &noteData);
+
     //! checks whether a tx has P2CS inputs or not
     bool HasP2CSInputs() const;
 

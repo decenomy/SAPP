@@ -23,7 +23,7 @@ void RegtestDeactivateSapling();
 
 libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey();
 
-CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore);
+CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore, bool genNewKey = false);
 
 /**
  * Generate a dummy SaplingNote and a SaplingMerkleTree with that note's commitment.
@@ -33,6 +33,7 @@ TestSaplingNote GetTestSaplingNote(const libzcash::SaplingPaymentAddress& pa, CA
 CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
                                  CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
-                                 CAmount value);
+                                 CAmount value,
+                                 bool genNewKey = false);
 
 #endif // PIVX_UTIL_TEST_H

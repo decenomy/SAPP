@@ -31,8 +31,11 @@ libzcash::SaplingExtendedSpendingKey GetTestMasterSaplingSpendingKey() {
     return libzcash::SaplingExtendedSpendingKey::Master(seed);
 }
 
-CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore) {
-    CKey tsk = KeyIO::DecodeSecret(T_SECRET_REGTEST);
+CKey AddTestCKeyToKeyStore(CBasicKeyStore& keyStore, bool genNewKey) {
+    CKey tsk;
+    if (genNewKey) tsk.MakeNewKey(true);
+    else tsk = KeyIO::DecodeSecret(T_SECRET_REGTEST);
+    if (!tsk.IsValid()) throw std::runtime_error("AddTestCKeyToKeyStore:: Invalid priv key");
     keyStore.AddKey(tsk);
     return tsk;
 }
@@ -49,9 +52,10 @@ TestSaplingNote GetTestSaplingNote(const libzcash::SaplingPaymentAddress& pa, CA
 CWalletTx GetValidSaplingReceive(const Consensus::Params& consensusParams,
                                  CBasicKeyStore& keyStore,
                                  const libzcash::SaplingExtendedSpendingKey &sk,
-                                 CAmount value) {
+                                 CAmount value,
+                                 bool genNewKey) {
     // From taddr
-    CKey tsk = AddTestCKeyToKeyStore(keyStore);
+    CKey tsk = AddTestCKeyToKeyStore(keyStore, genNewKey);
     auto scriptPubKey = GetScriptForDestination(tsk.GetPubKey().GetID());
     // To shielded addr
     auto fvk = sk.expsk.full_viewing_key();
