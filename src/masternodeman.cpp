@@ -641,11 +641,12 @@ std::vector<std::pair<int64_t, CMasternode>> CMasternodeMan::GetMasternodeRanks(
 
 int CMasternodeMan::ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb)
 {
-    if (mapSeenMasternodeBroadcast.count(mnb.GetHash())) { //seen
-        masternodeSync.AddedMasternodeList(mnb.GetHash());
+    const uint256& mnbHash = mnb.GetHash();
+    if (mapSeenMasternodeBroadcast.count(mnbHash)) { //seen
+        masternodeSync.AddedMasternodeList(mnbHash);
         return 0;
     }
-    mapSeenMasternodeBroadcast.emplace(mnb.GetHash(), mnb);
+    mapSeenMasternodeBroadcast.emplace(mnbHash, mnb);
 
     int nDoS = 0;
     if (!mnb.CheckAndUpdate(nDoS)) {
@@ -664,7 +665,7 @@ int CMasternodeMan::ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb)
     if (mnb.CheckInputsAndAdd(nDoS)) {
         // use this as a peer
         g_connman->AddNewAddress(CAddress(mnb.addr, NODE_NETWORK), pfrom->addr, 2 * 60 * 60);
-        masternodeSync.AddedMasternodeList(mnb.GetHash());
+        masternodeSync.AddedMasternodeList(mnbHash);
     } else {
         LogPrint(BCLog::MASTERNODE,"mnb - Rejected Masternode entry %s\n", mnb.vin.prevout.hash.ToString());
         return nDoS;
@@ -675,8 +676,9 @@ int CMasternodeMan::ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb)
 
 int CMasternodeMan::ProcessMNPing(CNode* pfrom, CMasternodePing& mnp)
 {
-    if (mapSeenMasternodePing.count(mnp.GetHash())) return 0; //seen
-    mapSeenMasternodePing.emplace(mnp.GetHash(), mnp);
+    const uint256& mnpHash = mnp.GetHash();
+    if (mapSeenMasternodePing.count(mnpHash)) return 0; //seen
+    mapSeenMasternodePing.emplace(mnpHash, mnp);
 
     int nDoS = 0;
     if (mnp.CheckAndUpdate(nDoS)) return 0;
