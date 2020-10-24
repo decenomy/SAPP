@@ -48,17 +48,20 @@ from .util import (
     connect_nodes,
     connect_nodes_clique,
     disconnect_nodes,
+    Decimal,
     DEFAULT_FEE,
     get_datadir_path,
     hex_str_to_bytes,
     bytes_to_hex_str,
     initialize_datadir,
+    p2p_port,
     set_node_times,
     SPORK_ACTIVATION_TIME,
     SPORK_DEACTIVATION_TIME,
     sync_blocks,
     sync_mempools,
     vZC_DENOMS,
+    wait_until,
 )
 
 class TestStatus(Enum):
@@ -1096,6 +1099,101 @@ class PivxTestFramework():
         return self.nodes[node_id].spork("active")[sporkName]
 
 
+    def get_mn_status(self, node, mnTxHash):
+        mnData = node.listmasternodes(mnTxHash)
+        if len(mnData) == 0:
+            self.log.warning("Masternode not found in the list")
+            return ""
+        return mnData[0]["status"]
+
+
+    def advance_mocktime(self, secs):
+        self.mocktime += secs
+        set_node_times(self.nodes, self.mocktime)
+        time.sleep(1)
+
+
+    def wait_until_mnsync_finished(self, _timeout):
+        for i in range(self.num_nodes):
+            try:
+                wait_until(lambda: self.nodes[i].mnsync("status")["RequestedMasternodeAssets"] == 999,
+                           timeout=_timeout, mocktime=self.advance_mocktime)
+            except AssertionError:
+                raise AssertionError("Unable to complete mnsync on node %d" % i)
+
+
+    def wait_until_mn_enabled(self, mnTxHash, _timeout):
+        for i in range(self.num_nodes):
+            try:
+                wait_until(lambda: self.get_mn_status(self.nodes[i], mnTxHash) == "ENABLED",
+                           timeout=_timeout, mocktime=self.advance_mocktime)
+            except AssertionError:
+                raise AssertionError("Unable to get status \"ENABLED\" on node %d" % i)
+
+
+    def controller_start_masternode(self, mnOwner, masternodeAlias):
+        ret = mnOwner.startmasternode("alias", "false", masternodeAlias, True)
+        assert_equal(ret["result"], "success")
+
+
+    def send_pings(self, mnodes):
+        for node in mnodes:
+            sent = node.mnping()["sent"]
+            if sent != "YES" and "Too early to send Masternode Ping" not in sent:
+                raise AssertionError("Unable to send ping: \"sent\" = %s" % sent)
+            time.sleep(1)
+
+
+    def stake_and_sync(self, node_id, num_blocks):
+        for i in range(num_blocks):
+            self.mocktime = self.generate_pos(node_id, self.mocktime)
+        sync_blocks(self.nodes)
+        time.sleep(1)
+
+
+    def stake_and_ping(self, node_id, num_blocks, with_ping_mns=[]):
+        # stake blocks and send mn pings in between
+        for i in range(num_blocks):
+            self.stake_and_sync(node_id, 1)
+            if len(with_ping_mns) > 0:
+                self.send_pings(with_ping_mns)
+
+
+    def setupMasternode(self,
+                        mnOwner,
+                        miner,
+                        masternodeAlias,
+                        mnOwnerDirPath,
+                        mnRemotePos,
+                        masternodePrivKey):
+        self.log.info("adding balance to the mn owner for " + masternodeAlias + "..")
+        mnAddress = mnOwner.getnewaddress(masternodeAlias)
+        # send to the owner the collateral tx cost
+        collateralTxId = miner.sendtoaddress(mnAddress, Decimal('10000'))
+        # confirm and verify reception
+        self.stake_and_sync(self.nodes.index(miner), 1)
+        assert_equal(mnOwner.getbalance(), Decimal('10000'))
+        assert(mnOwner.getrawtransaction(collateralTxId, 1)["confirmations"] > 0)
+
+        self.log.info("all good, creating masternode " + masternodeAlias + "..")
+
+        # get the collateral output using the RPC command
+        mnCollateralOutput = mnOwner.getmasternodeoutputs()[0]
+        assert_equal(mnCollateralOutput["txhash"], collateralTxId)
+        mnCollateralOutputIndex = mnCollateralOutput["outputidx"]
+
+        self.log.info("collateral accepted for "+ masternodeAlias +".. updating masternode.conf and stopping the node")
+
+        # verify collateral confirmed
+        confData = masternodeAlias + " 127.0.0.1:" + str(p2p_port(mnRemotePos)) + " " + str(masternodePrivKey) + " " + str(mnCollateralOutput["txhash"]) + " " + str(mnCollateralOutputIndex)
+        destinationDirPath = mnOwnerDirPath
+        destPath = os.path.join(destinationDirPath, "masternode.conf")
+        with open(destPath, "a+") as file_object:
+            file_object.write("\n")
+            file_object.write(confData)
+
+        # return the collateral id
+        return collateralTxId
 
 ### ------------------------------------------------------
 
@@ -1132,3 +1230,99 @@ class SkipTest(Exception):
     """This exception is raised to skip a test"""
     def __init__(self, message):
         self.message = message
+
+
+'''
+PivxTestFramework extensions
+'''
+
+class PivxTier2TestFramework(PivxTestFramework):
+
+    def set_test_params(self):
+        self.setup_clean_chain = True
+        self.num_nodes = 5
+        self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
+        self.setup_clean_chain = True
+        self.enable_mocktime()
+
+        self.ownerOnePos = 0
+        self.remoteOnePos = 1
+        self.ownerTwoPos = 2
+        self.remoteTwoPos = 3
+        self.minerPos = 4
+
+        self.mnOnePrivkey = "9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK"
+        self.mnTwoPrivkey = "92Hkebp3RHdDidGZ7ARgS4orxJAGyFUPDXNqtsYsiwho1HGVRbF"
+
+
+    def send_3_pings(self):
+        self.advance_mocktime(30)
+        self.send_pings([self.remoteOne, self.remoteTwo])
+        self.stake(1, [self.remoteOne, self.remoteTwo])
+        self.advance_mocktime(30)
+        self.send_pings([self.remoteOne, self.remoteTwo])
+        time.sleep(2)
+
+    def setup_2_masternodes_network(self):
+        self.ownerOne = self.nodes[self.ownerOnePos]
+        self.remoteOne = self.nodes[self.remoteOnePos]
+        self.ownerTwo = self.nodes[self.ownerTwoPos]
+        self.remoteTwo = self.nodes[self.remoteTwoPos]
+        self.miner = self.nodes[self.minerPos]
+        ownerOneDir = os.path.join(self.options.tmpdir, "node0")
+        ownerTwoDir = os.path.join(self.options.tmpdir, "node2")
+
+        self.log.info("generating 259 blocks..")
+        # First mine 250 PoW blocks
+        for i in range(250):
+            self.mocktime = self.generate_pow(self.minerPos, self.mocktime)
+        sync_blocks(self.nodes)
+        # Then start staking
+        self.stake_and_ping(self.minerPos, 9)
+
+        self.log.info("masternodes setup..")
+        # setup first masternode node, corresponding to nodeOne
+        masternodeOneAlias = "mnOne"
+        mnOneTxHash = self.setupMasternode(
+            self.ownerOne,
+            self.miner,
+            masternodeOneAlias,
+            os.path.join(ownerOneDir, "regtest"),
+            self.remoteOnePos,
+            self.mnOnePrivkey)
+        # setup second masternode node, corresponding to nodeTwo
+        masternodeTwoAlias = "mntwo"
+        mnTwoTxHash = self.setupMasternode(
+            self.ownerTwo,
+            self.miner,
+            masternodeTwoAlias,
+            os.path.join(ownerTwoDir, "regtest"),
+            self.remoteTwoPos,
+            self.mnTwoPrivkey)
+
+        self.log.info("masternodes setup completed, initializing them..")
+
+        # now both are configured, let's activate the masternodes
+        self.advance_mocktime(10)
+        remoteOnePort = p2p_port(self.remoteTwoPos)
+        remoteTwoPort = p2p_port(self.remoteOnePos)
+        self.remoteOne.initmasternode(self.mnOnePrivkey, "127.0.0.1:"+str(remoteOnePort))
+        self.remoteTwo.initmasternode(self.mnTwoPrivkey, "127.0.0.1:"+str(remoteTwoPort))
+        self.advance_mocktime(3)
+
+        # wait until mnsync complete on all nodes
+        self.stake(1)
+        time.sleep(20)
+        self.wait_until_mnsync_finished(15)
+        self.log.info("tier two synced! starting masternodes..")
+
+        # Now everything is set, can start both masternodes
+        self.controller_start_masternode(self.ownerOne, masternodeOneAlias)
+        self.controller_start_masternode(self.ownerTwo, masternodeTwoAlias)
+        self.log.info("masternodes started, waiting until both gets enabled..")
+        self.send_3_pings()
+        self.wait_until_mn_enabled(mnOneTxHash, 60)
+        self.wait_until_mn_enabled(mnTwoTxHash, 60)
+        self.log.info("masternodes enabled and running properly!")
+
+        return (masternodeOneAlias, masternodeTwoAlias, mnOneTxHash, mnTwoTxHash)
