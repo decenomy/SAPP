@@ -42,7 +42,7 @@ class MasternodeActivationTest(PivxTier2TestFramework):
         self.log.info("Reconnecting nodes and sending start message again...")
         self.reconnect_remotes()
         time.sleep(2)
-        self.wait_until_mnsync_finished(15)
+        self.wait_until_mnsync_finished(35)
         self.controller_start_all_masternodes()
 
     def spend_collateral(self):
@@ -113,7 +113,7 @@ class MasternodeActivationTest(PivxTier2TestFramework):
         sync_blocks(self.nodes)
         self.log.info("checking mn status..")
         time.sleep(5)           # wait a little bit
-        self.wait_until_mn_vinspent(self.mnOneTxHash, 30)
+        self.wait_until_mn_vinspent(self.mnOneTxHash, 30, [self.remoteTwo])
         self.log.info("masternode list updated successfully, vin spent")
 
 

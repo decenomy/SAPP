@@ -1128,23 +1128,29 @@ class PivxTestFramework():
                 raise AssertionError("Unable to complete mnsync on node %d" % i)
 
 
-    def wait_until_mn_status(self, status, mnTxHash, _timeout, orEmpty=False):
+    def wait_until_mn_status(self, status, mnTxHash, _timeout, orEmpty=False, with_ping_mns=[]):
+        def _sendpings():
+            if len(with_ping_mns) == 0:
+                return
+            else:
+                self.send_pings(with_ping_mns)
+
         for i in range(self.num_nodes):
             try:
                 wait_until(lambda: (self.get_mn_status(self.nodes[i], mnTxHash) == status or
                                     (orEmpty and self.get_mn_status(self.nodes[i], mnTxHash) == "")),
-                           timeout=_timeout, mocktime=self.advance_mocktime)
+                           timeout=_timeout, sendpings=_sendpings, mocktime=self.advance_mocktime)
             except AssertionError:
                 strErr = "Unable to get status \"%s\" on node %d for mnode %s" % (status, i, mnTxHash)
                 raise AssertionError(strErr)
 
 
-    def wait_until_mn_enabled(self, mnTxHash, _timeout):
-        self.wait_until_mn_status("ENABLED", mnTxHash, _timeout)
+    def wait_until_mn_enabled(self, mnTxHash, _timeout, _with_ping_mns=[]):
+        self.wait_until_mn_status("ENABLED", mnTxHash, _timeout, with_ping_mns=_with_ping_mns)
 
 
-    def wait_until_mn_vinspent(self, mnTxHash, _timeout):
-        self.wait_until_mn_status("VIN_SPENT", mnTxHash, _timeout, orEmpty=True)
+    def wait_until_mn_vinspent(self, mnTxHash, _timeout, _with_ping_mns=[]):
+        self.wait_until_mn_status("VIN_SPENT", mnTxHash, _timeout, orEmpty=True, with_ping_mns=_with_ping_mns)
 
 
     def controller_start_masternode(self, mnOwner, masternodeAlias):
@@ -1303,8 +1309,8 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.controller_start_masternode(self.ownerTwo, self.masternodeTwoAlias)
         self.log.info("masternodes started, waiting until both get enabled..")
         self.send_3_pings()
-        self.wait_until_mn_enabled(self.mnOneTxHash, 60)
-        self.wait_until_mn_enabled(self.mnTwoTxHash, 60)
+        self.wait_until_mn_enabled(self.mnOneTxHash, 60, [self.remoteOne, self.remoteTwo])
+        self.wait_until_mn_enabled(self.mnTwoTxHash, 60, [self.remoteOne, self.remoteTwo])
         self.log.info("masternodes enabled and running properly!")
 
     def advance_mocktime_and_stake(self, secs_to_add):
@@ -1360,7 +1366,7 @@ class PivxTier2TestFramework(PivxTestFramework):
         # wait until mnsync complete on all nodes
         self.stake(1)
         time.sleep(20)
-        self.wait_until_mnsync_finished(15)
+        self.wait_until_mnsync_finished(35)
         self.log.info("tier two synced! starting masternodes..")
 
         # Now everything is set, can start both masternodes
