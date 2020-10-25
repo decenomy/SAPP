@@ -1810,7 +1810,7 @@ bool AppInit2()
     if (fMasterNode) {
         LogPrintf("IS MASTER NODE\n");
         auto res = initMasternode(gArgs.GetArg("-masternodeprivkey", ""), gArgs.GetArg("-masternodeaddr", ""), true);
-        if (!res) UIError(*res.error);
+        if (!res) UIError(res.getError());
     }
 
     //get the mode of budget voting for this masternode

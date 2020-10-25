@@ -715,7 +715,7 @@ UniValue mnfinalbudgetsuggest(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_MISC_ERROR, "command available only for RegTest network");
     }
 
-    uint256 budgetHash = budget.SubmitFinalBudget();
+    const uint256& budgetHash = budget.SubmitFinalBudget();
     return (budgetHash.IsNull()) ? NullUniValue : budgetHash.ToString();
 }
 

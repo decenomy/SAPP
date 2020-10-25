@@ -20,12 +20,15 @@
 
 class OperationResult
 {
+private:
+    bool res{false};
+    Optional<std::string> error{nullopt};
+
 public:
     OperationResult(bool _res, const std::string& _error) : res(_res), error(_error) { }
     OperationResult(bool _res) : res(_res) { }
 
-    bool res{false};
-    Optional<std::string> error{nullopt};
+    std::string getError() const { return (error ? *error : ""); }
     explicit operator bool() const { return res; }
 };
 

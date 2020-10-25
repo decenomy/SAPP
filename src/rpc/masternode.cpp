@@ -70,7 +70,7 @@ UniValue initmasternode(const JSONRPCRequest& request)
     std::string _strMasterNodePrivKey = request.params[0].get_str();
     std::string _strMasterNodeAddr = request.params[1].get_str();
     auto res = initMasternode(_strMasterNodePrivKey, _strMasterNodeAddr, false);
-    if (!res) throw std::runtime_error(*res.error);
+    if (!res) throw std::runtime_error(res.getError());
     return "success";
 }
 
