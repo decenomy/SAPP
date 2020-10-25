@@ -183,7 +183,7 @@ jobs:
         TEST_RUNNER_EXTRA="--tiertwo"  # Run tier two functional tests only.
         GOAL="install"
         BITCOIN_CONFIG="--with-gui=no --enable-glibc-back-compat --enable-reduce-exports --disable-online-rust --with-params-dir=$PARAMS_DIR"
-        BUILD_TIMEOUT=800
+        BUILD_TIMEOUT=1800
 
     - stage: test
       name: 'x86_64 Linux  [GOAL: install]  [xenial]  [no depends, only system libs]'
