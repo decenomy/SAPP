@@ -1102,7 +1102,6 @@ class PivxTestFramework():
     def get_mn_status(self, node, mnTxHash):
         mnData = node.listmasternodes(mnTxHash)
         if len(mnData) == 0:
-            self.log.warning("Masternode not found in the list")
             return ""
         return mnData[0]["status"]
 
@@ -1122,18 +1121,29 @@ class PivxTestFramework():
                 raise AssertionError("Unable to complete mnsync on node %d" % i)
 
 
-    def wait_until_mn_enabled(self, mnTxHash, _timeout):
+    def wait_until_mn_status(self, status, mnTxHash, _timeout, orEmpty=False):
         for i in range(self.num_nodes):
             try:
-                wait_until(lambda: self.get_mn_status(self.nodes[i], mnTxHash) == "ENABLED",
+                wait_until(lambda: (self.get_mn_status(self.nodes[i], mnTxHash) == status or
+                                    (orEmpty and self.get_mn_status(self.nodes[i], mnTxHash) == "")),
                            timeout=_timeout, mocktime=self.advance_mocktime)
             except AssertionError:
-                raise AssertionError("Unable to get status \"ENABLED\" on node %d" % i)
+                strErr = "Unable to get status \"%s\" on node %d for mnode %s" % (status, i, mnTxHash)
+                raise AssertionError(strErr)
+
+
+    def wait_until_mn_enabled(self, mnTxHash, _timeout):
+        self.wait_until_mn_status("ENABLED", mnTxHash, _timeout)
+
+
+    def wait_until_mn_vinspent(self, mnTxHash, _timeout):
+        self.wait_until_mn_status("VIN_SPENT", mnTxHash, _timeout, orEmpty=True)
 
 
     def controller_start_masternode(self, mnOwner, masternodeAlias):
         ret = mnOwner.startmasternode("alias", "false", masternodeAlias, True)
         assert_equal(ret["result"], "success")
+        time.sleep(1)
 
 
     def send_pings(self, mnodes):
@@ -1241,7 +1251,11 @@ class PivxTier2TestFramework(PivxTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 5
-        self.extra_args = [[], ["-listen", "-externalip=127.0.0.1"], [], ["-listen", "-externalip=127.0.0.1"], ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
+        self.extra_args = [[],
+                           ["-listen", "-externalip=127.0.0.1"],
+                           [],
+                           ["-listen", "-externalip=127.0.0.1"],
+                           ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
         self.setup_clean_chain = True
         self.enable_mocktime()
 
@@ -1251,9 +1265,20 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.remoteTwoPos = 3
         self.minerPos = 4
 
+        self.masternodeOneAlias = "mnOne"
+        self.masternodeTwoAlias = "mntwo"
+
         self.mnOnePrivkey = "9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK"
         self.mnTwoPrivkey = "92Hkebp3RHdDidGZ7ARgS4orxJAGyFUPDXNqtsYsiwho1HGVRbF"
 
+        # Updated in setup_2_masternodes_network() to be called at the start of run_test
+        self.ownerOne = None        # self.nodes[self.ownerOnePos]
+        self.remoteOne = None       # self.nodes[self.remoteOnePos]
+        self.ownerTwo = None        # self.nodes[self.ownerTwoPos]
+        self.remoteTwo = None       # self.nodes[self.remoteTwoPos]
+        self.miner = None           # self.nodes[self.minerPos]
+        self.mnOneTxHash = ""
+        self.mnTwoTxHash = ""
 
     def send_3_pings(self):
         self.advance_mocktime(30)
@@ -1261,6 +1286,23 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.stake(1, [self.remoteOne, self.remoteTwo])
         self.advance_mocktime(30)
         self.send_pings([self.remoteOne, self.remoteTwo])
+        time.sleep(2)
+
+    def stake(self, num_blocks, with_ping_mns=[]):
+        self.stake_and_ping(self.minerPos, num_blocks, with_ping_mns)
+
+    def controller_start_all_masternodes(self):
+        self.controller_start_masternode(self.ownerOne, self.masternodeOneAlias)
+        self.controller_start_masternode(self.ownerTwo, self.masternodeTwoAlias)
+        self.log.info("masternodes started, waiting until both get enabled..")
+        self.send_3_pings()
+        self.wait_until_mn_enabled(self.mnOneTxHash, 60)
+        self.wait_until_mn_enabled(self.mnTwoTxHash, 60)
+        self.log.info("masternodes enabled and running properly!")
+
+    def advance_mocktime_and_stake(self, secs_to_add):
+        self.advance_mocktime(secs_to_add - 60 + 1)
+        self.mocktime = self.generate_pos(self.minerPos, self.mocktime)
         time.sleep(2)
 
     def setup_2_masternodes_network(self):
@@ -1282,20 +1324,18 @@ class PivxTier2TestFramework(PivxTestFramework):
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
-        masternodeOneAlias = "mnOne"
-        mnOneTxHash = self.setupMasternode(
+        self.mnOneTxHash = self.setupMasternode(
             self.ownerOne,
             self.miner,
-            masternodeOneAlias,
+            self.masternodeOneAlias,
             os.path.join(ownerOneDir, "regtest"),
             self.remoteOnePos,
             self.mnOnePrivkey)
         # setup second masternode node, corresponding to nodeTwo
-        masternodeTwoAlias = "mntwo"
-        mnTwoTxHash = self.setupMasternode(
+        self.mnTwoTxHash = self.setupMasternode(
             self.ownerTwo,
             self.miner,
-            masternodeTwoAlias,
+            self.masternodeTwoAlias,
             os.path.join(ownerTwoDir, "regtest"),
             self.remoteTwoPos,
             self.mnTwoPrivkey)
@@ -1317,12 +1357,4 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.log.info("tier two synced! starting masternodes..")
 
         # Now everything is set, can start both masternodes
-        self.controller_start_masternode(self.ownerOne, masternodeOneAlias)
-        self.controller_start_masternode(self.ownerTwo, masternodeTwoAlias)
-        self.log.info("masternodes started, waiting until both gets enabled..")
-        self.send_3_pings()
-        self.wait_until_mn_enabled(mnOneTxHash, 60)
-        self.wait_until_mn_enabled(mnTwoTxHash, 60)
-        self.log.info("masternodes enabled and running properly!")
-
-        return (masternodeOneAlias, masternodeTwoAlias, mnOneTxHash, mnTwoTxHash)
+        self.controller_start_all_masternodes()

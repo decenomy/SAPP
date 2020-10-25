@@ -60,16 +60,9 @@ class MasternodeGovernanceBasicTest(PivxTier2TestFramework):
                     found = True
             assert_true(found, "Error checking vote existence in node " + str(i))
 
-    def stake(self, num_blocks, with_ping_mns=[]):
-        self.stake_and_ping(self.minerPos, num_blocks, with_ping_mns)
-
     def run_test(self):
         self.enable_mocktime()
-        (masternodeOneAlias,
-         masternodeTwoAlias,
-         mnOneTxHash,
-         mnTwoTxHash,
-         ) = self.setup_2_masternodes_network()
+        self.setup_2_masternodes_network()
 
         # Prepare the proposal
         self.log.info("preparing budget proposal..")
@@ -121,21 +114,21 @@ class MasternodeGovernanceBasicTest(PivxTier2TestFramework):
 
         # now let's vote for the proposal with the first MN
         self.log.info("broadcasting votes for the proposal now..")
-        voteResult = self.ownerOne.mnbudgetvote("alias", proposalHash, "yes", masternodeOneAlias)
+        voteResult = self.ownerOne.mnbudgetvote("alias", proposalHash, "yes", self.masternodeOneAlias)
         assert_equal(voteResult["detail"][0]["result"], "success")
 
         # check that the vote was accepted everywhere
         self.stake(1, [self.remoteOne, self.remoteTwo])
-        self.check_vote_existence(firstProposalName, mnOneTxHash, "YES")
+        self.check_vote_existence(firstProposalName, self.mnOneTxHash, "YES")
         self.log.info("all good, MN1 vote accepted everywhere!")
 
         # now let's vote for the proposal with the second MN
-        voteResult = self.ownerTwo.mnbudgetvote("alias", proposalHash, "yes", masternodeTwoAlias)
+        voteResult = self.ownerTwo.mnbudgetvote("alias", proposalHash, "yes", self.masternodeTwoAlias)
         assert_equal(voteResult["detail"][0]["result"], "success")
 
         # check that the vote was accepted everywhere
         self.stake(1, [self.remoteOne, self.remoteTwo])
-        self.check_vote_existence(firstProposalName, mnTwoTxHash, "YES")
+        self.check_vote_existence(firstProposalName, self.mnTwoTxHash, "YES")
         self.log.info("all good, MN2 vote accepted everywhere!")
 
         # Quick block count check.
