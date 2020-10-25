@@ -145,9 +145,10 @@ BASE_SCRIPTS= [
 ]
 
 TIERTWO_SCRIPTS = [
-    'tiertwo_masternode_activation.py',
+    # Longest test should go first, to favor running tests in parallel
     'tiertwo_governance_sync_basic.py',
-
+    'tiertwo_masternode_activation.py',
+    'tiertwo_masternode_ping.py',
 ]
 
 EXTENDED_SCRIPTS = [
@@ -334,9 +335,14 @@ def main():
               tmpdir,
               args.jobs, args.coverage,
               passon_args, args.combinedlogslen,
-              args.keepcache)
+              # Skip cache creation when running with --tiertwo
+              "skip" if args.tiertwo else ("keep" if args.keepcache else "rewrite"))
 
-def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0, keep_cache=False):
+# keep_cache can either be
+# - "rewrite" : (default) Delete cache directory and recreate it.
+# - "keep"    : Check if the cache in the directory is valid. Recreate only if invalid.
+# - "skip"    : Don' check the contents of the cache and don't create a new one
+def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0, keep_cache="rewrite"):
     # Warn if pivxd is already running (unix only)
     try:
         if subprocess.check_output(["pidof", "pivxd"]) is not None:
@@ -380,15 +386,16 @@ def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_cove
             sys.stdout.flush()
             threading.Timer(pingTime, pingTravis).start()
 
-        if not keep_cache:
+        if keep_cache == "rewrite":
             pingTravis()
-        try:
-            subprocess.check_output([tests_dir + 'create_cache.py'] + flags + ["--tmpdir=%s/cache" % tmpdir])
-        except subprocess.CalledProcessError as e:
-            sys.stdout.buffer.write(e.output)
-            raise
-        finally:
-            stopTimer = True
+        if keep_cache != "skip":
+            try:
+                subprocess.check_output([tests_dir + 'create_cache.py'] + flags + ["--tmpdir=%s/cache" % tmpdir])
+            except subprocess.CalledProcessError as e:
+                sys.stdout.buffer.write(e.output)
+                raise
+            finally:
+                stopTimer = True
 
     #Run Tests
     job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags)
