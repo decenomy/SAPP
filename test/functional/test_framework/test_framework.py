@@ -1099,6 +1099,13 @@ class PivxTestFramework():
         return self.nodes[node_id].spork("active")[sporkName]
 
 
+    def get_mn_lastseen(self, node, mnTxHash):
+        mnData = node.listmasternodes(mnTxHash)
+        if len(mnData) == 0:
+            return -1
+        return mnData[0]["lastseen"]
+
+
     def get_mn_status(self, node, mnTxHash):
         mnData = node.listmasternodes(mnTxHash)
         if len(mnData) == 0:
@@ -1183,7 +1190,7 @@ class PivxTestFramework():
         # confirm and verify reception
         self.stake_and_sync(self.nodes.index(miner), 1)
         assert_equal(mnOwner.getbalance(), Decimal('10000'))
-        assert(mnOwner.getrawtransaction(collateralTxId, 1)["confirmations"] > 0)
+        assert_greater_than(mnOwner.getrawtransaction(collateralTxId, 1)["confirmations"], 0)
 
         self.log.info("all good, creating masternode " + masternodeAlias + "..")
 
@@ -1320,7 +1327,7 @@ class PivxTier2TestFramework(PivxTestFramework):
             self.mocktime = self.generate_pow(self.minerPos, self.mocktime)
         sync_blocks(self.nodes)
         # Then start staking
-        self.stake_and_ping(self.minerPos, 9)
+        self.stake(9)
 
         self.log.info("masternodes setup..")
         # setup first masternode node, corresponding to nodeOne
