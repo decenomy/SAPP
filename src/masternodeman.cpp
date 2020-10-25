@@ -616,41 +616,27 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
     return -1;
 }
 
-std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int64_t nBlockHeight, int minProtocol)
+std::vector<std::pair<int64_t, CMasternode>> CMasternodeMan::GetMasternodeRanks(int nBlockHeight)
 {
-    std::vector<std::pair<int64_t, CMasternode> > vecMasternodeScores;
-    std::vector<std::pair<int, CMasternode> > vecMasternodeRanks;
-
+    std::vector<std::pair<int64_t, CMasternode>> vecMasternodeScores;
     const uint256& hash = GetHashAtHeight(nBlockHeight - 1);
     // height outside range
-    if (!hash) return vecMasternodeRanks;
+    if (!hash) return vecMasternodeScores;
+    {
+        LOCK(cs);
+        // scan for winner
+        for (CMasternode& mn : vMasternodes) {
+            if (!mn.IsEnabled()) {
+                vecMasternodeScores.emplace_back(9999, mn);
+                continue;
+            }
 
-    // scan for winner
-    for (CMasternode& mn : vMasternodes) {
-        mn.Check();
-
-        if (mn.protocolVersion < minProtocol) continue;
-
-        if (!mn.IsEnabled()) {
-            vecMasternodeScores.emplace_back(9999, mn);
-            continue;
+            int64_t n2 = mn.CalculateScore(hash).GetCompact(false);
+            vecMasternodeScores.emplace_back(n2, mn);
         }
-
-        uint256 n = mn.CalculateScore(hash);
-        int64_t n2 = n.GetCompact(false);
-
-        vecMasternodeScores.emplace_back(n2, mn);
     }
-
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreMN());
-
-    int rank = 0;
-    for (PAIRTYPE(int64_t, CMasternode) & s : vecMasternodeScores) {
-        rank++;
-        vecMasternodeRanks.emplace_back(rank, s.second);
-    }
-
-    return vecMasternodeRanks;
+    return vecMasternodeScores;
 }
 
 void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
