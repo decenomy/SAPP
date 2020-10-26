@@ -133,9 +133,9 @@ void CMasternodeSync::AddedMasternodeWinner(const uint256& hash)
 
 void CMasternodeSync::AddedBudgetItem(const uint256& hash)
 {
-    if (budget.HaveSeenProposal(hash) ||
+    if (budget.HaveProposal(hash) ||
             budget.HaveSeenProposalVote(hash) ||
-            budget.HaveSeenFinalizedBudget(hash) ||
+            budget.HaveFinalizedBudget(hash) ||
             budget.HaveSeenFinalizedBudgetVote(hash)) {
         if (mapSeenSyncBudget[hash] < MASTERNODE_SYNC_THRESHOLD) {
             lastBudgetItem = GetTime();
