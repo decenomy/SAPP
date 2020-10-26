@@ -3,13 +3,15 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "qt/pivx/settings/settingsbackupwallet.h"
+
 #include "qt/pivx/settings/forms/ui_settingsbackupwallet.h"
-#include <QFile>
-#include <QGraphicsDropShadowEffect>
+
+#include "guiinterface.h"
 #include "guiutil.h"
 #include "qt/pivx/qtutils.h"
-#include "guiinterface.h"
-#include "qt/pivx/qtutils.h"
+
+#include <QGraphicsDropShadowEffect>
+
 SettingsBackupWallet::SettingsBackupWallet(PIVXGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsBackupWallet)

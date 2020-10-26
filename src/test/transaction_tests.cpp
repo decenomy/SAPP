@@ -24,10 +24,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/assign/list_of.hpp>
 
 #include <univalue.h>
-
 
 // In script_tests.cpp
 extern UniValue read_json(const std::string& jsondata);
