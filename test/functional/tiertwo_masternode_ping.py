@@ -7,13 +7,9 @@ from test_framework.test_framework import PivxTestFramework
 from test_framework.util import (
     assert_equal,
     assert_greater_than,
-    connect_nodes_clique,
-    disconnect_nodes,
     Decimal,
     p2p_port,
-    satoshi_round,
     sync_blocks,
-    wait_until,
 )
 
 import os
@@ -49,10 +45,18 @@ class MasternodePingTest(PivxTestFramework):
         masternodeAlias = "mnode"
         mnAddress = owner.getnewaddress(masternodeAlias)
         collateralTxId = miner.sendtoaddress(mnAddress, Decimal('10000'))
-        miner.generate(1)
+        miner.generate(2)
         sync_blocks(self.nodes)
+        time.sleep(1)
+        collateral_rawTx = owner.getrawtransaction(collateralTxId, 1)
         assert_equal(owner.getbalance(), Decimal('10000'))
-        assert_greater_than(owner.getrawtransaction(collateralTxId, 1)["confirmations"], 0)
+        assert_greater_than(collateral_rawTx["confirmations"], 0)
+
+        # Block time can be up to median time past +1. We might need to wait...
+        wait_time = collateral_rawTx["time"] - int(time.time())
+        if wait_time > 0:
+            self.log.info("Sleep %d seconds to catch up with the chain..." % wait_time)
+            time.sleep(wait_time)
 
         # Setup controller
         self.log.info("controller setup...")
@@ -60,7 +64,7 @@ class MasternodePingTest(PivxTestFramework):
         assert_equal(len(o), 1)
         assert_equal(o[0]["txhash"], collateralTxId)
         vout = o[0]["outputidx"]
-        self.log.info("collateral accepted for "+ masternodeAlias +".. updating masternode.conf and stopping the node")
+        self.log.info("collateral accepted for "+ masternodeAlias +". Updating masternode.conf...")
         confData = masternodeAlias + " 127.0.0.1:" + str(p2p_port(2)) + " " + \
                    str(mnPrivkey) +  " " + str(collateralTxId) + " " + str(vout)
         destPath = os.path.join(self.options.tmpdir, "node1", "regtest", "masternode.conf")
@@ -72,18 +76,14 @@ class MasternodePingTest(PivxTestFramework):
         self.log.info("initializing remote masternode...")
         remote.initmasternode(mnPrivkey, "127.0.0.1:" + str(p2p_port(2)))
 
-        # Wait until mnsync is complete (max 30 seconds)
-        self.log.info("waiting complete mnsync...")
-        synced = [False] * 3
-        timeout = time.time() + 30
-        while time.time() < timeout:
-            for i in range(3):
-                if not synced[i]:
-                    synced[i] = (self.nodes[i].mnsync("status")["RequestedMasternodeAssets"] == 999)
-            if synced != [True] * 3:
-                time.sleep(1)
-        if synced != [True] * 3:
-            raise AssertionError("Unable to complete mnsync: %s" % str(synced))
+        # Wait until mnsync is complete (max 120 seconds)
+        self.log.info("waiting to complete mnsync...")
+        start_time = time.time()
+        self.wait_until_mnsync_finished()
+        self.log.info("MnSync completed in %d seconds" % (time.time() - start_time))
+        miner.generate(1)
+        sync_blocks(self.nodes)
+        time.sleep(1)
 
         # Send Start message
         self.log.info("sending masternode broadcast...")
@@ -92,18 +92,12 @@ class MasternodePingTest(PivxTestFramework):
         sync_blocks(self.nodes)
         time.sleep(1)
 
-        # Wait until masternode is enabled anywhere (max 100 secs)
+        # Wait until masternode is enabled everywhere (max 180 secs)
         self.log.info("waiting till masternode gets enabled...")
-        enabled = [""] * 3
-        timeout = time.time() + 100
-        while time.time() < timeout:
-            for i in range(3):
-                if enabled[i] != "ENABLED":
-                    enabled[i] = self.get_mn_status(self.nodes[i], collateralTxId)
-            if enabled != ["ENABLED"] * 3:
-                time.sleep(1)
-        if enabled != ["ENABLED"] * 3:
-            raise AssertionError("Unable to get to \"ENABLED\" state: %s" % str(enabled))
+        start_time = time.time()
+        time.sleep(5)
+        self.wait_until_mn_enabled(collateralTxId, 180)
+        self.log.info("Masternode enabled in %d seconds" % (time.time() - start_time))
         self.log.info("Good. Masternode enabled")
         miner.generate(1)
         sync_blocks(self.nodes)

@@ -30,19 +30,18 @@ class MasternodeActivationTest(PivxTier2TestFramework):
 
     def disconnect_remotes(self):
         for i in [self.remoteOnePos, self.remoteTwoPos]:
-            disconnect_nodes(self.nodes[i + 1], i)
-            disconnect_nodes(self.nodes[i], i - 1)
+            for j in range(self.num_nodes):
+                if i != j:
+                    disconnect_nodes(self.nodes[i], j)
 
     def reconnect_remotes(self):
-        # !TODO: for some reason we need two-way connections now...
         connect_nodes_clique(self.nodes)
         self.sync_all()
 
     def reconnect_and_restart_masternodes(self):
         self.log.info("Reconnecting nodes and sending start message again...")
         self.reconnect_remotes()
-        time.sleep(2)
-        self.wait_until_mnsync_finished(35)
+        self.wait_until_mnsync_finished()
         self.controller_start_all_masternodes()
 
     def spend_collateral(self):

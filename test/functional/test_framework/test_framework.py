@@ -1110,6 +1110,7 @@ class PivxTestFramework():
         mnData = node.listmasternodes(mnTxHash)
         if len(mnData) == 0:
             return ""
+        assert_equal(len(mnData), 1)
         return mnData[0]["status"]
 
 
@@ -1119,34 +1120,54 @@ class PivxTestFramework():
         time.sleep(1)
 
 
-    def wait_until_mnsync_finished(self, _timeout):
-        for i in range(self.num_nodes):
-            try:
-                wait_until(lambda: self.nodes[i].mnsync("status")["RequestedMasternodeAssets"] == 999,
-                           timeout=_timeout, mocktime=self.advance_mocktime)
-            except AssertionError:
-                raise AssertionError("Unable to complete mnsync on node %d" % i)
+    def wait_until_mnsync_finished(self):
+        SYNC_FINISHED = [999] * self.num_nodes
+        synced = [-1] * self.num_nodes
+        time.sleep(2)
+        timeout = time.time() + 300
+        while synced != SYNC_FINISHED and time.time() < timeout:
+            for i in range(self.num_nodes):
+                if synced[i] != SYNC_FINISHED[i]:
+                    synced[i] = self.nodes[i].mnsync("status")["RequestedMasternodeAssets"]
+            if synced != SYNC_FINISHED:
+                time.sleep(5)
+        if synced != SYNC_FINISHED:
+            raise AssertionError("Unable to complete mnsync: %s" % str(synced))
 
 
     def wait_until_mn_status(self, status, mnTxHash, _timeout, orEmpty=False, with_ping_mns=[]):
-        def _sendpings():
-            if len(with_ping_mns) == 0:
-                return
-            else:
-                self.send_pings(with_ping_mns)
+        nodes_status = [None] * self.num_nodes
 
-        for i in range(self.num_nodes):
-            try:
-                wait_until(lambda: (self.get_mn_status(self.nodes[i], mnTxHash) == status or
-                                    (orEmpty and self.get_mn_status(self.nodes[i], mnTxHash) == "")),
-                           timeout=_timeout, sendpings=_sendpings, mocktime=self.advance_mocktime)
-            except AssertionError:
-                strErr = "Unable to get status \"%s\" on node %d for mnode %s" % (status, i, mnTxHash)
-                raise AssertionError(strErr)
+        def node_synced(i):
+            return nodes_status[i] == status or (orEmpty and nodes_status[i] == "")
+
+        def all_synced():
+            for i in range(self.num_nodes):
+                if not node_synced(i):
+                    return False
+            return True
+
+        time.sleep(2)
+        timeout = time.time() + _timeout
+        while not all_synced() and time.time() < timeout:
+            for i in range(self.num_nodes):
+                if not node_synced(i):
+                    nodes_status[i] = self.get_mn_status(self.nodes[i], mnTxHash)
+            if not all_synced():
+                time.sleep(2)
+                self.send_pings(with_ping_mns)
+        if not all_synced():
+            strErr = "Unable to get get status \"%s\" on all nodes for mnode %s. Current: %s" % (
+                    status, mnTxHash, str(nodes_status))
+            raise AssertionError(strErr)
 
 
     def wait_until_mn_enabled(self, mnTxHash, _timeout, _with_ping_mns=[]):
         self.wait_until_mn_status("ENABLED", mnTxHash, _timeout, with_ping_mns=_with_ping_mns)
+
+
+    def wait_until_mn_preenabled(self, mnTxHash, _timeout, _with_ping_mns=[]):
+        self.wait_until_mn_status("PRE_ENABLED", mnTxHash, _timeout, with_ping_mns=_with_ping_mns)
 
 
     def wait_until_mn_vinspent(self, mnTxHash, _timeout, _with_ping_mns=[]):
@@ -1205,7 +1226,7 @@ class PivxTestFramework():
         assert_equal(mnCollateralOutput["txhash"], collateralTxId)
         mnCollateralOutputIndex = mnCollateralOutput["outputidx"]
 
-        self.log.info("collateral accepted for "+ masternodeAlias +".. updating masternode.conf and stopping the node")
+        self.log.info("collateral accepted for "+ masternodeAlias +". Updating masternode.conf...")
 
         # verify collateral confirmed
         confData = masternodeAlias + " 127.0.0.1:" + str(p2p_port(mnRemotePos)) + " " + str(masternodePrivKey) + " " + str(mnCollateralOutput["txhash"]) + " " + str(mnCollateralOutputIndex)
@@ -1269,7 +1290,6 @@ class PivxTier2TestFramework(PivxTestFramework):
                            [],
                            ["-listen", "-externalip=127.0.0.1"],
                            ["-sporkkey=932HEevBSujW2ud7RfB1YF91AFygbBRQj3de3LyaCRqNzKKgWXi"]]
-        self.setup_clean_chain = True
         self.enable_mocktime()
 
         self.ownerOnePos = 0
@@ -1293,6 +1313,7 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.mnOneTxHash = ""
         self.mnTwoTxHash = ""
 
+
     def send_3_pings(self):
         self.advance_mocktime(30)
         self.send_pings([self.remoteOne, self.remoteTwo])
@@ -1307,10 +1328,12 @@ class PivxTier2TestFramework(PivxTestFramework):
     def controller_start_all_masternodes(self):
         self.controller_start_masternode(self.ownerOne, self.masternodeOneAlias)
         self.controller_start_masternode(self.ownerTwo, self.masternodeTwoAlias)
+        self.wait_until_mn_preenabled(self.mnOneTxHash, 40)
+        self.wait_until_mn_preenabled(self.mnTwoTxHash, 40)
         self.log.info("masternodes started, waiting until both get enabled..")
         self.send_3_pings()
-        self.wait_until_mn_enabled(self.mnOneTxHash, 60, [self.remoteOne, self.remoteTwo])
-        self.wait_until_mn_enabled(self.mnTwoTxHash, 60, [self.remoteOne, self.remoteTwo])
+        self.wait_until_mn_enabled(self.mnOneTxHash, 120, [self.remoteOne, self.remoteTwo])
+        self.wait_until_mn_enabled(self.mnTwoTxHash, 120, [self.remoteOne, self.remoteTwo])
         self.log.info("masternodes enabled and running properly!")
 
     def advance_mocktime_and_stake(self, secs_to_add):
@@ -1361,12 +1384,10 @@ class PivxTier2TestFramework(PivxTestFramework):
         remoteTwoPort = p2p_port(self.remoteOnePos)
         self.remoteOne.initmasternode(self.mnOnePrivkey, "127.0.0.1:"+str(remoteOnePort))
         self.remoteTwo.initmasternode(self.mnTwoPrivkey, "127.0.0.1:"+str(remoteTwoPort))
-        self.advance_mocktime(3)
 
         # wait until mnsync complete on all nodes
         self.stake(1)
-        time.sleep(20)
-        self.wait_until_mnsync_finished(35)
+        self.wait_until_mnsync_finished()
         self.log.info("tier two synced! starting masternodes..")
 
         # Now everything is set, can start both masternodes
