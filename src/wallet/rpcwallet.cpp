@@ -60,9 +60,7 @@ void EnsureWallet()
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain();
-    int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
-    entry.pushKV("confirmations", confirmsTotal);
-    entry.pushKV("bcconfirmations", confirms);
+    entry.pushKV("confirmations", confirms);
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         entry.pushKV("generated", true);
     if (confirms > 0) {
@@ -2137,14 +2135,12 @@ UniValue addmultisigaddress(const JSONRPCRequest& request)
 struct tallyitem {
     CAmount nAmount;
     int nConf;
-    int nBCConf;
     std::vector<uint256> txids;
     bool fIsWatchonly;
     tallyitem()
     {
         nAmount = 0;
         nConf = std::numeric_limits<int>::max();
-        nBCConf = std::numeric_limits<int>::max();
         fIsWatchonly = false;
     }
 };
@@ -2186,7 +2182,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
-        int nBCDepth = wtx.GetDepthInMainChain();
         if (nDepth < nMinDepth)
             continue;
 
@@ -2206,7 +2201,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             tallyitem& item = mapTally[address];
             item.nAmount += txout.nValue;
             item.nConf = std::min(item.nConf, nDepth);
-            item.nBCConf = std::min(item.nBCConf, nBCDepth);
             item.txids.push_back(wtx.GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
@@ -2236,12 +2230,10 @@ UniValue ListReceived(const UniValue& params, bool by_label)
 
         CAmount nAmount = 0;
         int nConf = std::numeric_limits<int>::max();
-        int nBCConf = std::numeric_limits<int>::max();
         bool fIsWatchonly = false;
         if (it != mapTally.end()) {
             nAmount = (*it).second.nAmount;
             nConf = (*it).second.nConf;
-            nBCConf = (*it).second.nBCConf;
             fIsWatchonly = (*it).second.fIsWatchonly;
         }
 
@@ -2249,7 +2241,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             tallyitem& _item = label_tally[label];
             _item.nAmount += nAmount;
             _item.nConf = std::min(_item.nConf, nConf);
-            _item.nBCConf = std::min(_item.nBCConf, nBCConf);
             _item.fIsWatchonly = fIsWatchonly;
         } else {
             UniValue obj(UniValue::VOBJ);
@@ -2258,7 +2249,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             obj.pushKV("address", EncodeDestination(address, AddressBook::IsColdStakingPurpose(label)));
             obj.pushKV("amount", ValueFromAmount(nAmount));
             obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
-            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
             obj.pushKV("label", label);
             UniValue transactions(UniValue::VARR);
             if (it != mapTally.end()) {
@@ -2275,13 +2265,11 @@ UniValue ListReceived(const UniValue& params, bool by_label)
         for (const auto& entry : label_tally) {
             CAmount nAmount = entry.second.nAmount;
             int nConf = entry.second.nConf;
-            int nBCConf = entry.second.nBCConf;
             UniValue obj(UniValue::VOBJ);
             if (entry.second.fIsWatchonly)
                 obj.pushKV("involvesWatchonly", true);
             obj.pushKV("amount", ValueFromAmount(nAmount));
             obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
-            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
             obj.pushKV("label", entry.first);
             ret.push_back(obj);
         }
@@ -2310,7 +2298,6 @@ UniValue listreceivedbyaddress(const JSONRPCRequest& request)
             "    \"address\" : \"receivingaddress\",  (string) The receiving address\n"
             "    \"amount\" : x.xxx,                  (numeric) The total amount in PIV received by the address\n"
             "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
-            "    \"bcconfirmations\" : n              (numeric) The number of blockchain confirmations of the most recent transaction included\n"
             "    \"label\" : \"label\",               (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
@@ -2438,7 +2425,6 @@ UniValue listreceivedbylabel(const JSONRPCRequest& request)
             "    \"involvesWatchonly\" : \"true\",    (bool) Only returned if imported addresses were involved in transaction\n"
             "    \"amount\" : x.xxx,             (numeric) The total amount received by addresses with this label\n"
             "    \"confirmations\" : n           (numeric) The number of confirmations of the most recent transaction included\n"
-            "    \"bcconfirmations\" : n         (numeric) The number of blockchain confirmations of the most recent transaction included\n"
             "    \"label\" : \"label\"           (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
@@ -2618,9 +2604,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "    \"vout\" : n,               (numeric) the vout value\n"
             "    \"fee\": x.xxx,             (numeric) The amount of the fee in PIV. This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
-            "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
-            "                                         'receive' category of transactions.\n"
-            "    \"bcconfirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
+            "    \"confirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
             "                                         'receive' category of transactions. Negative confirmations indicate the\n"
             "                                         transaction conflicts with the block chain\n"
             "    \"trusted\": xxx            (bool) Whether we consider the outputs of this unconfirmed transaction safe to spend.\n"
@@ -2728,7 +2712,6 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             "    \"vout\" : n,               (numeric) the vout value\n"
             "    \"fee\": x.xxx,             (numeric) The amount of the fee in PIV. This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
-            "    \"bcconfirmations\" : n,    (numeric) The number of blockchain confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockhash\": \"hashvalue\",     (string) The block hash containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockindex\": n,          (numeric) The block index containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blocktime\": xxx,         (numeric) The block time in seconds since epoch (1 Jan 1970 GMT).\n"
@@ -2809,7 +2792,6 @@ UniValue gettransaction(const JSONRPCRequest& request)
             "{\n"
             "  \"amount\" : x.xxx,        (numeric) The transaction amount in PIV\n"
             "  \"confirmations\" : n,     (numeric) The number of confirmations\n"
-            "  \"bcconfirmations\" : n,   (numeric) The number of blockchain confirmations\n"
             "  \"blockhash\" : \"hash\",  (string) The block hash\n"
             "  \"blockindex\" : xx,       (numeric) The block index\n"
             "  \"blocktime\" : ttt,       (numeric) The time in seconds since epoch (1 Jan 1970 GMT)\n"
