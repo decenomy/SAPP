@@ -59,7 +59,7 @@ void EnsureWallet()
 
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
-    int confirms = wtx.GetDepthInMainChain(false);
+    int confirms = wtx.GetDepthInMainChain();
     int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
     entry.pushKV("confirmations", confirmsTotal);
     entry.pushKV("bcconfirmations", confirms);
@@ -2186,7 +2186,7 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
-        int nBCDepth = wtx.GetDepthInMainChain(false);
+        int nBCDepth = wtx.GetDepthInMainChain();
         if (nDepth < nMinDepth)
             continue;
 
@@ -2514,7 +2514,7 @@ UniValue listcoldutxos(const JSONRPCRequest& request)
             entry.pushKV("txid", wtxid.GetHex());
             entry.pushKV("txidn", (int)i);
             entry.pushKV("amount", ValueFromAmount(out.nValue));
-            entry.pushKV("confirmations", pcoin->GetDepthInMainChain(false));
+            entry.pushKV("confirmations", pcoin->GetDepthInMainChain());
             entry.pushKV("cold-staker", EncodeDestination(addresses[0], CChainParams::STAKING_ADDRESS));
             entry.pushKV("coin-owner", EncodeDestination(addresses[1]));
             entry.pushKV("whitelisted", fWhitelisted ? "true" : "false");
@@ -2780,7 +2780,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
     for (std::map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++) {
         CWalletTx tx = (*it).second;
 
-        if (depth == -1 || tx.GetDepthInMainChain(false) < depth)
+        if (depth == -1 || tx.GetDepthInMainChain() < depth)
             ListTransactions(tx, 0, true, transactions, filter);
     }
 

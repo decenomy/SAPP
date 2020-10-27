@@ -2069,7 +2069,7 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     if (fOnlyConfirmed && !pcoin->IsTrusted()) return false;
     if (pcoin->GetBlocksToMaturity() > 0) return false;
 
-    nDepth = pcoin->GetDepthInMainChain(pindexRet, false);
+    nDepth = pcoin->GetDepthInMainChain(pindexRet);
     // do not use IX for inputs that have less then 6 blockchain confirmations
     if (fUseIX && nDepth < 6) return false;
 
@@ -4180,13 +4180,13 @@ void CMerkleTx::SetMerkleBranch(const uint256& blockHash, int posInBlock)
     nIndex = posInBlock;
 }
 
-int CMerkleTx::GetDepthInMainChain(bool enableIX) const
+int CMerkleTx::GetDepthInMainChain() const
 {
     const CBlockIndex* pindexRet = nullptr;
-    return GetDepthInMainChain(pindexRet, enableIX);
+    return GetDepthInMainChain(pindexRet);
 }
 
-int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
+int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet) const
 {
     if (hashUnset())
         return 0;
@@ -4207,15 +4207,6 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
         }
     }
 
-    if (enableIX) {
-        if (nResult < 6) {
-            int signatures = GetTransactionLockSignatures();
-            if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
-                return nSwiftTXDepth + nResult;
-            }
-        }
-    }
-
     return nResult;
 }
 
@@ -4229,13 +4220,13 @@ int CMerkleTx::GetBlocksToMaturity() const
 
 bool CMerkleTx::IsInMainChain() const
 {
-    return GetDepthInMainChain(false) > 0;
+    return GetDepthInMainChain() > 0;
 }
 
 bool CMerkleTx::IsInMainChainImmature() const
 {
     if (!IsCoinBase() && !IsCoinStake()) return false;
-    const int depth = GetDepthInMainChain(false);
+    const int depth = GetDepthInMainChain();
     return (depth > 0 && depth <= Params().GetConsensus().nCoinbaseMaturity);
 }
 
@@ -4571,9 +4562,9 @@ bool CWalletTx::IsTrusted(int& nDepth, bool& fConflicted) const
     return true;
 }
 
-int CWalletTx::GetDepthAndMempool(bool& fConflicted, bool enableIX) const
+int CWalletTx::GetDepthAndMempool(bool& fConflicted) const
 {
-    int ret = GetDepthInMainChain(enableIX);
+    int ret = GetDepthInMainChain();
     fConflicted = (ret == 0 && !InMempool());  // not in chain nor in mempool
     return ret;
 }

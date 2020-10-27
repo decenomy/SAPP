@@ -933,8 +933,8 @@ public:
      *  0  : in memory pool, waiting to be included in a block
      * >=1 : this many blocks deep in the main chain
      */
-    int GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX = true) const;
-    int GetDepthInMainChain(bool enableIX = true) const;
+    int GetDepthInMainChain(const CBlockIndex*& pindexRet) const;
+    int GetDepthInMainChain() const;
     bool IsInMainChain() const;
     bool IsInMainChainImmature() const;
     int GetBlocksToMaturity() const;
@@ -1051,7 +1051,7 @@ public:
     //! checks whether a tx has P2CS inputs or not
     bool HasP2CSInputs() const;
 
-    int GetDepthAndMempool(bool& fConflicted, bool enableIX = true) const;
+    int GetDepthAndMempool(bool& fConflicted) const;
 
     //! filter decides which addresses will count towards the debit
     CAmount GetDebit(const isminefilter& filter) const;
