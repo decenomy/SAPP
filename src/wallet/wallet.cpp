@@ -1729,18 +1729,18 @@ bool CWalletTx::InMempool() const
 
 void CWalletTx::RelayWalletTransaction(CConnman* connman)
 {
+    if (!connman || IsCoinBase() || IsCoinStake()) {
+        // Nothing to do. Return early
+        return;
+    }
     LOCK(cs_main);
-    if (!IsCoinBase() && !IsCoinStake()) {
-        if (GetDepthInMainChain() == 0 && !isAbandoned()) {
-            if (connman) {
-                const uint256& hash = GetHash();
-                LogPrintf("Relaying wtx %s\n", hash.ToString());
-                CInv inv(MSG_TX, hash);
-                connman->ForEachNode([&inv](CNode* pnode) {
-                  pnode->PushInventory(inv);
-                });
-            }
-        }
+    if (GetDepthInMainChain() == 0 && !isAbandoned()) {
+        const uint256& hash = GetHash();
+        LogPrintf("Relaying wtx %s\n", hash.ToString());
+        CInv inv(MSG_TX, hash);
+        connman->ForEachNode([&inv](CNode* pnode) {
+          pnode->PushInventory(inv);
+        });
     }
 }
 
