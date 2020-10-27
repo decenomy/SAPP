@@ -43,7 +43,6 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"rawdelegatestake", 3},
         {"rawdelegatestake", 4},
         {"sendtoaddress", 1},
-        {"sendtoaddressix", 1},
         {"settxfee", 0},
         {"getreceivedbyaddress", 1},
         {"listreceivedbyshieldedaddress", 1},

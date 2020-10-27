@@ -1192,54 +1192,6 @@ UniValue rawdelegatestake(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue sendtoaddressix(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
-        throw std::runtime_error(
-            "sendtoaddressix \"pivxaddress\" amount ( \"comment\" \"comment-to\" )\n"
-            "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n" +
-            HelpRequiringPassphrase() + "\n"
-
-            "\nArguments:\n"
-            "1. \"pivxaddress\"  (string, required) The pivx address to send to.\n"
-            "2. \"amount\"      (numeric, required) The amount in PIV to send. eg 0.1\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
-            "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
-            "                             to which you're sending the transaction. This is not part of the \n"
-            "                             transaction, just kept in your wallet.\n"
-
-            "\nResult:\n"
-            "\"transactionid\"  (string) The transaction id.\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1") +
-            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 0.1, \"donation\", \"seans outpost\""));
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    bool isStaking = false;
-    CTxDestination address = DecodeDestination(request.params[0].get_str(), isStaking);
-    if (!IsValidDestination(address) || isStaking)
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
-
-    // Amount
-    CAmount nAmount = AmountFromValue(request.params[1]);
-
-    // Wallet comments
-    CWalletTx wtx;
-    if (request.params.size() > 2 && !request.params[2].isNull() && !request.params[2].get_str().empty())
-        wtx.mapValue["comment"] = request.params[2].get_str();
-    if (request.params.size() > 3 && !request.params[3].isNull() && !request.params[3].get_str().empty())
-        wtx.mapValue["to"] = request.params[3].get_str();
-
-    EnsureWalletIsUnlocked();
-
-    SendMoney(address, nAmount, wtx);   // !TODO: remove
-
-    return wtx.GetHash().GetHex();
-}
 
 CAmount getBalanceShieldedAddr(const libzcash::PaymentAddress& filterAddress, int minDepth = 1, bool ignoreUnspendable=true) {
     CAmount balance = 0;
@@ -4015,7 +3967,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "rawdelegatestake",         &rawdelegatestake,         false },
     { "wallet",             "sendmany",                 &sendmany,                 false },
     { "wallet",             "sendtoaddress",            &sendtoaddress,            false },
-    { "wallet",             "sendtoaddressix",          &sendtoaddressix,          false },
     { "wallet",             "settxfee",                 &settxfee,                 true  },
     { "wallet",             "setstakesplitthreshold",   &setstakesplitthreshold,   false },
     { "wallet",             "signmessage",              &signmessage,              true  },
