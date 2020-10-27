@@ -25,9 +25,8 @@ int nSubmittedFinalBudget;
 
 bool CheckCollateralConfs(const uint256& nTxCollateralHash, int nCurrentHeight, int nProposalHeight, std::string& strError)
 {
-    //if we're syncing we won't have swiftTX information, so accept 1 confirmation
     const int nRequiredConfs = Params().GetConsensus().nBudgetFeeConfirmations;
-    const int nConf = GetIXConfirmations(nTxCollateralHash) + nCurrentHeight - nProposalHeight + 1;
+    const int nConf = nCurrentHeight - nProposalHeight + 1;
 
     if (nConf < nRequiredConfs) {
         strError = strprintf("Collateral requires at least %d confirmations - %d confirmations (current height: %d, fee tx height: %d)",
@@ -208,7 +207,7 @@ void CBudgetManager::SubmitFinalBudget()
             LogPrint(BCLog::MNBUDGET,"%s: Can't make collateral transaction\n", __func__);
             return;
         }
-        // Send the tx to the network. Do NOT use SwiftTx, locking might need too much time to propagate, especially for testnet
+        // Send the tx to the network
         const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get(), "NO-ix");
         if (res.status == CWallet::CommitStatus::OK) {
             const uint256& collateraltxid = wtx.GetHash();

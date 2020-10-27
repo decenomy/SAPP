@@ -42,7 +42,6 @@
 #include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"
-#include "swifttx.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "undo.h"
@@ -212,22 +211,6 @@ enum FlushStateMode {
 
 // See definition for documentation
 bool static FlushStateToDisk(CValidationState &state, FlushStateMode mode);
-
-
-int GetIXConfirmations(uint256 nTXHash)
-{
-    int sigs = 0;
-
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
-    if (i != mapTxLocks.end()) {
-        sigs = (*i).second.CountSignatures();
-    }
-    if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
-        return nSwiftTXDepth;
-    }
-
-    return 0;
-}
 
 bool CheckFinalTx(const CTransaction& tx, int flags)
 {
