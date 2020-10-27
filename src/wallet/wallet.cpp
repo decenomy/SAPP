@@ -1733,18 +1733,10 @@ void CWalletTx::RelayWalletTransaction(CConnman* connman, std::string strCommand
     LOCK(cs_main);
     if (!IsCoinBase() && !IsCoinStake()) {
         if (GetDepthInMainChain() == 0 && !isAbandoned()) {
-            uint256 hash = GetHash();
-            LogPrintf("Relaying wtx %s\n", hash.ToString());
-
-            int invType = MSG_TX;
-            if (strCommand == NetMsgType::IX) {
-                mapTxLockReq.emplace(hash, (CTransaction) * this);
-                CreateNewLock(((CTransaction) * this));
-                invType = MSG_TXLOCK_REQUEST;
-            }
-
             if (connman) {
-                CInv inv(invType, hash);
+                const uint256& hash = GetHash();
+                LogPrintf("Relaying wtx %s\n", hash.ToString());
+                CInv inv(MSG_TX, hash);
                 connman->ForEachNode([&inv](CNode* pnode) {
                   pnode->PushInventory(inv);
                 });
