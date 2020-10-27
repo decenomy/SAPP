@@ -1616,9 +1616,7 @@ UniValue getfeeinfo(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
-    { "blockchain",         "findserial",             &findserial,             true  },
     { "blockchain",         "getblockindexstats",     &getblockindexstats,     true  },
-    { "blockchain",         "getserials",             &getserials,             true  },
     { "blockchain",         "getblockchaininfo",      &getblockchaininfo,      true  },
     { "blockchain",         "getbestblockhash",       &getbestblockhash,       true  },
     { "blockchain",         "getblockcount",          &getblockcount,          true  },
@@ -1641,6 +1639,13 @@ static const CRPCCommand commands[] =
     { "hidden",             "waitfornewblock",        &waitfornewblock,        true  },
     { "hidden",             "waitforblock",           &waitforblock,           true  },
     { "hidden",             "waitforblockheight",     &waitforblockheight,     true  },
+
+    // TODO: Remove these two RPC commands after 5.0 is locked in
+    /* Zerocoin functions to be removed post-5.0 */
+    { "zerocoin",           "findserial",             &findserial,             true  },
+    { "zerocoin",           "getserials",             &getserials,             true  },
+
+
 };
 
 void RegisterBlockchainRPCCommands(CRPCTable &tableRPC)
