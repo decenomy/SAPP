@@ -58,9 +58,24 @@ bool CMasternodeSync::MessageDispatcher(CNode* pfrom, std::string& strCommand, C
         // as there is no completion message, this is using a SPORK_INVALID as final message for now.
         // which is just a hack, should be replaced with another message, guard it until the protocol gets deployed on mainnet and
         // add compatibility with the previous protocol as well.
-        sporkManager.ProcessSporkMsg(pfrom, strCommand, vRecv);
-        // Update in-flight message status if needed
-        UpdatePeerSyncState(pfrom->GetId(), NetMsgType::GETSPORKS, MASTERNODE_SYNC_LIST);
+        CSporkMessage spork;
+        vRecv >> spork;
+        int banScore = sporkManager.ProcessSporkMsg(spork);
+        if (banScore > 0) {
+            // add misbehaving..
+            return error("Failed to process spork message");
+        }
+        // All good, Update in-flight message status if needed
+        if (!UpdatePeerSyncState(pfrom->GetId(), NetMsgType::GETSPORKS, MASTERNODE_SYNC_LIST)) {
+            // This could happen because of the message thread is requesting the sporks alone..
+            // So.. for now, can just update the peer status and move it to the next state if the end message arrives
+            if (spork.nSporkID == SPORK_INVALID) {
+                if (RequestedMasternodeAssets < MASTERNODE_SYNC_LIST) {
+                    // future note: use internal cs for RequestedMasternodeAssets.
+                    RequestedMasternodeAssets = MASTERNODE_SYNC_LIST;
+                }
+            }
+        }
         return true;
     }
 
