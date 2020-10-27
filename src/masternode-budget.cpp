@@ -208,7 +208,7 @@ void CBudgetManager::SubmitFinalBudget()
             return;
         }
         // Send the tx to the network
-        const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get(), "NO-ix");
+        const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get());
         if (res.status == CWallet::CommitStatus::OK) {
             const uint256& collateraltxid = wtx.GetHash();
             mapUnconfirmedFeeTx.emplace(budgetHash, collateraltxid);
