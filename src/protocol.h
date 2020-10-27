@@ -221,15 +221,6 @@ extern const char* REJECT;
  */
 extern const char* SENDHEADERS;
 /**
- * The ix message transmits a single SwiftX transaction
- */
-extern const char* IX;
-/**
- * The ixlockvote message is used to reach consensus for SwiftX
- * transaction locks
- */
-extern const char* IXLOCKVOTE;
-/**
  * The spork message is used to send spork values to connected
  * peers
  */
