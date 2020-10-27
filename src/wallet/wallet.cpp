@@ -2547,7 +2547,7 @@ bool CWallet::CreateBudgetFeeTX(CWalletTx& tx, const uint256& hash, CReserveKey&
 
     CCoinControl* coinControl = nullptr;
     int nChangePosInOut = -1;
-    bool success = CreateTransaction(vecSend, tx, keyChange, nFeeRet, nChangePosInOut, strFail, coinControl, ALL_COINS, true, false /*useIX*/, (CAmount)0);
+    bool success = CreateTransaction(vecSend, tx, keyChange, nFeeRet, nChangePosInOut, strFail, coinControl, ALL_COINS, true, (CAmount)0);
     if (!success) {
         LogPrintf("%s: Error - %s\n", __func__, strFail);
         return false;
@@ -2608,12 +2608,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
     const CCoinControl* coinControl,
     AvailableCoinsType coin_type,
     bool sign,
-    bool useIX,
     CAmount nFeePay,
     bool fIncludeDelegated)
 {
-    if (useIX && nFeePay < CENT) nFeePay = CENT;
-
     CAmount nValue = 0;
     int nChangePosRequest = nChangePosInOut;
 
@@ -2644,7 +2641,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                 false,                  // fIncludeColdStaking
                 coin_type,
                 true,                   // fOnlyConfirmed
-                useIX);
+                false); // !TODO: remove
 
             nFeeRet = 0;
             if (nFeePay > 0) nFeeRet = nFeePay;
@@ -2695,11 +2692,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                     if (coin_type == ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
                     }
-
-                    if (useIX) {
-                        strFailReason += " " + _("SwiftX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.");
-                    }
-
                     return false;
                 }
 
@@ -2881,12 +2873,12 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
     return true;
 }
 
-bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, bool fIncludeDelegated)
+bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, CAmount nFeePay, bool fIncludeDelegated)
 {
     std::vector<CRecipient> vecSend;
     vecSend.emplace_back(scriptPubKey, nValue, false);
     int nChangePosInOut = -1;
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosInOut, strFailReason, coinControl, coin_type, true, useIX, nFeePay, fIncludeDelegated);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosInOut, strFailReason, coinControl, coin_type, true, nFeePay, fIncludeDelegated);
 }
 
 bool CWallet::CreateCoinStake(

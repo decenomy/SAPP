@@ -404,7 +404,6 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                                                   coinControl,
                                                   recipients[0].inputType,
                                                   true,
-                                                  false,    // !TODO: remove
                                                   0,
                                                   fIncludeDelegations);
         transaction.setTransactionFee(nFeeRequired);
