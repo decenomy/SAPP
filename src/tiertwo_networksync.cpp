@@ -24,9 +24,13 @@ bool CMasternodeSync::UpdatePeerSyncState(const NodeId& id, const char* msg, con
             msgMapIt->second.second = true;
             LogPrintf("%s: %s message updated peer sync state\n", __func__, msgMapIt->first);
 
-            // todo: this should only happen if more than N peers have sent the data.
-            // move overall tier two sync state to the next one if needed.
-            RequestedMasternodeAssets = nextSyncStatus;
+            // Only update sync status if we really need it. Otherwise, it's just good redundancy to verify data several times.
+            if (RequestedMasternodeAssets < nextSyncStatus) {
+                // todo: this should only happen if more than N peers have sent the data.
+                // move overall tier two sync state to the next one if needed.
+                LogPrintf("%s: moving to next assset %s\n", __func__, nextSyncStatus);
+                RequestedMasternodeAssets = nextSyncStatus;
+            }
             return true;
         }
     }
@@ -86,6 +90,10 @@ bool CMasternodeSync::MessageDispatcher(CNode* pfrom, std::string& strCommand, C
                 LogPrintf("SYNC FINISHED!\n");
                 return true;
             }
+            case MASTERNODE_SYNC_BUDGET_FIN: {
+                // No need to handle this one, is handled by the proposals sync message for now..
+                return true;
+            }
         }
     }
 
@@ -105,7 +113,9 @@ void CMasternodeSync::RequestDataTo(CNode* pnode, const char* msg, bool forceReq
     bool exist = it != peersSyncState.end();
     if (!exist || forceRequest) {
         // Erase it if this is a forced request
-        if (exist) peersSyncState.erase(it);
+        if (exist) {
+            peersSyncState.at(pnode->id).mapMsgData.erase(msg);
+        }
         // send the message
         PushMessage(pnode, msg, std::forward<Args>(args)...);
 

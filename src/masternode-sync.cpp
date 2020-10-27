@@ -280,7 +280,8 @@ void CMasternodeSync::Process()
     if (RequestedMasternodeAssets == MASTERNODE_SYNC_INITIAL) GetNextAsset();
 
     // sporks synced but blockchain is not, wait until we're almost at a recent block to continue
-    if (!isRegTestNet && !IsBlockchainSynced() &&
+    bool isSynced = IsBlockchainSynced(); // This is needed in regtest as well due how IsBlockchainSynced is implemented..
+    if (!isRegTestNet && !isSynced &&
         RequestedMasternodeAssets > MASTERNODE_SYNC_SPORKS) return;
 
     CMasternodeSync* sync = this;
