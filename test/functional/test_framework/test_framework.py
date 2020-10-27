@@ -1124,12 +1124,13 @@ class PivxTestFramework():
         SYNC_FINISHED = [999] * self.num_nodes
         synced = [-1] * self.num_nodes
         time.sleep(2)
-        timeout = time.time() + 300
+        timeout = time.time() + 45
         while synced != SYNC_FINISHED and time.time() < timeout:
             for i in range(self.num_nodes):
                 if synced[i] != SYNC_FINISHED[i]:
                     synced[i] = self.nodes[i].mnsync("status")["RequestedMasternodeAssets"]
             if synced != SYNC_FINISHED:
+                self.advance_mocktime(2)
                 time.sleep(5)
         if synced != SYNC_FINISHED:
             raise AssertionError("Unable to complete mnsync: %s" % str(synced))
@@ -1379,6 +1380,8 @@ class PivxTier2TestFramework(PivxTestFramework):
         self.log.info("masternodes setup completed, initializing them..")
 
         # now both are configured, let's activate the masternodes
+        self.stake(1)
+        time.sleep(3)
         self.advance_mocktime(10)
         remoteOnePort = p2p_port(self.remoteTwoPos)
         remoteTwoPort = p2p_port(self.remoteOnePos)

@@ -132,7 +132,7 @@ class MasternodeGovernanceBasicTest(PivxTier2TestFramework):
         self.log.info("all good, MN2 vote accepted everywhere!")
 
         # Quick block count check.
-        assert_equal(self.ownerOne.getblockcount(), 275)
+        assert_equal(self.ownerOne.getblockcount(), 276)
 
         self.log.info("starting budget finalization sync test..")
         self.stake(5, [self.remoteOne, self.remoteTwo])
