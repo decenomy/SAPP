@@ -3197,8 +3197,7 @@ UniValue listunspent(const JSONRPCRequest& request)
                                 true,       // include delegated
                                 false,      // include cold staking
                                 ALL_COINS,  // coin type
-                                false,      // only confirmed
-                                false       // use IX
+                                false       // only confirmed
                                 );
     for (const COutput& out : vecOutputs) {
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)

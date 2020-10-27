@@ -446,7 +446,6 @@ public:
                         bool fIncludeColdStaking        = false,
                         AvailableCoinsType nCoinType    = ALL_COINS,
                         bool fOnlyConfirmed             = true,
-                        bool fUseIX                     = false,
                         bool fOnlySpendable             = false,
                         std::set<CTxDestination>*       = nullptr,
                         int minDepth                    = 0

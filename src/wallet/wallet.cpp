@@ -2053,7 +2053,7 @@ void CWallet::GetAvailableP2CSCoins(std::vector<COutput>& vCoins) const {
 /**
  * Test if the transaction is spendable.
  */
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth, const CBlockIndex*& pindexRet)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, int& nDepth, const CBlockIndex*& pindexRet)
 {
     AssertLockHeld(cs_main);
     if (!CheckFinalTx(*pcoin)) return false;
@@ -2061,8 +2061,6 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     if (pcoin->GetBlocksToMaturity() > 0) return false;
 
     nDepth = pcoin->GetDepthInMainChain(pindexRet);
-    // do not use IX for inputs that have less then 6 blockchain confirmations
-    if (fUseIX && nDepth < 6) return false;
 
     // We should not consider coins which aren't at least in our mempool
     // It's possible for these to be conflicted via ancestors which we may never be able to detect
@@ -2071,10 +2069,10 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     return true;
 }
 
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, int& nDepth)
 {
     const CBlockIndex* pindexRet = nullptr;
-    return CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth, pindexRet);
+    return CheckTXAvailability(pcoin, fOnlyConfirmed, nDepth, pindexRet);
 }
 
 bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex, std::string& strError)
@@ -2121,7 +2119,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     int nDepth = 0;
     {
         LOCK(cs_main);
-        if (!CheckTXAvailability(wtx, true, false, nDepth)) {
+        if (!CheckTXAvailability(wtx, true, nDepth)) {
             strError = "Not available collateral transaction";
             return error("%s: tx %s not available", __func__, strTxHash);
         }
@@ -2215,7 +2213,6 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              bool fIncludeColdStaking,          // Default: false
                              AvailableCoinsType nCoinType,      // Default: ALL_COINS
                              bool fOnlyConfirmed,               // Default: true
-                             bool fUseIX,                       // Default: false
                              bool fOnlySpendable,               // Default: false
                              std::set<CTxDestination>* onlyFilteredDest,  // Default: nullptr
                              int minDepth                       // Default: 0
@@ -2235,7 +2232,7 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
 
             // Check if the tx is selectable
             int nDepth;
-            if (!CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth))
+            if (!CheckTXAvailability(pcoin, fOnlyConfirmed, nDepth))
                 continue;
 
             // Check min depth requirement for stake inputs
@@ -2362,7 +2359,7 @@ bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
         // Check if the tx is selectable
         int nDepth;
         const CBlockIndex* pindex = nullptr;
-        if (!CheckTXAvailability(pcoin, true, false, nDepth, pindex))
+        if (!CheckTXAvailability(pcoin, true, nDepth, pindex))
             continue;
 
         // Check min depth requirement for stake inputs
@@ -2640,8 +2637,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                 fIncludeDelegated,
                 false,                  // fIncludeColdStaking
                 coin_type,
-                true,                   // fOnlyConfirmed
-                false); // !TODO: remove
+                true);                  // fOnlyConfirmed
 
             nFeeRet = 0;
             if (nFeePay > 0) nFeeRet = nFeePay;
