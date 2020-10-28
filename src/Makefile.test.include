@@ -46,21 +46,8 @@ endif
 # test_pivx binary #
 BITCOIN_TESTS =\
   test/arith_uint256_tests.cpp \
-  test/zerocoin_denomination_tests.cpp \
-  test/zerocoin_transactions_tests.cpp \
-  test/zerocoin_bignum_tests.cpp \
   test/addrman_tests.cpp \
   test/allocator_tests.cpp \
-  test/librust/libsapling_utils_tests.cpp \
-  test/librust/sapling_key_tests.cpp \
-  test/librust/pedersen_hash_tests.cpp \
-  test/librust/noteencryption_tests.cpp \
-  test/librust/sapling_note_tests.cpp \
-  test/librust/sapling_keystore_tests.cpp \
-  test/librust/zip32_tests.cpp \
-  test/librust/wallet_zkeys_tests.cpp \
-  test/librust/merkletree_tests.cpp \
-  test/librust/transaction_builder_tests.cpp \
   test/base32_tests.cpp \
   test/base58_tests.cpp \
   test/base64_tests.cpp \
@@ -112,15 +99,34 @@ BITCOIN_TESTS =\
   test/sha256compress_tests.cpp \
   test/upgrades_tests.cpp
 
+SAPLING_TESTS =\
+    test/librust/libsapling_utils_tests.cpp \
+    test/librust/sapling_key_tests.cpp \
+    test/librust/pedersen_hash_tests.cpp \
+    test/librust/noteencryption_tests.cpp \
+    test/librust/sapling_note_tests.cpp \
+    test/librust/sapling_keystore_tests.cpp \
+    test/librust/zip32_tests.cpp \
+    test/librust/wallet_zkeys_tests.cpp \
+    test/librust/merkletree_tests.cpp \
+    test/librust/transaction_builder_tests.cpp
+
+ZEROCOIN_TESTS =\
+  test/zerocoin_denomination_tests.cpp \
+  test/zerocoin_transactions_tests.cpp \
+  test/zerocoin_bignum_tests.cpp
+
 if ENABLE_WALLET
 BITCOIN_TESTS += \
-  test/librust/sapling_rpc_wallet_tests.cpp \
   wallet/test/wallet_tests.cpp \
-  wallet/test/crypto_tests.cpp \
+  wallet/test/crypto_tests.cpp
+
+SAPLING_TESTS +=\
+  test/librust/sapling_rpc_wallet_tests.cpp \
   test/librust/sapling_wallet_tests.cpp
 endif
 
-test_test_pivx_SOURCES = $(BITCOIN_TEST_SUITE) $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
+test_test_pivx_SOURCES = $(BITCOIN_TEST_SUITE) $(BITCOIN_TESTS) $(SAPLING_TESTS) $(ZEROCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
 test_test_pivx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/test/ $(TESTDEFS) $(EVENT_FLAGS)
 test_test_pivx_LDADD =
 
@@ -157,7 +163,7 @@ pivx_test_check: $(TEST_BINARY) FORCE
 pivx_test_clean : FORCE
 	rm -f $(CLEAN_BITCOIN_TEST) $(test_test_pivx_OBJECTS) $(TEST_BINARY)
 
-check-local: $(BITCOIN_TESTS:.cpp=.cpp.test)
+check-standard: $(BITCOIN_TESTS:.cpp=.cpp.test)
 	@echo "Running test/util/bitcoin-util-test.py..."
 	$(PYTHON) $(top_builddir)/test/util/bitcoin-util-test.py
 	@echo "Running test/util/rpcauth-test.py..."
@@ -166,6 +172,12 @@ check-local: $(BITCOIN_TESTS:.cpp=.cpp.test)
 if EMBEDDED_UNIVALUE
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C univalue check
 endif
+
+check-sapling: $(SAPLING_TESTS:.cpp=.cpp.test)
+
+check-zerocoin: $(ZEROCOIN_TESTS:.cpp=.cpp.test)
+
+check-local: check-sapling check-zerocoin check-standard
 
 %.cpp.test: %.cpp
 	@echo "" && echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $<
