@@ -1211,7 +1211,6 @@ UniValue reconsiderblock(const JSONRPCRequest& request)
 
     if (state.IsValid()) {
         ActivateBestChain(state);
-        budget.SetBestHeight(WITH_LOCK(cs_main, return chainActive.Height(); ));
         int nHeight = WITH_LOCK(cs_main, return chainActive.Height(); );
         budget.SetBestHeight(nHeight);
         mnodeman.SetBestHeight(nHeight);
