@@ -1719,7 +1719,9 @@ bool AppInit2()
     {
         LOCK(g_best_block_mutex);
         if (g_best_block.IsNull() && chainActive.Tip()) {
-            g_best_block = chainActive.Tip()->GetBlockHash();
+            CBlockIndex* tip = chainActive.Tip();
+            g_best_block = tip->GetBlockHash();
+            g_best_block_time = tip->GetBlockTime();;
             g_best_block_cv.notify_all();
         }
     }
