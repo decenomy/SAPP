@@ -110,7 +110,7 @@ UniValue getgenerate(const JSONRPCRequest& request)
             HelpExampleCli("getgenerate", "") + HelpExampleRpc("getgenerate", ""));
 
     LOCK(cs_main);
-    return GetBoolArg("-gen", false);
+    return gArgs.GetBoolArg("-gen", false);
 }
 
 UniValue generate(const JSONRPCRequest& request)
@@ -244,8 +244,8 @@ UniValue setgenerate(const JSONRPCRequest& request)
             fGenerate = false;
     }
 
-    mapArgs["-gen"] = (fGenerate ? "1" : "0");
-    mapArgs["-genproclimit"] = itostr(nGenProcLimit);
+    gArgs.GetArg("-gen", "") = (fGenerate ? "1" : "0");
+    gArgs.GetArg("-genproclimit", "") = itostr(nGenProcLimit);
     GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);
 
     return NullUniValue;
@@ -305,7 +305,7 @@ UniValue getmininginfo(const JSONRPCRequest& request)
     obj.pushKV("currentblocktx", (uint64_t)nLastBlockTx);
     obj.pushKV("difficulty", (double)GetDifficulty());
     obj.pushKV("errors", GetWarnings("statusbar"));
-    obj.pushKV("genproclimit", (int)GetArg("-genproclimit", -1));
+    obj.pushKV("genproclimit", (int)gArgs.GetArg("-genproclimit", -1));
     obj.pushKV("networkhashps", getnetworkhashps(request));
     obj.pushKV("pooledtx", (uint64_t)mempool.size());
     obj.pushKV("testnet", Params().NetworkID() == CBaseChainParams::TESTNET);

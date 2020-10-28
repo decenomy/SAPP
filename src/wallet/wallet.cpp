@@ -611,48 +611,48 @@ void CWallet::SyncMetaData(std::pair<typename TxSpendMap<T>::iterator, typename 
 
 bool CWallet::ParameterInteraction()
 {
-    if (mapArgs.count("-mintxfee")) {
+    if (gArgs.IsArgSet("-mintxfee")) {
         CAmount n = 0;
-        if (ParseMoney(mapArgs["-mintxfee"], n) && n > 0)
+        if (ParseMoney(gArgs.GetArg("-mintxfee", ""), n) && n > 0)
             CWallet::minTxFee = CFeeRate(n);
         else
-            return UIError(AmountErrMsg("mintxfee", mapArgs["-mintxfee"]));
+            return UIError(AmountErrMsg("mintxfee", gArgs.GetArg("-mintxfee", "")));
     }
-    if (mapArgs.count("-paytxfee")) {
+    if (gArgs.IsArgSet("-paytxfee")) {
         CAmount nFeePerK = 0;
-        if (!ParseMoney(mapArgs["-paytxfee"], nFeePerK))
-            return UIError(AmountErrMsg("paytxfee", mapArgs["-paytxfee"]));
+        if (!ParseMoney(gArgs.GetArg("-paytxfee", ""), nFeePerK))
+            return UIError(AmountErrMsg("paytxfee", gArgs.GetArg("-paytxfee", "")));
         if (nFeePerK > nHighTransactionFeeWarning)
             UIWarning(_("Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction."));
         payTxFee = CFeeRate(nFeePerK, 1000);
         if (payTxFee < ::minRelayTxFee) {
             return UIError(strprintf(_("Invalid amount for -paytxfee=<amount>: '%s' (must be at least %s)"),
-                                       mapArgs["-paytxfee"], ::minRelayTxFee.ToString()));
+                                       gArgs.GetArg("-paytxfee", ""), ::minRelayTxFee.ToString()));
         }
     }
-    if (mapArgs.count("-maxtxfee")) {
+    if (gArgs.IsArgSet("-maxtxfee")) {
         CAmount nMaxFee = 0;
-        if (!ParseMoney(mapArgs["-maxtxfee"], nMaxFee))
-            return UIError(AmountErrMsg("maxtxfee", mapArgs["-maxtxfee"]));
+        if (!ParseMoney(gArgs.GetArg("-maxtxfee", ""), nMaxFee))
+            return UIError(AmountErrMsg("maxtxfee", gArgs.GetArg("-maxtxfee", "")));
         if (nMaxFee > nHighTransactionMaxFeeWarning)
             UIWarning(_("Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction."));
         maxTxFee = nMaxFee;
         if (CFeeRate(maxTxFee, 1000) < ::minRelayTxFee) {
             return UIError(strprintf(_("Invalid amount for -maxtxfee=<amount>: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)"),
-                                       mapArgs["-maxtxfee"], ::minRelayTxFee.ToString()));
+                                       gArgs.GetArg("-maxtxfee", ""), ::minRelayTxFee.ToString()));
         }
     }
-    if (mapArgs.count("-minstakesplit")) {
+    if (gArgs.IsArgSet("-minstakesplit")) {
         CAmount n = 0;
-        if (ParseMoney(mapArgs["-minstakesplit"], n) && n > 0)
+        if (ParseMoney(gArgs.GetArg("-minstakesplit", ""), n) && n > 0)
             CWallet::minStakeSplitThreshold = n;
         else
-            return UIError(AmountErrMsg("minstakesplit", mapArgs["-minstakesplit"]));
+            return UIError(AmountErrMsg("minstakesplit", gArgs.GetArg("-minstakesplit", "")));
     }
-    nTxConfirmTarget = GetArg("-txconfirmtarget", 1);
-    bSpendZeroConfChange = GetBoolArg("-spendzeroconfchange", DEFAULT_SPEND_ZEROCONF_CHANGE);
-    bdisableSystemnotifications = GetBoolArg("-disablesystemnotifications", false);
-    fSendFreeTransactions = GetBoolArg("-sendfreetransactions", DEFAULT_SEND_FREE_TRANSACTIONS);
+    nTxConfirmTarget = gArgs.GetArg("-txconfirmtarget", 1);
+    bSpendZeroConfChange = gArgs.GetBoolArg("-spendzeroconfchange", DEFAULT_SPEND_ZEROCONF_CHANGE);
+    bdisableSystemnotifications = gArgs.GetBoolArg("-disablesystemnotifications", false);
+    fSendFreeTransactions = gArgs.GetBoolArg("-sendfreetransactions", DEFAULT_SEND_FREE_TRANSACTIONS);
 
     return true;
 }
@@ -949,7 +949,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFlushOnClose)
     NotifyTransactionChanged(this, hash, fInsertedNew ? CT_NEW : CT_UPDATED);
 
     // notify an external script when a wallet transaction comes in or is updated
-    std::string strCmd = GetArg("-walletnotify", "");
+    std::string strCmd = gArgs.GetArg("-walletnotify", "");
 
     if (!strCmd.empty()) {
         boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
@@ -1580,7 +1580,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
 {
     int ret = 0;
     int64_t nNow = GetTime();
-    bool fCheckZPIV = GetBoolArg("-zapwallettxes", false);
+    bool fCheckZPIV = gArgs.GetBoolArg("-zapwallettxes", false);
     if (fCheckZPIV)
         zpivTracker->Init();
 
@@ -1709,7 +1709,7 @@ std::set<uint256> CWalletTx::GetConflicts() const
 
 bool CWallet::Verify()
 {
-    std::string walletFile = GetArg("-wallet", DEFAULT_WALLET_DAT);
+    std::string walletFile = gArgs.GetArg("-wallet", DEFAULT_WALLET_DAT);
     std::string strDataDir = GetDataDir().string();
 
     // Wallet file must be a plain filename without a directory
@@ -1738,7 +1738,7 @@ bool CWallet::Verify()
         }
     }
 
-    if (GetBoolArg("-salvagewallet", false)) {
+    if (gArgs.GetBoolArg("-salvagewallet", false)) {
         // Recover readable keypairs:
         if (!CWalletDB::Recover(bitdb, walletFile, true))
             return false;
@@ -2284,7 +2284,7 @@ static void ApproximateBestSubset(std::vector<std::pair<CAmount, std::pair<const
 bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
 {
     const bool fIncludeColdStaking = (sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT) &&
-                               GetBoolArg("-coldstaking", DEFAULT_COLDSTAKING));
+                               gArgs.GetBoolArg("-coldstaking", DEFAULT_COLDSTAKING));
 
     LOCK2(cs_main, cs_wallet);
     for (const auto& it : mapWallet) {
@@ -3867,7 +3867,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
     // needed to restore wallet transaction meta data after -zapwallettxes
     std::vector<CWalletTx> vWtx;
 
-    if (GetBoolArg("-zapwallettxes", false)) {
+    if (gArgs.GetBoolArg("-zapwallettxes", false)) {
         uiInterface.InitMessage(_("Zapping all transactions from wallet..."));
 
         CWallet *tempWallet = new CWallet(walletFile);
@@ -3917,15 +3917,15 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
     int prev_version = walletInstance->GetVersion();
 
     // Forced upgrade
-    const bool fLegacyWallet = GetBoolArg("-legacywallet", false);
-    if (GetBoolArg("-upgradewallet", fFirstRun && !fLegacyWallet)) {
+    const bool fLegacyWallet = gArgs.GetBoolArg("-legacywallet", false);
+    if (gArgs.GetBoolArg("-upgradewallet", fFirstRun && !fLegacyWallet)) {
         if (prev_version <= FEATURE_PRE_PIVX && walletInstance->IsLocked()) {
             // Cannot upgrade a locked wallet
             UIError("Cannot upgrade a locked wallet.");
             return nullptr;
         }
 
-        int nMaxVersion = GetArg("-upgradewallet", 0);
+        int nMaxVersion = gArgs.GetArg("-upgradewallet", 0);
         if (nMaxVersion == 0) // the -upgradewallet without argument case
         {
             LogPrintf("Performing wallet upgrade to %i\n", FEATURE_LATEST);
@@ -3941,7 +3941,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
     }
 
     // Upgrade to HD only if explicit upgrade was requested
-    if (GetBoolArg("-upgradewallet", false)) {
+    if (gArgs.GetBoolArg("-upgradewallet", false)) {
         std::string upgradeError;
         if (!walletInstance->Upgrade(upgradeError, prev_version)) {
             UIError(upgradeError);
@@ -3984,7 +3984,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
     RegisterValidationInterface(walletInstance);
 
     CBlockIndex* pindexRescan = chainActive.Tip();
-    if (GetBoolArg("-rescan", false))
+    if (gArgs.GetBoolArg("-rescan", false))
         pindexRescan = chainActive.Genesis();
     else {
         CWalletDB walletdb(walletFile);
@@ -4007,7 +4007,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
         CWalletDB::IncrementUpdateCounter();
 
         // Restore wallet transaction metadata after -zapwallettxes=1
-        if (GetBoolArg("-zapwallettxes", false) && GetArg("-zapwallettxes", "1") != "2") {
+        if (gArgs.GetBoolArg("-zapwallettxes", false) && gArgs.GetArg("-zapwallettxes", "1") != "2") {
             CWalletDB walletdb(walletFile);
             for (const CWalletTx& wtxOld : vWtx) {
                 uint256 hash = wtxOld.GetHash();
@@ -4043,13 +4043,13 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
 
 bool CWallet::InitLoadWallet()
 {
-    if (GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET)) {
+    if (gArgs.GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET)) {
         pwalletMain = nullptr;
         LogPrintf("Wallet disabled!\n");
         return true;
     }
 
-    std::string walletFile = GetArg("-wallet", DEFAULT_WALLET_DAT);
+    std::string walletFile = gArgs.GetArg("-wallet", DEFAULT_WALLET_DAT);
 
     CWallet * const pwallet = CreateWalletFromFile(walletFile);
     if (!pwallet) {

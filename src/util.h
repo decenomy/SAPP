@@ -19,6 +19,7 @@
 #include "fs.h"
 #include "logging.h"
 #include "compat.h"
+#include "sync.h"
 #include "tinyformat.h"
 #include "utiltime.h"
 #include "util/threadnames.h"
@@ -28,6 +29,7 @@
 #include <map>
 #include <stdint.h>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <boost/thread/exceptions.hpp>
@@ -50,9 +52,6 @@ extern int keysLoaded;
 extern bool fSucessfullyLoaded;
 extern std::string strBudgetMode;
 
-extern std::map<std::string, std::string> mapArgs;
-extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
-
 extern std::string strMiscWarning;
 
 
@@ -69,7 +68,6 @@ bool error(const char* fmt, const Args&... args)
 double double_safe_addition(double fValue, double fIncrement);
 double double_safe_multiplication(double fValue, double fmultiplicator);
 void PrintExceptionContinue(const std::exception* pex, const char* pszThread);
-void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);
 bool TruncateFile(FILE* file, unsigned int length);
 int RaiseFileDescriptorLimit(int nMinFD);
@@ -89,7 +87,6 @@ fs::path GetMasternodeConfigFile();
 fs::path GetPidFile();
 void CreatePidFile(const fs::path& path, pid_t pid);
 #endif
-void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 #ifdef WIN32
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
@@ -106,50 +103,98 @@ inline bool IsSwitchChar(char c)
 #endif
 }
 
-/**
- * Return string argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. "1")
- * @return command-line argument or default value
- */
-std::string GetArg(const std::string& strArg, const std::string& strDefault);
+class ArgsManager
+{
+protected:
+    mutable RecursiveMutex cs_args;
+    std::map<std::string, std::string> mapArgs;
+    std::map<std::string, std::vector<std::string>> mapMultiArgs;
+    std::unordered_set<std::string> m_negated_args;
 
-/**
- * Return integer argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (e.g. 1)
- * @return command-line argument (0 if invalid number) or default value
- */
-int64_t GetArg(const std::string& strArg, int64_t nDefault);
+public:
+    void ParseParameters(int argc, const char* const argv[]);
+    void ReadConfigFile();
 
-/**
- * Return boolean argument or default value
- *
- * @param strArg Argument to get (e.g. "-foo")
- * @param default (true or false)
- * @return command-line argument or default value
- */
-bool GetBoolArg(const std::string& strArg, bool fDefault);
+    /**
+     * Return a vector of strings of the given argument
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @return command-line arguments
+     */
+    std::vector<std::string> GetArgs(const std::string& strArg) const;
 
-/**
- * Set an argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param strValue Value (e.g. "1")
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetArg(const std::string& strArg, const std::string& strValue);
+    /**
+    * Return true if the given argument has been manually set
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @return true if the argument has been set
+    */
+    bool IsArgSet(const std::string& strArg) const;
 
-/**
- * Set a boolean argument if it doesn't already have a value
- *
- * @param strArg Argument to set (e.g. "-foo")
- * @param fValue Value (e.g. false)
- * @return true if argument gets set, false if it already had a value
- */
-bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+    /**
+     * Return true if the argument was originally passed as a negated option,
+     * i.e. -nofoo.
+     *
+     * @param strArg Argument to get (e.g. "-foo")
+     * @return true if the argument was passed negated
+     */
+    bool IsArgNegated(const std::string& strArg) const;
+
+    /**
+    * Return string argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (e.g. "1")
+    * @return command-line argument or default value
+    */
+    std::string GetArg(const std::string& strArg, const std::string& strDefault) const;
+
+    /**
+    * Return integer argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (e.g. 1)
+    * @return command-line argument (0 if invalid number) or default value
+    */
+    int64_t GetArg(const std::string& strArg, int64_t nDefault) const;
+
+    /**
+    * Return boolean argument or default value
+    *
+    * @param strArg Argument to get (e.g. "-foo")
+    * @param default (true or false)
+    * @return command-line argument or default value
+    */
+    bool GetBoolArg(const std::string& strArg, bool fDefault) const;
+
+    /**
+    * Set an argument if it doesn't already have a value
+    *
+    * @param strArg Argument to set (e.g. "-foo")
+    * @param strValue Value (e.g. "1")
+    * @return true if argument gets set, false if it already had a value
+    */
+    bool SoftSetArg(const std::string& strArg, const std::string& strValue);
+
+    /**
+    * Set a boolean argument if it doesn't already have a value
+    *
+    * @param strArg Argument to set (e.g. "-foo")
+    * @param fValue Value (e.g. false)
+    * @return true if argument gets set, false if it already had a value
+    */
+    bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+
+    // Forces a arg setting, used only in testing
+    void ForceSetArg(const std::string& strArg, const std::string& strValue);
+
+private:
+
+    // Munge -nofoo into -foo=0 and track the value as negated.
+    void InterpretNegatedOption(std::string &key, std::string &val);
+};
+
+extern ArgsManager gArgs;
 
 /**
  * Format a string to be used as group of options in help messages
