@@ -957,6 +957,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
             "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
             "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
             "  \"shielded_pool_value\": (object) Chain tip shielded pool value\n"
+            "  \"initial_block_downloading\" (boolean) whether the node is in initial block downloading state or not"
             "  {\n"
             "     \"chainValue\":        (numeric) Total value held by the Sapling circuit up to and including the chain tip\n"
             "     \"valueDelta\":        (numeric) Change in value held by the Sapling circuit over the chain tip block\n"
@@ -997,6 +998,7 @@ UniValue getblockchaininfo(const JSONRPCRequest& request)
     obj.pushKV("chainwork", pChainTip ? pChainTip->nChainWork.GetHex() : "");
     // Sapling shielded pool value
     obj.pushKV("shielded_pool_value", ValuePoolDesc(pChainTip->nChainSaplingValue, pChainTip->nSaplingValue));
+    obj.pushKV("initial_block_downloading", IsInitialBlockDownload());
     UniValue softforks(UniValue::VARR);
     softforks.push_back(SoftForkDesc("bip65", 5, pChainTip));
     obj.pushKV("softforks",             softforks);
