@@ -76,6 +76,12 @@ class MasternodePingTest(PivxTestFramework):
         self.log.info("initializing remote masternode...")
         remote.initmasternode(mnPrivkey, "127.0.0.1:" + str(p2p_port(2)))
 
+        # sanity check, verify that we are not in IBD
+        for i in range(0, len(self.nodes)):
+            node = self.nodes[i]
+            if (node.getblockchaininfo()['initial_block_downloading']):
+                raise AssertionError("Error, node(%s) shouldn't be in IBD." % str(i))
+
         # Wait until mnsync is complete (max 120 seconds)
         self.log.info("waiting to complete mnsync...")
         start_time = time.time()
