@@ -447,7 +447,8 @@ public:
                         AvailableCoinsType nCoinType    = ALL_COINS,
                         bool fOnlyConfirmed             = true,
                         bool fUseIX                     = false,
-                        bool fOnlySpendable             = false
+                        bool fOnlySpendable             = false,
+                        std::set<CTxDestination>*       = nullptr
                         ) const;
     //! >> Available coins (spending)
     bool SelectCoinsToSpend(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl = nullptr) const;

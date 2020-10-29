@@ -2225,7 +2225,8 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              AvailableCoinsType nCoinType,      // Default: ALL_COINS
                              bool fOnlyConfirmed,               // Default: true
                              bool fUseIX,                       // Default: false
-                             bool fOnlySpendable                // Default: false
+                             bool fOnlySpendable,               // Default: false
+                             std::set<CTxDestination>* onlyFilteredDest  // Default: nullptr
                              ) const
 {
     if (pCoins) pCoins->clear();
@@ -2251,6 +2252,15 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 const auto& output = pcoin->vout[i];
 
+                // Filter by specific destinations if needed
+                if (onlyFilteredDest && !onlyFilteredDest->empty()) {
+                    CTxDestination address;
+                    if (!ExtractDestination(output.scriptPubKey, address) || !onlyFilteredDest->count(address)) {
+                        continue;
+                    }
+                }
+
+                // Now check for chain availability
                 auto res = CheckOutputAvailability(
                         output,
                         i,
