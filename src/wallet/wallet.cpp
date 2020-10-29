@@ -2226,7 +2226,8 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              bool fOnlyConfirmed,               // Default: true
                              bool fUseIX,                       // Default: false
                              bool fOnlySpendable,               // Default: false
-                             std::set<CTxDestination>* onlyFilteredDest  // Default: nullptr
+                             std::set<CTxDestination>* onlyFilteredDest,  // Default: nullptr
+                             int minDepth                       // Default: 0
                              ) const
 {
     if (pCoins) pCoins->clear();
@@ -2248,6 +2249,9 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
 
             // Check min depth requirement for stake inputs
             if (nCoinType == STAKEABLE_COINS && nDepth < Params().GetConsensus().nStakeMinDepth) continue;
+
+            // Check min depth filtering requirements
+            if (nDepth < minDepth) continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 const auto& output = pcoin->vout[i];
