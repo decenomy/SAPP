@@ -2224,7 +2224,8 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              bool fIncludeColdStaking,          // Default: false
                              AvailableCoinsType nCoinType,      // Default: ALL_COINS
                              bool fOnlyConfirmed,               // Default: true
-                             bool fUseIX                       // Default: false
+                             bool fUseIX,                       // Default: false
+                             bool fOnlySpendable                // Default: false
                              ) const
 {
     if (pCoins) pCoins->clear();
@@ -2261,6 +2262,7 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                         fIncludeDelegated);
 
                 if (!res.available) continue;
+                if (fOnlySpendable && !res.spendable) continue;
 
                 // found valid coin
                 if (!pCoins) return true;
