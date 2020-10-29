@@ -495,6 +495,7 @@ void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransactionRef>& 
 
 void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags)
 {
+    AssertLockHeld(cs_main);
     // Remove transactions spending a coinbase which are now immature and no-longer-final transactions
     LOCK(cs);
     std::list<CTransaction> transactionsToRemove;
