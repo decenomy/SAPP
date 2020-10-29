@@ -721,23 +721,25 @@ int CMasternodeMan::ProcessGetMNList(CNode* pfrom, CTxIn& vin)
     } //else, asking for a specific node which is ok
 
     int nInvCount = 0;
+    {
+        LOCK(cs);
+        for (CMasternode& mn : vMasternodes) {
+            if (mn.addr.IsRFC1918()) continue; //local network
 
-    for (CMasternode& mn : vMasternodes) {
-        if (mn.addr.IsRFC1918()) continue; //local network
+            if (mn.IsEnabled()) {
+                LogPrint(BCLog::MASTERNODE, "dseg - Sending Masternode entry - %s \n", mn.vin.prevout.hash.ToString());
+                if (vin.IsNull() || vin == mn.vin) {
+                    CMasternodeBroadcast mnb = CMasternodeBroadcast(mn);
+                    uint256 hash = mnb.GetHash();
+                    pfrom->PushInventory(CInv(MSG_MASTERNODE_ANNOUNCE, hash));
+                    nInvCount++;
 
-        if (mn.IsEnabled()) {
-            LogPrint(BCLog::MASTERNODE, "dseg - Sending Masternode entry - %s \n", mn.vin.prevout.hash.ToString());
-            if (vin.IsNull() || vin == mn.vin) {
-                CMasternodeBroadcast mnb = CMasternodeBroadcast(mn);
-                uint256 hash = mnb.GetHash();
-                pfrom->PushInventory(CInv(MSG_MASTERNODE_ANNOUNCE, hash));
-                nInvCount++;
+                    if (!mapSeenMasternodeBroadcast.count(hash)) mapSeenMasternodeBroadcast.emplace(hash, mnb);
 
-                if (!mapSeenMasternodeBroadcast.count(hash)) mapSeenMasternodeBroadcast.emplace(hash, mnb);
-
-                if (vin == mn.vin) {
-                    LogPrint(BCLog::MASTERNODE, "dseg - Sent 1 Masternode entry to peer %i\n", pfrom->GetId());
-                    return 0;
+                    if (vin == mn.vin) {
+                        LogPrint(BCLog::MASTERNODE, "dseg - Sent 1 Masternode entry to peer %i\n", pfrom->GetId());
+                        return 0;
+                    }
                 }
             }
         }
