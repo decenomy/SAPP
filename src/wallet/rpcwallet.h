@@ -5,6 +5,9 @@
 #ifndef BITCOIN_WALLET_RPCWALLET_H
 #define BITCOIN_WALLET_RPCWALLET_H
 
-void walletRegisterRPCCommands();
+class CRPCTable;
+
+void RegisterWalletRPCCommands(CRPCTable &tableRPC);
+void RegisterZPIVRPCCommands(CRPCTable& tableRPC);
 
 #endif //BITCOIN_WALLET_RPCWALLET_H

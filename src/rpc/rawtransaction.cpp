@@ -997,3 +997,25 @@ UniValue createrawzerocoinspend(const JSONRPCRequest& request)
 }
 #endif
 
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         okSafeMode
+  //  --------------------- ------------------------  -----------------------  ----------
+    { "rawtransactions",    "getrawtransaction",      &getrawtransaction,      true  },
+    { "rawtransactions",    "createrawtransaction",   &createrawtransaction,   true  },
+    { "rawtransactions",    "decoderawtransaction",   &decoderawtransaction,   true  },
+    { "rawtransactions",    "decodescript",           &decodescript,           true  },
+    { "rawtransactions",    "fundrawtransaction",     &fundrawtransaction,     false },
+    { "rawtransactions",    "signrawtransaction",     &signrawtransaction,     false }, /* uses wallet if enabled */
+    { "rawtransactions",    "sendrawtransaction",     &sendrawtransaction,     false },
+
+    { "zerocoin",           "getspentzerocoinamount", &getspentzerocoinamount, false },
+#ifdef ENABLE_WALLET
+    { "zerocoin",           "createrawzerocoinspend", &createrawzerocoinspend, false },
+#endif // ENABLE_WALLET
+};
+
+void RegisterRawTransactionRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

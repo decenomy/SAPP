@@ -233,6 +233,7 @@ BITCOIN_CORE_H = \
   reverse_iterate.h \
   rpc/client.h \
   rpc/protocol.h \
+  rpc/register.h \
   rpc/server.h \
   scheduler.h \
   script/interpreter.h \
@@ -384,6 +385,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet/db.cpp \
   wallet/rpcdump.cpp \
   wallet/rpcwallet.cpp \
+  wallet/rpczpiv.cpp \
   wallet/hdchain.cpp \
   wallet/scriptpubkeyman.cpp \
   wallet/wallet.cpp \

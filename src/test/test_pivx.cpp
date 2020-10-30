@@ -10,6 +10,8 @@
 #include "guiinterface.h"
 #include "net_processing.h"
 #include "random.h"
+#include "rpc/server.h"
+#include "rpc/register.h"
 #include "script/sigcache.h"
 #include "txmempool.h"
 #include "txdb.h"
@@ -48,6 +50,9 @@ TestingSetup::TestingSetup()
         pathTemp = GetTempPath() / strprintf("test_pivx_%lu_%i", (unsigned long)GetTime(), (int)(InsecureRandRange(100000)));
         fs::create_directories(pathTemp);
         gArgs.ForceSetArg("-datadir", pathTemp.string());
+        // Ideally we'd move all the RPC tests to the functional testing framework
+        // instead of unit tests, but for now we need these here.
+        RegisterAllCoreRPCCommands(tableRPC);
         pblocktree = new CBlockTreeDB(1 << 20, true);
         pcoinsdbview = new CCoinsViewDB(1 << 23, true);
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);

@@ -904,3 +904,28 @@ UniValue checkbudgets(const JSONRPCRequest& request)
     budget.CheckAndRemove();
     return NullUniValue;
 }
+
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         okSafeMode
+  //  --------------------- ------------------------  -----------------------  ----------
+    { "budget",             "preparebudget",          &preparebudget,          true  },
+    { "budget",             "submitbudget",           &submitbudget,           true  },
+    { "budget",             "mnbudgetvote",           &mnbudgetvote,           true  },
+    { "budget",             "getbudgetvotes",         &getbudgetvotes,         true  },
+    { "budget",             "getnextsuperblock",      &getnextsuperblock,      true  },
+    { "budget",             "getbudgetprojection",    &getbudgetprojection,    true  },
+    { "budget",             "getbudgetinfo",          &getbudgetinfo,          true  },
+    { "budget",             "mnbudgetrawvote",        &mnbudgetrawvote,        true  },
+    { "budget",             "mnfinalbudget",          &mnfinalbudget,          true  },
+    { "budget",             "checkbudgets",           &checkbudgets,           true  },
+
+    /* Not shown in help */
+    { "hidden",             "mnfinalbudgetsuggest",   &mnfinalbudgetsuggest,   true  },
+
+};
+
+void RegisterBudgetRPCCommands(CRPCTable &tableRPC)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        tableRPC.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}
