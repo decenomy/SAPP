@@ -61,6 +61,7 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
     int confirms = wtx.GetDepthInMainChain();
     entry.pushKV("confirmations", confirms);
+    entry.pushKV("bcconfirmations", confirms);      // DEPRECATED in 4.3.99
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         entry.pushKV("generated", true);
     if (confirms > 0) {
@@ -2200,7 +2201,9 @@ UniValue ListReceived(const UniValue& params, bool by_label)
                 obj.pushKV("involvesWatchonly", true);
             obj.pushKV("address", EncodeDestination(address, AddressBook::IsColdStakingPurpose(label)));
             obj.pushKV("amount", ValueFromAmount(nAmount));
-            obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
+            if (nConf == std::numeric_limits<int>::max()) nConf = 0;
+            obj.pushKV("confirmations", nConf);
+            obj.pushKV("bcconfirmations", nConf);       // DEPRECATED in 4.3.99
             obj.pushKV("label", label);
             UniValue transactions(UniValue::VARR);
             if (it != mapTally.end()) {
@@ -2250,6 +2253,7 @@ UniValue listreceivedbyaddress(const JSONRPCRequest& request)
             "    \"address\" : \"receivingaddress\",  (string) The receiving address\n"
             "    \"amount\" : x.xxx,                  (numeric) The total amount in PIV received by the address\n"
             "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"label\" : \"label\",               (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
@@ -2375,9 +2379,10 @@ UniValue listreceivedbylabel(const JSONRPCRequest& request)
             "[\n"
             "  {\n"
             "    \"involvesWatchonly\" : \"true\",    (bool) Only returned if imported addresses were involved in transaction\n"
-            "    \"amount\" : x.xxx,             (numeric) The total amount received by addresses with this label\n"
-            "    \"confirmations\" : n           (numeric) The number of confirmations of the most recent transaction included\n"
-            "    \"label\" : \"label\"           (string) The label of the receiving address. The default label is \"\".\n"
+            "    \"amount\" : x.xxx,                  (numeric) The total amount received by addresses with this label\n"
+            "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
+            "    \"label\" : \"label\"                (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
             "]\n"
@@ -2559,6 +2564,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "    \"confirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
             "                                         'receive' category of transactions. Negative confirmations indicate the\n"
             "                                         transaction conflicts with the block chain\n"
+            "    \"bcconfirmations\" : n,         (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"trusted\": xxx            (bool) Whether we consider the outputs of this unconfirmed transaction safe to spend.\n"
             "                                          and 'receive' category of transactions.\n"
             "    \"blockhash\": \"hashvalue\", (string) The block hash containing the transaction. Available for 'send' and 'receive'\n"
@@ -2664,6 +2670,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             "    \"vout\" : n,               (numeric) the vout value\n"
             "    \"fee\": x.xxx,             (numeric) The amount of the fee in PIV. This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"blockhash\": \"hashvalue\",     (string) The block hash containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockindex\": n,          (numeric) The block index containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blocktime\": xxx,         (numeric) The block time in seconds since epoch (1 Jan 1970 GMT).\n"
@@ -2744,6 +2751,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
             "{\n"
             "  \"amount\" : x.xxx,        (numeric) The transaction amount in PIV\n"
             "  \"confirmations\" : n,     (numeric) The number of confirmations\n"
+            "  \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "  \"blockhash\" : \"hash\",  (string) The block hash\n"
             "  \"blockindex\" : xx,       (numeric) The block index\n"
             "  \"blocktime\" : ttt,       (numeric) The time in seconds since epoch (1 Jan 1970 GMT)\n"

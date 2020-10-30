@@ -825,7 +825,7 @@ UniValue signrawtransaction(const JSONRPCRequest& request)
 
 UniValue sendrawtransaction(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() < 1 || request.params.size() > 3)
+    if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
             "sendrawtransaction \"hexstring\" ( allowhighfees )\n"
             "\nSubmits raw transaction (serialized, hex-encoded) to local node and network.\n"
@@ -834,7 +834,6 @@ UniValue sendrawtransaction(const JSONRPCRequest& request)
             "\nArguments:\n"
             "1. \"hexstring\"    (string, required) The hex string of the raw transaction)\n"
             "2. allowhighfees    (boolean, optional, default=false) Allow high fees\n"
-            "3. swiftx           (boolean, optional, default=false) DEPRECATED: this value is just ignored\n"
 
             "\nResult:\n"
             "\"hex\"             (string) The transaction hash in hex\n"
