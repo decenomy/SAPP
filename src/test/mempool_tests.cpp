@@ -4,6 +4,7 @@
 
 #include "test/test_pivx.h"
 
+#include "policy/feerate.h"
 #include "txmempool.h"
 #include "util.h"
 

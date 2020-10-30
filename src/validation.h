@@ -21,6 +21,7 @@
 #include "consensus/validation.h"
 #include "fs.h"
 #include "moneysupply.h"
+#include "policy/feerate.h"
 #include "script/script_error.h"
 #include "sync.h"
 #include "txmempool.h"

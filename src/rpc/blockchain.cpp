@@ -12,6 +12,7 @@
 #include "kernel.h"
 #include "masternode-budget.h"
 #include "masternodeman.h"
+#include "policy/feerate.h"
 #include "policy/policy.h"
 #include "rpc/server.h"
 #include "sync.h"

@@ -14,6 +14,7 @@
 #include "key_io.h"
 #include "masternode-sync.h"
 #include "net.h"
+#include "policy/feerate.h"
 #include "rpc/server.h"
 #include "timedata.h"
 #include "util.h"
