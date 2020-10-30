@@ -10,6 +10,7 @@ from test_framework.util import (
     disconnect_nodes,
     satoshi_round,
     sync_blocks,
+    sync_mempools,
     wait_until,
 )
 
@@ -55,9 +56,10 @@ class MasternodeActivationTest(PivxTier2TestFramework):
         rawtx = self.ownerOne.createrawtransaction(inputs, outputs)
         signedtx = self.ownerOne.signrawtransaction(rawtx)
         txid = self.miner.sendrawtransaction(signedtx['hex'])
+        sync_mempools(self.nodes)
         self.log.info("Collateral spent in %s" % txid)
-        self.send_pings([self.remoteOne, self.remoteTwo])
-        self.stake(1, [self.remoteOne, self.remoteTwo])
+        self.send_pings([self.remoteTwo])
+        self.stake(1, [self.remoteTwo])
 
     # Similar to base class wait_until_mn_status but skipping the disconnected nodes
     def wait_until_mn_expired(self, _timeout, removed=False):
@@ -111,7 +113,7 @@ class MasternodeActivationTest(PivxTier2TestFramework):
         self.spend_collateral()
         sync_blocks(self.nodes)
         self.log.info("checking mn status..")
-        time.sleep(5)           # wait a little bit
+        time.sleep(3)           # wait a little bit
         self.wait_until_mn_vinspent(self.mnOneTxHash, 30, [self.remoteTwo])
         self.log.info("masternode list updated successfully, vin spent")
 
