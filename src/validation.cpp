@@ -38,6 +38,7 @@
 #include "policy/policy.h"
 #include "pow.h"
 #include "reverse_iterate.h"
+#include "sapling/sapling_validation.h"
 #include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"
@@ -317,14 +318,23 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
         return state.DoS(10, error("%s : Zerocoin transactions are temporarily disabled for maintenance",
                 __func__), REJECT_INVALID, "bad-tx");
 
-    const Consensus::Params& consensus = Params().GetConsensus();
+    const CChainParams& params = Params();
+    const Consensus::Params& consensus = params.GetConsensus();
 
     // Check transaction
     int chainHeight = chainActive.Height();
     bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT);
+    bool fSaplingActive = consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_V5_DUMMY);
     if (!CheckTransaction(tx, consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC),
-            true, state, isBlockBetweenFakeSerialAttackRange(chainHeight), fColdStakingActive))
+            true, state, isBlockBetweenFakeSerialAttackRange(chainHeight), fColdStakingActive, fSaplingActive))
         return error("%s : transaction checks for %s failed with %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
+
+    // Sapling
+    int nextBlockHeight = chainHeight + 1;
+    // Check transaction contextually against the set of consensus rules which apply in the next block to be mined.
+    if (!SaplingValidation::ContextualCheckTransaction(tx, state, params, nextBlockHeight, false, IsInitialBlockDownload())) {
+        return error("AcceptToMemoryPool: ContextualCheckTransaction failed");
+    }
 
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
@@ -374,6 +384,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
         }
     }
 
+    // TODO check sapling nullifiers
 
     {
         CCoinsView dummy;
@@ -422,6 +433,11 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
             if (!Params().IsRegTestNet() && tx.HasZerocoinMintOutputs())
                 return state.Invalid(error("%s : tried to include zPIV mint output in tx %s",
                         __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-zc-spend-mint");
+
+            // Sapling: are the sapling spends' requirements met in tx(valid anchors/nullifiers)?
+            if (!view.HaveShieldedRequirements(tx))
+                return state.Invalid(error("AcceptToMemoryPool: shielded requirements not met"),
+                                     REJECT_DUPLICATE, "bad-txns-shielded-requirements-not-met");
 
             // Bring the best block into scope
             view.GetBestBlock();
@@ -508,10 +524,21 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
             }
         }
 
-        if (fRejectAbsurdFee && nFees > ::minRelayTxFee.GetFee(nSize) * 10000)
-            return state.Invalid(false,
-                REJECT_HIGHFEE, "absurdly-high-fee",
-                strprintf("%d > %d", nFees, ::minRelayTxFee.GetFee(nSize) * 10000));
+        if (!tx.hasSaplingData()) { // Sapling fee could be higher. Review it properly
+            if (fRejectAbsurdFee && nFees > ::minRelayTxFee.GetFee(nSize) * 10000) {
+                return state.Invalid(false,
+                                     REJECT_HIGHFEE, "absurdly-high-fee",
+                                     strprintf("%d > %d", nFees, ::minRelayTxFee.GetFee(nSize) * 10000));
+            }
+        } else {
+            // Accept a tx if it contains sapling and has at least the default fee specified (0.0001 PIV).
+            // todo: this is a initial step, we can definitely be more accurate with the fee calculation and use the regular fee flow.
+            if (nFees < 10000) {
+                return state.Invalid(false,
+                                     REJECT_HIGHFEE, "sapling-invalid-fee",
+                                     strprintf("sapling fee: %d < %d", nFees, 10000));
+            }
+        }
 
         // As zero fee transactions are not going to be accepted in the near future (4.0) and the code will be fully refactored soon.
         // This is just a quick inline towards that goal, the mempool by default will not accept them. Blocking
@@ -945,6 +972,10 @@ void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, CTxUndo& txund
             inputs.SpendCoin(txin.prevout, &txundo.vprevout.back());
         }
     }
+
+    // update spent nullifiers
+    inputs.SetNullifiers(tx, true);
+
     // add outputs
     AddCoins(inputs, tx, nHeight);
 }
@@ -1044,6 +1075,10 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
     if (!inputs.HaveInputs(tx))
         return state.Invalid(false, 0, "", "Inputs unavailable");
 
+    // are the Sapling's requirements met?
+    if (!inputs.HaveShieldedRequirements(tx))
+        return state.Invalid(error("CheckInputs(): %s Sapling requirements not met", tx.GetHash().ToString()));
+
     const Consensus::Params& consensus = ::Params().GetConsensus();
     CAmount nValueIn = 0;
     CAmount nFees = 0;
@@ -1064,6 +1099,9 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
         if (!consensus.MoneyRange(coin.out.nValue) || !consensus.MoneyRange(nValueIn))
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
     }
+
+    // Sapling
+    nValueIn += tx.GetShieldedValueIn();
 
     if (!tx.IsCoinStake()) {
         if (nValueIn < tx.GetValueOut())
@@ -1324,6 +1362,9 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         if (tx.IsCoinBase() || tx.HasZerocoinSpendInputs())
             continue;
 
+        // Sapling, update unspent nullifiers
+        view.SetNullifiers(tx, false);
+
         // restore inputs
         CTxUndo& txundo = blockUndo.vtxundo[i - 1];
         if (txundo.vprevout.size() != tx.vin.size()) {
@@ -1343,10 +1384,22 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
             nValueIn += view.GetValueIn(tx);
     }
 
+    const Consensus::Params& consensus = Params().GetConsensus();
+
+    // set the old best Sapling anchor back
+    // We can get this from the `hashFinalSaplingRoot` of the last block
+    // However, this is only reliable if the last block was on or after
+    // the Sapling activation height. Otherwise, the last anchor was the
+    // empty root.
+    if (consensus.NetworkUpgradeActive(pindex->pprev->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        view.PopAnchor(pindex->pprev->hashFinalSaplingRoot);
+    } else {
+        view.PopAnchor(SaplingMerkleTree::empty_root());
+    }
+
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 
-    const Consensus::Params& consensus = Params().GetConsensus();
     if (consensus.NetworkUpgradeActive(pindex->nHeight, Consensus::UPGRADE_ZC_V2) &&
             pindex->nHeight <= consensus.height_last_ZC_AccumCheckpoint) {
         // Legacy Zerocoin DB: If Accumulators Checkpoint is changed, remove changed checksums
@@ -1445,7 +1498,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // conditionally.
     if (pindex->nChainSaplingValue) {
         if (*pindex->nChainSaplingValue < 0) {
-            return state.DoS(100, error("ConnectBlock(): turnstile violation in Sapling shielded value pool"),
+            return state.DoS(100, error("%s: turnstile violation in Sapling shielded value pool: val: %d", __func__, *pindex->nChainSaplingValue),
                              REJECT_INVALID, "turnstile-violation-sapling-shielded-pool");
         }
     }
@@ -1476,6 +1529,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     unsigned int nMaxBlockSigOps = MAX_BLOCK_SIGOPS_CURRENT;
     std::vector<uint256> vSpendsInBlock;
     uint256 hashBlock = block.GetHash();
+
+    // Sapling
+    SaplingMerkleTree sapling_tree;
+    assert(view.GetSaplingAnchorAt(view.GetBestAnchor(), sapling_tree));
 
     std::vector<PrecomputedTransactionData> precomTxData;
     precomTxData.reserve(block.vtx.size()); // Required so that pointers to individual precomTxData don't get invalidated
@@ -1556,6 +1613,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 return state.DoS(100, error("ConnectBlock() : inputs missing/spent"),
                     REJECT_INVALID, "bad-txns-inputs-missingorspent");
 
+            // Sapling: are the sapling spends' requirements met in tx(valid anchors/nullifiers)?
+            if (!view.HaveShieldedRequirements(tx))
+                return state.DoS(100, error("%s: spends requirements not met", __func__),
+                                 REJECT_INVALID, "bad-txns-sapling-requirements-not-met");
+
             // Check that the inputs are not marked as invalid/fraudulent
             for (const CTxIn& in : tx.vin) {
                 if (!ValidOutPoint(in.prevout, pindex->nHeight)) {
@@ -1599,8 +1661,27 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
         UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
+        // Sapling update tree
+        for(const OutputDescription &outputDescription : tx.sapData->vShieldedOutput) {
+            sapling_tree.append(outputDescription.cmu);
+        }
+
         vPos.emplace_back(tx.GetHash(), pos);
         pos.nTxOffset += ::GetSerializeSize(tx, SER_DISK, CLIENT_VERSION);
+    }
+
+    // Push new tree anchor
+    view.PushAnchor(sapling_tree);
+
+    // Verify header correctness
+    if (consensus.NetworkUpgradeActive(pindex->nHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // If Sapling is active, block.hashFinalSaplingRoot must be the
+        // same as the root of the Sapling tree
+        if (block.hashFinalSaplingRoot != sapling_tree.root()) {
+            return state.DoS(100,
+                             error("ConnectBlock(): block's hashFinalSaplingRoot is incorrect (should be Sapling tree root)"),
+                             REJECT_INVALID, "bad-sapling-root-in-block");
+        }
     }
 
     // track mint amount info
@@ -2791,15 +2872,18 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     std::vector<CBigNum> vBlockSerials;
     // TODO: Check if this is ok... blockHeight is always the tip or should we look for the prevHash and get the height?
     int blockHeight = chainActive.Height() + 1;
+    const Consensus::Params& consensus = Params().GetConsensus();
+    bool fSaplingActive = consensus.NetworkUpgradeActive(blockHeight, Consensus::UPGRADE_V5_DUMMY);
     for (const auto& txIn : block.vtx) {
         const CTransaction& tx = *txIn;
         if (!CheckTransaction(
                 tx,
                 fZerocoinActive,
-                blockHeight >= Params().GetConsensus().height_start_ZC_SerialRangeCheck,
+                blockHeight >= consensus.height_start_ZC_SerialRangeCheck,
                 state,
                 isBlockBetweenFakeSerialAttackRange(blockHeight),
-                fColdStakingActive
+                fColdStakingActive,
+                fSaplingActive
         ))
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                                              strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
@@ -2981,12 +3065,20 @@ bool IsTransactionInChain(const uint256& txId, int& nHeightTx)
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIndex* const pindexPrev)
 {
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
+    const CChainParams& chainparams = Params();
 
     // Check that all transactions are finalized
-    for (const auto& tx : block.vtx)
+    for (const auto& tx : block.vtx) {
+
+        // Sapling: Check transaction contextually against consensus rules at block height
+        if (!SaplingValidation::ContextualCheckTransaction(*tx, state, chainparams, nHeight, true, IsInitialBlockDownload())) {
+            return false; // Failure reason has been set in validation state object
+        }
+
         if (!IsFinalTx(*tx, nHeight, block.GetBlockTime())) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
         }
+    }
 
     // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
     if (pindexPrev) { // pindexPrev is only null on the first block which is a version 1 block.

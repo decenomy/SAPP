@@ -237,93 +237,95 @@ TransactionBuilderResult TransactionBuilder::Build()
     //
     // Sapling spends and outputs
     //
+    if (!spends.empty() || !outputs.empty()) {
 
-    auto ctx = librustzcash_sapling_proving_ctx_init();
+        auto ctx = librustzcash_sapling_proving_ctx_init();
 
-    // Create Sapling SpendDescriptions
-    for (auto spend : spends) {
-        auto cm = spend.note.cmu();
-        auto nf = spend.note.nullifier(
-            spend.expsk.full_viewing_key(), spend.witness.position());
-        if (!cm || !nf) {
-            librustzcash_sapling_proving_ctx_free(ctx);
-            return TransactionBuilderResult("Spend is invalid");
+        // Create Sapling SpendDescriptions
+        for (auto spend : spends) {
+            auto cm = spend.note.cmu();
+            auto nf = spend.note.nullifier(
+                    spend.expsk.full_viewing_key(), spend.witness.position());
+            if (!cm || !nf) {
+                librustzcash_sapling_proving_ctx_free(ctx);
+                return TransactionBuilderResult("Spend is invalid");
+            }
+
+            CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+            ss << spend.witness.path();
+            std::vector<unsigned char> witness(ss.begin(), ss.end());
+
+            SpendDescription sdesc;
+            if (!librustzcash_sapling_spend_proof(
+                    ctx,
+                    spend.expsk.full_viewing_key().ak.begin(),
+                    spend.expsk.nsk.begin(),
+                    spend.note.d.data(),
+                    spend.note.r.begin(),
+                    spend.alpha.begin(),
+                    spend.note.value(),
+                    spend.anchor.begin(),
+                    witness.data(),
+                    sdesc.cv.begin(),
+                    sdesc.rk.begin(),
+                    sdesc.zkproof.data())) {
+                librustzcash_sapling_proving_ctx_free(ctx);
+                return TransactionBuilderResult("Spend proof failed");
+            }
+
+            sdesc.anchor = spend.anchor;
+            sdesc.nullifier = *nf;
+            mtx.sapData->vShieldedSpend.push_back(sdesc);
         }
 
-        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-        ss << spend.witness.path();
-        std::vector<unsigned char> witness(ss.begin(), ss.end());
+        // Create Sapling OutputDescriptions
+        for (auto output : outputs) {
+            // Check this out here as well to provide better logging.
+            if (!output.note.cmu()) {
+                librustzcash_sapling_proving_ctx_free(ctx);
+                return TransactionBuilderResult("Output is invalid");
+            }
 
-        SpendDescription sdesc;
-        if (!librustzcash_sapling_spend_proof(
+            auto odesc = output.Build(ctx);
+            if (!odesc) {
+                librustzcash_sapling_proving_ctx_free(ctx);
+                return TransactionBuilderResult("Failed to create output description");
+            }
+
+            mtx.sapData->vShieldedOutput.push_back(odesc.get());
+        }
+
+        //
+        // Signatures
+        //
+
+        // Empty output script.
+        uint256 dataToBeSigned;
+        CScript scriptCode;
+        try {
+            dataToBeSigned = SignatureHash(scriptCode, mtx, NOT_AN_INPUT, SIGHASH_ALL, 0, SIGVERSION_SAPLING);
+        } catch (const std::logic_error& ex) {
+            librustzcash_sapling_proving_ctx_free(ctx);
+            return TransactionBuilderResult("Could not construct signature hash: " + std::string(ex.what()));
+        }
+
+        // Create Sapling spendAuth and binding signatures
+        for (size_t i = 0; i < spends.size(); i++) {
+            librustzcash_sapling_spend_sig(
+                    spends[i].expsk.ask.begin(),
+                    spends[i].alpha.begin(),
+                    dataToBeSigned.begin(),
+                    mtx.sapData->vShieldedSpend[i].spendAuthSig.data());
+        }
+
+        librustzcash_sapling_binding_sig(
                 ctx,
-                spend.expsk.full_viewing_key().ak.begin(),
-                spend.expsk.nsk.begin(),
-                spend.note.d.data(),
-                spend.note.r.begin(),
-                spend.alpha.begin(),
-                spend.note.value(),
-                spend.anchor.begin(),
-                witness.data(),
-                sdesc.cv.begin(),
-                sdesc.rk.begin(),
-                sdesc.zkproof.data())) {
-            librustzcash_sapling_proving_ctx_free(ctx);
-            return TransactionBuilderResult("Spend proof failed");
-        }
+                mtx.sapData->valueBalance,
+                dataToBeSigned.begin(),
+                mtx.sapData->bindingSig.data());
 
-        sdesc.anchor = spend.anchor;
-        sdesc.nullifier = *nf;
-        mtx.sapData->vShieldedSpend.push_back(sdesc);
-    }
-
-    // Create Sapling OutputDescriptions
-    for (auto output : outputs) {
-        // Check this out here as well to provide better logging.
-        if (!output.note.cmu()) {
-            librustzcash_sapling_proving_ctx_free(ctx);
-            return TransactionBuilderResult("Output is invalid");
-        }
-
-        auto odesc = output.Build(ctx);
-        if (!odesc) {
-            librustzcash_sapling_proving_ctx_free(ctx);
-            return TransactionBuilderResult("Failed to create output description");
-        }
-
-        mtx.sapData->vShieldedOutput.push_back(odesc.get());
-    }
-
-    //
-    // Signatures
-    //
-
-    // Empty output script.
-    uint256 dataToBeSigned;
-    CScript scriptCode;
-    try {
-        dataToBeSigned = SignatureHash(scriptCode, mtx, NOT_AN_INPUT, SIGHASH_ALL, 0, SIGVERSION_SAPLING);
-    } catch (const std::logic_error& ex) {
         librustzcash_sapling_proving_ctx_free(ctx);
-        return TransactionBuilderResult("Could not construct signature hash: " + std::string(ex.what()));
     }
-
-    // Create Sapling spendAuth and binding signatures
-    for (size_t i = 0; i < spends.size(); i++) {
-        librustzcash_sapling_spend_sig(
-            spends[i].expsk.ask.begin(),
-            spends[i].alpha.begin(),
-            dataToBeSigned.begin(),
-            mtx.sapData->vShieldedSpend[i].spendAuthSig.data());
-    }
-
-    librustzcash_sapling_binding_sig(
-        ctx,
-        mtx.sapData->valueBalance,
-        dataToBeSigned.begin(),
-        mtx.sapData->bindingSig.data());
-
-    librustzcash_sapling_proving_ctx_free(ctx);
 
     // Transparent signatures
     CTransaction txNewConst(mtx);

@@ -454,7 +454,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
     bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT);
 
     // Double check tx before do anything
-    CValidationState state;
+    CValidationState state; // TODO: Add sapling network active flag check
     if (!CheckTransaction(*transaction.getTransaction(), true, true, state, true, fColdStakingActive)) {
         return TransactionCheckFailed;
     }
