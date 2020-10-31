@@ -270,7 +270,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
             while (it3 != mapSeenMasternodeBroadcast.end()) {
                 if ((*it3).second.vin == (*it).vin) {
                     masternodeSync.mapSeenSyncMNB.erase((*it3).first);
-                    mapSeenMasternodeBroadcast.erase(it3++);
+                    it3 = mapSeenMasternodeBroadcast.erase(it3);
                 } else {
                     ++it3;
                 }
@@ -280,7 +280,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
             std::map<COutPoint, int64_t>::iterator it2 = mWeAskedForMasternodeListEntry.begin();
             while (it2 != mWeAskedForMasternodeListEntry.end()) {
                 if ((*it2).first == (*it).vin.prevout) {
-                    mWeAskedForMasternodeListEntry.erase(it2++);
+                    it2 = mWeAskedForMasternodeListEntry.erase(it2);
                 } else {
                     ++it2;
                 }
@@ -296,7 +296,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     std::map<CNetAddr, int64_t>::iterator it1 = mAskedUsForMasternodeList.begin();
     while (it1 != mAskedUsForMasternodeList.end()) {
         if ((*it1).second < GetTime()) {
-            mAskedUsForMasternodeList.erase(it1++);
+            it1 = mAskedUsForMasternodeList.erase(it1);
         } else {
             ++it1;
         }
@@ -306,7 +306,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     it1 = mWeAskedForMasternodeList.begin();
     while (it1 != mWeAskedForMasternodeList.end()) {
         if ((*it1).second < GetTime()) {
-            mWeAskedForMasternodeList.erase(it1++);
+            it1 = mWeAskedForMasternodeList.erase(it1);
         } else {
             ++it1;
         }
@@ -316,7 +316,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     std::map<COutPoint, int64_t>::iterator it2 = mWeAskedForMasternodeListEntry.begin();
     while (it2 != mWeAskedForMasternodeListEntry.end()) {
         if ((*it2).second < GetTime()) {
-            mWeAskedForMasternodeListEntry.erase(it2++);
+            it2 = mWeAskedForMasternodeListEntry.erase(it2);
         } else {
             ++it2;
         }
@@ -326,8 +326,8 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     std::map<uint256, CMasternodeBroadcast>::iterator it3 = mapSeenMasternodeBroadcast.begin();
     while (it3 != mapSeenMasternodeBroadcast.end()) {
         if ((*it3).second.lastPing.sigTime < GetTime() - (MasternodeRemovalSeconds() * 2)) {
-            mapSeenMasternodeBroadcast.erase(it3++);
             masternodeSync.mapSeenSyncMNB.erase((*it3).second.GetHash());
+            it3 = mapSeenMasternodeBroadcast.erase(it3);
         } else {
             ++it3;
         }
@@ -337,7 +337,7 @@ void CMasternodeMan::CheckAndRemove(bool forceExpiredRemoval)
     std::map<uint256, CMasternodePing>::iterator it4 = mapSeenMasternodePing.begin();
     while (it4 != mapSeenMasternodePing.end()) {
         if ((*it4).second.sigTime < GetTime() - (MasternodeRemovalSeconds() * 2)) {
-            mapSeenMasternodePing.erase(it4++);
+            it4 = mapSeenMasternodePing.erase(it4);
         } else {
             ++it4;
         }
