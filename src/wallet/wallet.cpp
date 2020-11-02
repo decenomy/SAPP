@@ -4457,6 +4457,7 @@ void CWalletTx::Init(const CWallet* pwalletIn)
     fFromMe = false;
     fChangeCached = false;
     nChangeCached = 0;
+    fStakeDelegationVoided = false;
     nOrderPos = -1;
 }
 
