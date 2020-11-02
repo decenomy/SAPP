@@ -737,7 +737,7 @@ void CBudgetManager::VoteOnFinalizedBudgets()
                 }
             }
             // exact match found. add budget hash to sign it later.
-            vBudgetHashes.push_back(pfb->GetHash());
+            vBudgetHashes.emplace_back(pfb->GetHash());
         }
     }
 
@@ -905,7 +905,7 @@ std::vector<CBudgetProposal> CBudgetManager::GetBudget()
 
     int nHeight = GetBestHeight();
     if (nHeight <= 0)
-        return std::vector<CBudgetProposal>();
+        return {};
 
     // ------- Sort budgets by net Yes Count
     std::vector<CBudgetProposal*> vBudgetPorposalsSort;
@@ -936,7 +936,7 @@ std::vector<CBudgetProposal> CBudgetManager::GetBudget()
             if (pbudgetProposal->GetAmount() + nBudgetAllocated <= nTotalBudget) {
                 pbudgetProposal->SetAllotted(pbudgetProposal->GetAmount());
                 nBudgetAllocated += pbudgetProposal->GetAmount();
-                vBudgetProposalsRet.push_back(*pbudgetProposal);
+                vBudgetProposalsRet.emplace_back(*pbudgetProposal);
                 LogPrint(BCLog::MNBUDGET,"%s:  -     Check 2 passed: Budget added\n", __func__);
             } else {
                 pbudgetProposal->SetAllotted(0);
@@ -1972,7 +1972,7 @@ bool CFinalizedBudget::CheckProposals(const std::map<uint256, CBudgetProposal>& 
         LogPrint(BCLog::MNBUDGET,"%s: Budget-Proposals - nAmount %lli\n", __func__, (it.second).GetAmount());
     }
 
-    for (const CTxBudgetPayment& p: vecBudgetPayments) {
+    for (const CTxBudgetPayment& p : vecBudgetPayments) {
         const auto& it = mapWinningProposals.find(p.nProposalHash);
         if (it == mapWinningProposals.end()) {
             LogPrint(BCLog::MNBUDGET,"%s: Proposal %s not found\n", __func__, p.nProposalHash.ToString());

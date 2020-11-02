@@ -560,7 +560,7 @@ UniValue getbudgetprojection(const JSONRPCRequest& request)
     std::vector<CBudgetProposal> winningProps = g_budgetman.GetBudget();
     for (const CBudgetProposal& p : winningProps) {
         UniValue bObj(UniValue::VOBJ);
-        budgetToJSON(&p, bObj, g_budgetman.GetBestHeight());;
+        budgetToJSON(&p, bObj, g_budgetman.GetBestHeight());
         nTotalAllotted += p.GetAllotted();
         bObj.pushKV("TotalBudgetAlloted", ValueFromAmount(nTotalAllotted));
         ret.push_back(bObj);
