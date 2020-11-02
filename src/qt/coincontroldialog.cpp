@@ -13,6 +13,7 @@
 #include "guiutil.h"
 #include "init.h"
 #include "optionsmodel.h"
+#include "policy/policy.h"
 #include "txmempool.h"
 #include "wallet/wallet.h"
 #include "walletmodel.h"
@@ -566,7 +567,7 @@ void CoinControlDialog::updateLabels()
         nPayAmount += amount;
         if (amount > 0) {
             CTxOut txout(amount, (CScript)std::vector<unsigned char>(24, 0));
-            if (txout.IsDust(::minRelayTxFee))
+            if (IsDust(txout, ::minRelayTxFee))
                 fDust = true;
         }
     }
@@ -669,7 +670,7 @@ void CoinControlDialog::updateLabels()
             // Never create dust outputs; if we would, just add the dust to the fee.
             if (nChange > 0 && nChange < CENT) {
                 CTxOut txout(nChange, (CScript)std::vector<unsigned char>(24, 0));
-                if (txout.IsDust(::minRelayTxFee)) {
+                if (IsDust(txout, ::minRelayTxFee)) {
                     nPayFee += nChange;
                     nChange = 0;
                 }

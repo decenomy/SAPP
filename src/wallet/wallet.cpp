@@ -2597,7 +2597,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                 if (coinControl && !coinControl->fSplitBlock) {
                     for (const CRecipient& rec : vecSend) {
                         CTxOut txout(rec.nAmount, rec.scriptPubKey);
-                        if (txout.IsDust(::minRelayTxFee)) {
+                        if (IsDust(txout, ::minRelayTxFee)) {
                             strFailReason = _("Transaction amount too small");
                             return false;
                         }
@@ -2704,7 +2704,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
 
                         // Never create dust outputs; if we would, just
                         // add the dust to the fee.
-                        if (newTxOut.IsDust(::minRelayTxFee)) {
+                        if (IsDust(newTxOut, ::minRelayTxFee)) {
                             nFeeRet += nChange;
                             nChange = 0;
                             reservekey.ReturnKey();
