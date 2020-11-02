@@ -199,7 +199,7 @@ void CBudgetManager::SubmitFinalBudget()
     }
 
     // See if collateral tx exists
-    if (!mapCollateralTxids.count(budgetHash)) {
+    if (!mapUnconfirmedFeeTx.count(budgetHash)) {
         // create the collateral tx, send it to the network and return
         CWalletTx wtx;
         // Get our change address
@@ -210,20 +210,21 @@ void CBudgetManager::SubmitFinalBudget()
         }
         // Send the tx to the network. Do NOT use SwiftTx, locking might need too much time to propagate, especially for testnet
         const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get(), "NO-ix");
-        if (res.status == CWallet::CommitStatus::OK)
-            mapCollateralTxids.emplace(budgetHash, wtx.GetHash());
+        if (res.status == CWallet::CommitStatus::OK) {
+            const uint256& collateraltxid = wtx.GetHash();
+            mapUnconfirmedFeeTx.emplace(budgetHash, collateraltxid);
+            LogPrint(BCLog::MNBUDGET,"%s: Collateral sent. txid: %s\n", __func__, collateraltxid.ToString());
+        }
         return;
     }
 
     // Collateral tx already exists, see if it's mature enough.
-    CFinalizedBudget fb(strBudgetName, nBlockStart, vecTxBudgetPayments, mapCollateralTxids.at(budgetHash));
+    CFinalizedBudget fb(strBudgetName, nBlockStart, vecTxBudgetPayments, mapUnconfirmedFeeTx.at(budgetHash));
     if (!AddFinalizedBudget(fb)) {
         return;
     }
     fb.Relay();
     nSubmittedHeight = nCurrentHeight;
-    // Remove collateral tx from map
-    mapCollateralTxids.erase(budgetHash);
     LogPrint(BCLog::MNBUDGET,"%s: Done! %s\n", __func__, budgetHash.ToString());
 }
 
@@ -445,9 +446,10 @@ bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
 
     std::string strError;
     int nCurrentHeight = GetBestHeight();
-    if (!CheckCollateral(finalizedBudget.GetFeeTXHash(), nHash, strError, finalizedBudget.nTime, nCurrentHeight, true)) {
-        LogPrint(BCLog::MNBUDGET,"%s: invalid finalized budget (%s) collateral - %s\n",
-                __func__, nHash.ToString(), strError);
+    const uint256& feeTxId = finalizedBudget.GetFeeTXHash();
+    if (!CheckCollateral(feeTxId, nHash, strError, finalizedBudget.nTime, nCurrentHeight, true)) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid finalized budget (%s) collateral id=%s - %s\n",
+                __func__, nHash.ToString(), feeTxId.ToString(), strError);
         return false;
     }
 
@@ -458,7 +460,15 @@ bool CBudgetManager::AddFinalizedBudget(CFinalizedBudget& finalizedBudget)
     }
 
     SetBudgetProposalsStr(finalizedBudget);
-    WITH_LOCK(cs_budgets, mapFinalizedBudgets.emplace(nHash, finalizedBudget); );
+    {
+        LOCK(cs_budgets);
+        mapFinalizedBudgets.emplace(nHash, finalizedBudget);
+        // Add to feeTx index
+        mapFeeTxToBudget.emplace(feeTxId, nHash);
+        // Remove the budget from the unconfirmed map, if it was there
+        if (mapUnconfirmedFeeTx.count(nHash))
+            mapUnconfirmedFeeTx.erase(nHash);
+    }
     LogPrint(BCLog::MNBUDGET,"%s: finalized budget %s [%s (%s)] added\n",
             __func__, nHash.ToString(), finalizedBudget.GetName(), finalizedBudget.GetProposalsStr());
     return true;
@@ -481,9 +491,10 @@ bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
 
     std::string strError;
     int nCurrentHeight = GetBestHeight();
-    if (!CheckCollateral(budgetProposal.GetFeeTXHash(), nHash, strError, budgetProposal.nTime, nCurrentHeight, false)) {
-        LogPrint(BCLog::MNBUDGET,"%s: invalid budget proposal (%s) collateral - %s\n",
-                __func__, nHash.ToString(), strError);
+    const uint256& feeTxId = budgetProposal.GetFeeTXHash();
+    if (!CheckCollateral(feeTxId, nHash, strError, budgetProposal.nTime, nCurrentHeight, false)) {
+        LogPrint(BCLog::MNBUDGET,"%s: invalid budget proposal (%s) collateral id=%s - %s\n",
+                __func__, nHash.ToString(), feeTxId.ToString(), strError);
         return false;
     }
 
@@ -493,8 +504,14 @@ bool CBudgetManager::AddProposal(CBudgetProposal& budgetProposal)
         return false;
     }
 
-    WITH_LOCK(cs_proposals, mapProposals.emplace(nHash, budgetProposal); );
-    LogPrint(BCLog::MNBUDGET,"%s: proposal %s [%s] added\n", __func__, nHash.ToString(), budgetProposal.GetName());
+    {
+        LOCK(cs_proposals);
+        mapProposals.emplace(nHash, budgetProposal);
+        // Add to feeTx index
+        mapFeeTxToProposal.emplace(feeTxId, nHash);
+    }
+    LogPrint(BCLog::MNBUDGET,"%s: budget proposal %s [%s] added\n", __func__, nHash.ToString(), budgetProposal.GetName());
+
     return true;
 }
 
@@ -511,6 +528,7 @@ void CBudgetManager::CheckAndRemove()
             CFinalizedBudget* pfinalizedBudget = &(it.second);
             if (!pfinalizedBudget->UpdateValid(nCurrentHeight)) {
                 LogPrint(BCLog::MNBUDGET,"%s: Invalid finalized budget %s %s\n", __func__, (it.first).ToString(), pfinalizedBudget->IsInvalidLogStr());
+                mapFeeTxToBudget.erase(pfinalizedBudget->GetFeeTXHash());
             } else {
                 LogPrint(BCLog::MNBUDGET,"%s: Found valid finalized budget: %s %s\n", __func__,
                           pfinalizedBudget->GetName(), pfinalizedBudget->GetFeeTXHash().ToString());
@@ -530,6 +548,7 @@ void CBudgetManager::CheckAndRemove()
             CBudgetProposal* pbudgetProposal = &(it.second);
             if (!pbudgetProposal->UpdateValid(nCurrentHeight)) {
                 LogPrint(BCLog::MNBUDGET,"%s: Invalid budget proposal %s %s\n", __func__, (it.first).ToString(), pbudgetProposal->IsInvalidLogStr());
+                mapFeeTxToProposal.erase(pbudgetProposal->GetFeeTXHash());
             } else {
                  LogPrint(BCLog::MNBUDGET,"%s: Found valid budget proposal: %s %s\n", __func__,
                           pbudgetProposal->GetName(), pbudgetProposal->GetFeeTXHash().ToString());
@@ -542,6 +561,60 @@ void CBudgetManager::CheckAndRemove()
     }
 
 }
+
+void CBudgetManager::RemoveByFeeTxId(const uint256& feeTxId)
+{
+    {
+        LOCK(cs_proposals);
+        // Is this collateral related to a proposal?
+        const auto& it = mapFeeTxToProposal.find(feeTxId);
+        if (it != mapFeeTxToProposal.end()) {
+            // Remove proposal
+            CBudgetProposal* p = FindProposal(it->second);
+            if (p) {
+                LogPrintf("%s: Removing proposal %s (collateral disconnected, id=%s)\n", __func__, p->GetName(), feeTxId.ToString());
+                {
+                    // Erase seen/orhpan votes
+                    LOCK(cs_votes);
+                    for (const uint256& hash: p->GetVotesHashes()) {
+                        mapSeenProposalVotes.erase(hash);
+                        mapOrphanProposalVotes.erase(hash);
+                    }
+                }
+                // Erase proposal object
+                mapProposals.erase(it->second);
+            }
+            // Remove from collateral index
+            mapFeeTxToProposal.erase(it);
+            return;
+        }
+    }
+    {
+        LOCK(cs_budgets);
+        // Is this collateral related to a finalized budget?
+        const auto& it = mapFeeTxToBudget.find(feeTxId);
+        if (it != mapFeeTxToBudget.end()) {
+            // Remove finalized budget
+            CFinalizedBudget* b = FindFinalizedBudget(it->second);
+            if (b) {
+                LogPrintf("%s: Removing finalized budget %s (collateral disconnected, id=%s)\n", __func__, b->GetName(), feeTxId.ToString());
+                {
+                    // Erase seen/orhpan votes
+                    LOCK(cs_finalizedvotes);
+                    for (const uint256& hash: b->GetVotesHashes()) {
+                        mapSeenFinalizedBudgetVotes.erase(hash);
+                        mapOrphanFinalizedBudgetVotes.erase(hash);
+                    }
+                }
+                // Erase finalized budget object
+                mapFinalizedBudgets.erase(it->second);
+            }
+            // Remove from collateral index
+            mapFeeTxToBudget.erase(it);
+        }
+    }
+}
+
 const CFinalizedBudget* CBudgetManager::GetBudgetWithHighestVoteCount(int chainHeight) const
 {
     LOCK(cs_budgets);
@@ -1554,6 +1627,15 @@ int CBudgetProposal::GetVoteCount(CBudgetVote::VoteDirection vd) const
     return ret;
 }
 
+std::vector<uint256> CBudgetProposal::GetVotesHashes() const
+{
+    std::vector<uint256> vRet;
+    for (const auto& it: mapVotes) {
+        vRet.push_back(it.first);
+    }
+    return vRet;
+}
+
 int CBudgetProposal::GetBlockStartCycle() const
 {
     //end block is half way through the next cycle (so the proposal will be removed much after the payment is sent)
@@ -1996,6 +2078,15 @@ bool CFinalizedBudget::UpdateValid(int nCurrentHeight)
     fValid = true;
     strInvalid.clear();
     return true;
+}
+
+std::vector<uint256> CFinalizedBudget::GetVotesHashes() const
+{
+    std::vector<uint256> vRet;
+    for (const auto& it: mapVotes) {
+        vRet.push_back(it.first);
+    }
+    return vRet;
 }
 
 bool CFinalizedBudget::IsPaidAlready(const uint256& nProposalHash, const uint256& nBlockHash, int nBlockHeight) const
