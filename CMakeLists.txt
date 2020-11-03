@@ -384,7 +384,6 @@ set(COMMON_SOURCES
         ./src/zpiv/zerocoin.cpp
         ./src/core_read.cpp
         ./src/core_write.cpp
-        ./src/sapling/sapling_core_write.cpp
         ./src/hash.cpp
         ./src/invalid.cpp
         ./src/key.cpp
@@ -451,6 +450,7 @@ set(SAPLING_SOURCES
         ./src/bech32.cpp
         ./src/sapling/sapling_util.cpp
         ./src/sapling/key_io_sapling.cpp
+        ./src/sapling/sapling_core_write.cpp
         ./src/sapling/prf.cpp
         ./src/sapling/noteencryption.cpp
         ./src/sapling/address.cpp
@@ -468,6 +468,7 @@ add_library(SAPLING_A STATIC ${BitcoinHeaders} ${SAPLING_SOURCES})
 target_include_directories(SAPLING_A PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/src/sapling
         ${CMAKE_CURRENT_SOURCE_DIR}/src/rust/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/univalue/include
         ${OPENSSL_INCLUDE_DIR}
         ${BerkeleyDB_INCLUDE_DIRS}
         )
