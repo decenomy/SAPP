@@ -43,7 +43,10 @@ bool CMasternodeSync::MessageDispatcher(CNode* pfrom, std::string& strCommand, C
 
     if (strCommand == NetMsgType::GETMNLIST) {
         // Get Masternode list or specific entry
-        mnodeman.ProcessGetMNList(pfrom, strCommand, vRecv);
+        CTxIn vin;
+        vRecv >> vin;
+        mnodeman.ProcessGetMNList(pfrom, vin);
+        // todo result ban score misbehaving..
         return true;
     }
 
