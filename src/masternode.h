@@ -147,6 +147,8 @@ public:
     const CTxIn GetVin() const override { return vin; };
     const CPubKey GetPublicKey(std::string& strErrorRet) const override { return pubKeyCollateralAddress; }
 
+    void SetLastPing(const CMasternodePing& _lastPing) { WITH_LOCK(cs, lastPing = _lastPing;); }
+
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {
         CSignedMessage::swap(first, second);

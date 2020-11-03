@@ -727,7 +727,8 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
                 return false;
             }
 
-            pmn->lastPing = *this;
+            // SetLastPing locks masternode cs. Be careful with the lock ordering.
+            pmn->SetLastPing(*this);
 
             //mnodeman.mapSeenMasternodeBroadcast.lastPing is probably outdated, so we'll update it
             CMasternodeBroadcast mnb(*pmn);
