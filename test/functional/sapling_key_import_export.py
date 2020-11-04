@@ -61,10 +61,7 @@ class SaplingkeyImportExportTest (PivxTestFramework):
         amountTo = 10 * 250 - fee
         # Shield Alice's coinbase funds to her shield_addr
         alice_addr = alice.getnewshieldedaddress()
-        txid = alice.shielded_sendmany(fromAddress, [{"address": alice_addr, "amount": Decimal(amountTo)}])
-        self.sync_all()
-        miner.generate(1)
-        self.sync_all()
+        txid = shielded_send(alice, fromAddress, alice_addr, amountTo)
 
         # Now get a pristine address for receiving transfers:
         bob_addr = bob.getnewshieldedaddress()

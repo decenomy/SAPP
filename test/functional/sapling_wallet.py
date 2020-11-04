@@ -22,6 +22,9 @@ class WalletSaplingTest(PivxTestFramework):
         saplingUpgrade = ['-nuparams=v5_dummy:1']
         self.extra_args = [saplingUpgrade, saplingUpgrade, saplingUpgrade, saplingUpgrade]
 
+    def check_tx_priority(self, mempool, mytxid):
+        assert(Decimal(mempool[mytxid]['startingpriority']) == Decimal('1E+25'))
+
     def run_test(self):
         # generate 100 more to activate sapling in regtest
         self.nodes[2].generate(12)
@@ -54,13 +57,12 @@ class WalletSaplingTest(PivxTestFramework):
         recipients.append({"address": saplingAddr0, "amount": Decimal('10')})
         coinstake = get_coinstake_address(self.nodes[0])
         mytxid = self.nodes[0].shielded_sendmany(coinstake, recipients, 1, nMinDefaultSaplingFee)
-        assert(mytxid != "SendTransaction: CommitTransaction failed")
 
         self.sync_all()
 
         # Verify priority of tx is INF_PRIORITY, defined as 1E+25 (10000000000000000000000000)
         mempool = self.nodes[0].getrawmempool(True)
-        assert(Decimal(mempool[mytxid]['startingpriority']) == Decimal('1E+25'))
+        self.check_tx_priority(mempool, mytxid)
 
         # Shield another coinbase UTXO
         mytxid = self.nodes[0].shielded_sendmany(get_coinstake_address(self.nodes[0]), recipients, 1, nMinDefaultSaplingFee)
@@ -85,7 +87,7 @@ class WalletSaplingTest(PivxTestFramework):
 
         # Verify priority of tx is MAX_PRIORITY, defined as 1E+25 (10000000000000000000000000)
         mempool = self.nodes[0].getrawmempool(True)
-        assert(Decimal(mempool[mytxid]['startingpriority']) == Decimal('1E+25'))
+        self.check_tx_priority(mempool, mytxid)
 
         self.nodes[2].generate(1)
         self.sync_all()
@@ -103,12 +105,11 @@ class WalletSaplingTest(PivxTestFramework):
         recipients.append({"address": saplingAddr0, "amount": Decimal('5')})
         recipients.append({"address": taddr1, "amount": Decimal('5')})
         mytxid = self.nodes[1].shielded_sendmany(saplingAddr1, recipients, 1, nMinDefaultSaplingFee)
-        assert(mytxid != "SendTransaction: CommitTransaction failed")
         self.sync_all()
 
         # Verify priority of tx is MAX_PRIORITY, defined as 1E+25 (10000000000000000000000000)
         mempool = self.nodes[1].getrawmempool(True)
-        assert(Decimal(mempool[mytxid]['startingpriority']) == Decimal('1E+25'))
+        self.check_tx_priority(mempool, mytxid)
 
         self.nodes[2].generate(1)
         self.sync_all()

@@ -1685,7 +1685,9 @@ UniValue shielded_sendmany(const JSONRPCRequest& request) {
             ->setShieldedRecipients(shieldAddrRecipients)
             ->setTransparentRecipients(taddrRecipients)
             ->send(txHash);
-    return res ? txHash : res.m_error;
+
+    if (!res) throw JSONRPCError(RPC_WALLET_ERROR, res.m_error);
+    return txHash;
 }
 
 UniValue listaddressgroupings(const JSONRPCRequest& request)
