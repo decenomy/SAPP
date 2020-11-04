@@ -39,12 +39,13 @@ UniValue getzerocoinbalance(const JSONRPCRequest& request)
 
     EnsureWalletIsUnlocked(true);
 
-        UniValue ret(UniValue::VOBJ);
-        ret.pushKV("Total", ValueFromAmount(pwalletMain->GetZerocoinBalance(false)));
-        ret.pushKV("Mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true)));
-        ret.pushKV("Unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedZerocoinBalance()));
-        ret.pushKV("Immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance()));
-        return ret;
+    UniValue ret(UniValue::VOBJ);
+    const UniValue& zcBalance = ValueFromAmount(pwalletMain->GetZerocoinBalance());
+    ret.pushKV("Total", zcBalance);
+    ret.pushKV("Mature", zcBalance);
+    ret.pushKV("Unconfirmed", 0);
+    ret.pushKV("Immature", 0);
+    return ret;
 
 }
 

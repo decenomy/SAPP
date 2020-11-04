@@ -122,41 +122,17 @@ std::vector<uint256> CzPIVTracker::GetSerialHashes()
     return vHashes;
 }
 
-CAmount CzPIVTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) const
+CAmount CzPIVTracker::GetBalance() const
 {
     CAmount nTotal = 0;
-    //! zerocoin specific fields
-    std::map<libzerocoin::CoinDenomination, unsigned int> myZerocoinSupply;
-    for (auto& denom : libzerocoin::zerocoinDenomList) {
-        myZerocoinSupply.emplace(denom, 0);
+    for (auto& it : mapSerialHashes) {
+        const CMintMeta& meta = it.second;
+        if (meta.isUsed || meta.isArchived)
+            continue;
+        nTotal += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
     }
-
-    {
-        //LOCK(cs_pivtracker);
-        // Get Unused coins
-        for (auto& it : mapSerialHashes) {
-            CMintMeta meta = it.second;
-            if (meta.isUsed || meta.isArchived)
-                continue;
-            bool fConfirmed = ((meta.nHeight < chainActive.Height() - Params().GetConsensus().ZC_MinMintConfirmations) && !(meta.nHeight == 0));
-            if (fConfirmedOnly && !fConfirmed)
-                continue;
-            if (fUnconfirmedOnly && fConfirmed)
-                continue;
-
-            nTotal += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
-            myZerocoinSupply.at(meta.denom)++;
-        }
-    }
-
-    if (nTotal < 0 ) nTotal = 0; // Sanity never hurts
 
     return nTotal;
-}
-
-CAmount CzPIVTracker::GetUnconfirmedBalance() const
-{
-    return GetBalance(false, true);
 }
 
 std::vector<CMintMeta> CzPIVTracker::GetMints(bool fConfirmedOnly) const
