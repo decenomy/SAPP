@@ -71,6 +71,12 @@ BASE_SCRIPTS= [
     'feature_logging.py',                       # ~ 200 sec
     'rpc_rawtransaction.py',                    # ~ 193 sec
     'wallet_keypool_topup.py',                  # ~ 174 sec
+    'sapling_wallet.py',                        # ~ 164 sec
+    'sapling_changeaddresses.py',
+    'sapling_wallet_anchorfork.py',
+    'sapling_wallet_nullifiers.py',
+    'sapling_key_import_export.py',
+    'sapling_wallet_listreceived.py',
     'wallet_txn_doublespend.py --mineblock',    # ~ 157 sec
     'wallet_txn_clone.py --mineblock',          # ~ 157 sec
     'rpc_spork.py',                             # ~ 156 sec
@@ -178,9 +184,15 @@ LEGACY_SKIP_TESTS = [
     'rpc_net.py',
     'rpc_signmessage.py',
     'rpc_spork.py',
-    'sapling_wallet_persistence.py',
     'wallet_hd.py',         # no HD tests for pre-HD wallets
     'wallet_upgrade.py',    # can't upgrade to pre-HD wallet
+    'sapling_wallet_persistence.py',
+    'sapling_wallet.py',
+    'sapling_changeaddresses.py',
+    'sapling_key_import_export.py',
+    'sapling_wallet_anchorfork.py',
+    'sapling_wallet_listreceived.py',
+    'sapling_wallet_nullifiers.py',
 ]
 
 # Place EXTENDED_SCRIPTS first since it has the 3 longest running tests

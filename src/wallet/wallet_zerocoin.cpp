@@ -119,7 +119,7 @@ void CWallet::doZPivRescan(const CBlockIndex* pindex, const CBlock& block,
                     if (txid == m.GetTxHash()) {
                         CWalletTx wtx(this, tx);
                         wtx.nTimeReceived = block.GetBlockTime();
-                        wtx.SetMerkleBranch(pindex, posInBlock);
+                        wtx.SetMerkleBranch(pindex->GetBlockHash(), posInBlock);
                         AddToWallet(wtx);
                         setAddedToWallet.insert(txid);
                     }
@@ -141,7 +141,7 @@ void CWallet::doZPivRescan(const CBlockIndex* pindex, const CBlock& block,
                         for (posInBlock = 0; posInBlock < (int)blockSpend.vtx.size(); posInBlock++) {
                             auto &tx = blockSpend.vtx[posInBlock];
                             if (tx->GetHash() == txidSpend)
-                                wtx.SetMerkleBranch(pindexSpend, posInBlock);
+                                wtx.SetMerkleBranch(pindexSpend->GetBlockHash(), posInBlock);
                         }
                     }
 

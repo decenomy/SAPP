@@ -475,6 +475,33 @@ void CWallet::SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc
         return;
     }
 
+    // For performance reasons, we update the witnesses data here and not when each transaction arrives
+    for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
+        auto wtx = wtxItem.second;
+        // We skip transactions for which mapSaplingNoteData is empty.
+        // This covers transactions that have no Sapling data
+        // (i.e. are purely transparent), as well as shielding and unshielding
+        // transactions in which we only have transparent addresses involved.
+        if (!wtx.mapSaplingNoteData.empty()) {
+            // Sanity check
+            if (wtx.nVersion < CTransaction::SAPLING_VERSION) {
+                LogPrintf("SetBestChain(): ERROR, Invalid tx version found with sapling data\n");
+                walletdb.TxnAbort();
+                uiInterface.ThreadSafeMessageBox(
+                        _("A fatal internal error occurred, see debug.log for details"),
+                        "Error", CClientUIInterface::MSG_ERROR);
+                StartShutdown();
+                return;
+            }
+
+            if (!walletdb.WriteTx(wtx)) {
+                LogPrintf("SetBestChain(): Failed to write CWalletTx, aborting atomic write\n");
+                walletdb.TxnAbort();
+                return;
+            }
+        }
+    }
+
     // Store sapling witness cache size
     if (m_sspk_man->nWitnessCacheNeedsUpdate) {
         if (!walletdb.WriteWitnessCacheSize(m_sspk_man->nWitnessCacheSize)) {
@@ -1040,7 +1067,7 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
 
             // Get merkle branch if transaction was found in a block
             if (posInBlock != -1)
-                wtx.SetMerkleBranch(pIndex, posInBlock);
+                wtx.SetMerkleBranch(pIndex->GetBlockHash(), posInBlock);
 
             return AddToWallet(wtx, false);
         }
@@ -1600,6 +1627,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
         double dProgressStart = Checkpoints::GuessVerificationProgress(pindex, false);
         double dProgressTip = Checkpoints::GuessVerificationProgress(chainActive.Tip(), false);
         std::set<uint256> setAddedToWallet;
+        std::vector<uint256> myTxHashes;
         while (pindex) {
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
@@ -1612,8 +1640,23 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
             ReadBlockFromDisk(block, pindex);
             int posInBlock;
             for (posInBlock = 0; posInBlock < (int)block.vtx.size(); posInBlock++) {
-                if (AddToWalletIfInvolvingMe(*block.vtx[posInBlock], pindex, posInBlock, fUpdate))
+                const auto& tx = block.vtx[posInBlock];
+                if (AddToWalletIfInvolvingMe(*tx, pindex, posInBlock, fUpdate)) {
+                    myTxHashes.push_back(tx->GetHash());
                     ret++;
+                }
+            }
+
+            // Sapling
+            // This should never fail: we should always be able to get the tree
+            // state on the path to the tip of our chain
+            if (pindex->pprev) {
+                if (Params().GetConsensus().NetworkUpgradeActive(pindex->pprev->nHeight,  Consensus::UPGRADE_V5_DUMMY)) {
+                    SaplingMerkleTree saplingTree;
+                    assert(pcoinsTip->GetSaplingAnchorAt(pindex->pprev->hashFinalSaplingRoot, saplingTree));
+                    // Increment note witness caches
+                    ChainTipAdded(pindex, &block, saplingTree);
+                }
             }
 
             // Will try to rescan it if zPIV upgrade is active.
@@ -1625,6 +1668,20 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
                 LogPrintf("Still rescanning. At block %d. Progress=%f\n", pindex->nHeight, Checkpoints::GuessVerificationProgress(pindex));
             }
         }
+
+        // Sapling
+        // After rescanning, persist Sapling note data that might have changed, e.g. nullifiers.
+        // Do not flush the wallet here for performance reasons.
+        CWalletDB walletdb(strWalletFile, "r+", false);
+        for (const auto& hash : myTxHashes) {
+            CWalletTx wtx = mapWallet[hash];
+            if (!wtx.mapSaplingNoteData.empty()) {
+                if (!walletdb.WriteTx(wtx)) {
+                    LogPrintf("Rescanning... WriteToDisk failed to update Sapling note data for: %s\n", hash.ToString());
+                }
+            }
+        }
+
         ShowProgress(_("Rescanning..."), 100); // hide progress dialog in GUI
     }
     return ret;
@@ -2167,7 +2224,10 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              bool fIncludeColdStaking,          // Default: false
                              AvailableCoinsType nCoinType,      // Default: ALL_COINS
                              bool fOnlyConfirmed,               // Default: true
-                             bool fUseIX                       // Default: false
+                             bool fUseIX,                       // Default: false
+                             bool fOnlySpendable,               // Default: false
+                             std::set<CTxDestination>* onlyFilteredDest,  // Default: nullptr
+                             int minDepth                       // Default: 0
                              ) const
 {
     if (pCoins) pCoins->clear();
@@ -2190,9 +2250,21 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
             // Check min depth requirement for stake inputs
             if (nCoinType == STAKEABLE_COINS && nDepth < Params().GetConsensus().nStakeMinDepth) continue;
 
+            // Check min depth filtering requirements
+            if (nDepth < minDepth) continue;
+
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 const auto& output = pcoin->vout[i];
 
+                // Filter by specific destinations if needed
+                if (onlyFilteredDest && !onlyFilteredDest->empty()) {
+                    CTxDestination address;
+                    if (!ExtractDestination(output.scriptPubKey, address) || !onlyFilteredDest->count(address)) {
+                        continue;
+                    }
+                }
+
+                // Now check for chain availability
                 auto res = CheckOutputAvailability(
                         output,
                         i,
@@ -2204,6 +2276,7 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                         fIncludeDelegated);
 
                 if (!res.available) continue;
+                if (fOnlySpendable && !res.spendable) continue;
 
                 // found valid coin
                 if (!pCoins) return true;
@@ -4098,10 +4171,10 @@ CWalletKey::CWalletKey(int64_t nExpires)
     nTimeExpires = nExpires;
 }
 
-void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock)
+void CMerkleTx::SetMerkleBranch(const uint256& blockHash, int posInBlock)
 {
     // Update the tx's hashBlock
-    hashBlock = pindex->GetBlockHash();
+    hashBlock = blockHash;
 
     // set the position of the transaction in the block
     nIndex = posInBlock;
@@ -4541,6 +4614,67 @@ void CWalletTx::SetSaplingNoteData(mapSaplingNoteData_t &noteData)
             throw std::logic_error("CWalletTx::SetSaplingNoteData(): Invalid note");
         }
     }
+}
+
+Optional<std::pair<
+        libzcash::SaplingNotePlaintext,
+        libzcash::SaplingPaymentAddress>> CWalletTx::DecryptSaplingNote(SaplingOutPoint op) const
+{
+    // Check whether we can decrypt this SaplingOutPoint
+    if (this->mapSaplingNoteData.count(op) == 0) {
+        return nullopt;
+    }
+
+    auto output = this->sapData->vShieldedOutput[op.n];
+    auto nd = this->mapSaplingNoteData.at(op);
+
+    auto maybe_pt = libzcash::SaplingNotePlaintext::decrypt(
+            output.encCiphertext,
+            nd.ivk,
+            output.ephemeralKey,
+            output.cmu);
+    assert(static_cast<bool>(maybe_pt));
+    auto notePt = maybe_pt.get();
+
+    auto maybe_pa = nd.ivk.address(notePt.d);
+    assert(static_cast<bool>(maybe_pa));
+    auto pa = maybe_pa.get();
+
+    return std::make_pair(notePt, pa);
+}
+
+Optional<std::pair<
+        libzcash::SaplingNotePlaintext,
+        libzcash::SaplingPaymentAddress>> CWalletTx::RecoverSaplingNote(
+        SaplingOutPoint op, std::set<uint256>& ovks) const
+{
+    auto output = this->sapData->vShieldedOutput[op.n];
+
+    for (auto ovk : ovks) {
+        auto outPt = libzcash::SaplingOutgoingPlaintext::decrypt(
+                output.outCiphertext,
+                ovk,
+                output.cv,
+                output.cmu,
+                output.ephemeralKey);
+        if (!outPt) {
+            continue;
+        }
+
+        auto maybe_pt = libzcash::SaplingNotePlaintext::decrypt(
+                output.encCiphertext,
+                output.ephemeralKey,
+                outPt->esk,
+                outPt->pk_d,
+                output.cmu);
+        assert(static_cast<bool>(maybe_pt));
+        auto notePt = maybe_pt.get();
+
+        return std::make_pair(notePt, libzcash::SaplingPaymentAddress(notePt.d, outPt->pk_d));
+    }
+
+    // Couldn't recover with any of the provided OutgoingViewingKeys
+    return nullopt;
 }
 
 bool CWalletTx::HasP2CSInputs() const

@@ -1755,7 +1755,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     if (tx.GetHash() == pSpend.second) {
                         CWalletTx wtx(pwalletMain, tx);
                         wtx.nTimeReceived = pindex->GetBlockTime();
-                        wtx.SetMerkleBranch(pindex, posInBlock);
+                        wtx.SetMerkleBranch(pindex->GetBlockHash(), posInBlock);
                         pwalletMain->AddToWallet(wtx);
                         setAddedTx.insert(pSpend.second);
                     }

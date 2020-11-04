@@ -446,7 +446,10 @@ public:
                         bool fIncludeColdStaking        = false,
                         AvailableCoinsType nCoinType    = ALL_COINS,
                         bool fOnlyConfirmed             = true,
-                        bool fUseIX                     = false
+                        bool fUseIX                     = false,
+                        bool fOnlySpendable             = false,
+                        std::set<CTxDestination>*       = nullptr,
+                        int minDepth                    = 0
                         ) const;
     //! >> Available coins (spending)
     bool SelectCoinsToSpend(const std::vector<COutput>& vAvailableCoins, const CAmount& nTargetValue, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl = nullptr) const;
@@ -922,7 +925,7 @@ public:
         READWRITE(nIndex);
     }
 
-    void SetMerkleBranch(const CBlockIndex* pIndex, int posInBlock);
+    void SetMerkleBranch(const uint256& blockHash, int posInBlock);
 
     /**
      * Return depth of transaction in blockchain:
@@ -1035,6 +1038,15 @@ public:
     void BindWallet(CWallet* pwalletIn);
 
     void SetSaplingNoteData(mapSaplingNoteData_t &noteData);
+
+    Optional<std::pair<
+            libzcash::SaplingNotePlaintext,
+            libzcash::SaplingPaymentAddress>> DecryptSaplingNote(SaplingOutPoint op) const;
+
+    Optional<std::pair<
+            libzcash::SaplingNotePlaintext,
+            libzcash::SaplingPaymentAddress>> RecoverSaplingNote(
+            SaplingOutPoint op, std::set<uint256>& ovks) const;
 
     //! checks whether a tx has P2CS inputs or not
     bool HasP2CSInputs() const;

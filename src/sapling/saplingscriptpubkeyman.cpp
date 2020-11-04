@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "sapling/saplingscriptpubkeyman.h"
-#include "sapling/note.hpp"
 #include "chain.h" // for CBlockIndex
 #include "validation.h" // for ReadBlockFromDisk()
 
@@ -334,7 +333,7 @@ std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> SaplingScriptPubKe
             }
 
             // Check if we already have it.
-            auto address = ivk.address(result.get().d);
+            Optional<libzcash::SaplingPaymentAddress> address = ivk.address(result.get().d);
             if (address && wallet->mapSaplingIncomingViewingKeys.count(address.get()) == 0) {
                 viewingKeysToAdd[address.get()] = ivk;
             }
@@ -351,11 +350,178 @@ std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> SaplingScriptPubKe
     return std::make_pair(noteData, viewingKeysToAdd);
 }
 
+std::vector<libzcash::SaplingPaymentAddress> SaplingScriptPubKeyMan::FindMySaplingAddresses(const CTransaction& tx) const
+{
+    LOCK(wallet->cs_KeyStore);
+    std::vector<libzcash::SaplingPaymentAddress> ret;
+    if (!tx.sapData) return ret;
+
+    // Protocol Spec: 4.19 Block Chain Scanning (Sapling)
+    for (const OutputDescription& output : tx.sapData->vShieldedOutput) {
+        for (auto it = wallet->mapSaplingFullViewingKeys.begin(); it != wallet->mapSaplingFullViewingKeys.end(); ++it) {
+            libzcash::SaplingIncomingViewingKey ivk = it->first;
+            auto result = libzcash::SaplingNotePlaintext::decrypt(output.encCiphertext, ivk, output.ephemeralKey, output.cmu);
+            if (!result) {
+                continue;
+            }
+            Optional<libzcash::SaplingPaymentAddress> address = ivk.address(result.get().d);
+            if (address && wallet->mapSaplingIncomingViewingKeys.count(address.get()) != 0) {
+                ret.emplace_back(address.get());
+            }
+        }
+    }
+    return ret;
+}
+
+/**
+ * Find notes in the wallet filtered by payment address, min depth and ability to spend.
+ * These notes are decrypted and added to the output parameter vector, saplingEntries.
+ */
+void SaplingScriptPubKeyMan::GetFilteredNotes(
+        std::vector<SaplingNoteEntry>& saplingEntries,
+        const libzcash::PaymentAddress& address,
+        int minDepth,
+        bool ignoreSpent,
+        bool requireSpendingKey)
+{
+    std::set<libzcash::PaymentAddress> filterAddresses;
+
+    if (IsValidPaymentAddress(address)) {
+        filterAddresses.insert(address);
+    }
+
+    GetFilteredNotes(saplingEntries, filterAddresses, minDepth, INT_MAX, ignoreSpent, requireSpendingKey);
+}
+
+/**
+ * Find notes in the wallet filtered by payment addresses, min depth, max depth,
+ * if the note is spent, if a spending key is required, and if the notes are locked.
+ * These notes are decrypted and added to the output parameter vector, saplingEntries.
+ */
+void SaplingScriptPubKeyMan::GetFilteredNotes(
+        std::vector<SaplingNoteEntry>& saplingEntries,
+        std::set<libzcash::PaymentAddress>& filterAddresses,
+        int minDepth,
+        int maxDepth,
+        bool ignoreSpent,
+        bool requireSpendingKey,
+        bool ignoreLocked)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    for (auto& p : wallet->mapWallet) {
+        const CWalletTx& wtx = p.second;
+
+        // Filter coinbase/coinstakes transactions that don't have Sapling outputs
+        if ((wtx.IsCoinBase() || wtx.IsCoinStake()) && wtx.mapSaplingNoteData.empty()) {
+            continue;
+        }
+
+        // Filter the transactions before checking for notes
+        if (!CheckFinalTx(wtx) ||
+            wtx.GetDepthInMainChain() < minDepth ||
+            wtx.GetDepthInMainChain() > maxDepth) {
+            continue;
+        }
+
+        for (const auto& it : wtx.mapSaplingNoteData) {
+            const SaplingOutPoint& op = it.first;
+            const SaplingNoteData& nd = it.second;
+
+            auto maybe_pt = libzcash::SaplingNotePlaintext::decrypt(
+                    wtx.sapData->vShieldedOutput[op.n].encCiphertext,
+                    nd.ivk,
+                    wtx.sapData->vShieldedOutput[op.n].ephemeralKey,
+                    wtx.sapData->vShieldedOutput[op.n].cmu);
+            assert(static_cast<bool>(maybe_pt));
+            auto notePt = maybe_pt.get();
+
+            auto maybe_pa = nd.ivk.address(notePt.d);
+            assert(static_cast<bool>(maybe_pa));
+            auto pa = maybe_pa.get();
+
+            // skip notes which belong to a different payment address in the wallet
+            if (!(filterAddresses.empty() || filterAddresses.count(pa))) {
+                continue;
+            }
+
+            if (ignoreSpent && nd.nullifier && IsSaplingSpent(*nd.nullifier)) {
+                continue;
+            }
+
+            // skip notes which cannot be spent
+            if (requireSpendingKey && !HaveSpendingKeyForPaymentAddress(pa)) {
+                continue;
+            }
+
+            // skip locked notes. todo: Implement locked notes..
+            //if (ignoreLocked && IsLockedNote(op)) {
+            //    continue;
+            //}
+
+            auto note = notePt.note(nd.ivk).get();
+            saplingEntries.emplace_back(op, pa, note, notePt.memo(), wtx.GetDepthInMainChain());
+        }
+    }
+}
+
 bool SaplingScriptPubKeyMan::IsSaplingNullifierFromMe(const uint256& nullifier) const
 {
     LOCK(wallet->cs_wallet);
     return mapSaplingNullifiersToNotes.count(nullifier) &&
         wallet->mapWallet.count(mapSaplingNullifiersToNotes.at(nullifier).hash);
+}
+
+std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::GetNullifiersForAddresses(
+        const std::set<libzcash::PaymentAddress> & addresses)
+{
+    AssertLockHeld(wallet->cs_wallet);
+    std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet;
+    // Sapling ivk -> list of addrs map
+    // (There may be more than one diversified address for a given ivk.)
+    std::map<libzcash::SaplingIncomingViewingKey, std::vector<libzcash::SaplingPaymentAddress>> ivkMap;
+    for (const auto& addr : addresses) {
+        auto saplingAddr = boost::get<libzcash::SaplingPaymentAddress>(&addr);
+        if (saplingAddr != nullptr) {
+            libzcash::SaplingIncomingViewingKey ivk;
+            if (wallet->GetSaplingIncomingViewingKey(*saplingAddr, ivk))
+                ivkMap[ivk].push_back(*saplingAddr);
+        }
+    }
+    for (const auto& txPair : wallet->mapWallet) {
+        for (const auto & noteDataPair : txPair.second.mapSaplingNoteData) {
+            auto & noteData = noteDataPair.second;
+            auto & nullifier = noteData.nullifier;
+            auto & ivk = noteData.ivk;
+            if (nullifier && ivkMap.count(ivk)) {
+                for (const auto & addr : ivkMap[ivk]) {
+                    nullifierSet.insert(std::make_pair(addr, nullifier.get()));
+                }
+            }
+        }
+    }
+    return nullifierSet;
+}
+
+bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>> & nullifierSet,
+                                  const libzcash::PaymentAddress & address,
+                                  const SaplingOutPoint & op)
+{
+    // A Note is marked as "change" if the address that received it
+    // also spent Notes in the same transaction. This will catch,
+    // for instance:
+    // - Change created by spending fractions of Notes (because
+    //   shielded_sendmany sends change to the originating shielded address).
+    // - Notes sent from one address to itself.
+    const auto& tx = wallet->mapWallet[op.hash];
+    if (tx.sapData) {
+        for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
+            if (nullifierSet.count(std::make_pair(address, spend.nullifier))) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void SaplingScriptPubKeyMan::GetSaplingNoteWitnesses(const std::vector<SaplingOutPoint>& notes,
@@ -688,6 +854,16 @@ bool SaplingScriptPubKeyMan::HaveSpendingKeyForPaymentAddress(const libzcash::Sa
            wallet->HaveSaplingSpendingKey(extfvk);
 }
 
+bool SaplingScriptPubKeyMan::PaymentAddressBelongsToWallet(const libzcash::SaplingPaymentAddress &zaddr) const
+{
+    libzcash::SaplingIncomingViewingKey ivk;
+
+    // If we have a SaplingExtendedSpendingKey in the wallet, then we will
+    // also have the corresponding SaplingExtendedFullViewingKey.
+    return wallet->GetSaplingIncomingViewingKey(zaddr, ivk) &&
+           wallet->HaveSaplingFullViewingKey(ivk);
+}
+
 ///////////////////// Load ////////////////////////////////////////
 
 bool SaplingScriptPubKeyMan::LoadCryptedSaplingZKey(
@@ -760,4 +936,19 @@ void SaplingScriptPubKeyMan::SetHDChain(CHDChain& chain, bool memonly)
     // Sanity check
     if (!wallet->HaveKey(hdChain.GetID()))
         throw std::runtime_error(std::string(__func__) + ": Not found sapling seed in wallet");
+}
+
+uint256 SaplingScriptPubKeyMan::getCommonOVKFromSeed()
+{
+    // Sending from a t-address, which we don't have an ovk for. Instead,
+    // generate a common one from the HD seed. This ensures the data is
+    // recoverable, while keeping it logically separate from the ZIP 32
+    // Sapling key hierarchy, which the user might not be using.
+    const CKeyID seedID = GetHDChain().GetID();
+    CKey key;
+    if (!wallet->GetKey(seedID, key)) {
+        throw std::runtime_error("Shielded spend, HD seed not found");
+    }
+    HDSeed seed{key.GetPrivKey()};
+    return ovkForShieldingFromTaddr(seed);
 }

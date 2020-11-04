@@ -19,6 +19,8 @@
 #include "sapling/note.hpp"
 #include "sapling/noteencryption.hpp"
 
+extern CAmount DEFAULT_SAPLING_FEE;
+
 struct SpendDescriptionInfo {
     libzcash::SaplingExpandedSpendingKey expsk;
     libzcash::SaplingNote note;
@@ -77,7 +79,7 @@ private:
     int nHeight;
     const CKeyStore* keystore;
     CMutableTransaction mtx;
-    CAmount fee = 10000;
+    CAmount fee = DEFAULT_SAPLING_FEE;
 
     std::vector<SpendDescriptionInfo> spends;
     std::vector<OutputDescriptionInfo> outputs;
