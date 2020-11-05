@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(saplingOperationTests) {
         operation.setFromAddress(DecodeDestination(taddr1));
         auto res = operation.setShieldedRecipients(recipients)->send(ret);
         BOOST_CHECK(!res);
-        BOOST_CHECK(res.m_error.find("Insufficient funds, no available UTXO to spend") != std::string::npos);
+        BOOST_CHECK(res.getError().find("Insufficient funds, no available UTXO to spend") != std::string::npos);
     }
 
     // minconf cannot be zero when sending from zaddr
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(saplingOperationTests) {
         operation.setFromAddress(pa);
         auto res = operation.setShieldedRecipients(recipients)->setMinDepth(0)->send(ret);
         BOOST_CHECK(!res);
-        BOOST_CHECK(res.m_error.find("Minconf cannot be zero when sending from shielded address") != std::string::npos);
+        BOOST_CHECK(res.getError().find("Minconf cannot be zero when sending from shielded address") != std::string::npos);
     }
 
     // there are no unspent notes to spend
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(saplingOperationTests) {
         operation.setFromAddress(pa);
         auto res = operation.setTransparentRecipients(recipients)->send(ret);
         BOOST_CHECK(!res);
-        BOOST_CHECK(res.m_error.find("Insufficient funds, no available notes to spend") != std::string::npos);
+        BOOST_CHECK(res.getError().find("Insufficient funds, no available notes to spend") != std::string::npos);
     }
 
     // get_memo_from_hex_string())

@@ -10,6 +10,7 @@
 #include "key.h"
 #include "masternode.h"
 #include "net.h"
+#include "operationresult.h"
 #include "sync.h"
 #include "wallet/wallet.h"
 
@@ -17,20 +18,6 @@
 #define ACTIVE_MASTERNODE_SYNC_IN_PROCESS 1
 #define ACTIVE_MASTERNODE_NOT_CAPABLE 3
 #define ACTIVE_MASTERNODE_STARTED 4
-
-class OperationResult
-{
-private:
-    bool res{false};
-    Optional<std::string> error{nullopt};
-
-public:
-    OperationResult(bool _res, const std::string& _error) : res(_res), error(_error) { }
-    OperationResult(bool _res) : res(_res) { }
-
-    std::string getError() const { return (error ? *error : ""); }
-    explicit operator bool() const { return res; }
-};
 
 // Responsible for initializing the masternode
 OperationResult initMasternode(const std::string& strMasterNodePrivKey, const std::string& strMasterNodeAddr, bool isFromInit);

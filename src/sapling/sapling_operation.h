@@ -7,6 +7,7 @@
 
 #include "amount.h"
 #include "sapling/transaction_builder.h"
+#include "operationresult.h"
 #include "primitives/transaction.h"
 #include "wallet/wallet.h"
 
@@ -33,15 +34,6 @@ public:
 
     CTxDestination fromTaddr{CNoDestination()};
     Optional<libzcash::SaplingPaymentAddress> fromSapAddr{nullopt};
-};
-
-class OperationResult {
-public:
-    explicit OperationResult(bool result, const std::string& error = "") : m_result(result), m_error(error)  {}
-    bool m_result;
-    std::string m_error;
-
-    explicit operator bool() const { return m_result; }
 };
 
 class SaplingOperation {

@@ -1637,7 +1637,7 @@ UniValue shielded_sendmany(const JSONRPCRequest& request) {
             ->setTransparentRecipients(taddrRecipients)
             ->send(txHash);
 
-    if (!res) throw JSONRPCError(RPC_WALLET_ERROR, res.m_error);
+    if (!res) throw JSONRPCError(RPC_WALLET_ERROR, res.getError());
     return txHash;
 }
 

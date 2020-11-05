@@ -14,11 +14,6 @@
 #include "netbase.h"
 #include "protocol.h"
 
-OperationResult errorOut(const std::string& errorStr)
-{
-    return OperationResult(false, errorStr);
-}
-
 OperationResult initMasternode(const std::string& _strMasterNodePrivKey, const std::string& _strMasterNodeAddr, bool isFromInit)
 {
     if (!isFromInit && fMasterNode) {
