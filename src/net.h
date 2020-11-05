@@ -217,7 +217,6 @@ public:
         post();
     };
 
-    void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll = false);
     void RelayInv(CInv& inv);
 
     // Addrman functions

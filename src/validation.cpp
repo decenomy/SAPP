@@ -42,7 +42,6 @@
 #include "script/sigcache.h"
 #include "spork.h"
 #include "sporkdb.h"
-#include "swifttx.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "undo.h"
@@ -213,22 +212,6 @@ enum FlushStateMode {
 // See definition for documentation
 bool static FlushStateToDisk(CValidationState &state, FlushStateMode mode);
 
-
-int GetIXConfirmations(uint256 nTXHash)
-{
-    int sigs = 0;
-
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
-    if (i != mapTxLocks.end()) {
-        sigs = (*i).second.CountSignatures();
-    }
-    if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
-        return nSwiftTXDepth;
-    }
-
-    return 0;
-}
-
 bool CheckFinalTx(const CTransaction& tx, int flags)
 {
     AssertLockHeld(cs_main);
@@ -358,16 +341,6 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
     uint256 hash = tx.GetHash();
     if (pool.exists(hash)) {
         return state.Invalid(false, REJECT_ALREADY_KNOWN, "txn-already-in-mempool");
-    }
-
-    // ----------- swiftTX transaction scanning -----------
-
-    for (const CTxIn& in : tx.vin) {
-        if (mapLockedInputs.count(in.prevout)) {
-            if (mapLockedInputs[in.prevout] != tx.GetHash()) {
-                return state.DoS(0, false, REJECT_INVALID, "tx-lock-conflict");
-            }
-        }
     }
 
     bool hasZcSpendInputs = tx.HasZerocoinSpendInputs();
@@ -2804,26 +2777,6 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i]->IsCoinStake())
                 return state.DoS(100, false, REJECT_INVALID, "bad-cs-multiple", false, "more than one coinstake");
-    }
-
-    // ----------- swiftTX transaction scanning -----------
-    if (sporkManager.IsSporkActive(SPORK_3_SWIFTTX_BLOCK_FILTERING)) {
-        for (const auto& txIn : block.vtx) {
-            const CTransaction& tx = *txIn;
-            if (!tx.IsCoinBase()) {
-                //only reject blocks when it's based on complete consensus
-                for (const CTxIn& in : tx.vin) {
-                    if (mapLockedInputs.count(in.prevout)) {
-                        if (mapLockedInputs[in.prevout] != tx.GetHash()) {
-                            mapRejectedBlocks.emplace(block.GetHash(), GetTime());
-                            return state.DoS(100, false, REJECT_INVALID, "conflicting-tx-ix", false, "conflicting tx with instantsend lock");
-                        }
-                    }
-                }
-            }
-        }
-    } else {
-        LogPrintf("%s : skipping transaction locking checks\n", __func__);
     }
 
     // Cold Staking enforcement (true during sync - reject P2CS outputs when false)

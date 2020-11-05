@@ -15,7 +15,6 @@
 #include "policy/policy.h"
 #include "script/sign.h"
 #include "spork.h"
-#include "swifttx.h"    // mapTxLockReq
 #include "util.h"
 #include "utilmoneystr.h"
 #include "zpivchain.h"
@@ -1728,28 +1727,20 @@ bool CWalletTx::InMempool() const
     return false;
 }
 
-void CWalletTx::RelayWalletTransaction(CConnman* connman, std::string strCommand)
+void CWalletTx::RelayWalletTransaction(CConnman* connman)
 {
+    if (!connman || IsCoinBase() || IsCoinStake()) {
+        // Nothing to do. Return early
+        return;
+    }
     LOCK(cs_main);
-    if (!IsCoinBase() && !IsCoinStake()) {
-        if (GetDepthInMainChain() == 0 && !isAbandoned()) {
-            uint256 hash = GetHash();
-            LogPrintf("Relaying wtx %s\n", hash.ToString());
-
-            int invType = MSG_TX;
-            if (strCommand == NetMsgType::IX) {
-                mapTxLockReq.emplace(hash, (CTransaction) * this);
-                CreateNewLock(((CTransaction) * this));
-                invType = MSG_TXLOCK_REQUEST;
-            }
-
-            if (connman) {
-                CInv inv(invType, hash);
-                connman->ForEachNode([&inv](CNode* pnode) {
-                  pnode->PushInventory(inv);
-                });
-            }
-        }
+    if (GetDepthInMainChain() == 0 && !isAbandoned()) {
+        const uint256& hash = GetHash();
+        LogPrintf("Relaying wtx %s\n", hash.ToString());
+        CInv inv(MSG_TX, hash);
+        connman->ForEachNode([&inv](CNode* pnode) {
+          pnode->PushInventory(inv);
+        });
     }
 }
 
@@ -2062,16 +2053,14 @@ void CWallet::GetAvailableP2CSCoins(std::vector<COutput>& vCoins) const {
 /**
  * Test if the transaction is spendable.
  */
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth, const CBlockIndex*& pindexRet)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, int& nDepth, const CBlockIndex*& pindexRet)
 {
     AssertLockHeld(cs_main);
     if (!CheckFinalTx(*pcoin)) return false;
     if (fOnlyConfirmed && !pcoin->IsTrusted()) return false;
     if (pcoin->GetBlocksToMaturity() > 0) return false;
 
-    nDepth = pcoin->GetDepthInMainChain(pindexRet, false);
-    // do not use IX for inputs that have less then 6 blockchain confirmations
-    if (fUseIX && nDepth < 6) return false;
+    nDepth = pcoin->GetDepthInMainChain(pindexRet);
 
     // We should not consider coins which aren't at least in our mempool
     // It's possible for these to be conflicted via ancestors which we may never be able to detect
@@ -2080,10 +2069,10 @@ bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseI
     return true;
 }
 
-bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, bool fUseIX, int& nDepth)
+bool CheckTXAvailability(const CWalletTx* pcoin, bool fOnlyConfirmed, int& nDepth)
 {
     const CBlockIndex* pindexRet = nullptr;
-    return CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth, pindexRet);
+    return CheckTXAvailability(pcoin, fOnlyConfirmed, nDepth, pindexRet);
 }
 
 bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex, std::string& strError)
@@ -2130,7 +2119,7 @@ bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& 
     int nDepth = 0;
     {
         LOCK(cs_main);
-        if (!CheckTXAvailability(wtx, true, false, nDepth)) {
+        if (!CheckTXAvailability(wtx, true, nDepth)) {
             strError = "Not available collateral transaction";
             return error("%s: tx %s not available", __func__, strTxHash);
         }
@@ -2224,7 +2213,6 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
                              bool fIncludeColdStaking,          // Default: false
                              AvailableCoinsType nCoinType,      // Default: ALL_COINS
                              bool fOnlyConfirmed,               // Default: true
-                             bool fUseIX,                       // Default: false
                              bool fOnlySpendable,               // Default: false
                              std::set<CTxDestination>* onlyFilteredDest,  // Default: nullptr
                              int minDepth                       // Default: 0
@@ -2244,7 +2232,7 @@ bool CWallet::AvailableCoins(std::vector<COutput>* pCoins,      // --> populates
 
             // Check if the tx is selectable
             int nDepth;
-            if (!CheckTXAvailability(pcoin, fOnlyConfirmed, fUseIX, nDepth))
+            if (!CheckTXAvailability(pcoin, fOnlyConfirmed, nDepth))
                 continue;
 
             // Check min depth requirement for stake inputs
@@ -2371,7 +2359,7 @@ bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
         // Check if the tx is selectable
         int nDepth;
         const CBlockIndex* pindex = nullptr;
-        if (!CheckTXAvailability(pcoin, true, false, nDepth, pindex))
+        if (!CheckTXAvailability(pcoin, true, nDepth, pindex))
             continue;
 
         // Check min depth requirement for stake inputs
@@ -2556,7 +2544,7 @@ bool CWallet::CreateBudgetFeeTX(CWalletTx& tx, const uint256& hash, CReserveKey&
 
     CCoinControl* coinControl = nullptr;
     int nChangePosInOut = -1;
-    bool success = CreateTransaction(vecSend, tx, keyChange, nFeeRet, nChangePosInOut, strFail, coinControl, ALL_COINS, true, false /*useIX*/, (CAmount)0);
+    bool success = CreateTransaction(vecSend, tx, keyChange, nFeeRet, nChangePosInOut, strFail, coinControl, ALL_COINS, true, (CAmount)0);
     if (!success) {
         LogPrintf("%s: Error - %s\n", __func__, strFail);
         return false;
@@ -2617,12 +2605,9 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
     const CCoinControl* coinControl,
     AvailableCoinsType coin_type,
     bool sign,
-    bool useIX,
     CAmount nFeePay,
     bool fIncludeDelegated)
 {
-    if (useIX && nFeePay < CENT) nFeePay = CENT;
-
     CAmount nValue = 0;
     int nChangePosRequest = nChangePosInOut;
 
@@ -2652,8 +2637,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                 fIncludeDelegated,
                 false,                  // fIncludeColdStaking
                 coin_type,
-                true,                   // fOnlyConfirmed
-                useIX);
+                true);                  // fOnlyConfirmed
 
             nFeeRet = 0;
             if (nFeePay > 0) nFeeRet = nFeePay;
@@ -2704,11 +2688,6 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                     if (coin_type == ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
                     }
-
-                    if (useIX) {
-                        strFailReason += " " + _("SwiftX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.");
-                    }
-
                     return false;
                 }
 
@@ -2890,12 +2869,12 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
     return true;
 }
 
-bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, bool fIncludeDelegated)
+bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, CAmount nFeePay, bool fIncludeDelegated)
 {
     std::vector<CRecipient> vecSend;
     vecSend.emplace_back(scriptPubKey, nValue, false);
     int nChangePosInOut = -1;
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosInOut, strFailReason, coinControl, coin_type, true, useIX, nFeePay, fIncludeDelegated);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosInOut, strFailReason, coinControl, coin_type, true, nFeePay, fIncludeDelegated);
 }
 
 bool CWallet::CreateCoinStake(
@@ -3045,7 +3024,7 @@ std::string CWallet::CommitResult::ToString() const
 /**
  * Call after CreateTransaction unless you want to abort
  */
-CWallet::CommitResult CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, CConnman* connman, std::string strCommand)
+CWallet::CommitResult CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, CConnman* connman)
 {
     CommitResult res;
     {
@@ -3094,7 +3073,7 @@ CWallet::CommitResult CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey&
         res.status = CWallet::CommitStatus::OK;
 
         // Broadcast
-        wtxNew.RelayWalletTransaction(connman, strCommand);
+        wtxNew.RelayWalletTransaction(connman);
     }
     return res;
 }
@@ -4180,13 +4159,13 @@ void CMerkleTx::SetMerkleBranch(const uint256& blockHash, int posInBlock)
     nIndex = posInBlock;
 }
 
-int CMerkleTx::GetDepthInMainChain(bool enableIX) const
+int CMerkleTx::GetDepthInMainChain() const
 {
     const CBlockIndex* pindexRet = nullptr;
-    return GetDepthInMainChain(pindexRet, enableIX);
+    return GetDepthInMainChain(pindexRet);
 }
 
-int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
+int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet) const
 {
     if (hashUnset())
         return 0;
@@ -4207,15 +4186,6 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
         }
     }
 
-    if (enableIX) {
-        if (nResult < 6) {
-            int signatures = GetTransactionLockSignatures();
-            if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
-                return nSwiftTXDepth + nResult;
-            }
-        }
-    }
-
     return nResult;
 }
 
@@ -4229,13 +4199,13 @@ int CMerkleTx::GetBlocksToMaturity() const
 
 bool CMerkleTx::IsInMainChain() const
 {
-    return GetDepthInMainChain(false) > 0;
+    return GetDepthInMainChain() > 0;
 }
 
 bool CMerkleTx::IsInMainChainImmature() const
 {
     if (!IsCoinBase() && !IsCoinStake()) return false;
-    const int depth = GetDepthInMainChain(false);
+    const int depth = GetDepthInMainChain();
     return (depth > 0 && depth <= Params().GetConsensus().nCoinbaseMaturity);
 }
 
@@ -4247,34 +4217,6 @@ bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool 
     if (!fAccepted)
         LogPrintf("%s : %s\n", __func__, state.GetRejectReason());
     return fAccepted;
-}
-
-int CMerkleTx::GetTransactionLockSignatures() const
-{
-    if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
-    if (!sporkManager.IsSporkActive(SPORK_2_SWIFTTX)) return -3;
-    if (!fEnableSwiftTX) return -1;
-
-    //compile consessus vote
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());
-    if (i != mapTxLocks.end()) {
-        return (*i).second.CountSignatures();
-    }
-
-    return -1;
-}
-
-bool CMerkleTx::IsTransactionLockTimedOut() const
-{
-    if (!fEnableSwiftTX) return 0;
-
-    //compile consessus vote
-    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());
-    if (i != mapTxLocks.end()) {
-        return GetTime() > (*i).second.nTimeout;
-    }
-
-    return false;
 }
 
 std::string CWallet::GetUniqueWalletBackupName() const
@@ -4571,9 +4513,9 @@ bool CWalletTx::IsTrusted(int& nDepth, bool& fConflicted) const
     return true;
 }
 
-int CWalletTx::GetDepthAndMempool(bool& fConflicted, bool enableIX) const
+int CWalletTx::GetDepthAndMempool(bool& fConflicted) const
 {
-    int ret = GetDepthInMainChain(enableIX);
+    int ret = GetDepthInMainChain();
     fConflicted = (ret == 0 && !InMempool());  // not in chain nor in mempool
     return ret;
 }

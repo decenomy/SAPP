@@ -17,7 +17,6 @@
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "sporkdb.h"
-#include "swifttx.h"
 
 int64_t nTimeBestReceived = 0;  // Used only to inform the wallet of when we last received a block
 
@@ -692,10 +691,11 @@ bool static AlreadyHave(const CInv& inv) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
     case MSG_BLOCK:
         return mapBlockIndex.count(inv.hash);
     case MSG_TXLOCK_REQUEST:
-        return mapTxLockReq.count(inv.hash) ||
-               mapTxLockReqRejected.count(inv.hash);
+        // deprecated
+        return true;
     case MSG_TXLOCK_VOTE:
-        return mapTxLockVote.count(inv.hash);
+        // deprecated
+        return true;
     case MSG_SPORK:
         return mapSporks.count(inv.hash);
     case MSG_MASTERNODE_WINNER:
@@ -874,24 +874,6 @@ void static ProcessGetData(CNode* pfrom, CConnman& connman, std::atomic<bool>& i
                     }
                 }
 
-                if (!pushed && inv.type == MSG_TXLOCK_VOTE) {
-                    if (mapTxLockVote.count(inv.hash)) {
-                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        ss.reserve(1000);
-                        ss << mapTxLockVote[inv.hash];
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::IXLOCKVOTE, ss));
-                        pushed = true;
-                    }
-                }
-                if (!pushed && inv.type == MSG_TXLOCK_REQUEST) {
-                    if (mapTxLockReq.count(inv.hash)) {
-                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        ss.reserve(1000);
-                        ss << mapTxLockReq[inv.hash];
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::IX, ss));
-                        pushed = true;
-                    }
-                }
                 if (!pushed && inv.type == MSG_SPORK) {
                     if (mapSporks.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
@@ -1270,6 +1252,12 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 
             if (interruptMsgProc)
                 return true;
+
+            // Reject deprecated messages
+            if (inv.type == MSG_TXLOCK_REQUEST || inv.type == MSG_TXLOCK_VOTE) {
+                Misbehaving(pfrom->GetId(), 20);
+                return error("message inv deprecated %d", (int)inv.type);
+            }
 
             pfrom->AddInventoryKnown(inv);
 
@@ -1836,7 +1824,6 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                 mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
                 budget.ProcessMessage(pfrom, strCommand, vRecv);
                 masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
-                ProcessMessageSwiftTX(pfrom, strCommand, vRecv);
                 sporkManager.ProcessSpork(pfrom, strCommand, vRecv);
                 masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
             }

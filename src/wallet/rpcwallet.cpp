@@ -59,10 +59,9 @@ void EnsureWallet()
 
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
-    int confirms = wtx.GetDepthInMainChain(false);
-    int confirmsTotal = GetIXConfirmations(wtx.GetHash()) + confirms;
-    entry.pushKV("confirmations", confirmsTotal);
-    entry.pushKV("bcconfirmations", confirms);
+    int confirms = wtx.GetDepthInMainChain();
+    entry.pushKV("confirmations", confirms);
+    entry.pushKV("bcconfirmations", confirms);      // DEPRECATED in 4.3.99
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         entry.pushKV("generated", true);
     if (confirms > 0) {
@@ -898,7 +897,7 @@ UniValue setlabel(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
-void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew)
 {
     // Check amount
     if (nValue <= 0)
@@ -923,13 +922,13 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, nullptr, ALL_COINS, fUseIX, (CAmount)0)) {
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, nullptr, ALL_COINS, (CAmount)0)) {
         if (nValue + nFeeRequired > pwalletMain->GetAvailableBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
-    const CWallet::CommitResult&& res = pwalletMain->CommitTransaction(wtxNew, reservekey, g_connman.get(), (!fUseIX ? NetMsgType::TX : NetMsgType::IX));
+    const CWallet::CommitResult&& res = pwalletMain->CommitTransaction(wtxNew, reservekey, g_connman.get());
     if (res.status != CWallet::CommitStatus::OK)
         throw JSONRPCError(RPC_WALLET_ERROR, res.ToString());
 }
@@ -1064,7 +1063,7 @@ UniValue CreateColdStakeDelegation(const UniValue& params, CWalletTx& wtxNew, CR
 
     // Create the transaction
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, nullptr, ALL_COINS, /*fUseIX*/ false, (CAmount)0, fUseDelegated)) {
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, nullptr, ALL_COINS, (CAmount)0, fUseDelegated)) {
         if (nValue + nFeeRequired > currBalance)
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("%s : %s\n", __func__, strError);
@@ -1113,7 +1112,7 @@ UniValue delegatestake(const JSONRPCRequest& request)
     CReserveKey reservekey(pwalletMain);
     UniValue ret = CreateColdStakeDelegation(request.params, wtx, reservekey);
 
-    const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, reservekey, g_connman.get(), NetMsgType::TX);
+    const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, reservekey, g_connman.get());
     if (res.status != CWallet::CommitStatus::OK)
         throw JSONRPCError(RPC_WALLET_ERROR, res.ToString());
 
@@ -1194,54 +1193,6 @@ UniValue rawdelegatestake(const JSONRPCRequest& request)
     return result;
 }
 
-UniValue sendtoaddressix(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 4)
-        throw std::runtime_error(
-            "sendtoaddressix \"pivxaddress\" amount ( \"comment\" \"comment-to\" )\n"
-            "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n" +
-            HelpRequiringPassphrase() + "\n"
-
-            "\nArguments:\n"
-            "1. \"pivxaddress\"  (string, required) The pivx address to send to.\n"
-            "2. \"amount\"      (numeric, required) The amount in PIV to send. eg 0.1\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
-            "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
-            "                             to which you're sending the transaction. This is not part of the \n"
-            "                             transaction, just kept in your wallet.\n"
-
-            "\nResult:\n"
-            "\"transactionid\"  (string) The transaction id.\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1") +
-            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 0.1, \"donation\", \"seans outpost\""));
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    bool isStaking = false;
-    CTxDestination address = DecodeDestination(request.params[0].get_str(), isStaking);
-    if (!IsValidDestination(address) || isStaking)
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid PIVX address");
-
-    // Amount
-    CAmount nAmount = AmountFromValue(request.params[1]);
-
-    // Wallet comments
-    CWalletTx wtx;
-    if (request.params.size() > 2 && !request.params[2].isNull() && !request.params[2].get_str().empty())
-        wtx.mapValue["comment"] = request.params[2].get_str();
-    if (request.params.size() > 3 && !request.params[3].isNull() && !request.params[3].get_str().empty())
-        wtx.mapValue["to"] = request.params[3].get_str();
-
-    EnsureWalletIsUnlocked();
-
-    SendMoney(address, nAmount, wtx, true);
-
-    return wtx.GetHash().GetHex();
-}
 
 CAmount getBalanceShieldedAddr(const libzcash::PaymentAddress& filterAddress, int minDepth = 1, bool ignoreUnspendable=true) {
     CAmount balance = 0;
@@ -2137,14 +2088,12 @@ UniValue addmultisigaddress(const JSONRPCRequest& request)
 struct tallyitem {
     CAmount nAmount;
     int nConf;
-    int nBCConf;
     std::vector<uint256> txids;
     bool fIsWatchonly;
     tallyitem()
     {
         nAmount = 0;
         nConf = std::numeric_limits<int>::max();
-        nBCConf = std::numeric_limits<int>::max();
         fIsWatchonly = false;
     }
 };
@@ -2186,7 +2135,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
-        int nBCDepth = wtx.GetDepthInMainChain(false);
         if (nDepth < nMinDepth)
             continue;
 
@@ -2206,7 +2154,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             tallyitem& item = mapTally[address];
             item.nAmount += txout.nValue;
             item.nConf = std::min(item.nConf, nDepth);
-            item.nBCConf = std::min(item.nBCConf, nBCDepth);
             item.txids.push_back(wtx.GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
@@ -2236,12 +2183,10 @@ UniValue ListReceived(const UniValue& params, bool by_label)
 
         CAmount nAmount = 0;
         int nConf = std::numeric_limits<int>::max();
-        int nBCConf = std::numeric_limits<int>::max();
         bool fIsWatchonly = false;
         if (it != mapTally.end()) {
             nAmount = (*it).second.nAmount;
             nConf = (*it).second.nConf;
-            nBCConf = (*it).second.nBCConf;
             fIsWatchonly = (*it).second.fIsWatchonly;
         }
 
@@ -2249,7 +2194,6 @@ UniValue ListReceived(const UniValue& params, bool by_label)
             tallyitem& _item = label_tally[label];
             _item.nAmount += nAmount;
             _item.nConf = std::min(_item.nConf, nConf);
-            _item.nBCConf = std::min(_item.nBCConf, nBCConf);
             _item.fIsWatchonly = fIsWatchonly;
         } else {
             UniValue obj(UniValue::VOBJ);
@@ -2257,8 +2201,9 @@ UniValue ListReceived(const UniValue& params, bool by_label)
                 obj.pushKV("involvesWatchonly", true);
             obj.pushKV("address", EncodeDestination(address, AddressBook::IsColdStakingPurpose(label)));
             obj.pushKV("amount", ValueFromAmount(nAmount));
-            obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
-            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
+            if (nConf == std::numeric_limits<int>::max()) nConf = 0;
+            obj.pushKV("confirmations", nConf);
+            obj.pushKV("bcconfirmations", nConf);       // DEPRECATED in 4.3.99
             obj.pushKV("label", label);
             UniValue transactions(UniValue::VARR);
             if (it != mapTally.end()) {
@@ -2275,13 +2220,11 @@ UniValue ListReceived(const UniValue& params, bool by_label)
         for (const auto& entry : label_tally) {
             CAmount nAmount = entry.second.nAmount;
             int nConf = entry.second.nConf;
-            int nBCConf = entry.second.nBCConf;
             UniValue obj(UniValue::VOBJ);
             if (entry.second.fIsWatchonly)
                 obj.pushKV("involvesWatchonly", true);
             obj.pushKV("amount", ValueFromAmount(nAmount));
             obj.pushKV("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf));
-            obj.pushKV("bcconfirmations", (nBCConf == std::numeric_limits<int>::max() ? 0 : nBCConf));
             obj.pushKV("label", entry.first);
             ret.push_back(obj);
         }
@@ -2310,7 +2253,7 @@ UniValue listreceivedbyaddress(const JSONRPCRequest& request)
             "    \"address\" : \"receivingaddress\",  (string) The receiving address\n"
             "    \"amount\" : x.xxx,                  (numeric) The total amount in PIV received by the address\n"
             "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
-            "    \"bcconfirmations\" : n              (numeric) The number of blockchain confirmations of the most recent transaction included\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"label\" : \"label\",               (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
@@ -2436,10 +2379,10 @@ UniValue listreceivedbylabel(const JSONRPCRequest& request)
             "[\n"
             "  {\n"
             "    \"involvesWatchonly\" : \"true\",    (bool) Only returned if imported addresses were involved in transaction\n"
-            "    \"amount\" : x.xxx,             (numeric) The total amount received by addresses with this label\n"
-            "    \"confirmations\" : n           (numeric) The number of confirmations of the most recent transaction included\n"
-            "    \"bcconfirmations\" : n         (numeric) The number of blockchain confirmations of the most recent transaction included\n"
-            "    \"label\" : \"label\"           (string) The label of the receiving address. The default label is \"\".\n"
+            "    \"amount\" : x.xxx,                  (numeric) The total amount received by addresses with this label\n"
+            "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
+            "    \"label\" : \"label\"                (string) The label of the receiving address. The default label is \"\".\n"
             "  }\n"
             "  ,...\n"
             "]\n"
@@ -2514,7 +2457,7 @@ UniValue listcoldutxos(const JSONRPCRequest& request)
             entry.pushKV("txid", wtxid.GetHex());
             entry.pushKV("txidn", (int)i);
             entry.pushKV("amount", ValueFromAmount(out.nValue));
-            entry.pushKV("confirmations", pcoin->GetDepthInMainChain(false));
+            entry.pushKV("confirmations", pcoin->GetDepthInMainChain());
             entry.pushKV("cold-staker", EncodeDestination(addresses[0], CChainParams::STAKING_ADDRESS));
             entry.pushKV("coin-owner", EncodeDestination(addresses[1]));
             entry.pushKV("whitelisted", fWhitelisted ? "true" : "false");
@@ -2618,11 +2561,10 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "    \"vout\" : n,               (numeric) the vout value\n"
             "    \"fee\": x.xxx,             (numeric) The amount of the fee in PIV. This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
-            "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
-            "                                         'receive' category of transactions.\n"
-            "    \"bcconfirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
+            "    \"confirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
             "                                         'receive' category of transactions. Negative confirmations indicate the\n"
             "                                         transaction conflicts with the block chain\n"
+            "    \"bcconfirmations\" : n,         (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"trusted\": xxx            (bool) Whether we consider the outputs of this unconfirmed transaction safe to spend.\n"
             "                                          and 'receive' category of transactions.\n"
             "    \"blockhash\": \"hashvalue\", (string) The block hash containing the transaction. Available for 'send' and 'receive'\n"
@@ -2728,7 +2670,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             "    \"vout\" : n,               (numeric) the vout value\n"
             "    \"fee\": x.xxx,             (numeric) The amount of the fee in PIV. This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
-            "    \"bcconfirmations\" : n,    (numeric) The number of blockchain confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
+            "    \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "    \"blockhash\": \"hashvalue\",     (string) The block hash containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockindex\": n,          (numeric) The block index containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blocktime\": xxx,         (numeric) The block time in seconds since epoch (1 Jan 1970 GMT).\n"
@@ -2780,7 +2722,7 @@ UniValue listsinceblock(const JSONRPCRequest& request)
     for (std::map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++) {
         CWalletTx tx = (*it).second;
 
-        if (depth == -1 || tx.GetDepthInMainChain(false) < depth)
+        if (depth == -1 || tx.GetDepthInMainChain() < depth)
             ListTransactions(tx, 0, true, transactions, filter);
     }
 
@@ -2809,7 +2751,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
             "{\n"
             "  \"amount\" : x.xxx,        (numeric) The transaction amount in PIV\n"
             "  \"confirmations\" : n,     (numeric) The number of confirmations\n"
-            "  \"bcconfirmations\" : n,   (numeric) The number of blockchain confirmations\n"
+            "  \"bcconfirmations\" : n,             (numeric) DEPRECATED: Will be removed in a future release\n"
             "  \"blockhash\" : \"hash\",  (string) The block hash\n"
             "  \"blockindex\" : xx,       (numeric) The block index\n"
             "  \"blocktime\" : ttt,       (numeric) The time in seconds since epoch (1 Jan 1970 GMT)\n"
@@ -3263,8 +3205,7 @@ UniValue listunspent(const JSONRPCRequest& request)
                                 true,       // include delegated
                                 false,      // include cold staking
                                 ALL_COINS,  // coin type
-                                false,      // only confirmed
-                                false       // use IX
+                                false       // only confirmed
                                 );
     for (const COutput& out : vecOutputs) {
         if (out.nDepth < nMinDepth || out.nDepth > nMaxDepth)
@@ -4033,7 +3974,6 @@ static const CRPCCommand commands[] =
     { "wallet",             "rawdelegatestake",         &rawdelegatestake,         false },
     { "wallet",             "sendmany",                 &sendmany,                 false },
     { "wallet",             "sendtoaddress",            &sendtoaddress,            false },
-    { "wallet",             "sendtoaddressix",          &sendtoaddressix,          false },
     { "wallet",             "settxfee",                 &settxfee,                 true  },
     { "wallet",             "setstakesplitthreshold",   &setstakesplitthreshold,   false },
     { "wallet",             "signmessage",              &signmessage,              true  },

@@ -257,7 +257,6 @@ set(WALLET_SOURCES
         ./src/wallet/db.cpp
         ./src/addressbook.cpp
         ./src/crypter.cpp
-        ./src/swifttx.cpp
         ./src/masternode.cpp
         ./src/masternode-budget.cpp
         ./src/masternode-payments.cpp

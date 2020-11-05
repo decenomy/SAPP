@@ -178,7 +178,6 @@ OperationResult SaplingOperation::loadUtxos(TxValues& txValues)
             false,
             ALL_COINS,
             true,
-            false,
             true,
             &destinations,
             mindepth)) {

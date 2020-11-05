@@ -138,7 +138,6 @@ UniValue preparebudget(const JSONRPCRequest& request)
     if (!proposal.IsWellFormed(budget.GetTotalBudget(proposal.GetBlockStart())))
         throw std::runtime_error("Proposal is not valid " + proposal.IsInvalidReason());
 
-    bool useIX = false;
     CWalletTx wtx;
     // make our change address
     CReserveKey keyChange(pwalletMain);
@@ -147,7 +146,7 @@ UniValue preparebudget(const JSONRPCRequest& request)
     }
 
     //send the tx to the network
-    const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get(), useIX ? NetMsgType::IX : NetMsgType::TX);
+    const CWallet::CommitResult& res = pwalletMain->CommitTransaction(wtx, keyChange, g_connman.get());
     if (res.status != CWallet::CommitStatus::OK)
         throw JSONRPCError(RPC_WALLET_ERROR, res.ToString());
 
