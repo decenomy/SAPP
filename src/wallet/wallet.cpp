@@ -1211,7 +1211,7 @@ void CWallet::MarkAffectedTransactionsDirty(const CTransaction& tx)
     }
 
     // Sapling
-    if (HasSaplingSPKM() && tx.isSapling() && tx.hasSaplingData()) {
+    if (HasSaplingSPKM() && tx.IsShieldedTx()) {
         for (const SpendDescription &spend : tx.sapData->vShieldedSpend) {
             uint256 nullifier = spend.nullifier;
             if (m_sspk_man->mapSaplingNullifiersToNotes.count(nullifier) &&
@@ -4346,7 +4346,7 @@ bool CWallet::IsFromMe(const CTransaction& tx) const
         return true;
     }
 
-    if (tx.hasSaplingData()) {
+    if (tx.IsShieldedTx()) {
         for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
             if (m_sspk_man->IsSaplingNullifierFromMe(spend.nullifier)) {
                 return true;

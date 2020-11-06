@@ -291,6 +291,11 @@ public:
         return nVersion >= SAPLING_VERSION;
     }
 
+    bool IsShieldedTx() const
+    {
+        return isSapling() && hasSaplingData();
+    }
+
     /*
      * Context for the two methods below:
      * We can think of the Sapling shielded part of the transaction as an input

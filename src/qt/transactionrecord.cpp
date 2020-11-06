@@ -313,7 +313,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
     }
 
     // TODO: Add shielded transactions parsing.
-    if (wtx.hasSaplingData()) {
+    if (wtx.IsShieldedTx()) {
         return parts;
     }
 

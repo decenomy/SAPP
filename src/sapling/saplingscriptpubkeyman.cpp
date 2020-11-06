@@ -209,7 +209,7 @@ void SaplingScriptPubKeyMan::IncrementNoteWitnesses(const CBlockIndex* pindex,
     }
 
     for (const auto& tx : pblock->vtx) {
-        if (!tx->hasSaplingData()) continue;
+        if (!tx->IsShieldedTx()) continue;
 
         const uint256& hash = tx->GetHash();
         bool txIsOurs = wallet->mapWallet.count(hash);
@@ -311,8 +311,8 @@ void SaplingScriptPubKeyMan::DecrementNoteWitnesses(const CBlockIndex* pindex)
  */
 std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> SaplingScriptPubKeyMan::FindMySaplingNotes(const CTransaction &tx) const
 {
-    // First check that this tx is a Sapling tx.
-    if (!tx.isSapling() || !tx.hasSaplingData()) {
+    // First check that this tx is a Shielded tx.
+    if (!tx.IsShieldedTx()) {
         return {};
     }
 
@@ -664,7 +664,7 @@ void SaplingScriptPubKeyMan::GetConflicts(const CWalletTx& wtx, std::set<uint256
     AssertLockHeld(wallet->cs_wallet);
     std::pair<TxNullifiers::const_iterator, TxNullifiers::const_iterator> range_o;
 
-    if (wtx.hasSaplingData()) {
+    if (wtx.IsShieldedTx()) {
         for (const SpendDescription& spend : wtx.sapData->vShieldedSpend) {
             const uint256& nullifier = spend.nullifier;
             if (mapTxSaplingNullifiers.count(nullifier) <= 1) {

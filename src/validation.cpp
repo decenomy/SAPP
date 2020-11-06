@@ -498,7 +498,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
             }
         }
 
-        if (!tx.hasSaplingData()) { // Sapling fee could be higher. Review it properly
+        if (!tx.IsShieldedTx()) { // Sapling fee could be higher. Review it properly
             if (fRejectAbsurdFee && nFees > ::minRelayTxFee.GetFee(nSize) * 10000) {
                 return state.Invalid(false,
                                      REJECT_HIGHFEE, "absurdly-high-fee",
@@ -2526,7 +2526,7 @@ bool ReceivedBlockTransactions(const CBlock& block, CValidationState& state, CBl
     // Sapling
     CAmount saplingValue = 0;
     for (const auto& tx : block.vtx) {
-        if (tx->isSapling() && tx->hasSaplingData()) {
+        if (tx->IsShieldedTx()) {
             // Negative valueBalance "takes" money from the transparent value pool
             // and adds it to the Sapling value pool. Positive valueBalance "gives"
             // money to the transparent value pool, removing from the Sapling value
