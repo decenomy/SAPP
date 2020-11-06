@@ -264,7 +264,7 @@ CAmount CTransaction::GetValueOut() const
         nValueOut += -sapData->valueBalance;
 
         // Verify Sapling
-        if (nVersion < SAPLING_VERSION)
+        if (!isSapling())
             throw std::runtime_error("GetValueOut(): sapData valueBalance invalid");
     }
 
@@ -280,7 +280,7 @@ CAmount CTransaction::GetShieldedValueIn() const
         nValue += sapData->valueBalance;
 
         // Verify Sapling
-        if (nVersion < SAPLING_VERSION)
+        if (!isSapling())
             throw std::runtime_error("GetValueOut(): sapData valueBalance invalid");
     }
 
@@ -334,7 +334,7 @@ unsigned int CTransaction::GetTotalSize() const
 std::string CTransaction::ToString() const
 {
     std::string str;
-    if (nVersion == CTransaction::SAPLING_VERSION && sapData) {
+    if (isSapling() && sapData) {
         str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u, valueBalance=%u, vShieldedSpend.size=%u, vShieldedOutput.size=%u)\n",
                          GetHash().ToString().substr(0,10),
                          nVersion,

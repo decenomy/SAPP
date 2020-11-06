@@ -1311,7 +1311,7 @@ UniValue viewshieldedtransaction(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid or non-wallet transaction id");
     const CWalletTx& wtx = pwalletMain->mapWallet[hash];
 
-    if (wtx.nVersion < CTransaction::SAPLING_VERSION || !wtx.hasSaplingData()) {
+    if (!wtx.isSapling() || !wtx.hasSaplingData()) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid transaction, no shielded data available");
     }
 

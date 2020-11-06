@@ -42,7 +42,7 @@ static UniValue TxShieldedOutputsToJSON(const CTransaction& tx) {
 }
 
 void TxSaplingToJSON(const CTransaction& tx, UniValue& entry) {
-    if (tx.nVersion >= CTransaction::SAPLING_VERSION && tx.sapData) {
+    if (tx.isSapling() && tx.sapData) {
         entry.pushKV("valueBalance", FormatMoney(tx.sapData->valueBalance));
         entry.pushKV("valueBalanceSat", tx.sapData->valueBalance);
         UniValue vspenddesc = TxShieldedSpendsToJSON(tx);

@@ -483,7 +483,7 @@ void CWallet::SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc
         // transactions in which we only have transparent addresses involved.
         if (!wtx.mapSaplingNoteData.empty()) {
             // Sanity check
-            if (wtx.nVersion < CTransaction::SAPLING_VERSION) {
+            if (!wtx.isSapling()) {
                 LogPrintf("SetBestChain(): ERROR, Invalid tx version found with sapling data\n");
                 walletdb.TxnAbort();
                 uiInterface.ThreadSafeMessageBox(

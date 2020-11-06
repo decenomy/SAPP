@@ -258,7 +258,7 @@ public:
         READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
 
-        if (g_IsSaplingActive && nVersion == CTransaction::SAPLING_VERSION) {
+        if (g_IsSaplingActive && isSapling()) {
             READWRITE(*const_cast<Optional<SaplingTxData>*>(&sapData));
         }
 
@@ -288,7 +288,7 @@ public:
 
     bool isSapling() const
     {
-        return nVersion == SAPLING_VERSION;
+        return nVersion >= SAPLING_VERSION;
     }
 
     /*
@@ -371,7 +371,7 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
 
-        if (g_IsSaplingActive && nVersion == CTransaction::SAPLING_VERSION) {
+        if (g_IsSaplingActive && nVersion >= CTransaction::SAPLING_VERSION) {
             READWRITE(*const_cast<Optional<SaplingTxData>*>(&sapData));
         }
     }
