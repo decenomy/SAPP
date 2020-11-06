@@ -1319,7 +1319,7 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         const uint256& hash = tx.GetHash();
 
         // if tx is a budget collateral tx, remove relative object
-        budget.RemoveByFeeTxId(hash);
+        g_budgetman.RemoveByFeeTxId(hash);
 
         // Check that all outputs are available and match the outputs in the block itself
         // exactly.
@@ -2710,7 +2710,7 @@ bool CheckColdStakeFreeOutput(const CTransaction& tx, const int nHeight)
         }
 
         // Check that this is indeed a superblock.
-        if (budget.IsBudgetPaymentBlock(nHeight)) {
+        if (g_budgetman.IsBudgetPaymentBlock(nHeight)) {
             // if superblocks are not enabled, reject
             if (!sporkManager.IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS))
                 return error("%s: superblocks are not enabled", __func__);
@@ -3462,7 +3462,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const std::shared_pt
 
     if (!fLiteMode) {
         mnodeman.SetBestHeight(newHeight);
-        budget.NewBlock(newHeight);
+        g_budgetman.NewBlock(newHeight);
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
             masternodePayments.ProcessBlock(newHeight + 10);
         }

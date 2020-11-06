@@ -14,7 +14,7 @@ BOOST_FIXTURE_TEST_SUITE(budget_tests, TestingSetup)
 void CheckBudgetValue(int nHeight, std::string strNetwork, CAmount nExpectedValue)
 {
     CBudgetManager budget;
-    CAmount nBudget = budget.GetTotalBudget(nHeight);
+    CAmount nBudget = g_budgetman.GetTotalBudget(nHeight);
     std::string strError = strprintf("Budget is not as expected for %s. Result: %s, Expected: %s", strNetwork, FormatMoney(nBudget), FormatMoney(nExpectedValue));
     BOOST_CHECK_MESSAGE(nBudget == nExpectedValue, strError);
 }

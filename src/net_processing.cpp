@@ -705,25 +705,25 @@ bool static AlreadyHave(const CInv& inv) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
         }
         return false;
     case MSG_BUDGET_VOTE:
-        if (budget.HaveSeenProposalVote(inv.hash)) {
+        if (g_budgetman.HaveSeenProposalVote(inv.hash)) {
             masternodeSync.AddedBudgetItem(inv.hash);
             return true;
         }
         return false;
     case MSG_BUDGET_PROPOSAL:
-        if (budget.HaveProposal(inv.hash)) {
+        if (g_budgetman.HaveProposal(inv.hash)) {
             masternodeSync.AddedBudgetItem(inv.hash);
             return true;
         }
         return false;
     case MSG_BUDGET_FINALIZED_VOTE:
-        if (budget.HaveSeenFinalizedBudgetVote(inv.hash)) {
+        if (g_budgetman.HaveSeenFinalizedBudgetVote(inv.hash)) {
             masternodeSync.AddedBudgetItem(inv.hash);
             return true;
         }
         return false;
     case MSG_BUDGET_FINALIZED:
-        if (budget.HaveFinalizedBudget(inv.hash)) {
+        if (g_budgetman.HaveFinalizedBudget(inv.hash)) {
             masternodeSync.AddedBudgetItem(inv.hash);
             return true;
         }
@@ -893,29 +893,29 @@ void static ProcessGetData(CNode* pfrom, CConnman& connman, std::atomic<bool>& i
                     }
                 }
                 if (!pushed && inv.type == MSG_BUDGET_VOTE) {
-                    if (budget.HaveSeenProposalVote(inv.hash)) {
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::BUDGETVOTE, budget.GetProposalVoteSerialized(inv.hash)));
+                    if (g_budgetman.HaveSeenProposalVote(inv.hash)) {
+                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::BUDGETVOTE, g_budgetman.GetProposalVoteSerialized(inv.hash)));
                         pushed = true;
                     }
                 }
 
                 if (!pushed && inv.type == MSG_BUDGET_PROPOSAL) {
-                    if (budget.HaveProposal(inv.hash)) {
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::BUDGETPROPOSAL, budget.GetProposalSerialized(inv.hash)));
+                    if (g_budgetman.HaveProposal(inv.hash)) {
+                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::BUDGETPROPOSAL, g_budgetman.GetProposalSerialized(inv.hash)));
                         pushed = true;
                     }
                 }
 
                 if (!pushed && inv.type == MSG_BUDGET_FINALIZED_VOTE) {
-                    if (budget.HaveSeenFinalizedBudgetVote(inv.hash)) {
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::FINALBUDGETVOTE, budget.GetFinalizedBudgetVoteSerialized(inv.hash)));
+                    if (g_budgetman.HaveSeenFinalizedBudgetVote(inv.hash)) {
+                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::FINALBUDGETVOTE, g_budgetman.GetFinalizedBudgetVoteSerialized(inv.hash)));
                         pushed = true;
                     }
                 }
 
                 if (!pushed && inv.type == MSG_BUDGET_FINALIZED) {
-                    if (budget.HaveFinalizedBudget(inv.hash)) {
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::FINALBUDGET, budget.GetFinalizedBudgetSerialized(inv.hash)));
+                    if (g_budgetman.HaveFinalizedBudget(inv.hash)) {
+                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::FINALBUDGET, g_budgetman.GetFinalizedBudgetSerialized(inv.hash)));
                         pushed = true;
                     }
                 }
@@ -1822,7 +1822,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (!masternodeSync.MessageDispatcher(pfrom, strCommand, vRecv)) {
                 //probably one the extensions
                 mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
-                budget.ProcessMessage(pfrom, strCommand, vRecv);
+                g_budgetman.ProcessMessage(pfrom, strCommand, vRecv);
                 masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
                 sporkManager.ProcessSpork(pfrom, strCommand, vRecv);
                 masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);

@@ -35,8 +35,8 @@ static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
 static std::map<uint256, std::pair<uint256,int> > mapPayment_History;   // proposal hash --> (block hash, block height)
 
-extern CBudgetManager budget;
-void DumpBudgets();
+extern CBudgetManager g_budgetman;
+void DumpBudgets(CBudgetManager& budgetman);
 
 //
 // CBudgetVote - Allow a masternode node to vote and broadcast throughout the network
@@ -61,7 +61,7 @@ private:
 
 public:
     CBudgetVote();
-    CBudgetVote(CTxIn vin, uint256 nProposalHash, VoteDirection nVoteIn);
+    CBudgetVote(const CTxIn& vin, const uint256& nProposalHash, VoteDirection nVoteIn);
 
     void Relay() const;
 
@@ -129,7 +129,7 @@ private:
 
 public:
     CFinalizedBudgetVote();
-    CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn);
+    CFinalizedBudgetVote(const CTxIn& vinIn, const uint256& nBudgetHashIn);
 
     void Relay() const;
     uint256 GetHash() const;
@@ -284,7 +284,7 @@ public:
     const CBudgetProposal* FindProposalByName(const std::string& strProposalName) const;
 
     static CAmount GetTotalBudget(int nHeight);
-    std::vector<CBudgetProposal*> GetBudget();
+    std::vector<CBudgetProposal> GetBudget();
     std::vector<CBudgetProposal*> GetAllProposals();
     std::vector<CFinalizedBudget*> GetFinalizedBudgets();
     bool IsBudgetPaymentBlock(int nBlockHeight) const;
@@ -298,6 +298,9 @@ public:
     TrxValidationStatus IsTransactionValid(const CTransaction& txNew, const uint256& nBlockHash, int nBlockHeight) const;
     std::string GetRequiredPaymentsString(int nBlockHeight);
     bool FillBlockPayee(CMutableTransaction& txNew, bool fProofOfStake) const;
+
+    // Only initialized masternodes: sign and submit votes on valid finalized budgets
+    void VoteOnFinalizedBudgets();
 
     void CheckOrphanVotes();
     void Clear()
@@ -438,6 +441,9 @@ public:
     std::string IsInvalidReason() const { return strInvalid; }
     std::string IsInvalidLogStr() const { return strprintf("[%s (%s)]: %s", GetName(), GetProposalsStr(), IsInvalidReason()); }
 
+    bool IsAutoChecked() const { return fAutoChecked; }
+    void SetAutoChecked(bool _fAutoChecked) { fAutoChecked = _fAutoChecked; }
+
     void SetProposalsStr(const std::string _strProposals) { strProposals = _strProposals; }
 
     std::string GetName() const { return strBudgetName; }
@@ -453,12 +459,10 @@ public:
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment) const;
     bool GetPayeeAndAmount(int64_t nBlockHeight, CScript& payee, CAmount& nAmount) const;
 
-    // Verify and vote on finalized budget
-    void CheckAndVote();
-    //total pivx paid out by this budget
+    // Check finalized budget proposals. Masternodes only (when voting on finalized budgets)
+    bool CheckProposals(const std::map<uint256, CBudgetProposal>& mapWinningProposals) const;
+    // Total amount paid out by this budget
     CAmount GetTotalPayout() const;
-    //vote on this finalized budget as a masternode
-    void SubmitVote();
 
     uint256 GetHash() const
     {
@@ -607,8 +611,6 @@ public:
 
     // compare proposals by proposal hash
     inline bool operator>(const CBudgetProposal& other) const { return GetHash() > other.GetHash(); }
-    // compare proposals pointers by hash
-    static inline bool PtrGreater(CBudgetProposal* a, CBudgetProposal* b) { return *a > *b; }
     // compare proposals pointers by net yes count (solve tie with feeHash)
     static bool PtrHigherYes(CBudgetProposal* a, CBudgetProposal* b);
 
