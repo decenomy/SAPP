@@ -19,6 +19,7 @@
 #include "masternode-sync.h"
 #include "net.h"
 #include "pow.h"
+#include "policy/feerate.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "timedata.h"

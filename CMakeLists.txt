@@ -365,7 +365,6 @@ target_include_directories(ZEROCOIN_A PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 
 set(COMMON_SOURCES
         ./src/allocators.cpp
-        ./src/amount.cpp
         ./src/base58.cpp
         ./src/bip38.cpp
         ./src/consensus/params.cpp
@@ -389,6 +388,7 @@ set(COMMON_SOURCES
         ./src/keystore.cpp
         ./src/netaddress.cpp
         ./src/netbase.cpp
+        ./src/policy/feerate.cpp
         ./src/protocol.cpp
         ./src/pubkey.cpp
         ./src/scheduler.cpp

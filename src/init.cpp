@@ -34,6 +34,7 @@
 #include "miner.h"
 #include "netbase.h"
 #include "net_processing.h"
+#include "policy/feerate.h"
 #include "policy/policy.h"
 #include "reverse_iterate.h"
 #include "rpc/register.h"

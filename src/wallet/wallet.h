@@ -18,6 +18,7 @@
 #include "key.h"
 #include "keystore.h"
 #include "pairresult.h"
+#include "policy/feerate.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "sapling/address.hpp"
