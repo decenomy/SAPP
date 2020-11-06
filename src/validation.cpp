@@ -334,9 +334,9 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
     if (!CheckFinalTx(tx, STANDARD_LOCKTIME_VERIFY_FLAGS))
         return state.DoS(0, false, REJECT_NONSTANDARD, "non-final");
 
-    // Rather not work on nonstandard transactions (unless regtest)
+    // Rather not work on nonstandard transactions
     std::string reason;
-    if (!Params().IsRegTestNet() && !IsStandardTx(tx, nextBlockHeight, reason))
+    if (!IsStandardTx(tx, nextBlockHeight, reason))
         return state.DoS(0, false, REJECT_NONSTANDARD, reason);
     // is it already in the memory pool?
     uint256 hash = tx.GetHash();
