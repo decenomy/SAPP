@@ -81,13 +81,17 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
     return whichType != TX_NONSTANDARD;
 }
 
-bool IsStandardTx(const CTransaction& tx, std::string& reason)
+bool IsStandardTx(const CTransaction& tx, int nBlockHeight, std::string& reason)
 {
     AssertLockHeld(cs_main);
-    if (tx.nVersion > CTransaction::CURRENT_VERSION || tx.nVersion < 1) {
-        reason = "version";
-        return false;
+    if (!Params().GetConsensus().NetworkUpgradeActive(nBlockHeight, Consensus::UPGRADE_V5_DUMMY)) {
+        // Before v5, all txes with version other than STANDARD_VERSION (1) are considered non-standard
+        if (tx.nVersion != CTransaction::TxVersion::LEGACY) {
+            reason = "version";
+            return false;
+        }
     }
+    // After v5, all txes with a version number accepted by consensus are considered standard.
 
     // Treat non-final transactions as non-standard to prevent a specific type
     // of double-spend attack, as well as DoS attacks. (if the transaction
@@ -106,7 +110,7 @@ bool IsStandardTx(const CTransaction& tx, std::string& reason)
     // Timestamps on the other hand don't get any special treatment, because we
     // can't know what timestamp the next block will have, and there aren't
     // timestamp applications where it matters.
-    if (!IsFinalTx(tx, chainActive.Height() + 1)) {
+    if (!IsFinalTx(tx, nBlockHeight)) {
         reason = "non-final";
         return false;
     }

@@ -65,6 +65,15 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
     if (tx.vout.empty() && (tx.sapData && tx.sapData->vShieldedOutput.empty()))
         return state.DoS(10, false, REJECT_INVALID, "bad-txns-vout-empty");
 
+    // Version check
+    if (fSaplingActive) {
+        // After sapling activation we require 1 <= tx.nVersion < TxVersion::TOOHIGH
+        if (tx.nVersion < 1 || tx.nVersion >= CTransaction::TxVersion::TOOHIGH)
+            return state.DoS(10,
+                    error("%s: Transaction version (%d) too high. Max: %d", __func__, tx.nVersion, int(CTransaction::TxVersion::TOOHIGH) - 1),
+                    REJECT_INVALID, "bad-tx-version-too-high");
+    }
+
     // Dispatch to Sapling validator
     CAmount nValueOut = 0;
     if (!SaplingValidation::CheckTransaction(tx, state, nValueOut, fSaplingActive)) {
