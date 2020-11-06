@@ -22,7 +22,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state, CAmount& 
     bool hasSaplingData = tx.hasSaplingData();
 
     // v1 must not have shielded data.
-    if (!tx.isSapling() && hasSaplingData) {
+    if (!tx.isSaplingVersion() && hasSaplingData) {
         return state.DoS(100, error("%s: Not Sapling version with Sapling data", __func__ ),
                          REJECT_INVALID, "bad-txns-form-not-sapling");
     }
@@ -55,7 +55,7 @@ bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidatio
     // Basic checks that don't depend on any context
     const Consensus::Params& consensus = Params().GetConsensus();
     // If the tx got to this point, must be +v2.
-    assert(tx.isSapling());
+    assert(tx.isSaplingVersion());
 
     // Size limits
     BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT >= MAX_TX_SIZE_AFTER_SAPLING); // sanity
@@ -151,7 +151,7 @@ bool ContextualCheckTransaction(
     }
 
     // Reject transactions with invalid version
-    if (!tx.isSapling() && tx.hasSaplingData()) {
+    if (!tx.isSaplingVersion() && tx.hasSaplingData()) {
         return state.DoS(
                 dosLevelConstricting,
                 error("%s: Sapling version too low", __func__ ),

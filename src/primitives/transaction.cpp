@@ -263,9 +263,9 @@ CAmount CTransaction::GetValueOut() const
         // NB: negative valueBalance "takes" money from the transparent value pool just as outputs do
         nValueOut += -sapData->valueBalance;
 
-        // Verify Sapling
-        if (!isSapling())
-            throw std::runtime_error("GetValueOut(): sapData valueBalance invalid");
+        // Verify Sapling version
+        if (!isSaplingVersion())
+            throw std::runtime_error("GetValueOut(): invalid tx version");
     }
 
     return nValueOut;
@@ -280,8 +280,8 @@ CAmount CTransaction::GetShieldedValueIn() const
         nValue += sapData->valueBalance;
 
         // Verify Sapling
-        if (!isSapling())
-            throw std::runtime_error("GetValueOut(): sapData valueBalance invalid");
+        if (!isSaplingVersion())
+            throw std::runtime_error("GetValueOut(): invalid tx version");
     }
 
     return nValue;

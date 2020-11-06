@@ -1012,7 +1012,7 @@ public:
         READWRITE(fFromMe);
         READWRITE(fSpent);
 
-        if (this->isSapling()) {
+        if (this->isSaplingVersion()) {
             READWRITE(mapSaplingNoteData);
         }
 

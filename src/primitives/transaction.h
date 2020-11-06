@@ -258,7 +258,7 @@ public:
         READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
 
-        if (g_IsSaplingActive && isSapling()) {
+        if (g_IsSaplingActive && isSaplingVersion()) {
             READWRITE(*const_cast<Optional<SaplingTxData>*>(&sapData));
         }
 
@@ -286,14 +286,14 @@ public:
             sapData->hasBindingSig());
     };
 
-    bool isSapling() const
+    bool isSaplingVersion() const
     {
         return nVersion >= SAPLING_VERSION;
     }
 
     bool IsShieldedTx() const
     {
-        return isSapling() && hasSaplingData();
+        return isSaplingVersion() && hasSaplingData();
     }
 
     /*
