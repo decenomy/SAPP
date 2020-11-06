@@ -14,6 +14,57 @@
 #include "netbase.h"
 #include "protocol.h"
 
+OperationResult initMasternode(const std::string& _strMasterNodePrivKey, const std::string& _strMasterNodeAddr, bool isFromInit)
+{
+    if (!isFromInit && fMasterNode) {
+        return errorOut( "ERROR: Masternode already initialized.");
+    }
+
+    LOCK(cs_main); // Lock cs_main so the node doesn't perform any action while we setup the Masternode
+    LogPrintf("Initializing masternode, addr %s..\n", _strMasterNodeAddr.c_str());
+
+    if (_strMasterNodePrivKey.empty()) {
+        return errorOut("ERROR: Masternode priv key cannot be empty.");
+    }
+
+    if (_strMasterNodeAddr.empty()) {
+        return errorOut("ERROR: Empty masternodeaddr");
+    }
+
+    // Global params set
+    strMasterNodeAddr = _strMasterNodeAddr;
+    strMasterNodePrivKey = _strMasterNodePrivKey;
+
+    // Address parsing.
+    const CChainParams& params = Params();
+    int nPort = 0;
+    int nDefaultPort = params.GetDefaultPort();
+    std::string strHost;
+    SplitHostPort(strMasterNodeAddr, nPort, strHost);
+
+    // Allow for the port number to be omitted here and just double check
+    // that if a port is supplied, it matches the required default port.
+    if (nPort == 0) nPort = nDefaultPort;
+    if (nPort != nDefaultPort && !params.IsRegTestNet()) {
+        return errorOut(strprintf(_("Invalid -masternodeaddr port %d, only %d is supported on %s-net."),
+                                           nPort, nDefaultPort, Params().NetworkIDString()));
+    }
+    CService addrTest(LookupNumeric(strHost.c_str(), nPort));
+    if (!addrTest.IsValid()) {
+        return errorOut(strprintf(_("Invalid -masternodeaddr address: %s"), strMasterNodeAddr));
+    }
+
+    CKey key;
+    CPubKey pubkey;
+
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, key, pubkey)) {
+        return errorOut(_("Invalid masternodeprivkey. Please see the documentation."));
+    }
+    activeMasternode.pubKeyMasternode = pubkey;
+    fMasterNode = true;
+    return OperationResult(true);
+}
+
 //
 // Bootup the Masternode, look for a 10000 PIVX input and register on the network
 //
@@ -68,7 +119,7 @@ void CActiveMasternode::ManageStatus()
                 return;
             }
         } else {
-            int nPort;
+            int nPort = 0;
             std::string strHost;
             SplitHostPort(strMasterNodeAddr, nPort, strHost);
             service = LookupNumeric(strHost.c_str(), nPort);
@@ -153,13 +204,18 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
             return false;
         }
 
-        pmn->lastPing = mnp;
+        // SetLastPing locks the masternode cs, be careful with the lock order.
+        pmn->SetLastPing(mnp);
         mnodeman.mapSeenMasternodePing.emplace(mnp.GetHash(), mnp);
 
         //mnodeman.mapSeenMasternodeBroadcast.lastPing is probably outdated, so we'll update it
         CMasternodeBroadcast mnb(*pmn);
         uint256 hash = mnb.GetHash();
-        if (mnodeman.mapSeenMasternodeBroadcast.count(hash)) mnodeman.mapSeenMasternodeBroadcast[hash].lastPing = mnp;
+        if (mnodeman.mapSeenMasternodeBroadcast.count(hash)) {
+            // SetLastPing locks the masternode cs, be careful with the lock order.
+            // TODO: check why are we double setting the last ping here..
+            mnodeman.mapSeenMasternodeBroadcast[hash].SetLastPing(mnp);
+        }
 
         mnp.Relay();
         return true;

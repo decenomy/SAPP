@@ -78,34 +78,40 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
     if (fLiteMode) return; // disable all masternode related functionality
 
     if (strCommand == NetMsgType::SPORK) {
-        ProcessSporkMsg(pfrom, strCommand, vRecv);
+        int banScore = ProcessSporkMsg(vRecv);
+        if (banScore > 0) {
+            LOCK(cs_main);
+            Misbehaving(pfrom->GetId(), banScore);
+        }
     }
     if (strCommand == NetMsgType::GETSPORKS) {
         ProcessGetSporks(pfrom, strCommand, vRecv);
     }
 }
 
-void CSporkManager::ProcessSporkMsg(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+int CSporkManager::ProcessSporkMsg(CDataStream& vRecv)
 {
     CSporkMessage spork;
     vRecv >> spork;
+    return ProcessSporkMsg(spork);
+}
 
+int CSporkManager::ProcessSporkMsg(CSporkMessage& spork)
+{
     // Ignore spork messages about unknown/deleted sporks
     std::string strSpork = sporkManager.GetSporkNameByID(spork.nSporkID);
-    if (strSpork == "Unknown") return;
+    if (strSpork == "Unknown") return 0;
 
     // Do not accept sporks signed way too far into the future
     if (spork.nTimeSigned > GetAdjustedTime() + 2 * 60 * 60) {
         LogPrint(BCLog::NET, "%s : ERROR: too far into the future\n", __func__);
-        LOCK(cs_main);
-        Misbehaving(pfrom->GetId(), 100);
-        return;
+        return 100;
     }
 
     // reject old signature version
     if (spork.nMessVersion != MessageVersion::MESS_VER_HASH) {
         LogPrint(BCLog::NET, "%s : nMessVersion=%d not accepted anymore\n", __func__, spork.nMessVersion);
-        return;
+        return 0;
     }
 
     uint256 hash = spork.GetHash();
@@ -119,7 +125,7 @@ void CSporkManager::ProcessSporkMsg(CNode* pfrom, std::string& strCommand, CData
                 LogPrint(BCLog::NET, "%s : spork %d (%s) in memory is more recent: %d >= %d\n", __func__,
                           spork.nSporkID, sporkName,
                           mapSporksActive[spork.nSporkID].nTimeSigned, spork.nTimeSigned);
-                return;
+                return 0;
             } else {
                 // update active spork
                 LogPrint(BCLog::NET, "%s : got updated spork %d (%s) with value %d (signed at %d)\n", __func__,
@@ -144,9 +150,7 @@ void CSporkManager::ProcessSporkMsg(CNode* pfrom, std::string& strCommand, CData
 
     if (!fValidSig) {
         LogPrint(BCLog::NET, "%s : Invalid Signature\n", __func__);
-        LOCK(cs_main);
-        Misbehaving(pfrom->GetId(), 100);
-        return;
+        return 100;
     }
 
     {
@@ -158,6 +162,8 @@ void CSporkManager::ProcessSporkMsg(CNode* pfrom, std::string& strCommand, CData
 
     // PIVX: add to spork database.
     pSporkDB->WriteSpork(spork.nSporkID, spork);
+    // All good.
+    return 0;
 }
 
 void CSporkManager::ProcessGetSporks(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)

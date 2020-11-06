@@ -147,6 +147,8 @@ public:
     const CTxIn GetVin() const override { return vin; };
     const CPubKey GetPublicKey(std::string& strErrorRet) const override { return pubKeyCollateralAddress; }
 
+    void SetLastPing(const CMasternodePing& _lastPing) { WITH_LOCK(cs, lastPing = _lastPing;); }
+
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {
         CSignedMessage::swap(first, second);
@@ -245,19 +247,18 @@ public:
         return WITH_LOCK(cs, return activeState == MASTERNODE_PRE_ENABLED );
     }
 
-    std::string Status()
+    std::string Status() const
     {
-        std::string strStatus = "ACTIVE";
-
         LOCK(cs);
-        if (activeState == CMasternode::MASTERNODE_ENABLED) strStatus = "ENABLED";
-        if (activeState == CMasternode::MASTERNODE_EXPIRED) strStatus = "EXPIRED";
-        if (activeState == CMasternode::MASTERNODE_VIN_SPENT) strStatus = "VIN_SPENT";
-        if (activeState == CMasternode::MASTERNODE_REMOVE) strStatus = "REMOVE";
-        if (activeState == CMasternode::MASTERNODE_POS_ERROR) strStatus = "POS_ERROR";
-        if (activeState == CMasternode::MASTERNODE_MISSING) strStatus = "MISSING";
+        if (activeState == CMasternode::MASTERNODE_PRE_ENABLED) return "PRE_ENABLED";
+        if (activeState == CMasternode::MASTERNODE_ENABLED)     return "ENABLED";
+        if (activeState == CMasternode::MASTERNODE_EXPIRED)     return "EXPIRED";
+        if (activeState == CMasternode::MASTERNODE_VIN_SPENT)   return "VIN_SPENT";
+        if (activeState == CMasternode::MASTERNODE_REMOVE)      return "REMOVE";
+        if (activeState == CMasternode::MASTERNODE_POS_ERROR)   return "POS_ERROR";
+        if (activeState == CMasternode::MASTERNODE_MISSING)     return "MISSING";
 
-        return strStatus;
+        return strprintf("INVALID_%d", activeState);
     }
 
     int64_t GetLastPaid();

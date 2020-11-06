@@ -207,7 +207,14 @@ def str_to_b64str(string):
 def satoshi_round(amount):
     return Decimal(amount).quantize(Decimal('0.00000001'), rounding=ROUND_DOWN)
 
-def wait_until(predicate, *, attempts=float('inf'), timeout=float('inf'), lock=None):
+def wait_until(predicate,
+               *,
+               attempts=float('inf'),
+               timeout=float('inf'),
+               lock=None,
+               sendpings=None,
+               mocktime=None):
+
     if attempts == float('inf') and timeout == float('inf'):
         timeout = 60
     attempt = 0
@@ -223,6 +230,10 @@ def wait_until(predicate, *, attempts=float('inf'), timeout=float('inf'), lock=N
                 return
         attempt += 1
         time.sleep(0.5)
+        if sendpings is not None:
+            sendpings()
+        if mocktime is not None:
+            mocktime(1)
 
     # Print the cause of the timeout
     assert_greater_than(attempts, attempt)
@@ -420,22 +431,6 @@ def sync_mempools(rpc_connections, *, wait=1, timeout=60, flush_scheduler=True):
         timeout,
         "".join("\n  {!r}".format(m) for m in pool),
     ))
-
-def sync_tiertwo(rpc_connections, *, wait=5, timeout=60):
-    """
-    Wait until everybody has the tier two synced
-    pools
-    """
-    stop_time = time.time() + timeout
-    while time.time() <= stop_time:
-        # Check that each peer has at least one connection
-        assert (all([len(x.getpeerinfo()) for x in rpc_connections]))
-        time.sleep(wait)
-
-        sync_status = [x.mnsync("status")["RequestedMasternodeAssets"] for x in rpc_connections]
-        if sync_status.count(999) == len(rpc_connections):
-            return
-    raise AssertionError("Tier two sync timed out")
 
 # Transaction/Block functions
 #############################

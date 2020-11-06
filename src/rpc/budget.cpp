@@ -708,14 +708,15 @@ UniValue mnfinalbudgetsuggest(const JSONRPCRequest& request)
     if (request.fHelp || !request.params.empty())
         throw std::runtime_error(
                 "mnfinalbudgetsuggest\n"
-                "\nTry to submit a budget finalization\n");
+                "\nTry to submit a budget finalization\n"
+                "returns the budget hash if it was broadcasted sucessfully");
 
     if (!Params().IsRegTestNet()) {
-        throw std::runtime_error("mnfinalbudgetsuggest enabled only in regtest");
+        throw JSONRPCError(RPC_MISC_ERROR, "command available only for RegTest network");
     }
 
-    budget.SubmitFinalBudget();
-    return NullUniValue;
+    const uint256& budgetHash = budget.SubmitFinalBudget();
+    return (budgetHash.IsNull()) ? NullUniValue : budgetHash.ToString();
 }
 
 UniValue mnfinalbudget(const JSONRPCRequest& request)

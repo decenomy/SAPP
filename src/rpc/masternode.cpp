@@ -18,6 +18,62 @@
 
 #include <boost/tokenizer.hpp>
 
+UniValue mnping(const JSONRPCRequest& request)
+{
+    if (request.fHelp || !request.params.empty()) {
+        throw std::runtime_error(
+            "mnping \n"
+            "\nSend masternode ping. Only for remote masternodes on Regtest\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"sent\":           (string YES|NO) Whether the ping was sent and, if not, the error.\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("mnping", "") + HelpExampleRpc("mnping", ""));
+    }
+
+    if (!Params().IsRegTestNet()) {
+        throw JSONRPCError(RPC_MISC_ERROR, "command available only for RegTest network");
+    }
+
+    if (!fMasterNode) {
+        throw JSONRPCError(RPC_MISC_ERROR, "this is not a masternode");
+    }
+
+    UniValue ret(UniValue::VOBJ);
+    std::string strError;
+    ret.pushKV("sent", activeMasternode.SendMasternodePing(strError) ?
+                       "YES" : strprintf("NO (%s)", strError));
+    return ret;
+}
+
+UniValue initmasternode(const JSONRPCRequest& request)
+{
+    if (request.fHelp || (request.params.empty() || request.params.size() > 2)) {
+        throw std::runtime_error(
+                "initmasternode ( \"masternodePrivKey\" \"masternodeAddr\" )\n"
+                "\nInitialize masternode on demand if it's not already initialized.\n"
+                "\nArguments:\n"
+                "1. masternodePrivKey          (string, required) The masternode private key.\n"
+                "2. masternodeAddr             (string, required) The IP:Port of this masternode.\n"
+
+                "\nResult:\n"
+                " success                      (string) if the masternode initialization succeeded.\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("initmasternode", "\"9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK\" \"187.24.32.124:51472\"") +
+                HelpExampleRpc("initmasternode", "\"9247iC59poZmqBYt9iDh9wDam6v9S1rW5XekjLGyPnDhrDkP4AK\" \"187.24.32.124:51472\""));
+    }
+
+    std::string _strMasterNodePrivKey = request.params[0].get_str();
+    std::string _strMasterNodeAddr = request.params[1].get_str();
+    auto res = initMasternode(_strMasterNodePrivKey, _strMasterNodeAddr, false);
+    if (!res) throw std::runtime_error(res.getError());
+    return "success";
+}
+
 UniValue getcachedblockhashes(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() > 0)
@@ -268,17 +324,18 @@ UniValue startmasternode (const JSONRPCRequest& request)
         if (strCommand == "start-disabled") strCommand = "disabled";
     }
 
-    if (request.fHelp || request.params.size() < 2 || request.params.size() > 3 ||
+    if (request.fHelp || request.params.size() < 2 || request.params.size() > 4 ||
         (request.params.size() == 2 && (strCommand != "local" && strCommand != "all" && strCommand != "many" && strCommand != "missing" && strCommand != "disabled")) ||
-        (request.params.size() == 3 && strCommand != "alias"))
+        ( (request.params.size() == 3 || request.params.size() == 4) && strCommand != "alias"))
         throw std::runtime_error(
-            "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" )\n"
+            "startmasternode \"local|all|many|missing|disabled|alias\" lockwallet ( \"alias\" reload_conf )\n"
             "\nAttempts to start one or more masternode(s)\n"
 
             "\nArguments:\n"
             "1. set         (string, required) Specify which set of masternode(s) to start.\n"
             "2. lockwallet  (boolean, required) Lock wallet after completion.\n"
             "3. alias       (string) Masternode alias. Required if using 'alias' as the set.\n"
+            "4. reload_conf (boolean) if true and \"alias\" was selected, reload the masternodes.conf data from disk"
 
             "\nResult: (for 'local' set):\n"
             "\"status\"     (string) Masternode status message\n"
@@ -352,6 +409,15 @@ UniValue startmasternode (const JSONRPCRequest& request)
 
     if (strCommand == "alias") {
         std::string alias = request.params[2].get_str();
+
+        // Check reload param
+        if(request.params[3].getBool()) {
+            masternodeConfig.clear();
+            std::string error;
+            if (!masternodeConfig.read(error)) {
+                throw std::runtime_error("Error reloading masternode.conf, " + error);
+            }
+        }
 
         bool found = false;
 
@@ -923,9 +989,11 @@ static const CRPCCommand commands[] =
     { "masternode",         "createmasternodebroadcast", &createmasternodebroadcast, true  },
     { "masternode",         "decodemasternodebroadcast", &decodemasternodebroadcast, true  },
     { "masternode",         "relaymasternodebroadcast",  &relaymasternodebroadcast,  true  },
+    { "masternode",         "initmasternode",            &initmasternode,            true  },
 
     /* Not shown in help */
     { "hidden",             "getcachedblockhashes",      &getcachedblockhashes,      true  },
+    { "hidden",             "mnping",                    &mnping,                    true  },
 };
 
 void RegisterMasternodeRPCCommands(CRPCTable &tableRPC)

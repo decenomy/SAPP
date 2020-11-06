@@ -9,11 +9,6 @@
 #include "sapling/key_io_sapling.h"
 #include "utilmoneystr.h"        // for FormatMoney
 
-OperationResult errorOut(const std::string& serror)
-{
-    return OperationResult(false, serror);
-}
-
 struct TxValues
 {
     CAmount transInTotal{0};

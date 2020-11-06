@@ -348,7 +348,7 @@ bool CMasternodeBroadcast::Create(const std::string& strService,
         return false;
     }
 
-    int nPort;
+    int nPort = 0;
     int nDefaultPort = Params().GetDefaultPort();
     std::string strHost;
     SplitHostPort(strService, nPort, strHost);
@@ -558,11 +558,16 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
     // we are a masternode with the same vin (i.e. already activated) and this mnb is ours (matches our Masternode privkey)
     // so nothing to do here for us
     if (fMasterNode && activeMasternode.vin != nullopt &&
-            vin.prevout == activeMasternode.vin->prevout && pubKeyMasternode == activeMasternode.pubKeyMasternode)
+            vin.prevout == activeMasternode.vin->prevout &&
+            pubKeyMasternode == activeMasternode.pubKeyMasternode &&
+            activeMasternode.GetStatus() == ACTIVE_MASTERNODE_STARTED) {
         return true;
+    }
 
     // incorrect ping or its sigTime
-    if(lastPing.IsNull() || !lastPing.CheckAndUpdate(nDoS, false, true)) return false;
+    if(lastPing.IsNull() || !lastPing.CheckAndUpdate(nDoS, false, true)) {
+        return false;
+    }
 
     // search existing Masternode list
     CMasternode* pmn = mnodeman.Find(vin);
@@ -727,7 +732,8 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
                 return false;
             }
 
-            pmn->lastPing = *this;
+            // SetLastPing locks masternode cs. Be careful with the lock ordering.
+            pmn->SetLastPing(*this);
 
             //mnodeman.mapSeenMasternodeBroadcast.lastPing is probably outdated, so we'll update it
             CMasternodeBroadcast mnb(*pmn);

@@ -65,11 +65,9 @@ bool CMasternodeSync::IsBlockchainSynced()
 
     int64_t blockTime = 0;
     {
-        TRY_LOCK(cs_main, lockMain);
-        if (!lockMain) return false;
-        CBlockIndex *pindex = chainActive.Tip();
-        if (pindex == nullptr) return false;
-        blockTime = pindex->nTime;
+        TRY_LOCK(g_best_block_mutex, lock);
+        if (!lock) return false;
+        blockTime = g_best_block_time;
     }
 
     if (blockTime + 60 * 60 < lastProcess)
@@ -280,7 +278,7 @@ void CMasternodeSync::Process()
     if (RequestedMasternodeAssets == MASTERNODE_SYNC_INITIAL) GetNextAsset();
 
     // sporks synced but blockchain is not, wait until we're almost at a recent block to continue
-    if (!isRegTestNet && !IsBlockchainSynced() &&
+    if (!IsBlockchainSynced() &&
         RequestedMasternodeAssets > MASTERNODE_SYNC_SPORKS) return;
 
     CMasternodeSync* sync = this;
