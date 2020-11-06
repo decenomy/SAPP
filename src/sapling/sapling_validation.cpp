@@ -57,13 +57,6 @@ bool CheckTransactionWithoutProofVerification(const CTransaction& tx, CValidatio
     // If the tx got to this point, must be +v2.
     assert(tx.isSaplingVersion());
 
-    // Size limits
-    BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT >= MAX_TX_SIZE_AFTER_SAPLING); // sanity
-    BOOST_STATIC_ASSERT(MAX_TX_SIZE_AFTER_SAPLING > MAX_ZEROCOIN_TX_SIZE); // sanity
-    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_TX_SIZE_AFTER_SAPLING)
-        return state.DoS(100, error("%s: size limits failed", __func__ ),
-                         REJECT_INVALID, "bad-txns-oversize");
-
     // Check for non-zero valueBalance when there are no Sapling inputs or outputs
     if (tx.sapData->vShieldedSpend.empty() && tx.sapData->vShieldedOutput.empty() && tx.sapData->valueBalance != 0) {
         return state.DoS(100, error("%s: tx.sapData->valueBalance has no sources or sinks", __func__ ),
@@ -157,14 +150,6 @@ bool ContextualCheckTransaction(
                 error("%s: Sapling version too low", __func__ ),
                 REJECT_INVALID, "bad-tx-sapling-version-too-low");
     }
-
-    // Size limits
-    BOOST_STATIC_ASSERT(MAX_BLOCK_SIZE_CURRENT > MAX_TX_SIZE_AFTER_SAPLING); // sanity
-    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_TX_SIZE_AFTER_SAPLING)
-        return state.DoS(
-                dosLevelPotentiallyRelaxing,
-                error("%s: size limits failed", __func__ ),
-                REJECT_INVALID, "bad-txns-oversize");
 
     bool hasShieldedData = tx.hasSaplingData();
     // A coinbase/coinstake transaction cannot have output descriptions nor shielded spends
