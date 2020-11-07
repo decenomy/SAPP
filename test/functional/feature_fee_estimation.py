@@ -155,9 +155,9 @@ class EstimateFeeTest(PivxTestFramework):
         But first we need to use one node to create a lot of outputs
         which we will use to generate our transactions.
         """
-        self.add_nodes(3, extra_args=[[],
-                                      ["-blockmaxsize=18000"],
-                                      ["-blockmaxsize=9000"]])
+        self.add_nodes(3, extra_args=[["-minrelaytxfee=0.000001"],
+                                      ["-minrelaytxfee=0.000001", "-blockmaxsize=18000"],
+                                      ["-minrelaytxfee=0.000001", "-blockmaxsize=9000"]])
         # Use node0 to mine blocks for input splitting
         # Node1 mines small blocks but that are bigger than the expected transaction rate.
         # NOTE: the CreateNewBlock code starts counting block size at 1,000 bytes,
