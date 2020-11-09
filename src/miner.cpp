@@ -573,16 +573,19 @@ bool ProcessBlockFound(const std::shared_ptr<const CBlock>& pblock, CWallet& wal
 
 bool fGenerateBitcoins = false;
 bool fStakeableCoins = false;
-int nMintableLastCheck = 0;
 
-void CheckForCoins(CWallet* pwallet, const int minutes, std::vector<CStakeableOutput>* availableCoins)
+void CheckForCoins(CWallet* pwallet, std::vector<CStakeableOutput>* availableCoins)
 {
-    //control the amount of times the client will check for mintable coins
-    int nTimeNow = GetTime();
-    if ((nTimeNow - nMintableLastCheck > minutes * 60)) {
-        nMintableLastCheck = nTimeNow;
-        fStakeableCoins = pwallet->StakeableCoins(availableCoins);
+    if (!pwallet || !pwallet->pStakerStatus)
+        return;
+
+    // control the amount of times the client will check for mintable coins (every block)
+    {
+        WAIT_LOCK(g_best_block_mutex, lock);
+        if (g_best_block == pwallet->pStakerStatus->GetLastHash())
+            return;
     }
+    fStakeableCoins = pwallet->StakeableCoins(availableCoins);
 }
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
@@ -616,14 +619,14 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 continue;
             }
 
-            // update fStakeableCoins (5 minute check time);
-            CheckForCoins(pwallet, 5, &availableCoins);
+            // update fStakeableCoins
+            CheckForCoins(pwallet, &availableCoins);
 
             while ((g_connman && g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0 && Params().MiningRequiresPeers())
                     || pwallet->IsLocked() || !fStakeableCoins || masternodeSync.NotCompleted()) {
                 MilliSleep(5000);
-                // Do a separate 1 minute check here to ensure fStakeableCoins is updated
-                if (!fStakeableCoins) CheckForCoins(pwallet, 1, &availableCoins);
+                // Do another check here to ensure fStakeableCoins is updated
+                if (!fStakeableCoins) CheckForCoins(pwallet, &availableCoins);
             }
 
             //search our map of hashed blocks, see if bestblock has been hashed yet
