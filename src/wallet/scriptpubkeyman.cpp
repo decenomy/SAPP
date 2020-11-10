@@ -7,13 +7,13 @@
 #include "crypter.h"
 #include "script/standard.h"
 
-bool ScriptPubKeyMan::SetupGeneration(bool newKeypool, bool force)
+bool ScriptPubKeyMan::SetupGeneration(bool newKeypool, bool force, bool memOnly)
 {
     if (CanGenerateKeys() && !force) {
         return false;
     }
 
-    SetHDSeed(GenerateNewSeed(), force);
+    SetHDSeed(GenerateNewSeed(), force, memOnly);
     if (newKeypool && !NewKeyPool()) {
         return false;
     }
@@ -654,7 +654,7 @@ CPubKey ScriptPubKeyMan::DeriveNewSeed(const CKey& key)
 
 //////////////////////////////////////////////////////////////////////
 
-void ScriptPubKeyMan::SetHDSeed(const CPubKey& seed, bool force)
+void ScriptPubKeyMan::SetHDSeed(const CPubKey& seed, bool force, bool memOnly)
 {
     if (!hdChain.IsNull() && !force)
         throw std::runtime_error(std::string(__func__) + ": trying to set a hd seed on an already created chain");
@@ -668,7 +668,7 @@ void ScriptPubKeyMan::SetHDSeed(const CPubKey& seed, bool force)
         throw std::runtime_error(std::string(__func__) + ": set hd seed failed");
     }
 
-    SetHDChain(newHdChain, false);
+    SetHDChain(newHdChain, memOnly);
     // TODO: Connect this if is needed.
     //NotifyCanGetAddressesChanged();
 }

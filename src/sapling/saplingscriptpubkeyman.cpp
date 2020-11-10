@@ -59,8 +59,7 @@ void SaplingScriptPubKeyMan::UpdateSaplingNullifierNoteMapWithTx(CWalletTx& wtx)
                 mapSaplingNullifiersToNotes.erase(item.second.nullifier.get());
             }
             item.second.nullifier = boost::none;
-        }
-        else {
+        } else {
             uint64_t position = nd.witnesses.front().position();
             auto extfvk = wallet->mapSaplingFullViewingKeys.at(nd.ivk);
             OutputDescription output = wtx.sapData->vShieldedOutput[op.n];
@@ -342,6 +341,7 @@ std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> SaplingScriptPubKe
             SaplingOutPoint op {hash, i};
             SaplingNoteData nd;
             nd.ivk = ivk;
+            nd.amount = result->value();
             noteData.insert(std::make_pair(op, nd));
             break;
         }
@@ -501,6 +501,116 @@ std::set<std::pair<libzcash::PaymentAddress, uint256>> SaplingScriptPubKeyMan::G
         }
     }
     return nullifierSet;
+}
+
+CAmount SaplingScriptPubKeyMan::TryToRecoverAndSetAmount(const CWalletTx& tx, const SaplingOutPoint& op)
+{
+    CAmount nCredit = 0;
+    // if amount was not set, let's try to decrypt the note and set it.
+    auto noteAndAddress = tx.DecryptSaplingNote(op);
+    // todo: if cannot be decrypted, use RecoverSaplingNote.
+    if (noteAndAddress) {
+        const libzcash::SaplingNotePlaintext &note = noteAndAddress->first;
+        nCredit = note.value();
+        // if it's not set, then set it.
+        wallet->mapWallet[tx.GetHash()].mapSaplingNoteData[op].amount = nCredit;
+    }
+    return nCredit;
+}
+
+CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const SaplingOutPoint& op)
+{
+    const auto& it = tx.mapSaplingNoteData.find(op);
+    if (it == tx.mapSaplingNoteData.end()) {
+        return 0;
+    }
+    SaplingNoteData noteData = it->second;
+    return (noteData.amount) ? *noteData.amount : TryToRecoverAndSetAmount(tx, op);
+}
+
+CAmount SaplingScriptPubKeyMan::GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent)
+{
+    CAmount nCredit = 0;
+    for (int i = 0; i < (int) tx.sapData->vShieldedOutput.size(); ++i) {
+        SaplingOutPoint op(tx.GetHash(), i);
+        if (tx.mapSaplingNoteData.find(op) == tx.mapSaplingNoteData.end()) {
+            continue;
+        }
+        // Obtain the noteData and check if the nullifier has being spent or not
+        SaplingNoteData noteData = tx.mapSaplingNoteData.at(op);
+
+        // The nullifier could be null if the wallet was locked when the noteData was created.
+        if (noteData.nullifier &&
+            (fUnspent && IsSaplingSpent(*noteData.nullifier))) {
+            continue; // only unspent
+        }
+        // todo: check if we can spend this note or not. (if not, then it's a watch only)
+
+        // Check whether the note value was already cached or needs to be loaded
+        nCredit += noteData.amount ? *noteData.amount : TryToRecoverAndSetAmount(tx, op);
+    }
+    return nCredit;
+}
+
+CAmount SaplingScriptPubKeyMan::GetDebit(const CTransaction& tx, const isminefilter& filter)
+{
+    CAmount nDebit = 0;
+    for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
+        const auto &it = mapSaplingNullifiersToNotes.find(spend.nullifier);
+        if (it != mapSaplingNullifiersToNotes.end()) {
+            // If we have the sapling output means that this input is mine.
+            SaplingOutPoint op = it->second;
+            const auto& itTx = wallet->mapWallet.find(op.hash);
+            if (itTx == wallet->mapWallet.end()) {
+                continue;
+            }
+
+            // Now try to decrypt the note (it should never fail if it reach to this point, mapSaplingNullifiersToNotes is loaded after the note decryption)
+            Optional<std::pair<
+                    libzcash::SaplingNotePlaintext,
+                    libzcash::SaplingPaymentAddress>> decryptedNote = itTx->second.DecryptSaplingNote(op);
+
+            // todo: Add watch only check.
+            CAmount value = decryptedNote->first.value();
+            nDebit += value;
+            if (!Params().GetConsensus().MoneyRange(nDebit))
+                throw std::runtime_error("SaplingScriptPubKeyMan::GetDebit() : value out of range");
+        }
+    }
+    return nDebit;
+}
+
+CAmount SaplingScriptPubKeyMan::GetShieldedChange(const CWalletTx& wtx)
+{
+    if (!wtx.isSapling() || wtx.sapData->vShieldedOutput.empty()) {
+        return 0;
+    }
+    const uint256& txHash = wtx.GetHash();
+    CAmount nChange = 0;
+    SaplingOutPoint sapOutPoint{txHash, 0};
+    for (uint32_t pos = 0; pos < (uint32_t) wtx.sapData->vShieldedOutput.size(); ++pos) {
+        sapOutPoint.n = pos;
+        const auto noteAndAddress = wtx.DecryptSaplingNote(sapOutPoint);
+        if (noteAndAddress) {
+            const libzcash::SaplingNotePlaintext& notePlaintext = noteAndAddress->first;
+            const libzcash::SaplingPaymentAddress& pa = noteAndAddress->second;
+
+            if (IsNoteSaplingChange(sapOutPoint, pa)) {
+                nChange += notePlaintext.value();
+                if (!Params().GetConsensus().MoneyRange(nChange))
+                    throw std::runtime_error("GetShieldedChange() : value out of range");
+            }
+        }
+    }
+    return nChange;
+}
+
+bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address)
+{
+    LOCK(wallet->cs_KeyStore);
+    std::set<libzcash::PaymentAddress> shieldedAddresses = {address};
+    std::set<std::pair<libzcash::PaymentAddress, uint256>> nullifierSet = GetNullifiersForAddresses(shieldedAddresses);
+    return IsNoteSaplingChange(nullifierSet, address, op);
 }
 
 bool SaplingScriptPubKeyMan::IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>> & nullifierSet,
@@ -894,9 +1004,9 @@ bool SaplingScriptPubKeyMan::LoadSaplingPaymentAddress(
 
 ///////////////////// Setup ///////////////////////////////////////
 
-bool SaplingScriptPubKeyMan::SetupGeneration(const CKeyID& keyID, bool force)
+bool SaplingScriptPubKeyMan::SetupGeneration(const CKeyID& keyID, bool force, bool memonly)
 {
-    SetHDSeed(keyID, force);
+    SetHDSeed(keyID, force, memonly);
     return true;
 }
 

@@ -73,18 +73,18 @@ std::string COutput::ToString() const
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool CWallet::SetupSPKM(bool newKeypool)
+bool CWallet::SetupSPKM(bool newKeypool, bool memOnly)
 {
-    if (m_spk_man->SetupGeneration(newKeypool, true)) {
+    if (m_spk_man->SetupGeneration(newKeypool, true, memOnly)) {
         LogPrintf("%s : spkm setup completed\n", __func__);
-        return ActivateSaplingWallet();
+        return ActivateSaplingWallet(memOnly);
     }
     return false;
 }
 
-bool CWallet::ActivateSaplingWallet()
+bool CWallet::ActivateSaplingWallet(bool memOnly)
 {
-    if (m_sspk_man->SetupGeneration(m_spk_man->GetHDChain().GetID())) {
+    if (m_sspk_man->SetupGeneration(m_spk_man->GetHDChain().GetID(), true, memOnly)) {
         LogPrintf("%s : sapling spkm setup completed\n", __func__);
         return true;
     }
@@ -1005,12 +1005,26 @@ bool CWallet::LoadToWallet(const CWalletTx& wtxIn)
     return true;
 }
 
+bool CWallet::FindNotesDataAndAddMissingIVKToKeystore(const CTransaction& tx, Optional<mapSaplingNoteData_t>& saplingNoteData)
+{
+    auto saplingNoteDataAndAddressesToAdd = m_sspk_man->FindMySaplingNotes(tx);
+    saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
+    auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
+    // Add my addresses
+    for (const auto& addressToAdd : addressesToAdd) {
+        if (!m_sspk_man->AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * Add a transaction to the wallet, or update it.
  * pblock is optional, but should be provided if the transaction is known to be in a block.
  * If fUpdate is true, existing transactions will be updated.
  */
-bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex* pIndex, int posInBlock, bool fUpdate)
+bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& blockHash, int posInBlock, bool fUpdate)
 {
     {
         AssertLockHeld(cs_wallet);
@@ -1020,8 +1034,8 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
                 std::pair<TxSpends::const_iterator, TxSpends::const_iterator> range = mapTxSpends.equal_range(txin.prevout);
                 while (range.first != range.second) {
                     if (range.first->second != tx.GetHash()) {
-                        LogPrintf("Transaction %s (in block %s) conflicts with wallet transaction %s (both spend %s:%i)\n", tx.GetHash().ToString(), pIndex->GetBlockHash().ToString(), range.first->second.ToString(), range.first->first.hash.ToString(), range.first->first.n);
-                        MarkConflicted(pIndex->GetBlockHash(), range.first->second);
+                        LogPrintf("Transaction %s (in block %s) conflicts with wallet transaction %s (both spend %s:%i)\n", tx.GetHash().ToString(), blockHash.ToString(), range.first->second.ToString(), range.first->first.hash.ToString(), range.first->first.n);
+                        MarkConflicted(blockHash, range.first->second);
                     }
                     range.first++;
                 }
@@ -1032,20 +1046,14 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
         if (fExisted && !fUpdate) return false;
 
         // Check tx for Sapling notes
-        mapSaplingNoteData_t saplingNoteData;
+        Optional<mapSaplingNoteData_t> saplingNoteData {nullopt};
         if (HasSaplingSPKM()) {
-            auto saplingNoteDataAndAddressesToAdd = m_sspk_man->FindMySaplingNotes(tx);
-            saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
-            auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
-            // Add my addresses
-            for (const auto &addressToAdd : addressesToAdd) {
-                if (!m_sspk_man->AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
-                    return false;
-                }
+            if (!FindNotesDataAndAddMissingIVKToKeystore(tx, saplingNoteData)) {
+                return false; // error adding incoming viewing key.
             }
         }
 
-        if (fExisted || IsMine(tx) || IsFromMe(tx) || saplingNoteData.size() > 0) {
+        if (fExisted || IsMine(tx) || IsFromMe(tx) || (saplingNoteData && !saplingNoteData->empty())) {
 
             /* Check if any keys in the wallet keypool that were supposed to be unused
              * have appeared in a new transaction. If so, remove those keys from the keypool.
@@ -1060,13 +1068,13 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex
 
             CWalletTx wtx(this, tx);
 
-            if (saplingNoteData.size() > 0) {
-                wtx.SetSaplingNoteData(saplingNoteData);
+            if (saplingNoteData && !saplingNoteData->empty()) {
+                wtx.SetSaplingNoteData(*saplingNoteData);
             }
 
             // Get merkle branch if transaction was found in a block
             if (posInBlock != -1)
-                wtx.SetMerkleBranch(pIndex->GetBlockHash(), posInBlock);
+                wtx.SetMerkleBranch(blockHash, posInBlock);
 
             return AddToWallet(wtx, false);
         }
@@ -1194,7 +1202,7 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
 void CWallet::SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock)
 {
     LOCK(cs_wallet);
-    if (!AddToWalletIfInvolvingMe(tx, pindex, posInBlock, true))
+    if (!AddToWalletIfInvolvingMe(tx, (pindex) ? pindex->GetBlockHash() : uint256(), posInBlock, true))
         return; // Not one of ours
 
     MarkAffectedTransactionsDirty(tx);
@@ -1347,8 +1355,9 @@ bool CWalletTx::IsAmountCached(AmountType type, const isminefilter& filter) cons
 //! filter decides which addresses will count towards the debit
 CAmount CWalletTx::GetDebit(const isminefilter& filter) const
 {
-    if (vin.empty())
+    if (vin.empty() && (sapData && sapData->vShieldedSpend.empty())) {
         return 0;
+    }
 
     CAmount debit = 0;
     if (filter & ISMINE_SPENDABLE) {
@@ -1363,6 +1372,10 @@ CAmount CWalletTx::GetDebit(const isminefilter& filter) const
     if (filter & ISMINE_SPENDABLE_DELEGATED) {
         debit += GetCachableAmount(DEBIT, ISMINE_SPENDABLE_DELEGATED);
     }
+    if (filter & ISMINE_SPENDABLE_SHIELDED) {
+        debit += GetCachableAmount(DEBIT, ISMINE_SPENDABLE_SHIELDED);
+    }
+
     return debit;
 }
 
@@ -1392,6 +1405,9 @@ CAmount CWalletTx::GetCredit(const isminefilter& filter, bool recalculate) const
     if (filter & ISMINE_SPENDABLE_DELEGATED) {
         credit += GetCachableAmount(CREDIT, ISMINE_SPENDABLE_DELEGATED, recalculate);
     }
+    if (filter & ISMINE_SPENDABLE_SHIELDED) {
+        credit += GetCachableAmount(CREDIT, ISMINE_SPENDABLE_SHIELDED);
+    }
     return credit;
 }
 
@@ -1411,7 +1427,8 @@ CAmount CWalletTx::GetAvailableCredit(bool fUseCache, const isminefilter& filter
         return 0;
 
     // Avoid caching ismine for NO or ALL cases (could remove this check and simplify in the future).
-    bool allow_cache = filter == ISMINE_SPENDABLE || filter == ISMINE_WATCH_ONLY;
+    bool allow_cache = filter == ISMINE_SPENDABLE || filter == ISMINE_WATCH_ONLY ||
+            filter == ISMINE_SPENDABLE_SHIELDED || filter == ISMINE_WATCH_ONLY_SHIELDED;
 
     // Must wait until coinbase/coinstake is safely deep enough in the chain before valuing it
     if (GetBlocksToMaturity() > 0)
@@ -1422,13 +1439,25 @@ CAmount CWalletTx::GetAvailableCredit(bool fUseCache, const isminefilter& filter
     }
 
     CAmount nCredit = 0;
-    const uint256& hashTx = GetHash();
-    for (unsigned int i = 0; i < vout.size(); i++) {
-        if (!pwallet->IsSpent(hashTx, i)) {
-            const CTxOut &txout = vout[i];
-            nCredit += pwallet->GetCredit(txout, filter);
-            if (!Params().GetConsensus().MoneyRange(nCredit))
-                throw std::runtime_error(std::string(__func__) + " : value out of range");
+    // If the filter is only for shielded amounts, do not calculate the regular outputs
+    if (filter != ISMINE_SPENDABLE_SHIELDED && filter != ISMINE_WATCH_ONLY_SHIELDED) {
+
+        const uint256& hashTx = GetHash();
+        for (unsigned int i = 0; i < vout.size(); i++) {
+            if (!pwallet->IsSpent(hashTx, i)) {
+                const CTxOut &txout = vout[i];
+                nCredit += pwallet->GetCredit(txout, filter);
+                if (!Params().GetConsensus().MoneyRange(nCredit))
+                    throw std::runtime_error(std::string(__func__) + " : value out of range");
+            }
+        }
+
+    }
+
+    if (pwallet->HasSaplingSPKM()) {
+        // Can calculate the shielded available balance.
+        if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+            nCredit += pwallet->GetSaplingScriptPubKeyMan()->GetCredit(*this, filter, true);
         }
     }
 
@@ -1640,7 +1669,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
             int posInBlock;
             for (posInBlock = 0; posInBlock < (int)block.vtx.size(); posInBlock++) {
                 const auto& tx = block.vtx[posInBlock];
-                if (AddToWalletIfInvolvingMe(*tx, pindex, posInBlock, fUpdate)) {
+                if (AddToWalletIfInvolvingMe(*tx, pindex->GetBlockHash(), posInBlock, fUpdate)) {
                     myTxHashes.push_back(tx->GetHash());
                     ret++;
                 }
@@ -4365,15 +4394,31 @@ CAmount CWallet::GetDebit(const CTransaction& tx, const isminefilter& filter) co
         if (!Params().GetConsensus().MoneyRange(nDebit))
             throw std::runtime_error("CWallet::GetDebit() : value out of range");
     }
+
+    // Shielded debit
+    if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+        if (tx.hasSaplingData()) {
+            nDebit += m_sspk_man->GetDebit(tx, filter);
+        }
+    }
+
     return nDebit;
 }
 
-CAmount CWallet::GetCredit(const CTransaction& tx, const isminefilter& filter) const
+CAmount CWallet::GetCredit(const CWalletTx& tx, const isminefilter& filter) const
 {
     CAmount nCredit = 0;
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         nCredit += GetCredit(tx.vout[i], filter);
     }
+
+    // Shielded credit
+    if (filter & ISMINE_SPENDABLE_SHIELDED || filter & ISMINE_WATCH_ONLY_SHIELDED) {
+        if (tx.hasSaplingData()) {
+            nCredit += m_sspk_man->GetCredit(tx, filter, false);
+        }
+    }
+
     if (!Params().GetConsensus().MoneyRange(nCredit))
         throw std::runtime_error("CWallet::GetCredit() : value out of range");
     return nCredit;
@@ -4473,6 +4518,8 @@ void CWalletTx::Init(const CWallet* pwalletIn)
     fChangeCached = false;
     nChangeCached = 0;
     fStakeDelegationVoided = false;
+    fShieldedChangeCached = false;
+    nShieldedChangeCached = 0;
     nOrderPos = -1;
 }
 
@@ -4537,6 +4584,8 @@ void CWalletTx::MarkDirty()
     m_amounts[AVAILABLE_CREDIT].Reset();
     nChangeCached = 0;
     fChangeCached = false;
+    nShieldedChangeCached = 0;
+    fShieldedChangeCached = false;
     fStakeDelegationVoided = false;
 }
 
@@ -4633,12 +4682,26 @@ CAmount CWalletTx::GetChange() const
     return nChangeCached;
 }
 
+CAmount CWalletTx::GetShieldedChange() const
+{
+    if (fShieldedChangeCached) {
+        return nShieldedChangeCached;
+    }
+    nShieldedChangeCached = pwallet->GetSaplingScriptPubKeyMan()->GetShieldedChange(*this);
+    fShieldedChangeCached = true;
+    return nShieldedChangeCached;
+}
+
 bool CWalletTx::IsFromMe(const isminefilter& filter) const
 {
     return (GetDebit(filter) > 0);
 }
 
+CAmount CWalletTx::GetShieldedAvailableCredit(bool fUseCache) const
+{
+    return GetAvailableCredit(fUseCache, ISMINE_SPENDABLE_SHIELDED);
+}
+
 CStakeableOutput::CStakeableOutput(const CWalletTx* txIn, int iIn, int nDepthIn, bool fSpendableIn, bool fSolvableIn,
                                    const CBlockIndex*& _pindex) : COutput(txIn, iIn, nDepthIn, fSpendableIn, fSolvableIn),
                                                                 pindex(_pindex) {}
-

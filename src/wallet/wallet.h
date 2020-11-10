@@ -280,6 +280,7 @@ private:
 
 template <class T>
 using TxSpendMap = std::multimap<T, uint256>;
+typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
 
 /**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
@@ -352,7 +353,7 @@ public:
     static const CAmount DEFAULT_STAKE_SPLIT_THRESHOLD = 500 * COIN;
 
     //! Generates hd wallet //
-    bool SetupSPKM(bool newKeypool = true);
+    bool SetupSPKM(bool newKeypool = true, bool memOnly = false);
     //! Whether the wallet is hd or not //
     bool IsHDEnabled() const;
 
@@ -485,6 +486,9 @@ public:
 
     //////////// Sapling //////////////////
 
+    // Search for notes and addresses from this wallet in the tx, and add the addresses --> IVK mapping to the keystore if missing.
+    bool FindNotesDataAndAddMissingIVKToKeystore(const CTransaction& tx, Optional<mapSaplingNoteData_t>& saplingNoteData);
+
     //! Generates new Sapling key
     libzcash::SaplingPaymentAddress GenerateNewSaplingZKey();
 
@@ -573,14 +577,14 @@ public:
     bool AddToWallet(const CWalletTx& wtxIn, bool fFlushOnClose = true);
     bool LoadToWallet(const CWalletTx& wtxIn);
     void SyncTransaction(const CTransaction& tx, const CBlockIndex *pindex, int posInBlock);
-    bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlockIndex* pIndex, int posInBlock, bool fUpdate);
+    bool AddToWalletIfInvolvingMe(const CTransaction& tx, const uint256& blockHash, int posInBlock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
 
     /**
      * Upgrade wallet to HD and Sapling if needed. Does nothing if not.
      */
     bool Upgrade(std::string& error, const int& prevVersion);
-    bool ActivateSaplingWallet();
+    bool ActivateSaplingWallet(bool memOnly = false);
 
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false, bool fromStartup = false);
     void ReacceptWalletTransactions(bool fFirstLoad = false);
@@ -684,7 +688,7 @@ public:
     /** should probably be renamed to IsRelevantToMe */
     bool IsFromMe(const CTransaction& tx) const;
     CAmount GetDebit(const CTransaction& tx, const isminefilter& filter) const;
-    CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const;
+    CAmount GetCredit(const CWalletTx& tx, const isminefilter& filter) const;
     CAmount GetChange(const CTransaction& tx) const;
 
     //! Sapling merkle tree update
@@ -943,9 +947,6 @@ public:
     void setAbandoned() { hashBlock = ABANDON_HASH; }
 };
 
-// Sapling map
-typedef std::map<SaplingOutPoint, SaplingNoteData> mapSaplingNoteData_t;
-
 /**
  * A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
@@ -974,9 +975,12 @@ public:
     CAmount GetCachableAmount(AmountType type, const isminefilter& filter, bool recalculate = false) const;
     bool IsAmountCached(AmountType type, const isminefilter& filter) const; // Only used in unit tests
     mutable CachableAmount m_amounts[AMOUNTTYPE_ENUM_ELEMENTS];
-    mutable bool fChangeCached;
+
     mutable bool fStakeDelegationVoided;
+    mutable bool fChangeCached;
     mutable CAmount nChangeCached;
+    mutable bool fShieldedChangeCached;
+    mutable CAmount nShieldedChangeCached;
 
     CWalletTx();
     CWalletTx(const CWallet* pwalletIn);
@@ -1060,6 +1064,10 @@ public:
     CAmount GetImmatureWatchOnlyCredit(const bool& fUseCache = true) const;
     CAmount GetAvailableWatchOnlyCredit(const bool& fUseCache = true) const;
     CAmount GetChange() const;
+
+    // Shielded credit/debit/change
+    CAmount GetShieldedChange() const;
+    CAmount GetShieldedAvailableCredit(bool fUseCache = true) const;
 
     // Cold staking contracts credit/debit
     CAmount GetColdStakingCredit(bool fUseCache = true) const;

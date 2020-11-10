@@ -47,6 +47,11 @@ public:
 
     std::list<SaplingWitness> witnesses;
     libzcash::SaplingIncomingViewingKey ivk;
+    /**
+     * Cached note amount.
+     * It will be loaded the first time that the note is decrypted.
+     */
+    Optional<CAmount> amount{nullopt};
 
     /**
      * Block height corresponding to the most current witness.
@@ -155,7 +160,7 @@ public:
     /**
      * Set and initialize the Sapling HD chain.
      */
-    bool SetupGeneration(const CKeyID& keyID, bool force = false);
+    bool SetupGeneration(const CKeyID& keyID, bool force = false, bool memonly = false);
     bool IsEnabled() const { return !hdChain.IsNull(); };
 
     /* Set the current HD seed (will reset the chain child index counters)
@@ -256,6 +261,21 @@ public:
 
     std::set<std::pair<libzcash::PaymentAddress, uint256>> GetNullifiersForAddresses(const std::set<libzcash::PaymentAddress> & addresses);
     bool IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>>& nullifierSet, const libzcash::PaymentAddress& address, const SaplingOutPoint& entry);
+
+    //! Try to decrypt the note and load the amount into the always available SaplingNoteData
+    CAmount TryToRecoverAndSetAmount(const CWalletTx& tx, const SaplingOutPoint& op);
+
+    //! Return the shielded credit of an specific output description
+    CAmount GetCredit(const CWalletTx& tx, const SaplingOutPoint& op);
+    //! Return the shielded credit of the tx
+    CAmount GetCredit(const CWalletTx& tx, const isminefilter& filter, const bool fUnspent = false);
+    //! Return the shielded debit of the tx.
+    CAmount GetDebit(const CTransaction& tx, const isminefilter& filter);
+    //! Return the shielded change of the tx
+    CAmount GetShieldedChange(const CWalletTx& wtx);
+
+    //! Check whether an specific output is change or not.
+    bool IsNoteSaplingChange(const SaplingOutPoint& op, libzcash::SaplingPaymentAddress address);
 
     //! Update note data if is needed
     bool UpdatedNoteData(const CWalletTx& wtxIn, CWalletTx& wtx);
