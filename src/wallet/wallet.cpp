@@ -483,7 +483,7 @@ void CWallet::SetBestChainInternal(CWalletDB& walletdb, const CBlockLocator& loc
         // transactions in which we only have transparent addresses involved.
         if (!wtx.mapSaplingNoteData.empty()) {
             // Sanity check
-            if (wtx.nVersion < CTransaction::SAPLING_VERSION) {
+            if (!wtx.isSaplingVersion()) {
                 LogPrintf("SetBestChain(): ERROR, Invalid tx version found with sapling data\n");
                 walletdb.TxnAbort();
                 uiInterface.ThreadSafeMessageBox(
@@ -1211,7 +1211,7 @@ void CWallet::MarkAffectedTransactionsDirty(const CTransaction& tx)
     }
 
     // Sapling
-    if (HasSaplingSPKM() && tx.isSapling() && tx.hasSaplingData()) {
+    if (HasSaplingSPKM() && tx.IsShieldedTx()) {
         for (const SpendDescription &spend : tx.sapData->vShieldedSpend) {
             uint256 nullifier = spend.nullifier;
             if (m_sspk_man->mapSaplingNullifiersToNotes.count(nullifier) &&
@@ -4346,7 +4346,7 @@ bool CWallet::IsFromMe(const CTransaction& tx) const
         return true;
     }
 
-    if (tx.hasSaplingData()) {
+    if (tx.IsShieldedTx()) {
         for (const SpendDescription& spend : tx.sapData->vShieldedSpend) {
             if (m_sspk_man->IsSaplingNullifierFromMe(spend.nullifier)) {
                 return true;

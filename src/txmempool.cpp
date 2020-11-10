@@ -29,7 +29,7 @@ CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFe
     nModSize = _tx->CalculateModifiedSize(nTxSize);
     nUsageSize = _tx->DynamicMemoryUsage();
     hasZerocoins = _tx->ContainsZerocoins();
-    m_isShielded = _tx->hasSaplingData();
+    m_isShielded = _tx->IsShieldedTx();
 
     nCountWithDescendants = 1;
     nSizeWithDescendants = nTxSize;

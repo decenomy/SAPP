@@ -365,7 +365,7 @@ double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight, CAmount
     // cannot apply the priority algorithm used for transparent utxos.  Instead, we just
     // use the maximum priority for all (partially or fully) shielded transactions.
     // (Note that coinbase/coinstakes transactions cannot contain Sapling shielded Spends or Outputs.)
-    if (tx.hasSaplingData()) {
+    if (tx.IsShieldedTx()) {
         return INF_PRIORITY;
     }
 
@@ -582,7 +582,7 @@ uint256 CCoinsViewCache::GetBestAnchor() const {
 
 bool CCoinsViewCache::HaveShieldedRequirements(const CTransaction& tx) const
 {
-    if (tx.hasSaplingData()) {
+    if (tx.IsShieldedTx()) {
         for (const SpendDescription &spendDescription : tx.sapData->vShieldedSpend) {
             if (GetNullifier(spendDescription.nullifier)) // Prevent double spends
                 return false;

@@ -452,7 +452,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             // Update the Sapling commitment tree.
             for (const auto &tx : pblock->vtx) {
-                if (tx->isSapling() && tx->hasSaplingData()) {
+                if (tx->IsShieldedTx()) {
                     for (const OutputDescription &odesc : tx->sapData->vShieldedOutput) {
                         sapling_tree.append(odesc.cmu);
                     }

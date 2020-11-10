@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(sighash_test)
         }
         std::cout << "\n";
         #endif
-        if (txTo.nVersion != CTransaction::SAPLING_VERSION) { // Sapling has a different signature.
+        if (txTo.nVersion < CTransaction::TxVersion::SAPLING) { // Sapling has a different signature.
             BOOST_CHECK(sh == sho);
         }
     }

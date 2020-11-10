@@ -224,10 +224,13 @@ private:
     void UpdateHash() const;
 
 public:
-    static const int32_t STANDARD_VERSION = 1;
-    static const int32_t SAPLING_VERSION = 2;
+    enum TxVersion {
+        LEGACY      = 1,
+        SAPLING     = 2,
+        TOOHIGH
+    };
 
-    static const int32_t CURRENT_VERSION = STANDARD_VERSION;
+    static const int32_t CURRENT_VERSION = static_cast<int32_t>(TxVersion::LEGACY);
 
     // The local variables are made const to prevent unintended modification
     // without updating the cached hash value. However, CTransaction is not
@@ -258,7 +261,7 @@ public:
         READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
 
-        if (g_IsSaplingActive && nVersion == CTransaction::SAPLING_VERSION) {
+        if (g_IsSaplingActive && isSaplingVersion()) {
             READWRITE(*const_cast<Optional<SaplingTxData>*>(&sapData));
         }
 
@@ -286,9 +289,14 @@ public:
             sapData->hasBindingSig());
     };
 
-    bool isSapling() const
+    bool isSaplingVersion() const
     {
-        return nVersion == SAPLING_VERSION;
+        return nVersion >= TxVersion::SAPLING;
+    }
+
+    bool IsShieldedTx() const
+    {
+        return isSaplingVersion() && hasSaplingData();
     }
 
     /*
@@ -371,7 +379,7 @@ struct CMutableTransaction
         READWRITE(vout);
         READWRITE(nLockTime);
 
-        if (g_IsSaplingActive && nVersion == CTransaction::SAPLING_VERSION) {
+        if (g_IsSaplingActive && nVersion >= CTransaction::TxVersion::SAPLING) {
             READWRITE(*const_cast<Optional<SaplingTxData>*>(&sapData));
         }
     }

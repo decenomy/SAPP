@@ -1311,7 +1311,7 @@ UniValue viewshieldedtransaction(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid or non-wallet transaction id");
     const CWalletTx& wtx = pwalletMain->mapWallet[hash];
 
-    if (wtx.nVersion < CTransaction::SAPLING_VERSION || !wtx.hasSaplingData()) {
+    if (!wtx.IsShieldedTx()) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid transaction, no shielded data available");
     }
 
@@ -1553,7 +1553,7 @@ UniValue shielded_sendmany(const JSONRPCRequest& request) {
 
     // Now check the transaction
     CMutableTransaction mtx;
-    mtx.nVersion = CTransaction::SAPLING_VERSION;
+    mtx.nVersion = CTransaction::TxVersion::SAPLING;
     unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
 
     // As a sanity check, estimate and verify that the size of the transaction will be valid.

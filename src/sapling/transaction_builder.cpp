@@ -103,7 +103,7 @@ CMutableTransaction CreateNewContextualCMutableTransaction(const Consensus::Para
 {
     CMutableTransaction mtx;
     bool isSapling = consensusParams.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_V5_DUMMY);
-    mtx.nVersion = isSapling ? CTransaction::SAPLING_VERSION : CTransaction::STANDARD_VERSION;
+    mtx.nVersion = isSapling ? CTransaction::TxVersion::SAPLING : CTransaction::TxVersion::LEGACY;
     return mtx;
 }
 
@@ -125,7 +125,7 @@ void TransactionBuilder::AddSaplingSpend(
     SaplingWitness witness)
 {
     // Sanity check: cannot add Sapling spend to pre-Sapling transaction
-    if (mtx.nVersion < CTransaction::SAPLING_VERSION) {
+    if (mtx.nVersion < CTransaction::TxVersion::SAPLING) {
         throw std::runtime_error("TransactionBuilder cannot add Sapling spend to pre-Sapling transaction");
     }
 
@@ -145,7 +145,7 @@ void TransactionBuilder::AddSaplingOutput(
     std::array<unsigned char, ZC_MEMO_SIZE> memo)
 {
     // Sanity check: cannot add Sapling output to pre-Sapling transaction
-    if (mtx.nVersion < CTransaction::SAPLING_VERSION) {
+    if (mtx.nVersion < CTransaction::TxVersion::SAPLING) {
         throw std::runtime_error("TransactionBuilder cannot add Sapling output to pre-Sapling transaction");
     }
 

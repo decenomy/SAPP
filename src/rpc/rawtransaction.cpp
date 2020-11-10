@@ -68,7 +68,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
     TxToUniv(tx, uint256(), entry);
 
     // Sapling
-    if (pwalletMain && tx.nVersion >= CTransaction::SAPLING_VERSION && tx.hasSaplingData()) {
+    if (pwalletMain && tx.IsShieldedTx()) {
         // Add information that only this wallet knows about the transaction if is possible
         if (pwalletMain->HasSaplingSPKM()) {
             std::vector<libzcash::SaplingPaymentAddress> addresses =

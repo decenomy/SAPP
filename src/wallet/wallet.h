@@ -1012,7 +1012,7 @@ public:
         READWRITE(fFromMe);
         READWRITE(fSpent);
 
-        if (this->nVersion >= CTransaction::SAPLING_VERSION) {
+        if (this->isSaplingVersion()) {
             READWRITE(mapSaplingNoteData);
         }
 
