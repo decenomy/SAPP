@@ -582,7 +582,7 @@ CAmount SaplingScriptPubKeyMan::GetDebit(const CTransaction& tx, const isminefil
 
 CAmount SaplingScriptPubKeyMan::GetShieldedChange(const CWalletTx& wtx)
 {
-    if (!wtx.isSapling() || wtx.sapData->vShieldedOutput.empty()) {
+    if (!wtx.isSaplingVersion() || wtx.sapData->vShieldedOutput.empty()) {
         return 0;
     }
     const uint256& txHash = wtx.GetHash();
