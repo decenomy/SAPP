@@ -709,9 +709,8 @@ bool CWallet::HasSaplingSPKM() const
  * Outpoint is spent if any non-conflicted transaction
  * spends it:
  */
-bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
+bool CWallet::IsSpent(const COutPoint& outpoint) const
 {
-    const COutPoint outpoint(hash, n);
     std::pair<TxSpends::const_iterator, TxSpends::const_iterator> range;
     range = mapTxSpends.equal_range(outpoint);
     for (TxSpends::const_iterator it = range.first; it != range.second; ++it) {
@@ -727,6 +726,11 @@ bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
         }
     }
     return false;
+}
+
+bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
+{
+    return IsSpent(COutPoint(hash, n));
 }
 
 void CWallet::AddToSpends(const COutPoint& outpoint, const uint256& wtxid)
@@ -2934,10 +2938,11 @@ bool CWallet::CreateCoinStake(
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
     int nAttempts = 0;
-    for (const auto& out : *availableCoins) {
-        CPivStake stakeInput(out.tx->vout[out.i],
-                             COutPoint(out.tx->GetHash(), out.i),
-                             out.pindex);
+    for (auto it = availableCoins->begin(); it != availableCoins->end();) {
+        COutPoint outPoint = COutPoint(it->tx->GetHash(), it->i);
+        CPivStake stakeInput(it->tx->vout[it->i],
+                             outPoint,
+                             it->pindex);
 
         //new block came in, move on
         if (WITH_LOCK(cs_main, return chainActive.Height()) != pindexPrev->nHeight) return false;
@@ -2945,9 +2950,17 @@ bool CWallet::CreateCoinStake(
         // Make sure the wallet is unlocked and shutdown hasn't been requested
         if (IsLocked() || ShutdownRequested()) return false;
 
+        // Make sure the stake input hasn't been spent since last check
+        if (IsSpent(outPoint)) {
+            // remove it from the available coins
+            it = availableCoins->erase(it);
+            continue;
+        }
+
         // This should never happen
         if (stakeInput.IsZPIV()) {
             LogPrintf("%s: ERROR - zPOS is disabled\n", __func__);
+            it++;
             continue;
         }
 
@@ -2960,7 +2973,10 @@ bool CWallet::CreateCoinStake(
         pStakerStatus->SetLastTime(nTxNewTime);
         pStakerStatus->SetLastTries(nAttempts);
 
-        if (!fKernelFound) continue;
+        if (!fKernelFound) {
+            it++;
+            continue;
+        }
 
         // Found a kernel
         LogPrintf("CreateCoinStake : kernel found\n");
@@ -2973,6 +2989,7 @@ bool CWallet::CreateCoinStake(
         std::vector<CTxOut> vout;
         if (!stakeInput.CreateTxOuts(this, vout, nCredit, onlyP2PK)) {
             LogPrintf("%s : failed to create output\n", __func__);
+            it++;
             continue;
         }
         txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
@@ -3006,6 +3023,7 @@ bool CWallet::CreateCoinStake(
             LogPrintf("%s : failed to create TxIn\n", __func__);
             txNew.vin.clear();
             txNew.vout.clear();
+            it++;
             continue;
         }
         txNew.vin.emplace_back(in);
