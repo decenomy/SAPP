@@ -74,17 +74,19 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
                     REJECT_INVALID, "bad-tx-version-too-high");
     }
 
+    // Size limits
+    static_assert(MAX_BLOCK_SIZE_CURRENT >= MAX_TX_SIZE_AFTER_SAPLING, "Max block size must be bigger than max TX size");    // sanity
+    static_assert(MAX_TX_SIZE_AFTER_SAPLING > MAX_ZEROCOIN_TX_SIZE, "New max TX size must be bigger than old max TX size");  // sanity
+    const unsigned int nMaxSize = tx.IsShieldedTx() ? MAX_TX_SIZE_AFTER_SAPLING : MAX_ZEROCOIN_TX_SIZE;
+    if (tx.GetTotalSize() > nMaxSize) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-txns-oversize");
+    }
+
     // Dispatch to Sapling validator
     CAmount nValueOut = 0;
     if (!SaplingValidation::CheckTransaction(tx, state, nValueOut, fSaplingActive)) {
         return false;
     }
-
-    // Size limits
-    unsigned int nMaxSize = MAX_ZEROCOIN_TX_SIZE;
-
-    if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > nMaxSize)
-        return state.DoS(100, false, REJECT_INVALID, "bad-txns-oversize");
 
     // Check for negative or overflow output values
     const Consensus::Params& consensus = Params().GetConsensus();
