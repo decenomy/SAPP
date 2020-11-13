@@ -630,10 +630,10 @@ public:
          * a large 4-byte int at any alignment.
          */
 
-        pchMessageStart[0] = 0xa1;
-        pchMessageStart[1] = 0xcf;
-        pchMessageStart[2] = 0x7e;
-        pchMessageStart[3] = 0xac;
+        pchMessageStart[0] = 0xa7;
+        pchMessageStart[1] = 0xc3;
+        pchMessageStart[2] = 0x72;
+        pchMessageStart[3] = 0xa8;
         nDefaultPort = 47328;
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
