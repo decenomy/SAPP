@@ -72,7 +72,8 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
 	(122440, uint256("0xd72ea9245e69fa3d1acd0ba30ba99c31b813ee7f3cb70894b16cb9fb53647daf"))
 	(247852, uint256("0xed081efe1d76620413a4b31f0457d2a7755bf400cb54054ac777ec41216aae26"))
 	(351247, uint256("0x4d08ce2fb5de95d860d39a0ffdf397fc13285b8cf892fcfe27f5fcc3983b1ae0"))
-	(433942 , uint256("0xad866a67d0a5409518f48200ad49b968c8e36f1771ce3e5af546fce0dff4469f")); //!< PIVX v4.1.1 enforced
+	(433942 , uint256("0xad866a67d0a5409518f48200ad49b968c8e36f1771ce3e5af546fce0dff4469f"))  //!< PIVX v4.1.1 enforced
+	(806565, uint256("e4f16d631bf85aac842d9a3cc2e8e098a537de9f616524ed71111192a07d6aa9"));
 
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
@@ -238,7 +239,7 @@ public:
         bech32HRPs[SAPLING_FULL_VIEWING_KEY]     = "pviews";
         bech32HRPs[SAPLING_INCOMING_VIEWING_KEY] = "pivks";
         bech32HRPs[SAPLING_EXTENDED_SPEND_KEY]   = "p-secret-spending-key-main";
-        bech32HRPs[SAPLING_EXTENDED_FVK]         = "pxviews";
+        // bech32HRPs[SAPLING_EXTENDED_FVK]         = "pxviews";
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
