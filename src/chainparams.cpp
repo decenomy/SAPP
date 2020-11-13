@@ -461,7 +461,7 @@ public:
         bech32HRPs[SAPLING_FULL_VIEWING_KEY]     = "pviewtestsapling";
         bech32HRPs[SAPLING_INCOMING_VIEWING_KEY] = "pivktestsapling";
         bech32HRPs[SAPLING_EXTENDED_SPEND_KEY]   = "p-secret-spending-key-test";
-        bech32HRPs[SAPLING_EXTENDED_FVK]         = "pxviewtestsapling";
+        // bech32HRPs[SAPLING_EXTENDED_FVK]         = "pxviewtestsapling";
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
