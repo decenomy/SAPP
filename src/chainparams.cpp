@@ -207,18 +207,15 @@ public:
         nDefaultPort = 45328;
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.emplace_back("fuzzbawls.pw", "pivx-testnet.seed.fuzzbawls.pw", true);
-        vSeeds.emplace_back("fuzzbawls.pw", "pivx-testnet.seed2.fuzzbawls.pw", true);
-
-        vSeeds.emplace_back("seed1.sappcoin.com", "seed1.sappcoin.com");
-        vSeeds.emplace_back("seed2.sappcoin.com", "seed2.sappcoin.com");
-        vSeeds.emplace_back("seed3.sappcoin.com", "seed3.sappcoin.com");
-        vSeeds.emplace_back("seed4.sappcoin.com", "seed4.sappcoin.com");
-        vSeeds.emplace_back("seed5.sappcoin.com", "seed5.sappcoin.com");
-        vSeeds.emplace_back("seed6.sappcoin.com", "seed6.sappcoin.com");
-        vSeeds.emplace_back("seed7.sappcoin.com", "seed7.sappcoin.com");
-        vSeeds.emplace_back("seed8.sappcoin.com", "seed8.sappcoin.com");
-        vSeeds.emplace_back("seed9.sappcoin.com", "seed9.sappcoin.com");
+        vSeeds.emplace_back("seed1.sappcoin.com", "seed1.sappcoin.com", true);
+        vSeeds.emplace_back("seed2.sappcoin.com", "seed2.sappcoin.com", true);
+        vSeeds.emplace_back("seed3.sappcoin.com", "seed3.sappcoin.com", true);
+        vSeeds.emplace_back("seed4.sappcoin.com", "seed4.sappcoin.com", true);
+        vSeeds.emplace_back("seed5.sappcoin.com", "seed5.sappcoin.com", true);
+        vSeeds.emplace_back("seed6.sappcoin.com", "seed6.sappcoin.com", true);
+        vSeeds.emplace_back("seed7.sappcoin.com", "seed7.sappcoin.com", true);
+        vSeeds.emplace_back("seed8.sappcoin.com", "seed8.sappcoin.com", true);
+        vSeeds.emplace_back("seed9.sappcoin.com", "seed9.sappcoin.com", true);
         vSeeds.emplace_back("seed10.sappcoin.com", "seed10.sappcoin.com");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
