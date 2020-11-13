@@ -216,7 +216,7 @@ public:
         vSeeds.emplace_back("seed7.sappcoin.com", "seed7.sappcoin.com", true);
         vSeeds.emplace_back("seed8.sappcoin.com", "seed8.sappcoin.com", true);
         vSeeds.emplace_back("seed9.sappcoin.com", "seed9.sappcoin.com", true);
-        vSeeds.emplace_back("seed10.sappcoin.com", "seed10.sappcoin.com");
+        vSeeds.emplace_back("seed10.sappcoin.com", "seed10.sappcoin.com", true);
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
