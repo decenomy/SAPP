@@ -207,16 +207,16 @@ public:
         nDefaultPort = 45328;
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.emplace_back("seed1.sappcoin.com", "seed1.sappcoin.com", true);
-        vSeeds.emplace_back("seed2.sappcoin.com", "seed2.sappcoin.com", true);
-        vSeeds.emplace_back("seed3.sappcoin.com", "seed3.sappcoin.com", true);
-        vSeeds.emplace_back("seed4.sappcoin.com", "seed4.sappcoin.com", true);
-        vSeeds.emplace_back("seed5.sappcoin.com", "seed5.sappcoin.com", true);
-        vSeeds.emplace_back("seed6.sappcoin.com", "seed6.sappcoin.com", true);
-        vSeeds.emplace_back("seed7.sappcoin.com", "seed7.sappcoin.com", true);
-        vSeeds.emplace_back("seed8.sappcoin.com", "seed8.sappcoin.com", true);
-        vSeeds.emplace_back("seed9.sappcoin.com", "seed9.sappcoin.com", true);
-        vSeeds.emplace_back("seed10.sappcoin.com", "seed10.sappcoin.com", true);
+        vSeeds.emplace_back(CDNSSeedData("seed1.sappcoin.com", "seed1.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed2.sappcoin.com", "seed2.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed3.sappcoin.com", "seed3.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed4.sappcoin.com", "seed4.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed5.sappcoin.com", "seed5.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed6.sappcoin.com", "seed6.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed7.sappcoin.com", "seed7.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed8.sappcoin.com", "seed8.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed9.sappcoin.com", "seed9.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed10.sappcoin.com", "seed10.sappcoin.com", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
@@ -429,18 +429,18 @@ public:
         vFixedSeeds.clear();
         vSeeds.clear();
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.emplace_back("kyan-testnet.572133.club", true);
-        vSeeds.emplace_back("kyan-testnet2.572133.club", true);
-        vSeeds.emplace_back("seed1.sappcoin.com", true);
-        vSeeds.emplace_back("seed2.sappcoin.com", true);
-        vSeeds.emplace_back("seed3.sappcoin.com", true);
-        vSeeds.emplace_back("seed4.sappcoin.com", true);
-        vSeeds.emplace_back("seed5.sappcoin.com", true);
-        vSeeds.emplace_back("seed6.sappcoin.com", true);
-        vSeeds.emplace_back("seed7.sappcoin.com", true);
-        vSeeds.emplace_back("seed8.sappcoin.com", true);
-        vSeeds.emplace_back("seed9.sappcoin.com", true);
-        vSeeds.emplace_back("seed10.sappcoin.com", true);
+        vSeeds.emplace_back(CDNSSeedData("kyan-testnet.572133.club", "kyan-testnet.572133.club", true));
+        vSeeds.emplace_back(CDNSSeedData("kyan-testnet2.572133.club", "kyan-testnet2.572133.club", true));
+        vSeeds.emplace_back(CDNSSeedData("seed1.sappcoin.com", "seed1.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed2.sappcoin.com", "seed2.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed3.sappcoin.com", "seed3.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed4.sappcoin.com", "seed4.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed5.sappcoin.com", "seed5.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed6.sappcoin.com", "seed6.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed7.sappcoin.com", "seed7.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed8.sappcoin.com", "seed8.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed9.sappcoin.com", "seed9.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed10.sappcoin.com", "seed10.sappcoin.com", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet pivx addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet pivx script addresses start with '8' or '9'
