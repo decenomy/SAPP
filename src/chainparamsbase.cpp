@@ -22,7 +22,7 @@ public:
     CBaseMainParams()
     {
         networkID = CBaseChainParams::MAIN;
-        nRPCPort = 51473;
+        nRPCPort = 45329;
     }
 };
 static CBaseMainParams mainParams;
@@ -36,7 +36,7 @@ public:
     CBaseTestNetParams()
     {
         networkID = CBaseChainParams::TESTNET;
-        nRPCPort = 51475;
+        nRPCPort = 46329;
         strDataDir = "testnet4";
     }
 };
@@ -86,8 +86,8 @@ void SelectBaseParams(CBaseChainParams::Network network)
 
 CBaseChainParams::Network NetworkIdFromCommandLine()
 {
-    bool fRegTest = GetBoolArg("-regtest", false);
-    bool fTestNet = GetBoolArg("-testnet", false);
+    bool fRegTest = gArgs.GetBoolArg("-regtest", false);
+    bool fTestNet = gArgs.GetBoolArg("-testnet", false);
 
     if (fTestNet && fRegTest)
         return CBaseChainParams::MAX_NETWORK_TYPES;
