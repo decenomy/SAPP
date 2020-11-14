@@ -113,7 +113,7 @@ public:
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(consensus.hashGenesisBlock == uint256S("0x00000eef0583695d6da23a78bab1c39939bbb54cf9bd5f0d4881c8eef364cd26"));
 		//TODO: Set hashMerkleRoot. CLUE: Mining Testnet genesis block will give the hashMerkleRoot which will be the same as Mainnet.
-        assert(genesis.hashMerkleRoot == uint256S("0x1b2ef6e2f28be914103a277377ae7729dcd125dfeb8bf97bd5964ba72b6dc39b"));
+        assert(genesis.hashMerkleRoot == uint256S("0x62179b80cc4da52f1ff4bad5d690836a3a663d14d5581a63822963bf1613041b"));
 
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // PIVX starting difficulty is 1 / 2^12
@@ -264,7 +264,7 @@ public:
         // // This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
         // /////////////////////////////////////////////////////////////////
 
-        // uint32_t nGenesisTime = 1605269627; // 09/10/2020 @ 7:32pm (UTC)
+        // uint32_t nGenesisTime = 1605313072; // 09/10/2020 @ 7:32pm (UTC)
 
         // arith_uint256 test;
         // bool fNegative;
@@ -279,7 +279,7 @@ public:
         //         uint32_t i = 0x00000000;
         //         do {
         //                 if( i == 0xFFFFFFFF ) i = nGenesisTime;
-        //                         genesis = CreateGenesisBlock(nGenesisTime, i, 0x1e0ffff0, 1, 0 * COIN);
+        //                         genesis = CreateGenesisBlock(nGenesisTime, i, 0x1e0ffff0, 1, 250 * COIN);
         //                 //  genesis.hashPrevBlock = TempHashHolding;
         //                         // Depending on when the timestamp is on the genesis block. You will need to use GetX16RHash or GetX16RV2Hash. Replace GetHash() with these below
         //                         consensus.hashGenesisBlock = genesis.GetHash();
@@ -327,12 +327,12 @@ public:
 
         // exit(0);
 
-		//////////////////////////////////////////
+		// ////////////////////////////////////////
 
-        genesis = CreateGenesisBlock(1605269627, 2402015, 0x1e0ffff0, 1, 250 * COIN);
+        genesis = CreateGenesisBlock(1605313072, 2878520, 0x1e0ffff0, 1, 250 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818"));
-        assert(genesis.hashMerkleRoot == uint256S("0x1b2ef6e2f28be914103a277377ae7729dcd125dfeb8bf97bd5964ba72b6dc39b"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000054e470f4146635399f08a10e27c7fbf5c2b3ab90018613bc8ea6879862f"));
+        assert(genesis.hashMerkleRoot == uint256S("0x62179b80cc4da52f1ff4bad5d690836a3a663d14d5581a63822963bf1613041b"));
 
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // PIVX starting difficulty is 1 / 2^12
@@ -486,12 +486,12 @@ public:
         // // This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
         // /////////////////////////////////////////////////////////////////
 
-        // uint32_t nGenesisTime = 1605144460; // 09/10/2020 @ 7:32pm (UTC)
+        // uint32_t nGenesisTime = 1605314006; // 09/10/2020 @ 7:32pm (UTC)
 
         // arith_uint256 test;
         // bool fNegative;
         // bool fOverflow;
-        // test.SetCompact(0x1e000ff0, &fNegative, &fOverflow);
+        // test.SetCompact(0x1effffff, &fNegative, &fOverflow);
         // std::cout << "Test threshold: " << test.GetHex() << "\n\n";
 
         // int genesisNonce = 0;
@@ -501,7 +501,7 @@ public:
         //         uint32_t i = 0x00000000;
         //         do {
         //                 if( i == 0xFFFFFFFF ) i = nGenesisTime;
-        //                         genesis = CreateGenesisBlock(nGenesisTime, i, 0x1e000ff0, 1, 0 * COIN);
+        //                         genesis = CreateGenesisBlock(nGenesisTime, i, 0x1effffff, 1, 250 * COIN);
         //                 //  genesis.hashPrevBlock = TempHashHolding;
         //                         // Depending on when the timestamp is on the genesis block. You will need to use GetX16RHash or GetX16RV2Hash. Replace GetHash() with these below
         //                         consensus.hashGenesisBlock = genesis.GetHash();
@@ -549,13 +549,13 @@ public:
 
         // exit(0);
 
-		//////////////////////////////////////////
+		// ////////////////////////////////////////
 
 
-        genesis = CreateGenesisBlock(1454124731, 2402015, 0x1e0ffff0, 1, 250 * COIN);
+        genesis = CreateGenesisBlock(1605314006, 18440, 0x1effffff, 1, 250 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818"));
-        assert(genesis.hashMerkleRoot == uint256S("0x1b2ef6e2f28be914103a277377ae7729dcd125dfeb8bf97bd5964ba72b6dc39b"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000529df5fae941569b6466128042f5f036a8d1d380dd484a06e8a12fb275a3"));
+        assert(genesis.hashMerkleRoot == uint256S("0x62179b80cc4da52f1ff4bad5d690836a3a663d14d5581a63822963bf1613041b"));
 
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.powLimit   = ~UINT256_ZERO >> 20;   // PIVX starting difficulty is 1 / 2^12
