@@ -32,7 +32,7 @@ git config --global user.email "MY_NAME@example.com"
 Fetching the Build Script
 --------------------------
 
-The build script we'll be using is contained in the SAPP github repository ([contrib/gitian-build.py](https://github.com/pivx-project/pivx/blob/master/contrib/gitian-build.py)). Since this is a completely fresh environment, we haven't yet cloned the SAPP repository and will need to fetch this script with the following commands:
+The build script we'll be using is contained in the SAPP github repository ([contrib/gitian-build.py](https://github.com/sappcoin-com/sapp/blob/master/contrib/gitian-build.py)). Since this is a completely fresh environment, we haven't yet cloned the SAPP repository and will need to fetch this script with the following commands:
 
 ```bash
 curl -L -O https://raw.githubusercontent.com/sappcoin-com/SAPP/master/contrib/gitian-build.py
