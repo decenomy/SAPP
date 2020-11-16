@@ -26,7 +26,7 @@ Drag PIVX-Qt to your applications folder, and then run PIVX-Qt.
 
 ### Need Help?
 
-* See the documentation at the [Sapphire Coin Wiki](https://github.com/sappcoin-com/SAPP/wiki)
+* See the documentation at the [Sapphire Coin Wiki](https://github.com/PIVX-Project/PIVX/wiki)
 for help and more information.
 * Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=5144109)
 * Join our Discord server [Discord Server](https://discord.gg/zgcXB76)
