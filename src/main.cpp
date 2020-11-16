@@ -1498,11 +1498,6 @@ double ConvertBitsToDouble(unsigned int nBits)
     return dDiff;
 }
 
-int64_t GetMasternodePayment()
-{
-    return 3 * COIN;
-}
-
 bool IsInitialBlockDownload()
 {
     // Once this function has returned false, it must remain false.

@@ -442,6 +442,15 @@ int64_t CMasternode::GetBlockValue(int nHeight)
     return nSubsidy;
 }
 
+/**
+ * Dummy masternode payment function
+ */
+
+int64_t CMasternode::GetMasternodePayment()
+{
+    return CMasternode::GetBlockValue(chainActive.Height());
+}
+
 
 
 CMasternodeBroadcast::CMasternodeBroadcast() :
