@@ -365,7 +365,7 @@ CAmount CMasternode::GetMasternodeCollateral(int nHeight) const
  * Masternode reward change schedule
  */
 
-int64_t CMasternode::GetBlockValue(int nHeight) const
+CAmount CMasternode::GetBlockValue(int nHeight) const
 {
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight < 200 && nHeight > 0)
@@ -378,7 +378,7 @@ int64_t CMasternode::GetBlockValue(int nHeight) const
 
     }
 
-    int64_t nSubsidy = 0;
+    CAmount nSubsidy = 0;
     if (nHeight == 1)
         nSubsidy = 300000 * COIN;
     else if (nHeight <= 500)
@@ -445,7 +445,7 @@ int64_t CMasternode::GetBlockValue(int nHeight) const
  * Dummy masternode payment function
  */
 
-int64_t CMasternode::GetMasternodePayment() const
+CAmount CMasternode::GetMasternodePayment() const
 {
     return CMasternode::GetBlockValue(chainActive.Height());
 }

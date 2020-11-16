@@ -267,8 +267,8 @@ public:
 
 	// Masternode collateral and reward schedules
 	CAmount GetMasternodeCollateral(int nHeight) const;
-	int64_t GetBlockValue(int nHeight) const;
-	int64_t GetMasternodePayment() const;
+	CAmount GetBlockValue(int nHeight) const;
+	CAmount GetMasternodePayment() const;
 };
 
 //
