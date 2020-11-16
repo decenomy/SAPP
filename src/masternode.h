@@ -264,8 +264,12 @@ public:
 
     /// Is the input associated with collateral public key? (and there is 10000 PIV - checking if valid masternode)
     bool IsInputAssociatedWithPubkey() const;
-};
 
+	// Masternode collateral and reward schedules
+	static CAmount GetMasternodeCollateral(int nHeight);
+	static CAmount GetBlockValue(int nHeight);
+	static CAmount GetMasternodePayment();
+};
 
 //
 // The Masternode Broadcast Class : Contains a different serialize method for sending masternodes through the network
