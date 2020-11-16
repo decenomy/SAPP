@@ -24,7 +24,7 @@
 from time import sleep
 
 from test_framework.mininode import *
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import *
 
 class TestNode(P2PInterface):
@@ -32,7 +32,7 @@ class TestNode(P2PInterface):
         # Don't send a verack in response
         pass
 
-class TimeoutsTest(PivxTestFramework):
+class TimeoutsTest(SapphireTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1

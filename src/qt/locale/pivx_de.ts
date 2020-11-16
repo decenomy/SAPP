@@ -1594,7 +1594,7 @@ in die Zwischenablage zu kopieren.
 
 
 SIe müssen lediglich die Daten in die sapphire.conf Datei Ihres externen Servers einfügen,
-die Pivx-wallet starten, um dann von der Kontrollwallet aus
+die Sapphire-wallet starten, um dann von der Kontrollwallet aus
 ihren Masternode zu starten (Wählen Sie den Masternode in der Liste aus und drücken SIe "Start").
 </translation>
     </message>

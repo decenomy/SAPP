@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.authproxy import JSONRPCException
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import (
     sync_blocks,
     assert_equal,
@@ -16,7 +16,7 @@ from test_framework.util import (
     DecimalAmt,
 )
 
-class ReorgStakeTest(PivxTestFramework):
+class ReorgStakeTest(SapphireTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 3

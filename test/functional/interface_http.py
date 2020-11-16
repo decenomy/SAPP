@@ -4,13 +4,13 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the RPC HTTP basics."""
 
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import *
 
 import http.client
 import urllib.parse
 
-class HTTPBasicsTest (PivxTestFramework):
+class HTTPBasicsTest (SapphireTestFramework):
     def set_test_params(self):
         self.num_nodes = 3
 

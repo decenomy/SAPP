@@ -4,11 +4,11 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the wallet accounts properly when there is a double-spend conflict."""
 
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import *
 import time
 
-class TxnMallTest(PivxTestFramework):
+class TxnMallTest(SapphireTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
 

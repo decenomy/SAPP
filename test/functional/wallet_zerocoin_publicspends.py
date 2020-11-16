@@ -10,7 +10,7 @@ Tests v2, v3 and v4 Zerocoin Spends
 from time import sleep
 
 from test_framework.authproxy import JSONRPCException
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import (
     sync_blocks,
     sync_mempools,
@@ -21,7 +21,7 @@ from test_framework.util import (
 )
 
 
-class ZerocoinSpendTest(PivxTestFramework):
+class ZerocoinSpendTest(SapphireTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 3

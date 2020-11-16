@@ -5,14 +5,14 @@
 """Test the -alertnotify, -blocknotify and -walletnotify options."""
 import os
 
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import (
     assert_equal,
     wait_until,
     connect_nodes,
 )
 
-class NotificationsTest(PivxTestFramework):
+class NotificationsTest(SapphireTestFramework):
     def set_test_params(self):
         self.num_nodes = 2
         self.setup_clean_chain = True

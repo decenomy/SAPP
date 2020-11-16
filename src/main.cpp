@@ -3622,10 +3622,10 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
     }
 
     if (block.nBits != nBitsRequired) {
-        // Pivx Specific reference to the block with the wrong threshold was used.
+        // Sapphire Specific reference to the block with the wrong threshold was used.
         const Consensus::Params& consensus = Params().GetConsensus();
-        if ((block.nTime == (uint32_t) consensus.nPivxBadBlockTime) &&
-                (block.nBits == (uint32_t) consensus.nPivxBadBlockBits)) {
+        if ((block.nTime == (uint32_t) consensus.nSapphireBadBlockTime) &&
+                (block.nBits == (uint32_t) consensus.nSapphireBadBlockBits)) {
             // accept SAPP block minted with incorrect proof of work threshold
             return true;
         }

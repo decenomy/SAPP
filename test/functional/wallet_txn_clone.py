@@ -5,12 +5,12 @@
 """Test the wallet accounts properly when there are cloned transactions with malleated scriptsigs."""
 
 import io
-from test_framework.test_framework import PivxTestFramework
+from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import *
 from test_framework.messages import CTransaction, COIN
 
 
-class TxnMallTest(PivxTestFramework):
+class TxnMallTest(SapphireTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
 
