@@ -1511,66 +1511,40 @@ int64_t GetBlockValue(int nHeight)
 
     }
 
+    const Consensus::Params& consensus = Params().GetConsensus();
+    const bool isPoSActive = consensus.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_POS);
     int64_t nSubsidy = 0;
-    if (nHeight == 1)
-        nSubsidy = 300000 * COIN;
-    else if (nHeight <= 500)
-        nSubsidy = 1 * COIN;
-    else if (nHeight <= 2000 && nHeight > 500)
-        nSubsidy = 1 * COIN;
-    else if (nHeight <= 20000 && nHeight > 2000)
-        nSubsidy = 2 * COIN;
-    else if (nHeight <= 30000 && nHeight > 20000)
-        nSubsidy = 10 * COIN;
-    else if (nHeight <= 40000 && nHeight > 30000)
-        nSubsidy = 15 * COIN;
-    else if (nHeight <= 50000 && nHeight > 40000)
-        nSubsidy = 20 * COIN;
-    else if (nHeight <= 60000 && nHeight > 50000)
-        nSubsidy = 25 * COIN;
-    else if (nHeight <= 100000 && nHeight > 60000)
-        nSubsidy = 50 * COIN;
-    else if (nHeight <= 130000 && nHeight > 100000)
-        nSubsidy = 100 * COIN;
-    else if (nHeight <= 150000 && nHeight > 130000)
-        nSubsidy = 150 * COIN;
-    else if (nHeight <= 175000 && nHeight > 150000)
+    if (nHeight == 0) {
+        nSubsidy = 60001 * COIN;
+    } else if (nHeight < 86400 && nHeight > 0) {
         nSubsidy = 250 * COIN;
-    else if (nHeight <= 200000 && nHeight > 175000)
-        nSubsidy = 400 * COIN;
-    else if (nHeight <= 250000 && nHeight > 200000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 300000 && nHeight > 250000)
-        nSubsidy = 450 * COIN;
-    else if (nHeight <= 400000 && nHeight > 300000)
-        nSubsidy = 400 * COIN;
-    else if (nHeight <= 450000 && nHeight > 400000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 500000 && nHeight > 450000)
-        nSubsidy = 600 * COIN;
-    else if (nHeight <= 550000 && nHeight > 500000)
-        nSubsidy = 700 * COIN;
-    else if (nHeight <= 600000 && nHeight > 550000)
-        nSubsidy = 800 * COIN;
-    else if (nHeight <= 650000 && nHeight > 600000)
-        nSubsidy = 900 * COIN;
-    else if (nHeight <= 700000 && nHeight > 650000)
-        nSubsidy = 1000 * COIN;
-    else if (nHeight <= 750000 && nHeight > 700000)
-        nSubsidy = 900 * COIN;
-    else if (nHeight <= 800000 && nHeight > 750000)
-        nSubsidy = 800 * COIN;
-    else if (nHeight <= 850000 && nHeight > 800000)
-        nSubsidy = 700 * COIN;
-    else if (nHeight <= 900000 && nHeight > 850000)
-        nSubsidy = 600 * COIN;
-    else if (nHeight <= 950000 && nHeight > 900000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 1000000 && nHeight > 950000)
-        nSubsidy = 450 * COIN;
-    else
-        nSubsidy = 400 * COIN;
-
+    } else if (nHeight < (Params().NetworkID() == CBaseChainParams::TESTNET ? 145000 : 151200) && nHeight >= 86400) {
+        nSubsidy = 225 * COIN;
+    } else if (nHeight >= 151200 && !isPoSActive) {
+        nSubsidy = 45 * COIN;
+    } else if (isPoSActive && nHeight <= 302399) {
+        nSubsidy = 45 * COIN;
+    } else if (nHeight <= 345599 && nHeight >= 302400) {
+        nSubsidy = 40.5 * COIN;
+    } else if (nHeight <= 388799 && nHeight >= 345600) {
+        nSubsidy = 36 * COIN;
+    } else if (nHeight <= 431999 && nHeight >= 388800) {
+        nSubsidy = 31.5 * COIN;
+    } else if (nHeight <= 475199 && nHeight >= 432000) {
+        nSubsidy = 27 * COIN;
+    } else if (nHeight <= 518399 && nHeight >= 475200) {
+        nSubsidy = 22.5 * COIN;
+    } else if (nHeight <= 561599 && nHeight >= 518400) {
+        nSubsidy = 18 * COIN;
+    } else if (nHeight <= 604799 && nHeight >= 561600) {
+        nSubsidy = 13.5 * COIN;
+    } else if (nHeight <= 647999 && nHeight >= 604800) {
+        nSubsidy = 9 * COIN;
+    } else if (!consensus.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_ZC_V2)) {
+        nSubsidy = 4.5 * COIN;
+    } else {
+        nSubsidy = 5 * COIN;
+    }
     return nSubsidy;
 }
 
