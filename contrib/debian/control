@@ -32,7 +32,7 @@ Homepage: http://www.sappcoin.com
 Vcs-Git: git://github.com/sappcoin-com/SAPP.git
 Vcs-Browser: http://github.com/sappcoin-com/SAPP
 
-Package: pivxd
+Package: sapphired
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
@@ -45,10 +45,10 @@ Description: peer-to-peer network based digital currency - daemon
  Full transaction history is stored locally at each client.  This
  requires 18.5+ GB of space, slowly growing.
  .
- This package provides the daemon, pivxd, and the CLI tool
- pivx-cli to interact with the daemon.
+ This package provides the daemon, sapphired, and the CLI tool
+ sapphirepivx-cli-cli to interact with the daemon.
 
-Package: pivx-qt
+Package: sapphire-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI

@@ -13,12 +13,12 @@ The following are some helpful notes on how to run Sapphire Core on your native 
 
 Unpack the files into a directory and run:
 
-- `bin/pivx-qt` (GUI) or
-- `bin/pivxd` (headless)
+- `bin/sapphire-qt` (GUI) or
+- `bin/sapphired` (headless)
 
 ### Windows
 
-Unpack the files into a directory, and then run pivx-qt.exe.
+Unpack the files into a directory, and then run sapphire-qt.exe.
 
 ### macOS
 

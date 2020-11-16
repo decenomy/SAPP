@@ -1,5 +1,5 @@
 [Protocol]
-exec=pivx-qt '%u'
+exec=sapphire-qt '%u'
 protocol=pivx
 input=none
 output=none

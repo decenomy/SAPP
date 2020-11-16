@@ -100,7 +100,7 @@ SettingsInformationWidget::SettingsInformationWidget(SAPPGUI* _window,QWidget *p
     });
     connect(ui->pushButtonFile, &QPushButton::clicked, [this](){
         if (!GUIUtil::openConfigfile())
-            inform(tr("Unable to open pivx.conf with default application"));
+            inform(tr("Unable to open sapphire.conf with default application"));
     });
     connect(ui->pushButtonNetworkMonitor, &QPushButton::clicked, this, &SettingsInformationWidget::openNetworkMonitor);
 }

@@ -24,18 +24,18 @@ URL:		https://sappcoin.com/
 Source0:	https://sappcoin.com/bin/pivx-core-%{version}/pivx-%{version}.tar.gz
 Source1:	http://download.oracle.com/berkeley-db/db-%{bdbv}.NC.tar.gz
 
-Source10:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/contrib/debian/examples/pivx.conf
+Source10:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/contrib/debian/examples/pivx.conf
 
 #man pages
-Source20:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/doc/man/pivxd.1
-Source21:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/doc/man/pivx-cli.1
-Source22:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/doc/man/pivx-qt.1
+Source20:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/doc/man/pivxd.1
+Source21:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/doc/man/pivx-cli.1
+Source22:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/doc/man/pivx-qt.1
 
 #selinux
-Source30:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/contrib/rpm/pivx.te
+Source30:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/contrib/rpm/pivx.te
 # Source31 - what about pivx-tx and bench_pivx ???
-Source31:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/contrib/rpm/pivx.fc
-Source32:	https://raw.githubusercontent.com/sappcoin-com/sapp/v%{version}/contrib/rpm/pivx.if
+Source31:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/contrib/rpm/pivx.fc
+Source32:	https://raw.githubusercontent.com/pivx-project/pivx/v%{version}/contrib/rpm/pivx.if
 
 Source100:	https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg
 

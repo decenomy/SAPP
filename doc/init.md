@@ -15,22 +15,22 @@ Service User
 
 All three Linux startup configurations assume the existence of a "pivx" user
 and group.  They must be created before attempting to use these scripts.
-The macOS configuration assumes pivxd will be set up for the current user.
+The macOS configuration assumes sapphired will be set up for the current user.
 
 Configuration
 ---------------------------------
 
-At a bare minimum, pivxd requires that the rpcpassword setting be set
+At a bare minimum, sapphired requires that the rpcpassword setting be set
 when running as a daemon.  If the configuration file does not exist or this
-setting is not set, pivxd will shutdown promptly after startup.
+setting is not set, sapphired will shutdown promptly after startup.
 
 This password does not have to be remembered or typed as it is mostly used
-as a fixed token that pivxd and client programs read from the configuration
+as a fixed token that sapphired and client programs read from the configuration
 file, however it is recommended that a strong and secure password be used
 as this password is security critical to securing the wallet should the
 wallet be enabled.
 
-If pivxd is run with the "-server" flag (set by default), and no rpcpassword is set,
+If sapphired is run with the "-server" flag (set by default), and no rpcpassword is set,
 it will use a special cookie file for authentication. The cookie is generated with random
 content when the daemon starts, and deleted when it exits. Read access to this file
 controls who can access it through RPC.
@@ -38,7 +38,7 @@ controls who can access it through RPC.
 By default the cookie is stored in the data directory, but it's location can be overridden
 with the option '-rpccookiefile'.
 
-This allows for running pivxd without having to do any manual configuration.
+This allows for running sapphired without having to do any manual configuration.
 
 `conf`, `pid`, and `wallet` accept relative paths which are interpreted as
 relative to the data directory. `wallet` *only* supports relative paths.
@@ -62,7 +62,7 @@ Lock file:           `/var/lock/subsys/pivxd` (CentOS)
 The configuration file, PID directory (if applicable) and data directory
 should all be owned by the pivx user and group.  It is advised for security
 reasons to make the configuration file and data directory only readable by the
-pivx user and group.  Access to pivx-cli and other pivxd rpc clients
+pivx user and group.  Access to sapphire-cli and other pivxd rpc clients
 can then be controlled by group membership.
 
 NOTE: When using the systemd .service file, the creation of the aforementioned

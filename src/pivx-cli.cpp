@@ -74,9 +74,9 @@ static bool AppInitRPC(int argc, char* argv[])
         std::string strUsage = _("Sapphire Core RPC client version") + " " + FormatFullVersion() + "\n";
         if (!mapArgs.count("-version")) {
             strUsage += "\n" + _("Usage:") + "\n" +
-                        "  pivx-cli [options] <command> [params]  " + _("Send command to Sapphire Core") + "\n" +
-                        "  pivx-cli [options] help                " + _("List commands") + "\n" +
-                        "  pivx-cli [options] help <command>      " + _("Get help for a command") + "\n";
+                        "  sapphire-cli [options] <command> [params]  " + _("Send command to Sapphire Core") + "\n" +
+                        "  sapphire-cli [options] help                " + _("List commands") + "\n" +
+                        "  sapphire-cli [options] help <command>      " + _("Get help for a command") + "\n";
 
             strUsage += "\n" + HelpMessageCli();
         }
