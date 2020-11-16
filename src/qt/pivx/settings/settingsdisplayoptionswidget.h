@@ -1,4 +1,4 @@
-// Copyright (c) 2019 The PIVX developers
+// Copyright (c) 2019 The PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,7 +18,7 @@ class SettingsDisplayOptionsWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit SettingsDisplayOptionsWidget(PIVXGUI* _window = nullptr, QWidget *parent = nullptr);
+    explicit SettingsDisplayOptionsWidget(SAPPGUI* _window = nullptr, QWidget *parent = nullptr);
     ~SettingsDisplayOptionsWidget();
 
     void setMapper(QDataWidgetMapper *mapper);

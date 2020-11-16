@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "PIVX"
-            VALUE "FileDescription",    "pivx-tx (CLI PIVX transaction editor utility)"
+            VALUE "CompanyName",        "SAPP"
+            VALUE "FileDescription",    "pivx-tx (CLI SAPP transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "pivx-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR

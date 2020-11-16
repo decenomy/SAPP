@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2020 The PIVX developers
+// Copyright (c) 2017-2020 The PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PIVX_STAKEINPUT_H
-#define PIVX_STAKEINPUT_H
+#ifndef SAPP_STAKEINPUT_H
+#define SAPP_STAKEINPUT_H
 
 #include "chain.h"
 #include "streams.h"
@@ -57,4 +57,4 @@ public:
 };
 
 
-#endif //PIVX_STAKEINPUT_H
+#endif //SAPP_STAKEINPUT_H

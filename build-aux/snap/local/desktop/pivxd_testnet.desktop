@@ -4,7 +4,7 @@
 Encoding=UTF-8
 Name=Sapphire Core Daemon SNAP
 Comment=testnet
-GenericName=PIVX Digital Currency Daemon Client testnet network
+GenericName=SAPP Digital Currency Daemon Client testnet network
 Exec=pivx-core.daemon-testnet %u
 Terminal=true
 Type=Application

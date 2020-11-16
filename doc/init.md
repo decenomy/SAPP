@@ -84,9 +84,9 @@ OpenRC).
 ### macOS
 
 Binary:              `/usr/local/bin/pivxd`
-Configuration file:  `~/Library/Application Support/PIVX/pivx.conf`
-Data directory:      `~/Library/Application Support/PIVX`
-Lock file:           `~/Library/Application Support/PIVX/.lock`
+Configuration file:  `~/Library/Application Support/SAPP/pivx.conf`
+Data directory:      `~/Library/Application Support/SAPP`
+Lock file:           `~/Library/Application Support/SAPP/.lock`
 
 Installing Service Configuration
 -----------------------------------
@@ -124,7 +124,7 @@ use old versions of Upstart and do not supply the start-stop-daemon utility.
 Copy pivxd.init to /etc/init.d/pivxd. Test by running `service pivxd start`.
 
 Using this script, you can adjust the path and flags to the pivxd program by
-setting the PIVXD and FLAGS environment variables in the file
+setting the SAPPD and FLAGS environment variables in the file
 /etc/sysconfig/pivxd. You can also use the DAEMONOPTS environment variable here.
 
 ### macOS

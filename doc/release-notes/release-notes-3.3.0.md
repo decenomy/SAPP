@@ -65,7 +65,7 @@ Notice text has been added to the privacy tab indicating that zPIV minting is di
 
 The `masternode` and `mnbudget` RPC commands, which were marked as deprecated in Sapphire Core v2.3.1 (September 19, 2017), have now been completely removed from Sapphire Core.
 
-Several new commands were added in v2.3.1 to replace the two aforementioned commands, reference the [v2.3.1 Release Notes](https://github.com/sappcoin-com/SAPP/blob/master/doc/release-notes/release-notes-2.3.1.md#rpc-changes) for further details.
+Several new commands were added in v2.3.1 to replace the two aforementioned commands, reference the [v2.3.1 Release Notes](https://github.com/sappcoin-com/PIVX/blob/master/doc/release-notes/release-notes-2.3.1.md#rpc-changes) for further details.
 
 ### New `getblockindexstats` Command
 

@@ -141,7 +141,7 @@
              <string notr="true">margin-left:8px;</string>
             </property>
             <property name="text">
-             <string>PIVX address or contact label</string>
+             <string>SAPP address or contact label</string>
             </property>
            </widget>
           </item>

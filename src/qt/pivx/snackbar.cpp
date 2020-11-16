@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2019-2020 PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include <QTimer>
 
 
-SnackBar::SnackBar(PIVXGUI* _window, QWidget *parent) :
+SnackBar::SnackBar(SAPPGUI* _window, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SnackBar),
     window(_window),
@@ -23,7 +23,7 @@ SnackBar::SnackBar(PIVXGUI* _window, QWidget *parent) :
 
     connect(ui->pushButton, &QPushButton::clicked, this, &SnackBar::close);
     if (window)
-        connect(window, &PIVXGUI::windowResizeEvent, this, &SnackBar::windowResizeEvent);
+        connect(window, &SAPPGUI::windowResizeEvent, this, &SnackBar::windowResizeEvent);
     else {
         ui->horizontalLayout->setContentsMargins(0,0,0,0);
         ui->label->setStyleSheet("font-size: 15px; color:white;");

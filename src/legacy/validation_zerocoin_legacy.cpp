@@ -1,4 +1,4 @@
-// Copyright (c) 2020 The PIVX developers
+// Copyright (c) 2020 The PIVX Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or https://www.opensource.org/licenses/mit-license.php.
 #include "legacy/validation_zerocoin_legacy.h"
@@ -44,7 +44,7 @@ bool AcceptToMemoryPoolZerocoin(const CTransaction& tx, CAmount& nValueIn, int c
 bool DisconnectZerocoinTx(const CTransaction& tx, CAmount& nValueIn, CZerocoinDB* zerocoinDB)
 {
     /** UNDO ZEROCOIN DATABASING
-         * note we only undo zerocoin databasing in the following statement, value to and from PIVX
+         * note we only undo zerocoin databasing in the following statement, value to and from SAPP
          * addresses should still be handled by the typical bitcoin based undo code
          * */
     if (tx.ContainsZerocoins()) {

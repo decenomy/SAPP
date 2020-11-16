@@ -19,8 +19,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "PIVX"
-            VALUE "FileDescription",    "Sapphire Core (OSS GUI client for PIVX)"
+            VALUE "CompanyName",        "SAPP"
+            VALUE "FileDescription",    "Sapphire Core (OSS GUI client for SAPP)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "pivx-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR

@@ -1,9 +1,9 @@
-// Copyright (c) 2018 The PIVX developers
+// Copyright (c) 2018 The PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PIVX_DETERMINISTICMINT_H
-#define PIVX_DETERMINISTICMINT_H
+#ifndef SAPP_DETERMINISTICMINT_H
+#define SAPP_DETERMINISTICMINT_H
 
 #include <libzerocoin/Denominations.h>
 #include <uint256.h>
@@ -64,4 +64,4 @@ public:
     };
 };
 
-#endif //PIVX_DETERMINISTICMINT_H
+#endif //SAPP_DETERMINISTICMINT_H

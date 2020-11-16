@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2019-2020 PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,7 +19,7 @@
 #include <vector>
 
 
-SettingsBitToolWidget::SettingsBitToolWidget(PIVXGUI* _window, QWidget *parent) :
+SettingsBitToolWidget::SettingsBitToolWidget(SAPPGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsBitToolWidget)
 {

@@ -1,17 +1,17 @@
 # Copyright (c) 2018-2019 The Ion developers
-# Copyright (c) 2019 The PIVX developers
+# Copyright (c) 2019 The PIVX Developers
 name: pivx-core
 base: core18
 version: 4.3.0
-summary:   PIVX (Private – Instant – Verified – Transaction)
+summary:   SAPP (Private – Instant – Verified – Transaction)
 description: |
-  PIVX is an MIT licensed,
+  SAPP is an MIT licensed,
   open source, blockchain-based cryptocurrency with
   ultra fast transactions, low fees, high network decentralization, and
   Zero Knowledge cryptography proofs for industry-leading
   transaction anonymity.
 
-  - [Download](https://sappcoin.com/SapphireCoin.pdf) PIVX White Paper PDF
+  - [Download](https://sappcoin.com/SapphireCoin.pdf) SAPP White Paper PDF
 grade: devel
 confinement: strict
 apps:

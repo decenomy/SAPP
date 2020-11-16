@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2019-2020 PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 #include "qt/pivx/qtutils.h"
 #include "guiinterface.h"
 #include "qt/pivx/qtutils.h"
-SettingsBackupWallet::SettingsBackupWallet(PIVXGUI* _window, QWidget *parent) :
+SettingsBackupWallet::SettingsBackupWallet(SAPPGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsBackupWallet)
 {

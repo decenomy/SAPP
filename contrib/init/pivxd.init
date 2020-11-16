@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  pivxd The PIVX core server.
+#  pivxd The SAPP core server.
 #
 #
 # chkconfig: 345 80 20

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2019-2020 PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -17,7 +17,7 @@ class SettingsBackupWallet : public PWidget
     Q_OBJECT
 
 public:
-    explicit SettingsBackupWallet(PIVXGUI* _window, QWidget *parent = nullptr);
+    explicit SettingsBackupWallet(SAPPGUI* _window, QWidget *parent = nullptr);
     ~SettingsBackupWallet();
 
 private Q_SLOTS:

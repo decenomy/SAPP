@@ -4,7 +4,7 @@
 Encoding=UTF-8
 Name=Sapphire Core
 Comment=Sapphire Core QT main network
-GenericName=PIVX Digital Currency QT client main network
+GenericName=SAPP Digital Currency QT client main network
 Exec=pivx-core.qt %u
 Terminal=false
 Type=Application

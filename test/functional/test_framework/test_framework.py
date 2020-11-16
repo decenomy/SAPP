@@ -679,7 +679,7 @@ class PivxTestFramework():
             initialize_datadir(self.options.tmpdir, i)
 
 
-    ### PIVX Specific TestFramework ###
+    ### SAPP Specific TestFramework ###
     ###################################
     def init_dummy_key(self):
         self.DUMMY_KEY = CECKey()

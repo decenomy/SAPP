@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2019-2020 PIVX Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 #include "optionsmodel.h"
 #include <QScrollBar>
 
-NavMenuWidget::NavMenuWidget(PIVXGUI *mainWindow, QWidget *parent) :
+NavMenuWidget::NavMenuWidget(SAPPGUI *mainWindow, QWidget *parent) :
     PWidget(mainWindow, parent),
     ui(new Ui::NavMenuWidget)
 {

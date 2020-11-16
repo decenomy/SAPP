@@ -3,7 +3,7 @@ Gitian building
 
 *Setup instructions for a gitian build of Sapphire Core using a VM or physical system.*
 
-Gitian is the deterministic build process that is used to build the PIVX
+Gitian is the deterministic build process that is used to build the SAPP
 Core executables. It provides a way to be reasonably sure that the
 executables are really built from source on GitHub. It also makes sure that
 the same, tested dependencies are used and statically built into the executable.
@@ -11,7 +11,7 @@ the same, tested dependencies are used and statically built into the executable.
 Multiple developers build the source code by following a specific descriptor
 ("recipe"), cryptographically sign the result, and upload the resulting signature.
 These results are compared and only if they match, the build is accepted and uploaded
-to the PIVX GitHub release page.
+to the SAPP GitHub release page.
 
 More independent gitian builders are needed, which is why this guide exists.
 It is preferred to follow these steps yourself instead of using someone else's

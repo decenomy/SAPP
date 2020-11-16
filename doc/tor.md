@@ -1,4 +1,4 @@
-# TOR SUPPORT IN PIVX
+# TOR SUPPORT IN SAPP
 
 It is possible to run Sapphire Core as a Tor hidden service, and connect to such services.
 
@@ -9,7 +9,7 @@ configure Tor.
 ## 1. Run Sapphire Core behind a Tor proxy
 ----------------------------------
 
-The first step is running PIVX behind a Tor proxy. This will already anonymize all
+The first step is running SAPP behind a Tor proxy. This will already anonymize all
 outgoing connections, but more is possible.
 
 	-proxy=ip:port  Set the proxy server. If SOCKS5 is selected (default), this proxy
@@ -55,7 +55,7 @@ your pivxd's P2P listen port (51472 by default).
 
 	-externalip=X   You can tell pivx about its publicly reachable address using
 	                this option, and this can be a v2 .onion address (v3 .onion
-	                addresses are not supported by the PIVX network). Given the above
+	                addresses are not supported by the SAPP network). Given the above
 	                configuration, you can find your .onion address in
 	                /var/lib/tor/pivx-service/hostname. For connections
 	                coming from unroutable addresses (such as 127.0.0.1, where the

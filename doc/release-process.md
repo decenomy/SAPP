@@ -54,7 +54,7 @@ Check out the source code in the following directory hierarchy.
     git clone https://github.com/devrandom/gitian-builder.git
     git clone https://github.com/pivx-project/pivx.git
 
-### PIVX maintainers/release engineers, suggestion for writing release notes
+### SAPP maintainers/release engineers, suggestion for writing release notes
 
 Write release notes. git shortlog helps a lot, for example:
 
