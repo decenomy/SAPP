@@ -1,8 +1,8 @@
 # Copyright (c) 2013-2016 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-bin_PROGRAMS += qt/test/test_pivx-qt
-TESTS += qt/test/test_pivx-qt
+bin_PROGRAMS += qt/test/test_sapphire-qt
+TESTS += qt/test/test_sapphire-qt
 
 TEST_QT_MOC_CPP = qt/test/moc_uritests.cpp
 
@@ -47,9 +47,9 @@ CLEAN_BITCOIN_QT_TEST = $(TEST_QT_MOC_CPP) qt/test/*.gcda qt/test/*.gcno
 
 CLEANFILES += $(CLEAN_BITCOIN_QT_TEST)
 
-test_pivx_qt : qt/test/test_pivx-qt$(EXEEXT)
+test_pivx_qt : qt/test/test_sapphire-qt$(EXEEXT)
 
-test_sapphire_qt_check : qt/test/test_pivx-qt$(EXEEXT) FORCE
+test_sapphire_qt_check : qt/test/test_sapphire-qt$(EXEEXT) FORCE
 	$(MAKE) check-TESTS TESTS=$^
 
 test_sapphire_qt_clean: FORCE

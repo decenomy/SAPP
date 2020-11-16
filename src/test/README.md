@@ -14,7 +14,7 @@ To add more sapphired tests, add `BOOST_AUTO_TEST_CASE` functions to the existin
 .cpp files in the `test/` directory or add new .cpp files that
 implement new BOOST_FIXTURE_TEST_SUITE sections.
 
-To run the sapphire-qt tests manually, launch `src/qt/test/test_pivx-qt`
+To run the sapphire-qt tests manually, launch `src/qt/test/test_sapphire-qt`
 
 To add more sapphire-qt tests, add them to the `src/qt/test/` directory and
 the `src/qt/test/test_main.cpp` file.
