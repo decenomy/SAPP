@@ -266,9 +266,9 @@ public:
     bool IsInputAssociatedWithPubkey() const;
 
 	// Masternode collateral and reward schedules
-	CAmount GetMasternodeCollateral(int nHeight) const;
-	CAmount GetBlockValue(int nHeight) const;
-	CAmount GetMasternodePayment() const;
+	static CAmount GetMasternodeCollateral(int nHeight);
+	static CAmount GetBlockValue(int nHeight);
+	static CAmount GetMasternodePayment();
 };
 
 //

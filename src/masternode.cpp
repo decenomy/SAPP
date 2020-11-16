@@ -318,7 +318,7 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
  * Masternode collateral change schedule
  */
 
-CAmount CMasternode::GetMasternodeCollateral(int nHeight) const
+CAmount CMasternode::GetMasternodeCollateral(int nHeight)
 {
 	if (nHeight <= 2000 && nHeight > 500) {
 		return 10 * COIN;
@@ -365,7 +365,7 @@ CAmount CMasternode::GetMasternodeCollateral(int nHeight) const
  * Masternode reward change schedule
  */
 
-CAmount CMasternode::GetBlockValue(int nHeight) const
+CAmount CMasternode::GetBlockValue(int nHeight)
 {
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight < 200 && nHeight > 0)
@@ -445,7 +445,7 @@ CAmount CMasternode::GetBlockValue(int nHeight) const
  * Dummy masternode payment function
  */
 
-CAmount CMasternode::GetMasternodePayment() const
+CAmount CMasternode::GetMasternodePayment()
 {
     return CMasternode::GetBlockValue(chainActive.Height());
 }
