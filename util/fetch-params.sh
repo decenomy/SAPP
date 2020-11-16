@@ -15,7 +15,7 @@ else
     if [[ "$OSTYPE" == "darwin"* ]]; then
         PARAMS_DIR="$HOME/Library/Application Support/SAPPParams"
     else
-        PARAMS_DIR="$HOME/.pivx-params"
+        PARAMS_DIR="$HOME/.sapphire-params"
     fi
 fi
 

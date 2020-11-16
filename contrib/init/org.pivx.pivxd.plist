@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>org.pivx.sapphired</string>
+	<string>org.sapphire.sapphired</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/local/bin/sapphired</string>

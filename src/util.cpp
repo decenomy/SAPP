@@ -293,7 +293,7 @@ fs::path GetDefaultDataDir()
 // Windows < Vista: C:\Documents and Settings\Username\Application Data\SAPP
 // Windows >= Vista: C:\Users\Username\AppData\Roaming\SAPP
 // Mac: ~/Library/Application Support/SAPP
-// Unix: ~/.pivx
+// Unix: ~/.sapphire
 #ifdef WIN32
     // Windows
     return GetSpecialFolderPath(CSIDL_APPDATA) / "SAPP";
@@ -311,7 +311,7 @@ fs::path GetDefaultDataDir()
     return pathRet / "SAPP";
 #else
     // Unix
-    return pathRet / ".pivx";
+    return pathRet / ".sapphire";
 #endif
 #endif
 }
@@ -327,7 +327,7 @@ static fs::path ZC_GetBaseParamsDir()
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\SAPPParams
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\SAPPParams
     // Mac: ~/Library/Application Support/SAPPParams
-    // Unix: ~/.pivx-params
+    // Unix: ~/.sapphire-params
 #ifdef WIN32
     // Windows
     return GetSpecialFolderPath(CSIDL_APPDATA) / "SAPPParams";
@@ -345,7 +345,7 @@ static fs::path ZC_GetBaseParamsDir()
     return pathRet / "SAPPParams";
 #else
     // Unix
-    return pathRet / ".pivx-params";
+    return pathRet / ".sapphire-params";
 #endif
 #endif
 }
