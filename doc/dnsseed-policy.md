@@ -41,11 +41,6 @@ details of their operating practices.
 7. A reachable email contact address must be published for inquiries
 related to the DNS seed operation.
 
-If these expectations cannot be satisfied the operator should
-discontinue providing services and contact the active PIVX
-Core development team as well as posting on the
-[PIVX Forum](https://forum.pivx.org).
-
 Behavior outside of these expectations may be reasonable in some
 situations but should be discussed in public in advance.
 

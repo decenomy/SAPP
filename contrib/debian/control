@@ -28,9 +28,9 @@ Build-Depends: debhelper,
  libzmq3-dev,
  dh-systemd
 Standards-Version: 3.9.2
-Homepage: http://www.pivx.org
-Vcs-Git: git://github.com/PIVX-Project/PIVX.git
-Vcs-Browser: http://github.com/PIVX-Project/PIVX
+Homepage: http://www.sappcoin.com
+Vcs-Git: git://github.com/sappcoin-com/SAPP.git
+Vcs-Browser: http://github.com/sappcoin-com/SAPP
 
 Package: pivxd
 Architecture: any

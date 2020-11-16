@@ -120,7 +120,7 @@ git commit -S -a -m "Add $NAME $VERSION non-code signed signatures"
 git push --set-upstream $NAME $VERSION-not-codesigned
 ```
 
-You can also mail the files to Fuzzbawls (fuzzbawls@pivx.org) and he will commit them.
+You can also mail the files to partner@sappcoin.com (partner@sappcoin.com) and we will commit them.
 
 ```bash
 gpg --detach-sign ${VERSION}-linux/${NAME}/pivx-linux-*-build.assert
