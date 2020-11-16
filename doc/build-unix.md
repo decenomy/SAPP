@@ -1,10 +1,10 @@
 UNIX BUILD NOTES
 ====================
-Some notes on how to build PIVX Core in Unix.
+Some notes on how to build Sapphire Core in Unix.
 
 Note
 ---------------------
-Always use absolute paths to configure and compile PIVX Core and the dependencies,
+Always use absolute paths to configure and compile Sapphire Core and the dependencies,
 For example, when specifying the path of the dependency:
 
 	../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$BDB_PREFIX
@@ -54,7 +54,7 @@ Memory Requirements
 --------------------
 
 C++ compilers are memory-hungry. It is recommended to have at least 1.5 GB of
-memory available when compiling PIVX Core. On systems with less, gcc can be
+memory available when compiling Sapphire Core. On systems with less, gcc can be
 tuned to conserve memory with additional CXXFLAGS:
 
 
@@ -92,7 +92,7 @@ pass `--with-incompatible-bdb` to configure.
 
 Otherwise, you can build from self-compiled `depends` (see above).
 
-To build PIVX Core without wallet, see [*Disable-wallet mode*](/doc/build-unix.md#disable-wallet-mode)
+To build Sapphire Core without wallet, see [*Disable-wallet mode*](/doc/build-unix.md#disable-wallet-mode)
 
 
 Optional (see --with-miniupnpc and --enable-upnp-default):
@@ -186,7 +186,7 @@ If you need to build Boost yourself:
 
 Security
 --------
-To help make your PIVX Core installation more secure by making certain attacks impossible to
+To help make your Sapphire Core installation more secure by making certain attacks impossible to
 exploit even if a vulnerability is found, binaries are hardened by default.
 This can be disabled with:
 
@@ -216,7 +216,7 @@ Hardening enables the following features:
     ET_DYN
 
 * _Non-executable Stack_: If the stack is executable then trivial stack-based buffer overflow exploits are possible if
-    vulnerable buffers are found. By default, PIVX Core should be built with a non-executable stack
+    vulnerable buffers are found. By default, Sapphire Core should be built with a non-executable stack
     but if one of the libraries it uses asks for an executable stack or someone makes a mistake
     and uses a compiler extension which requires an executable stack, it will silently build an
     executable without the non-executable stack protection.
@@ -234,7 +234,7 @@ Disable-wallet mode
 --------------------
 **Note:** This functionality is not yet completely implemented, and compilation using the below option will currently fail.
 
-When the intention is to run only a P2P node without a wallet, PIVX Core may be compiled in
+When the intention is to run only a P2P node without a wallet, Sapphire Core may be compiled in
 disable-wallet mode with:
 
     ./configure --disable-wallet

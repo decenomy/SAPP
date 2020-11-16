@@ -1,12 +1,12 @@
 # TOR SUPPORT IN PIVX
 
-It is possible to run PIVX Core as a Tor hidden service, and connect to such services.
+It is possible to run Sapphire Core as a Tor hidden service, and connect to such services.
 
 The following directions assume you have a Tor proxy running on port 9050. Many distributions default to having a SOCKS proxy listening on port 9050, but others may not. In particular, the Tor Browser Bundle defaults to listening on port 9150. See [Tor Project FAQ:TBBSocksPort](https://www.torproject.org/docs/faq.html.en#TBBSocksPort) for how to properly
 configure Tor.
 
 
-## 1. Run PIVX Core behind a Tor proxy
+## 1. Run Sapphire Core behind a Tor proxy
 ----------------------------------
 
 The first step is running PIVX behind a Tor proxy. This will already anonymize all
@@ -38,7 +38,7 @@ In a typical situation, this suffices to run behind a Tor proxy:
 	./pivxd -proxy=127.0.0.1:9050
 
 
-## 2. Run a PIVX Core hidden server
+## 2. Run a Sapphire Core hidden server
 
 If you configure your Tor system accordingly, it is possible to make your node also
 reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equivalent
@@ -98,13 +98,13 @@ for normal IPv4/IPv6 communication, use:
 
 Starting with Tor version 0.2.7.1 it is possible, through Tor's control socket
 API, to create and destroy 'ephemeral' hidden services programmatically.
-PIVX Core has been updated to make use of this.
+Sapphire Core has been updated to make use of this.
 
 This means that if Tor is running (and proper authentication has been configured),
-PIVX Core automatically creates a hidden service to listen on. This will positively
+Sapphire Core automatically creates a hidden service to listen on. This will positively
 affect the number of available .onion nodes.
 
-This new feature is enabled by default if PIVX Core is listening (`-listen`), and
+This new feature is enabled by default if Sapphire Core is listening (`-listen`), and
 requires a Tor connection to work. It can be explicitly disabled with `-listenonion=0`
 and, if not disabled, configured using the `-torcontrol` and `-torpassword` settings.
 To show verbose debugging information, pass `-debug=tor`.
@@ -127,7 +127,7 @@ in the tor configuration file. The hashed password can be obtained with the comm
 
 ## 4. Privacy recommendations
 
-- Do not add anything but PIVX Core ports to the hidden service created in section 2.
+- Do not add anything but Sapphire Core ports to the hidden service created in section 2.
   If you run a web service too, create a new hidden service for that.
   Otherwise it is trivial to link them, which may reduce privacy. Hidden
   services created automatically (as in section 3) always have only one port

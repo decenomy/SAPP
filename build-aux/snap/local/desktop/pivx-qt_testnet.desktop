@@ -2,8 +2,8 @@
 
 [Desktop Entry]
 Encoding=UTF-8
-Name=PIVX Core
-Comment=PIVX Core QT test network
+Name=Sapphire Core
+Comment=Sapphire Core QT test network
 GenericName=PIVX Digital Currency QT client testnet network
 Exec=pivx-core.qt-testnet %u
 Terminal=false

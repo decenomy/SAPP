@@ -2,7 +2,7 @@
 
 [Desktop Entry]
 Encoding=UTF-8
-Name=PIVX Core Daemon SNAP
+Name=Sapphire Core Daemon SNAP
 Comment=main
 GenericName=PIVX Digital Currency Daemon Client main network
 Exec=pivx-core.daemon %u

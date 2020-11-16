@@ -18,7 +18,7 @@ BITCOIND_BIN=${BITCOIND_BIN:-/usr/bin/pivxd}
 BITCOIND_NICE=${BITCOIND_NICE:-${NICELEVEL:-0}}
 BITCOIND_OPTS="${BITCOIND_OPTS:-${BITCOIN_OPTS}}"
 
-name="PIVX Core Daemon"
+name="Sapphire Core Daemon"
 description="PIVX crypto-currency p2p network daemon"
 
 command="/usr/bin/pivxd"
