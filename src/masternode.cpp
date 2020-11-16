@@ -307,7 +307,7 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
     uint256 hash;
     if(GetTransaction(vin.prevout.hash, txVin, hash, true)) {
         for (CTxOut out : txVin.vout) {
-            if (out.nValue == 10000 * COIN && out.scriptPubKey == payee) return true;
+            if (out.nValue == CMasternode::GetMasternodeCollateral(chainActive.Height()) && out.scriptPubKey == payee) return true;
         }
     }
 
@@ -318,55 +318,54 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
  * Masternode collateral change schedule
  */
 
-int64_t CMasternode::GetMasternodeCollateral(int nHeight)
+CAmount CMasternode::GetMasternodeCollateral(int nHeight) const
 {
 	if (nHeight <= 2000 && nHeight > 500) {
-		return 10;
+		return 10 * COIN;
 	} else if (nHeight <= 20000 && nHeight > 2000) {
-		return 50;
+		return 50 * COIN;
 	} else if (nHeight <= 30000 && nHeight > 20000) {
-		return 500;
+		return 500 * COIN;
 	} else if (nHeight <= 40000 && nHeight > 30000) {
-		return 750;
+		return 750 * COIN;
 	} else if (nHeight <= 50000 && nHeight > 40000) {
-		return 1000;
+		return 1000 * COIN;
 	} else if (nHeight <= 60000 && nHeight > 50000) {
-		return 1250;
+		return 1250 * COIN;
 	} else if (nHeight <= 100000 && nHeight > 60000) {
-		return 2500;
+		return 2500 * COIN;
 	} else if (nHeight <= 130000 && nHeight > 100000) {
-		return 5000;
+		return 5000 * COIN;
 	} else if (nHeight <= 150000 && nHeight > 130000) {
-		return 10000;
+		return 10000 * COIN;
 	} else if (nHeight <= 175000 && nHeight > 150000) {
-		return 20000;
+		return 20000 * COIN;
 	} else if (nHeight <= 200000 && nHeight > 175000) {
-		return 30000;
+		return 30000 * COIN;
 	} else if (nHeight <= 250000 && nHeight > 200000) {
-		return 40000;
+		return 40000 * COIN;
 	} else if (nHeight <= 400000 && nHeight > 250000) {
-		return 50000;
+		return 50000 * COIN;
 	} else if (nHeight <= 450000 && nHeight > 400000) {
-		return 75000;
+		return 75000 * COIN;
 	} else if (nHeight <= 500000 && nHeight > 450000) {
-		return 100000;
+		return 100000 * COIN;
 	} else if (nHeight <= 550000 && nHeight > 500000) {
-		return 125000;
+		return 125000 * COIN;
 	} else if (nHeight <= 600000 && nHeight > 550000) {
-		return 150000;
+		return 150000 * COIN;
 	} else if (nHeight <= 650000 && nHeight > 600000) {
-		return 175000;
-	} else if (nHeight <= 700000 && nHeight > 650000) {
-		return 200000;
+		return 175000 * COIN;
+	} else if (nHeight > 650000) {
+		return 200000 * COIN;
 	}
-	return 200000;
 }
 
 /**
  * Masternode reward change schedule
  */
 
-int64_t CMasternode::GetBlockValue(int nHeight)
+int64_t CMasternode::GetBlockValue(int nHeight) const
 {
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight < 200 && nHeight > 0)
@@ -446,7 +445,7 @@ int64_t CMasternode::GetBlockValue(int nHeight)
  * Dummy masternode payment function
  */
 
-int64_t CMasternode::GetMasternodePayment()
+int64_t CMasternode::GetMasternodePayment() const
 {
     return CMasternode::GetBlockValue(chainActive.Height());
 }
