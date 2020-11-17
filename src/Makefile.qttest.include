@@ -47,7 +47,7 @@ CLEAN_BITCOIN_QT_TEST = $(TEST_QT_MOC_CPP) qt/test/*.gcda qt/test/*.gcno
 
 CLEANFILES += $(CLEAN_BITCOIN_QT_TEST)
 
-test_pivx_qt : qt/test/test_sapphire-qt$(EXEEXT)
+test_sapphire_qt : qt/test/test_sapphire-qt$(EXEEXT)
 
 test_sapphire_qt_check : qt/test/test_sapphire-qt$(EXEEXT) FORCE
 	$(MAKE) check-TESTS TESTS=$^
