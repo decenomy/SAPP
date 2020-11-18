@@ -119,7 +119,7 @@ bool AppInit(int argc, char* argv[])
 #ifndef WIN32
         fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon) {
-            fprintf(stdout, "SAPP server starting\n");
+            fprintf(stdout, "Sapphire Coin Core server starting\n");
 
             // Daemonize
             pid_t pid = fork();
