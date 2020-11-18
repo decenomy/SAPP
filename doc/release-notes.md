@@ -1,8 +1,8 @@
-Sappre Coin Core version *4.3.0* is now available from:  <https://github.com/sappcoin-com/sapp/releases>
+Sappre Coin Core version *4.3.0* is now available from:  <https://github.com/pivx-project/pivx/releases>
 
 This is a new major version release, including various bug fixes and performance improvements, as well as updated translations.
 
-Please report bugs using the issue tracker at github: <https://github.com/sappcoin-com/sapp/issues>
+Please report bugs using the issue tracker at github: <https://github.com/pivx-project/pivx/issues>
 
 
 Recommended Update
