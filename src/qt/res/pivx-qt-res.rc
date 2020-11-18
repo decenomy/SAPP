@@ -20,13 +20,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "SAPP"
-            VALUE "FileDescription",    "Sapphire Core (OSS GUI client for SAPP)"
+            VALUE "FileDescription",    "Sappre Coin Core (OSS GUI client for SAPP)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "sapphire-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "sapphire-qt.exe"
-            VALUE "ProductName",        "Sapphire Core"
+            VALUE "ProductName",        "Sappre Coin Core"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

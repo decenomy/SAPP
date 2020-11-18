@@ -1,7 +1,7 @@
 Translation Strings Policy
 ===========================
 
-This document provides guidelines for internationalization of the Sapphire Core software.
+This document provides guidelines for internationalization of the Sappre Coin Core software.
 
 How to translate?
 ------------------

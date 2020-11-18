@@ -27,7 +27,7 @@ Splash::Splash(Qt::WindowFlags f, const NetworkStyle* networkStyle) :
     QWidget(0, f), ui(new Ui::Splash)
 {
     ui->setupUi(this);
-    QString titleText = tr("Sapphire Core");
+    QString titleText = tr("Sappre Coin Core");
     QString titleAddText = networkStyle->getTitleAddText();
     setWindowTitle(titleText + " " + titleAddText);
 

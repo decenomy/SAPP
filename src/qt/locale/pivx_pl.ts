@@ -1096,16 +1096,16 @@ Rozpocznie się automatycznie, gdy portfel będzie miał wystarczającą liczbę
         <translation>Wersja</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Sapphire Core</source>
-        <translation>O Sapphire Core</translation>
+        <source>About Sappre Coin Core</source>
+        <translation>O Sappre Coin Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1159,16 +1159,16 @@ Rozpocznie się automatycznie, gdy portfel będzie miał wystarczającą liczbę
         <translation>Zapraszamy</translation>
     </message>
     <message>
-        <source>Welcome to Sapphire Core.</source>
-        <translation>Zapraszamy do Sapphire Core</translation>
+        <source>Welcome to Sappre Coin Core.</source>
+        <translation>Zapraszamy do Sappre Coin Core</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
-        <translation>Ponieważ program jest uruchamiany po raz pierwszy, możesz wybrać miejsce, w którym Sapphire Core będzie przechowywać swoje dane.</translation>
+        <source>As this is the first time the program is launched, you can choose where Sappre Coin Core will store its data.</source>
+        <translation>Ponieważ program jest uruchamiany po raz pierwszy, możesz wybrać miejsce, w którym Sappre Coin Core będzie przechowywać swoje dane.</translation>
     </message>
     <message>
-        <source>Sapphire Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Sapphire Core pobierze i zapisze kopię łańcucha bloków SAPP. Przynajmniej %1 GB danych zostanie zapisanych w tym katalogu, a jego liczba będzie rosnąć z czasem. Portfel zostanie również zapisany w tym katalogu.</translation>
+        <source>Sappre Coin Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Sappre Coin Core pobierze i zapisze kopię łańcucha bloków SAPP. Przynajmniej %1 GB danych zostanie zapisanych w tym katalogu, a jego liczba będzie rosnąć z czasem. Portfel zostanie również zapisany w tym katalogu.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1187,8 +1187,8 @@ Rozpocznie się automatycznie, gdy portfel będzie miał wystarczającą liczbę
         <translation>OK</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1927,8 +1927,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations </translation>
 <context>
     <name>SAPPGUI</name>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -1955,8 +1955,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations </translation>
         <translation>Wyjdź z aplikacji</translation>
     </message>
     <message>
-        <source>Sapphire Core client</source>
-        <translation>Sapphire Core klient</translation>
+        <source>Sappre Coin Core client</source>
+        <translation>Sappre Coin Core klient</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2160,8 +2160,8 @@ Adres: %4
         <translation>Wystąpił błąd krytyczny. SAPP nie może już działać bezpiecznie i zakończy działanie.</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2180,8 +2180,8 @@ Adres: %4
         <translation>Błąd odczytu pliku konfiguracyjnego masternode: %1</translation>
     </message>
     <message>
-        <source>Sapphire Core didn't yet exit safely...</source>
-        <translation>Sapphire Core nie zamkną się jeszcze bezpiecznie ...</translation>
+        <source>Sappre Coin Core didn't yet exit safely...</source>
+        <translation>Sappre Coin Core nie zamkną się jeszcze bezpiecznie ...</translation>
     </message>
     <message>
         <source>Contact</source>
@@ -4292,8 +4292,8 @@ Jesteś pewny?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Sapphire Core is shutting down...</source>
-        <translation>Sapphire Core się wyłącza ...</translation>
+        <source>Sappre Coin Core is shutting down...</source>
+        <translation>Sappre Coin Core się wyłącza ...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4322,8 +4322,8 @@ Jesteś pewny?
         <translation>Ładowanie…</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
 </context>
 <context>
@@ -4766,9 +4766,9 @@ kopia zapasowa zostanie utworzona.
     </message>
     <message>
         <source>Welcome to
-Sapphire Core Wallet</source>
+Sappre Coin Core Wallet</source>
         <translation>Witamy
-Portfel Sapphire Core</translation>
+Portfel Sappre Coin Core</translation>
     </message>
     <message>
         <source>SAPP is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
@@ -4814,8 +4814,8 @@ Portfel Sapphire Core</translation>
         <translation>Powiąż z podanym adresem, aby odsłuchać połączenia JSON-RPC. Użyj [host]:port dla IPv6. Ta opcja może być określona wiele razy (domyślnie: powiązanie ze wszystkimi interfejsami)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
-        <translation>Nie można uzyskać dostępu do katalogu danych %s. Sapphire Core prawdopodobnie już działa.</translation>
+        <source>Cannot obtain a lock on data directory %s. Sappre Coin Core is probably already running.</source>
+        <translation>Nie można uzyskać dostępu do katalogu danych %s. Sappre Coin Core prawdopodobnie już działa.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4978,8 +4978,8 @@ Portfel Sapphire Core</translation>
         <translation>Całkowita długość string wersji sieciowej (%i) przekracza maksymalną długość (%i). Zmniejsz liczbę lub rozmiar uacomments.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
-        <translation>Nie można podłączyć %s na tym komputerze. Sapphire Core prawdopodobnie już działa.</translation>
+        <source>Unable to bind to %s on this computer. Sappre Coin Core is probably already running.</source>
+        <translation>Nie można podłączyć %s na tym komputerze. Sappre Coin Core prawdopodobnie już działa.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -4994,8 +4994,8 @@ Portfel Sapphire Core</translation>
         <translation>Ostrzeżenie: -paytxfee jest ustawione bardzo wysoko! Jest to opłata transakcyjna, którą zapłacisz, jeśli wyślesz transakcję.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Ostrzeżenie: sprawdź, czy data i godzina komputera są poprawne! Jeśli zegar jest nieprawidłowy, Sapphire Core nie będzie działać poprawnie.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>Ostrzeżenie: sprawdź, czy data i godzina komputera są poprawne! Jeśli zegar jest nieprawidłowy, Sappre Coin Core nie będzie działać poprawnie.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5070,8 +5070,8 @@ Portfel Sapphire Core</translation>
         <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The Sapphire Core Developers</source>
-        <translation>Copyright (C) 2015-%i The Sapphire Core Developers</translation>
+        <source>Copyright (C) 2015-%i The Sappre Coin Core Developers</source>
+        <translation>Copyright (C) 2015-%i The Sappre Coin Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5210,8 +5210,8 @@ Portfel Sapphire Core</translation>
         <translation>Informacje</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
-        <translation>Sprawdzenie poprawności inicjalizacji nie powiodło się. Sapphire Core zamyka się.</translation>
+        <source>Initialization sanity check failed. Sappre Coin Core is shutting down.</source>
+        <translation>Sprawdzenie poprawności inicjalizacji nie powiodło się. Sappre Coin Core zamyka się.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5510,8 +5510,8 @@ Portfel Sapphire Core</translation>
         <translation>Przygotowanie do ponownej synchronizacji ...</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Sprawdź, czy data i godzina komputera są poprawne! Jeśli zegar jest nieprawidłowy, Sapphire Core nie będzie działać poprawnie.</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>Sprawdź, czy data i godzina komputera są poprawne! Jeśli zegar jest nieprawidłowy, Sappre Coin Core nie będzie działać poprawnie.</translation>
     </message>
     <message>
         <source>Specify location of debug log file: this can be an absolute path or a path relative to the data directory (default: %s)</source>
@@ -5814,8 +5814,8 @@ Portfel Sapphire Core</translation>
         <translation>Portfel %s znajduje się poza katalogiem danych %s</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
-        <translation>Portfel musiał zostać przepisany: zrestartuj Sapphire Core, aby zakończyć</translation>
+        <source>Wallet needed to be rewritten: restart Sappre Coin Core to complete</source>
+        <translation>Portfel musiał zostać przepisany: zrestartuj Sappre Coin Core, aby zakończyć</translation>
     </message>
     <message>
         <source>Wallet options:</source>

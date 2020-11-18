@@ -152,8 +152,8 @@ public:
         consensus.height_ZC_RecalcAccumulators = 999999999;
 
         // validation by-pass
-        consensus.nSapphireBadBlockTime = 4294967295; // Very far in the future. Practically never.
-        consensus.nSapphireBadBlockBits = 0x00;    // No bad block so 0x00
+        // consensus.nPivxBadBlockTime = 4294967295; // Very far in the future. Practically never.
+        // consensus.nPivxBadBlockBits = 0x00;    // No bad block so 0x00
 
         // Zerocoin-related params
         consensus.ZC_Modulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"

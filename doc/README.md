@@ -1,4 +1,4 @@
-Sapphire Core
+Sappre Coin Core
 =============
 
 Setup
@@ -7,7 +7,7 @@ Setup
 
 Running
 ---------------------
-The following are some helpful notes on how to run Sapphire Core on your native platform.
+The following are some helpful notes on how to run Sappre Coin Core on your native platform.
 
 ### Unix
 
@@ -34,7 +34,7 @@ for help and more information.
 
 Building
 ---------------------
-The following are developer notes on how to build Sapphire Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
+The following are developer notes on how to build Sappre Coin Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
 - [Dependencies](dependencies.md)
 - [macOS Build Notes](build-osx.md)

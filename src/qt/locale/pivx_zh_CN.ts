@@ -1094,16 +1094,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>版本</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-位)</translation>
     </message>
     <message>
-        <source>About Sapphire Core</source>
-        <translation>关于Sapphire Core</translation>
+        <source>About Sappre Coin Core</source>
+        <translation>关于Sapphire Coin Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1157,16 +1157,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>欢迎</translation>
     </message>
     <message>
-        <source>Welcome to Sapphire Core.</source>
-        <translation>欢迎使用 Sapphire Core</translation>
+        <source>Welcome to Sappre Coin Core.</source>
+        <translation>欢迎使用 Sappre Coin Core</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
-        <translation>由于这是该程序第一次启动，您可以选择存储Sapphire Core 数据的位置。</translation>
+        <source>As this is the first time the program is launched, you can choose where Sappre Coin Core will store its data.</source>
+        <translation>由于这是该程序第一次启动，您可以选择存储Sapphire Coin Core 数据的位置。</translation>
     </message>
     <message>
-        <source>Sapphire Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Sapphire Core将下载并存储SAPP区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
+        <source>Sappre Coin Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Sapphire Coin Core将下载并存储SAPP区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1185,8 +1185,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>好的</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1931,8 +1931,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
 <context>
     <name>SAPPGUI</name>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -1959,8 +1959,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>关闭应用</translation>
     </message>
     <message>
-        <source>Sapphire Core client</source>
-        <translation>Sapphire Core 客户端</translation>
+        <source>Sappre Coin Core client</source>
+        <translation>Sappre Coin Core 客户端</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2164,8 +2164,8 @@ Address: %4
         <translation>发生了一个致命的错误。SAPP不能继续安全，将退出。</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2184,7 +2184,7 @@ Address: %4
         <translation>读取主节点配置文件出错:%1</translation>
     </message>
     <message>
-        <source>Sapphire Core didn't yet exit safely...</source>
+        <source>Sappre Coin Core didn't yet exit safely...</source>
         <translation>SAPP核心尚未安全退出……</translation>
     </message>
     <message>
@@ -4423,7 +4423,7 @@ Are you sure?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Sapphire Core is shutting down...</source>
+        <source>Sappre Coin Core is shutting down...</source>
         <translation>SAPP 核心正在关闭...</translation>
     </message>
     <message>
@@ -4453,8 +4453,8 @@ Are you sure?
         <translation>正在下载…</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
 </context>
 <context>
@@ -4897,7 +4897,7 @@ backup will be created.
     </message>
     <message>
         <source>Welcome to
-Sapphire Core Wallet</source>
+Sappre Coin Core Wallet</source>
         <translation>欢迎
 SAPP核心钱包</translation>
     </message>
@@ -4949,7 +4949,7 @@ SAPP核心钱包</translation>
         <translation>绑定到给定地址监听JSON-RPC连接。使用[主机]: IPv6的端口符号。可以多次指定此选项(默认:绑定到所有接口)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Sappre Coin Core is probably already running.</source>
         <translation>无法获取数据目录%s锁。SAPP核心可能已经在运行了。</translation>
     </message>
     <message>
@@ -5113,7 +5113,7 @@ SAPP核心钱包</translation>
         <translation>网络版本字符串的总长度(%i)超过最大长度(%i)。减少任务的数量或大小。</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Sappre Coin Core is probably already running.</source>
         <translation>无法绑定到此计算机上的%s。SAPP核心可能已经在运行了。</translation>
     </message>
     <message>
@@ -5129,8 +5129,8 @@ SAPP核心钱包</translation>
         <translation>警告:-支付tx费用设置的非常高!这是您发送交易时要支付的交易费。</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，Sapphire Core将无法正常工作。</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，Sapphire Coin Core将无法正常工作。</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5205,7 +5205,7 @@ SAPP核心钱包</translation>
         <translation>版权所有(C) 2014-%i的达世核心开发者</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The Sapphire Core Developers</source>
+        <source>Copyright (C) 2015-%i The Sappre Coin Core Developers</source>
         <translation>版权所有(C) 2015-%i SAPP核心开发者</translation>
     </message>
     <message>
@@ -5345,7 +5345,7 @@ SAPP核心钱包</translation>
         <translation>信息</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
+        <source>Initialization sanity check failed. Sappre Coin Core is shutting down.</source>
         <translation>初始化完整性检查失败。SAPP核心快要关闭了。</translation>
     </message>
     <message>
@@ -5645,8 +5645,8 @@ SAPP核心钱包</translation>
         <translation>准备重新同步……</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>请检查您的电脑的日期和时间是否正确!如果你的时间错误，Sapphire Core将无法正常工作。</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>请检查您的电脑的日期和时间是否正确!如果你的时间错误，Sapphire Coin Core将无法正常工作。</translation>
     </message>
     <message>
         <source>Specify location of debug log file: this can be an absolute path or a path relative to the data directory (default: %s)</source>
@@ -5949,7 +5949,7 @@ SAPP核心钱包</translation>
         <translation>钱包%s驻留在数据目录%s之外</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Sappre Coin Core to complete</source>
         <translation>钱包需要重写:重新启动SAPP核心完成</translation>
     </message>
     <message>

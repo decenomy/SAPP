@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Sapphire"
-            VALUE "FileDescription",    "Sapphire-cli (OSS RPC client for Sapphire)"
+            VALUE "CompanyName",        "Sapphire Coin"
+            VALUE "FileDescription",    "Sapphire-cli (OSS RPC client for Sapphire Coin)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "sapphire-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR

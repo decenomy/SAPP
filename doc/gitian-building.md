@@ -1,7 +1,7 @@
 Gitian building
 ================
 
-*Setup instructions for a gitian build of Sapphire Core using a VM or physical system.*
+*Setup instructions for a gitian build of Sappre Coin Core using a VM or physical system.*
 
 Gitian is the deterministic build process that is used to build the SAPP
 Core executables. It provides a way to be reasonably sure that the
@@ -23,7 +23,7 @@ Table of Contents
 - [Preparing the Gitian builder host](#preparing-the-gitian-builder-host)
   - [macOS Builds](#macos-builds)
 - [Initial Gitian Setup](#initial-gitian-setup)
-- [Building Sapphire Core](#building-pivx-core)
+- [Building Sappre Coin Core](#building-pivx-core)
 - [Signing externally](#signing-externally)
 - [Uploading signatures](#uploading-signatures)
 
@@ -63,7 +63,7 @@ Initial Gitian Setup
 
 The `gitian-build.py` script is designed to checkout different release tags, commits, branches, or pull requests. The linked guides above cover the process of obtaining the script and doing the basic initial setup.
 
-Building Sapphire Core
+Building Sappre Coin Core
 --------------------
 
 The script allows you to build tags, commits, branches, and even pull requests. Below are some examples:

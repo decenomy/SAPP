@@ -1,7 +1,7 @@
 Translations
 ============
 
-The Sapphire Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, Sapphire Core makes use of the Transifex online translation management tool.
+The Sappre Coin Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, Sappre Coin Core makes use of the Transifex online translation management tool.
 
 ### Helping to translate (using Transifex)
 Transifex is setup to monitor the GitHub repo for updates, and when code containing new translations is found, Transifex will process any changes. It may take several hours after a pull-request has been merged, to appear in the Transifex web interface.
@@ -104,6 +104,6 @@ To create a new language template, you will need to edit the languages manifest 
 **Note:** that the language translation file **must end in `.qm`** (the compiled extension), and not `.ts`.
 
 ### Questions and general assistance
-The Sapphire Core translation maintainers include *Fuzzbawls*. You can find them, and others, in the [Sapphire Coin Discord](https://discord.gg/Rkxu77S).
+The Sappre Coin Core translation maintainers include *Fuzzbawls*. You can find them, and others, in the [Sapphire Coin Discord](https://discord.gg/Rkxu77S).
 
 Announcements will be posted during application pre-releases to notify translators to check for updates.

@@ -1444,7 +1444,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
     </message>
     <message>
         <location line="+0"/>
-        <source>Sapphire Core</source>
+        <source>Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1455,7 +1455,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
     </message>
     <message>
         <location line="+6"/>
-        <source>About Sapphire Core</source>
+        <source>About Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1523,17 +1523,17 @@ It will start automatically as soon as the wallet has enough confirmations on an
     </message>
     <message>
         <location line="+90"/>
-        <source>Welcome to Sapphire Core.</source>
+        <source>Welcome to Sappre Coin Core.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+35"/>
-        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
+        <source>As this is the first time the program is launched, you can choose where Sappre Coin Core will store its data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>Sapphire Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <source>Sappre Coin Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1558,7 +1558,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
     </message>
     <message>
         <location filename="../intro.cpp" line="+100"/>
-        <source>Sapphire Core</source>
+        <source>Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2551,7 +2551,7 @@ https://www.transifex.com/pivx-project/pivx-project-translations</source>
         <location filename="../pivx/pivxgui.cpp" line="+69"/>
         <location line="+298"/>
         <location line="+69"/>
-        <source>Sapphire Core</source>
+        <source>Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2586,7 +2586,7 @@ https://www.transifex.com/pivx-project/pivx-project-translations</source>
     </message>
     <message>
         <location line="+39"/>
-        <source>Sapphire Core client</source>
+        <source>Sappre Coin Core client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2856,7 +2856,7 @@ Address: %4
         <location line="+7"/>
         <location line="+13"/>
         <location line="+19"/>
-        <source>Sapphire Core</source>
+        <source>Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2881,7 +2881,7 @@ Address: %4
     </message>
     <message>
         <location line="+64"/>
-        <source>Sapphire Core didn&apos;t yet exit safely...</source>
+        <source>Sappre Coin Core didn&apos;t yet exit safely...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5943,7 +5943,7 @@ Are you sure?
     <name>ShutdownWindow</name>
     <message>
         <location filename="../utilitydialog.cpp" line="+71"/>
-        <source>Sapphire Core is shutting down...</source>
+        <source>Sappre Coin Core is shutting down...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5979,7 +5979,7 @@ Are you sure?
     </message>
     <message>
         <location filename="../pivx/splash.cpp" line="+30"/>
-        <source>Sapphire Core</source>
+        <source>Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6702,7 +6702,7 @@ Select fewer inputs with coin control.</source>
     <message>
         <location line="+89"/>
         <source>Welcome to
-Sapphire Core Wallet</source>
+Sappre Coin Core Wallet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6777,7 +6777,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+5"/>
-        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Sappre Coin Core is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6987,7 +6987,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+3"/>
-        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
+        <source>Unable to bind to %s on this computer. Sappre Coin Core is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7007,7 +7007,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+3"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7102,7 +7102,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+1"/>
-        <source>Copyright (C) 2015-%i The Sapphire Core Developers</source>
+        <source>Copyright (C) 2015-%i The Sappre Coin Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7277,7 +7277,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+1"/>
-        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
+        <source>Initialization sanity check failed. Sappre Coin Core is shutting down.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7732,7 +7732,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+7"/>
-        <source>Please check that your computer&apos;s date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <source>Please check that your computer&apos;s date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7787,7 +7787,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+1"/>
-        <source>Error loading %s: Wallet requires newer version of Sapphire Core</source>
+        <source>Error loading %s: Wallet requires newer version of Sappre Coin Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8289,7 +8289,7 @@ Please run &apos;sapling-fetch-params&apos; or &apos;./util/fetch-params.sh&apos
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
+        <source>Wallet needed to be rewritten: restart Sappre Coin Core to complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

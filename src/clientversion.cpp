@@ -13,7 +13,7 @@
  * for both sapphired and sapphire-qt, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
-const std::string CLIENT_NAME("Sapphire Core");
+const std::string CLIENT_NAME("Sappre Coin Core");
 
 /**
  * Client version number

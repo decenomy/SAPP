@@ -66,7 +66,7 @@ SAPPGUI::SAPPGUI(const NetworkStyle* networkStyle, QWidget* parent) :
 
     QString windowTitle = QString::fromStdString(GetArg("-windowtitle", ""));
     if (windowTitle.isEmpty()) {
-        windowTitle = tr("Sapphire Core") + " - ";
+        windowTitle = tr("Sappre Coin Core") + " - ";
         windowTitle += ((enableWallet) ? tr("Wallet") : tr("Node"));
     }
     windowTitle += " " + networkStyle->getTitleAddText();
@@ -210,7 +210,7 @@ void SAPPGUI::createTrayIcon(const NetworkStyle* networkStyle)
 {
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
-    QString toolTip = tr("Sapphire Core client") + " " + networkStyle->getTitleAddText();
+    QString toolTip = tr("Sappre Coin Core client") + " " + networkStyle->getTitleAddText();
     trayIcon->setToolTip(toolTip);
     trayIcon->setIcon(networkStyle->getAppIcon());
     trayIcon->hide();
@@ -364,7 +364,7 @@ void SAPPGUI::messageInfo(const QString& text)
 
 void SAPPGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret)
 {
-    QString strTitle =  tr("Sapphire Core"); // default title
+    QString strTitle =  tr("Sappre Coin Core"); // default title
     // Default to information icon
     int nNotifyIcon = Notificator::Information;
 
@@ -433,7 +433,7 @@ bool SAPPGUI::openStandardDialog(QString title, QString body, QString okBtn, QSt
     } else {
         dialog = new DefaultDialog();
         dialog->setText(title, body, okBtn);
-        dialog->setWindowTitle(tr("Sapphire Core"));
+        dialog->setWindowTitle(tr("Sappre Coin Core"));
         dialog->adjustSize();
         dialog->raise();
         dialog->exec();

@@ -936,8 +936,7 @@
                       <string notr="true">padding:1px;</string>
                      </property>
                      <property name="text">
-                      <string>Welcome to
-Sapphire Core Wallet</string>
+                      <string>Welcome to Sappre Coin Core Wallet</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>

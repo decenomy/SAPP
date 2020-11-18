@@ -1164,16 +1164,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>versión</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Sapphire Core</source>
-        <translation>Acerca de Sapphire Core</translation>
+        <source>About Sappre Coin Core</source>
+        <translation>Acerca de Sappre Coin Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1227,16 +1227,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Bienvenido/a</translation>
     </message>
     <message>
-        <source>Welcome to Sapphire Core.</source>
-        <translation>Bienvenido/a a Sapphire Core.</translation>
+        <source>Welcome to Sappre Coin Core.</source>
+        <translation>Bienvenido/a a Sappre Coin Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
-        <translation>Al ser la primera vez que se inicia el programa, usted puede elegir dónde guardará Sapphire Core sus datos.</translation>
+        <source>As this is the first time the program is launched, you can choose where Sappre Coin Core will store its data.</source>
+        <translation>Al ser la primera vez que se inicia el programa, usted puede elegir dónde guardará Sappre Coin Core sus datos.</translation>
     </message>
     <message>
-        <source>Sapphire Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Sapphire Core descargará y guardará una copia de la cadena de bloques SAPP. Por lo menos %1GB de datos serán guardados en esta carpeta, y crecerá con el tiempo. La wallet también se guardará en esta carpeta.</translation>
+        <source>Sappre Coin Core will download and store a copy of the SAPP block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Sappre Coin Core descargará y guardará una copia de la cadena de bloques SAPP. Por lo menos %1GB de datos serán guardados en esta carpeta, y crecerá con el tiempo. La wallet también se guardará en esta carpeta.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1255,8 +1255,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>OK</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -2078,8 +2078,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
 <context>
     <name>SAPPGUI</name>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -2106,8 +2106,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Cerrar aplicación</translation>
     </message>
     <message>
-        <source>Sapphire Core client</source>
-        <translation>Cliente Sapphire Core</translation>
+        <source>Sappre Coin Core client</source>
+        <translation>Cliente Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2315,8 +2315,8 @@ Dirección: %4
         <translation>Se produjo un error fatal. SAPP ya no puede continuar de forma segura y dejará de funcionar.   </translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2335,7 +2335,7 @@ Dirección: %4
         <translation>Error al leer el archivo de configuración de masternode: %1</translation>
     </message>
     <message>
-        <source>Sapphire Core didn't yet exit safely...</source>
+        <source>Sappre Coin Core didn't yet exit safely...</source>
         <translation>El núcleo SAPP aún no ha salido de forma segura...</translation>
     </message>
     <message>
@@ -4815,7 +4815,7 @@ Are you sure?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Sapphire Core is shutting down...</source>
+        <source>Sappre Coin Core is shutting down...</source>
         <translation>El programa SAPP se está cerrando...</translation>
     </message>
     <message>
@@ -4845,8 +4845,8 @@ Are you sure?
         <translation>Cargando....</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Sappre Coin Core</source>
+        <translation>Sappre Coin Core</translation>
     </message>
 </context>
 <context>
@@ -5389,9 +5389,9 @@ Seleccione menos entradas con control de monedas.</translation>
     </message>
     <message>
         <source>Welcome to
-Sapphire Core Wallet</source>
+Sappre Coin Core Wallet</source>
         <translation>Bienvenido a
-Sapphire Core Wallet</translation>
+Sappre Coin Core Wallet</translation>
     </message>
     <message>
         <source>SAPP is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
@@ -5453,8 +5453,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
 Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
-        <translation>No se puede obtener un bloqueo sobre el directorio de datos %s. Sapphire Core esta probablemente en ejecución.</translation>
+        <source>Cannot obtain a lock on data directory %s. Sappre Coin Core is probably already running.</source>
+        <translation>No se puede obtener un bloqueo sobre el directorio de datos %s. Sappre Coin Core esta probablemente en ejecución.</translation>
     </message>
     <message>
         <source>Cannot upgrade to Sapling wallet (already running Sapling support). Version: %d</source>
@@ -5621,8 +5621,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>La longitud total de la cadena de la versión de red (%i) excede la longitud máxima (%i). Reducir el número o tamaño de los uacomments.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
-        <translation>Imposible conectar a %s en esta computadora. Es probable que Sapphire Core ya este corriendo.</translation>
+        <source>Unable to bind to %s on this computer. Sappre Coin Core is probably already running.</source>
+        <translation>Imposible conectar a %s en esta computadora. Es probable que Sappre Coin Core ya este corriendo.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5637,8 +5637,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Advertencia: -paytxfee esta muy alta! Esta es la comisión de transacción que pagarás si envías una transacción.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Advertencia: Por favor verifique que la fecha y hora de su computadora sean correctas! Si su reloj esta fuera de hora Sapphire Core no funcionará adecuadamente.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>Advertencia: Por favor verifique que la fecha y hora de su computadora sean correctas! Si su reloj esta fuera de hora Sappre Coin Core no funcionará adecuadamente.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5713,8 +5713,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The Sapphire Core Developers</source>
-        <translation>Copyright (C) 2015-%i The Sapphire Core Developers</translation>
+        <source>Copyright (C) 2015-%i The Sappre Coin Core Developers</source>
+        <translation>Copyright (C) 2015-%i The Sappre Coin Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5853,8 +5853,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Información</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
-        <translation>La prueba de salud de inicialización ha fallado. Sapphire Core se cerrará.</translation>
+        <source>Initialization sanity check failed. Sappre Coin Core is shutting down.</source>
+        <translation>La prueba de salud de inicialización ha fallado. Sappre Coin Core se cerrará.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -6193,8 +6193,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Cantidad mínima positiva (en PIV) permitida por GUI y RPC para el umbral de división de participación (predeterminado: %s)</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Por favor verifique que la fecha y hora de su computadora sean correctas! Si su reloj esta fuera de hora Sapphire Core no funcionará adecuadamente.</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Sappre Coin Core will not work properly.</source>
+        <translation>Por favor verifique que la fecha y hora de su computadora sean correctas! Si su reloj esta fuera de hora Sappre Coin Core no funcionará adecuadamente.</translation>
     </message>
     <message>
         <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect/-noconnect)</source>
@@ -6237,8 +6237,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Error al cargar %s: billetera dañada</translation>
     </message>
     <message>
-        <source>Error loading %s: Wallet requires newer version of Sapphire Core</source>
-        <translation>Error al cargar %s: Wallet requiere una versión más reciente de Sapphire Core</translation>
+        <source>Error loading %s: Wallet requires newer version of Sappre Coin Core</source>
+        <translation>Error al cargar %s: Wallet requiere una versión más reciente de Sappre Coin Core</translation>
     </message>
     <message>
         <source>Error loading %s
@@ -6629,8 +6629,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Opciones de prueba / depuración de billetera:</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
-        <translation>La wallet necesita reescribirse: reinicie la Sapphire Core para completarlo</translation>
+        <source>Wallet needed to be rewritten: restart Sappre Coin Core to complete</source>
+        <translation>La wallet necesita reescribirse: reinicie la Sappre Coin Core para completarlo</translation>
     </message>
     <message>
         <source>Wallet options:</source>
