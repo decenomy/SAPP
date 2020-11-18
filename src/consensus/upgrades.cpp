@@ -42,11 +42,11 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
                 /*.strInfo =*/ "activation of zerocoin public spends (spend v3)",
         },
         {
-                /*.strName =*/ "SAPP_v3.4",
+                /*.strName =*/ "PIVX_v3.4",
                 /*.strInfo =*/ "new 256-bit stake modifier - start block v6",
         },
         {
-                /*.strName =*/ "SAPP_v4.0",
+                /*.strName =*/ "PIVX_v4.0",
                 /*.strInfo =*/ "new message sigs - start block v7 - time protocol - zc spend v4",
         },
         {

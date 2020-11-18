@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_BLOCKSIGNATURE_H
-#define SAPP_BLOCKSIGNATURE_H
+#ifndef PIVX_BLOCKSIGNATURE_H
+#define PIVX_BLOCKSIGNATURE_H
 
 #include "key.h"
 #include "primitives/block.h"
@@ -13,4 +13,4 @@ bool SignBlockWithKey(CBlock& block, const CKey& key);
 bool SignBlock(CBlock& block, const CKeyStore& keystore);
 bool CheckBlockSignature(const CBlock& block, const bool enableP2PKH);
 
-#endif //SAPP_BLOCKSIGNATURE_H
+#endif //PIVX_BLOCKSIGNATURE_H

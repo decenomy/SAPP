@@ -10,7 +10,7 @@ from test_framework.test_framework import SapphireTestFramework
 from test_framework.util import set_node_times, assert_equal
 
 
-class SAPP_RPCSporkTest(SapphireTestFramework):
+class PIVX_RPCSporkTest(SapphireTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True
@@ -70,5 +70,5 @@ class SAPP_RPCSporkTest(SapphireTestFramework):
 
 
 if __name__ == '__main__':
-    SAPP_RPCSporkTest().main()
+    PIVX_RPCSporkTest().main()
 

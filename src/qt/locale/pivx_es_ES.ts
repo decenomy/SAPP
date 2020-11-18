@@ -3585,12 +3585,12 @@ Verifica que tengas instalado un editor de texto predeterminado.</translation>
         <translation>Exportar lista de direcciones</translation>
     </message>
     <message>
-        <source>SAPP_tx_csv_export(*.csv)</source>
-        <translation>SAPP_tx_csv_export(*.csv)</translation>
+        <source>PIVX_tx_csv_export(*.csv)</source>
+        <translation>PIVX_tx_csv_export(*.csv)</translation>
     </message>
     <message>
-        <source>SAPP_addresses_csv_export(*.csv)</source>
-        <translation>SAPP_addresses_csv_export(*.csv)</translation>
+        <source>PIVX_addresses_csv_export(*.csv)</source>
+        <translation>PIVX_addresses_csv_export(*.csv)</translation>
     </message>
     <message>
         <source>Please select a folder to export the csv file first.</source>

@@ -4698,12 +4698,12 @@ Verify that you have installed a predetermined text editor.</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>SAPP_tx_csv_export(*.csv)</source>
+        <source>PIVX_tx_csv_export(*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>SAPP_addresses_csv_export(*.csv)</source>
+        <source>PIVX_addresses_csv_export(*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

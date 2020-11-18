@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_PFBorderImage_H
-#define SAPP_PFBorderImage_H
+#ifndef PIVX_PFBorderImage_H
+#define PIVX_PFBorderImage_H
 
 #include <QPainter>
 #include <QPixmap>
@@ -52,4 +52,4 @@ protected:
 
 };
 
-#endif //SAPP_PFBorderImage_H
+#endif //PIVX_PFBorderImage_H

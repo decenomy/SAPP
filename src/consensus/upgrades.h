@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_CONSENSUS_UPGRADES_H
-#define SAPP_CONSENSUS_UPGRADES_H
+#ifndef PIVX_CONSENSUS_UPGRADES_H
+#define PIVX_CONSENSUS_UPGRADES_H
 
 #include "consensus/params.h"
 #include "optional.h"
@@ -81,4 +81,4 @@ Optional<int> NextActivationHeight(
         int nHeight,
         const Consensus::Params& params);
 
-#endif // SAPP_CONSENSUS_UPGRADES_H
+#endif // PIVX_CONSENSUS_UPGRADES_H

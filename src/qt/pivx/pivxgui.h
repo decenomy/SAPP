@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_CORE_NEW_GUI_SAPPGUI_H
-#define SAPP_CORE_NEW_GUI_SAPPGUI_H
+#ifndef PIVX_CORE_NEW_GUI_SAPPGUI_H
+#define PIVX_CORE_NEW_GUI_SAPPGUI_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/pivx-config.h"
@@ -189,4 +189,4 @@ Q_SIGNALS:
 };
 
 
-#endif //SAPP_CORE_NEW_GUI_SAPPGUI_H
+#endif //PIVX_CORE_NEW_GUI_SAPPGUI_H

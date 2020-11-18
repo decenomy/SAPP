@@ -3660,12 +3660,12 @@ Provjerite jeste li instalirali unaprijed određjeni uređjivač teksta.</transl
         <translation>Izvezi popis adresa</translation>
     </message>
     <message>
-        <source>SAPP_tx_csv_export(*.csv)</source>
-        <translation>SAPP_transakcije_csv_izvoz(*.csv)</translation>
+        <source>PIVX_tx_csv_export(*.csv)</source>
+        <translation>PIVX_transakcije_csv_izvoz(*.csv)</translation>
     </message>
     <message>
-        <source>SAPP_addresses_csv_export(*.csv)</source>
-        <translation>SAPP_adrese_csv_izvoz(*.csv)</translation>
+        <source>PIVX_addresses_csv_export(*.csv)</source>
+        <translation>PIVX_adrese_csv_izvoz(*.csv)</translation>
     </message>
     <message>
         <source>Please select a folder to export the csv file first.</source>

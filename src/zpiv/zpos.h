@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_LEGACY_ZPOS_H
-#define SAPP_LEGACY_ZPOS_H
+#ifndef PIVX_LEGACY_ZPOS_H
+#define PIVX_LEGACY_ZPOS_H
 
 #include "stakeinput.h"
 #include "main.h"
@@ -33,4 +33,4 @@ public:
     virtual bool ContextCheck(int nHeight, uint32_t nTime) override;
 };
 
-#endif //SAPP_LEGACY_ZPOS_H
+#endif //PIVX_LEGACY_ZPOS_H

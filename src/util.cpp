@@ -85,9 +85,9 @@
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 
-const char * const SAPP_CONF_FILENAME = "sapphire.conf";
-const char * const SAPP_PID_FILENAME = "sapphire.pid";
-const char * const SAPP_MASTERNODE_CONF_FILENAME = "masternode.conf";
+const char * const PIVX_CONF_FILENAME = "sapphire.conf";
+const char * const PIVX_PID_FILENAME = "sapphire.pid";
+const char * const PIVX_MASTERNODE_CONF_FILENAME = "masternode.conf";
 
 
 // SAPP only features
@@ -452,13 +452,13 @@ void ClearDatadirCache()
 
 fs::path GetConfigFile()
 {
-    fs::path pathConfigFile(GetArg("-conf", SAPP_CONF_FILENAME));
+    fs::path pathConfigFile(GetArg("-conf", PIVX_CONF_FILENAME));
     return AbsPathForConfigVal(pathConfigFile, false);
 }
 
 fs::path GetMasternodeConfigFile()
 {
-    fs::path pathConfigFile(GetArg("-mnconf", SAPP_MASTERNODE_CONF_FILENAME));
+    fs::path pathConfigFile(GetArg("-mnconf", PIVX_MASTERNODE_CONF_FILENAME));
     return AbsPathForConfigVal(pathConfigFile);
 }
 
@@ -501,7 +501,7 @@ fs::path AbsPathForConfigVal(const fs::path& path, bool net_specific)
 #ifndef WIN32
 fs::path GetPidFile()
 {
-    fs::path pathPidFile(GetArg("-pid", SAPP_PID_FILENAME));
+    fs::path pathPidFile(GetArg("-pid", PIVX_PID_FILENAME));
     return AbsPathForConfigVal(pathPidFile);
 }
 

@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_ZPIVTRACKER_H
-#define SAPP_ZPIVTRACKER_H
+#ifndef PIVX_ZPIVTRACKER_H
+#define PIVX_ZPIVTRACKER_H
 
 #include "zerocoin.h"
 #include "sync.h"
@@ -52,4 +52,4 @@ public:
     void Clear();
 };
 
-#endif //SAPP_ZPIVTRACKER_H
+#endif //PIVX_ZPIVTRACKER_H

@@ -4,8 +4,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_PUBKEY_H
-#define SAPP_PUBKEY_H
+#ifndef PIVX_PUBKEY_H
+#define PIVX_PUBKEY_H
 
 #include "hash.h"
 #include "serialize.h"
@@ -264,4 +264,4 @@ public:
     ~ECCVerifyHandle();
 };
 
-#endif // SAPP_PUBKEY_H
+#endif // PIVX_PUBKEY_H

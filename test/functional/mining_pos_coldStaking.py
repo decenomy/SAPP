@@ -28,7 +28,7 @@ def getDelegatedUtxos(utxos):
     return [x for x in utxos if x["scriptPubKey"][:10] == '76a97b63d1']
 
 
-class SAPP_ColdStakingTest(SapphireTestFramework):
+class PIVX_ColdStakingTest(SapphireTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 3
@@ -456,4 +456,4 @@ class SAPP_ColdStakingTest(SapphireTestFramework):
 
 
 if __name__ == '__main__':
-    SAPP_ColdStakingTest().main()
+    PIVX_ColdStakingTest().main()

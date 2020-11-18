@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H
-#define SAPP_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H
+#ifndef PIVX_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H
+#define PIVX_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
 #include "addresstablemodel.h"
@@ -44,4 +44,4 @@ private:
 };
 
 
-#endif //SAPP_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H
+#endif //PIVX_CORE_NEW_GUI_ADDRESSFILTERPROXYMODEL_H

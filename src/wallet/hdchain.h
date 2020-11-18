@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_HDCHAIN_H
-#define SAPP_HDCHAIN_H
+#ifndef PIVX_HDCHAIN_H
+#define PIVX_HDCHAIN_H
 
 #include "key.h"
 
@@ -72,4 +72,4 @@ public:
     }
 };
 
-#endif // SAPP_HDCHAIN_H
+#endif // PIVX_HDCHAIN_H

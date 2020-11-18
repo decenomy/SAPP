@@ -5,8 +5,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_BLOB_UINT256_H
-#define SAPP_BLOB_UINT256_H
+#ifndef PIVX_BLOB_UINT256_H
+#define PIVX_BLOB_UINT256_H
 
 #include <assert.h>
 #include <cstring>
@@ -173,4 +173,4 @@ inline blob_uint256 blob_uint256S(const std::string& str)
 const blob_uint256 BLOB_UINT256_ZERO = blob_uint256();
 const blob_uint256 BLOB_UINT256_ONE = blob_uint256S("0000000000000000000000000000000000000000000000000000000000000001");
 
-#endif // SAPP_BLOB_UINT256_H
+#endif // PIVX_BLOB_UINT256_H

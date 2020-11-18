@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef SAPP_ZPIVWALLET_H
-#define SAPP_ZPIVWALLET_H
+#ifndef PIVX_ZPIVWALLET_H
+#define PIVX_ZPIVWALLET_H
 
 #include <map>
 #include "libzerocoin/Coin.h"
@@ -50,4 +50,4 @@ private:
     uint512 GetZerocoinSeed(uint32_t n);
 };
 
-#endif //SAPP_ZPIVWALLET_H
+#endif //PIVX_ZPIVWALLET_H
