@@ -447,7 +447,7 @@ CAmount CMasternode::GetBlockValue(int nHeight)
 
 CAmount CMasternode::GetMasternodePayment()
 {
-    return CMasternode::GetBlockValue(chainActive.Height());
+    return ((95/100) * CMasternode::GetBlockValue(chainActive.Height())); // 95% of the block reward
 }
 
 
