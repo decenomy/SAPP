@@ -378,6 +378,22 @@ CAmount CMasternode::GetBlockValue(int nHeight)
 
     }
 
+    //Create a fork to ensure all old wallets update
+    if (nHeight == 574010)
+    {
+        return 801 * COIN;
+    }
+
+    if (nHeight == 585330)
+    {
+        return 801 * COIN;
+    }
+
+    if (nHeight == 586594)
+    { // to be set at phase 2 compile
+        return 801 * COIN;
+    }
+
     CAmount nSubsidy = 0;
     if (nHeight == 1)
         nSubsidy = 300000 * COIN;
