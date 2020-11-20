@@ -609,14 +609,16 @@ std::string CMasternodeBroadcast::GetOldStrMessage() const
 bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
-    std::string strMessage = (
+    const std::string strMessage = (
                             nMessVersion == MessageVersion::MESS_VER_HASH ?
                             GetSignatureHash().GetHex() :
                             GetStrMessage()
                             );
 
-    if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError))
+    if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError) &&
+       !CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetOldStrMessage(), strError)) {
         return error("%s : VerifyMessage (nMessVersion=%d) failed: %s", __func__, nMessVersion, strError);
+	}
 
     return true;
 }
