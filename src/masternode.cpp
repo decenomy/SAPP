@@ -595,6 +595,17 @@ bool CMasternodeBroadcast::Sign(const std::string strSignKey)
     return Sign(key, pubkey);
 }
 
+std::string CMasternodeBroadcast::GetOldStrMessage() const
+{
+    std::string strMessage;
+
+    std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
+    std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
+    strMessage = addr.ToString() + std::to_string(sigTime) + vchPubKey + vchPubKey2 + std::to_string(protocolVersion);
+
+    return strMessage;
+}
+
 bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
