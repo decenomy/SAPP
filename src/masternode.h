@@ -74,8 +74,6 @@ public:
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     void Relay();
 
-    std::string GetOldStrMessage() const;
-
     void swap(CMasternodePing& first, CMasternodePing& second) // nothrow
     {
         CSignedMessage::swap(first, second);
@@ -290,6 +288,8 @@ public:
     uint256 GetHash() const;
 
     void Relay();
+
+    std::string GetOldStrMessage() const;
 
     // special sign/verify
     bool Sign(const CKey& key, const CPubKey& pubKey);
