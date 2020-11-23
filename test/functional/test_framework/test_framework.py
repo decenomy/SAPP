@@ -73,7 +73,7 @@ TEST_EXIT_SKIPPED = 77
 TMPDIR_PREFIX = "pivx_func_test_"
 
 
-class SapphireTestFramework():
+class PivxTestFramework():
     """Base class for a pivx test script.
 
     Individual pivx test scripts should subclass this class and override the set_test_params() and run_test() methods.
@@ -1097,7 +1097,7 @@ class SapphireTestFramework():
 
 ### ------------------------------------------------------
 
-class ComparisonTestFramework(SapphireTestFramework):
+class ComparisonTestFramework(PivxTestFramework):
     """Test framework for doing p2p comparison testing
 
     Sets up some sapphired binaries:

@@ -4,10 +4,10 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-from test_framework.test_framework import SapphireTestFramework
+from test_framework.test_framework import PivxTestFramework
 from test_framework.util import *
 
-class SaplingWalletPersistenceTest(SapphireTestFramework):
+class SaplingWalletPersistenceTest(PivxTestFramework):
 
     def set_test_params(self):
         self.num_nodes = 1

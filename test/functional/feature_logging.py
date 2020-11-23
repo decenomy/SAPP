@@ -8,9 +8,9 @@
 
 import os
 
-from test_framework.test_framework import SapphireTestFramework
+from test_framework.test_framework import PivxTestFramework
 
-class LoggingTest(SapphireTestFramework):
+class LoggingTest(PivxTestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True

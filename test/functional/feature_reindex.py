@@ -9,11 +9,11 @@
 - Stop the node and restart it with -reindex-chainstate. Verify that the node has reindexed up to block 3.
 """
 
-from test_framework.test_framework import SapphireTestFramework
+from test_framework.test_framework import PivxTestFramework
 from test_framework.util import wait_until
 import time
 
-class ReindexTest(SapphireTestFramework):
+class ReindexTest(PivxTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True

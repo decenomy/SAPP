@@ -10,10 +10,10 @@
 - verify that getchaintips now returns two chain tips.
 """
 
-from test_framework.test_framework import SapphireTestFramework
+from test_framework.test_framework import PivxTestFramework
 from test_framework.util import assert_equal
 
-class GetChainTipsTest (SapphireTestFramework):
+class GetChainTipsTest (PivxTestFramework):
     def set_test_params(self):
         self.num_nodes = 4
 

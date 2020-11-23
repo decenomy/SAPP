@@ -6,11 +6,11 @@
 
 from time import sleep
 
-from test_framework.test_framework import SapphireTestFramework
+from test_framework.test_framework import PivxTestFramework
 from test_framework.util import set_node_times, assert_equal
 
 
-class PIVX_RPCSporkTest(SapphireTestFramework):
+class PIVX_RPCSporkTest(PivxTestFramework):
 
     def set_test_params(self):
         self.setup_clean_chain = True

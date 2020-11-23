@@ -192,8 +192,8 @@ void OptionsModel::setDisplayDefaultOptions(QSettings& settings, bool reset)
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
 
-    if (settings.contains("nAnonymizeSapphireAmount") || reset)
-        SoftSetArg("-anonymizepivxamount", settings.value("nAnonymizeSapphireAmount").toString().toStdString());
+    if (settings.contains("nAnonymizePivxAmount") || reset)
+        SoftSetArg("-anonymizepivxamount", settings.value("nAnonymizePivxAmount").toString().toStdString());
 
     if (!settings.contains("strThirdPartyTxUrls") || reset)
         settings.setValue("strThirdPartyTxUrls", "");
