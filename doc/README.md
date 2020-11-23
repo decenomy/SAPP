@@ -44,7 +44,7 @@ The following are developer notes on how to build Sappre Coin Core on your nativ
 
 Development
 ---------------------
-The Sapphire Coin repo's [root README](/README.md) contains relevant information on the development process and automated testing.
+Sapphire Coin repo's [root README](/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Multiwallet Qt Development](multiwallet-qt.md)

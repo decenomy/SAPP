@@ -36,7 +36,7 @@ Package: sapphired
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
- SAPP is a free, open source peer-to-peer electronic cash system that
+ Sapphire Coin is a free, open source peer-to-peer electronic cash system that
  is completely decentralized, without the need for a central server or
  trusted parties.  Users hold the crypto keys to their own money and
  transact directly with each other, with the help of a P2P network to
@@ -52,7 +52,7 @@ Package: sapphire-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI
- SAPP is a free, open source peer-to-peer electronic cash system that
+ Sapphire Coin is a free, open source peer-to-peer electronic cash system that
  is completely decentralized, without the need for a central server or
  trusted parties.  Users hold the crypto keys to their own money and
  transact directly with each other, with the help of a P2P network to
@@ -61,4 +61,4 @@ Description: peer-to-peer network based digital currency - Qt GUI
  Full transaction history is stored locally at each client.  This
  requires 18.5+ GB of space, slowly growing.
  .
- This package provides Sapphire-Qt, a GUI for SAPP based on Qt.
+ This package provides Sapphire-Qt, a GUI for Sapphire based on Qt.

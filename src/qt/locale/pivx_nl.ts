@@ -5730,7 +5730,7 @@ Sappre Coin Core Portemonnee</translation>
     </message>
     <message>
         <source>Copyright (C) 2015-%i The Sappre Coin Core Developers</source>
-        <translation>Copyright (C) 2015-%i The SAPP Kernontwikkelaars</translation>
+        <translation>Copyright (C) 2015-%i Sapphire Coin Kernontwikkelaars</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>

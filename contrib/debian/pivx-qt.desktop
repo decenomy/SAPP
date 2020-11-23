@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.0
 Name=Sappre Coin Core
-Comment=SAPP P2P Cryptocurrency
-Comment[fr]=SAPP, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=SAPP, eşten eşe kriptografik sanal para birimi
+Comment=Sapphire Coin P2P Cryptocurrency
+Comment[fr]=Sapphire Coin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Sapphire Coin, eşten eşe kriptografik sanal para birimi
 Exec=sapphire-qt %u
 Terminal=false
 Type=Application

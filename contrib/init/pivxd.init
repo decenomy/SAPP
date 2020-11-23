@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  pivxd The SAPP core server.
+#  pivxd Sapphire Coin core server.
 #
 #
 # chkconfig: 345 80 20
