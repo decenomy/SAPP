@@ -235,7 +235,7 @@ stake on your behalf, while you keep the keys securely offline.</string>
                 <item alignment="Qt::AlignTop">
                  <widget class="QLabel" name="labelSubtitle2">
                   <property name="text">
-                   <string>Accept PIV delegation / Delegate PIV</string>
+                   <string>Accept SAPP delegation / Delegate SAPP</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

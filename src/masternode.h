@@ -105,7 +105,7 @@ public:
 };
 
 //
-// The Masternode Class. It contains the input of the 10000 PIV, signature to prove
+// The Masternode Class. It contains the input of the 200000 SAPP, signature to prove
 // it's the one who own that ip address and code for calculating the payment election.
 //
 class CMasternode : public CSignedMessage
@@ -262,7 +262,7 @@ public:
     int64_t GetLastPaid();
     bool IsValidNetAddr();
 
-    /// Is the input associated with collateral public key? (and there is 10000 PIV - checking if valid masternode)
+    /// Is the input associated with collateral public key? (and there is 200000 SAPP - checking if valid masternode)
     bool IsInputAssociatedWithPubkey() const;
 };
 

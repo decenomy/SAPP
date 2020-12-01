@@ -223,7 +223,7 @@ void DashboardWidget::loadWalletModel()
         connect(walletModel->getOptionsModel(), &OptionsModel::hideChartsChanged, this, &DashboardWidget::onHideChartsChanged);
 #endif
     }
-    // update the display unit, to not use the default ("PIV")
+    // update the display unit, to not use the default ("SAPP")
     updateDisplayUnit();
 }
 
@@ -521,7 +521,7 @@ void DashboardWidget::updateStakeFilter()
     }
 }
 
-// pair PIV, zPIV
+// pair SAPP, zSAPP
 const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
 {
     updateStakeFilter();
@@ -577,7 +577,7 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
     }
 
     chartData = new ChartData();
-    chartData->amountsByCache = getAmountBy(); // pair PIV, zPIV
+    chartData->amountsByCache = getAmountBy(); // pair SAPP, zSAPP
 
     std::pair<int,int> range = getChartRange(chartData->amountsByCache);
     if (range.first == 0 && range.second == 0) {

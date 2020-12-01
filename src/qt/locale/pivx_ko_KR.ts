@@ -415,8 +415,8 @@ for staking</source>
         <translation>계좌</translation>
     </message>
     <message>
-        <source>0,00 PIV</source>
-        <translation>0,00 PIV</translation>
+        <source>0,00 SAPP</source>
+        <translation>0,00 SAPP</translation>
     </message>
     <message>
         <source>address</source>
@@ -457,8 +457,8 @@ for staking</source>
         <translation>코인 선택</translation>
     </message>
     <message>
-        <source>Select PIV Outputs to Spend</source>
-        <translation>사용할 PIV 아웃풋 선택</translation>
+        <source>Select SAPP Outputs to Spend</source>
+        <translation>사용할 SAPP 아웃풋 선택</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -485,8 +485,8 @@ for staking</source>
         <translation>금액</translation>
     </message>
     <message>
-        <source>0.00 PIV</source>
-        <translation>0.00 PIV</translation>
+        <source>0.00 SAPP</source>
+        <translation>0.00 SAPP</translation>
     </message>
     <message>
         <source>0</source>
@@ -738,15 +738,15 @@ for staking</source>
     <message>
         <source>You can delegate your PIVs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>안전히 개인 프라이빗 키를 오프라인으로 보관한 상태로, 가지고 계신 PIV 를 매일 24시간 온라인으로 돌아가는 핫 노드로 위임하여, 대신 스테이킹을 하게 할수 있습니다. </translation>
+        <translation>안전히 개인 프라이빗 키를 오프라인으로 보관한 상태로, 가지고 계신 SAPP 를 매일 24시간 온라인으로 돌아가는 핫 노드로 위임하여, 대신 스테이킹을 하게 할수 있습니다. </translation>
     </message>
     <message>
         <source>Enter owner address</source>
         <translation>Owner 주소 입력</translation>
     </message>
     <message>
-        <source>Accept PIV delegation / Delegate PIV</source>
-        <translation>PIV 위임권 수락하기 / PIV 위임 하기</translation>
+        <source>Accept SAPP delegation / Delegate SAPP</source>
+        <translation>SAPP 위임권 수락하기 / SAPP 위임 하기</translation>
     </message>
     <message>
         <source>Cold Staking address</source>
@@ -940,8 +940,8 @@ address</source>
         <translation>Filter by</translation>
     </message>
     <message>
-        <source>Amount of PIV and zPIV staked.</source>
-        <translation>스테이킹 된 PIV와 zPIV 양</translation>
+        <source>Amount of SAPP and zSAPP staked.</source>
+        <translation>스테이킹 된 PIV와 zSAPP 양</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1279,8 +1279,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>새로운 마스터노드 컨트롤러 만들기</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 PIV (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SAPP 마스터노드를 생성하기 위해서는 10,000 PIV (SAPP 단위)를 네트워크에 예치해야 합니다. (예치한 코인은 계속 본인의 소유입니다.) &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;언제든지 노드를 비활성화 시키고 코인을 잠금해제할 수 있습니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 SAPP (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SAPP 마스터노드를 생성하기 위해서는 10,000 SAPP (SAPP 단위)를 네트워크에 예치해야 합니다. (예치한 코인은 계속 본인의 소유입니다.) &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;언제든지 노드를 비활성화 시키고 코인을 잠금해제할 수 있습니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1299,7 +1299,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>이만큼의 코인을 보유하고 있는지 확인하십시오.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 PIV will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;10,000 PIV의 트랜잭션은&lt;/p&gt;&lt;p&gt;지갑의 새로운 빈 주소로 만들어질 것입니다.&lt;/p&gt;&lt;p&gt;그 주소는 마스터노드 이름에 따라 레이블링됩니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -1740,36 +1740,36 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>&amp;UPnp를 사용하여 포트 매핑</translation>
     </message>
     <message>
-        <source>Enable automatic minting of PIV units to zPIV</source>
+        <source>Enable automatic minting of SAPP units to zSAPP</source>
         <translation>보상받은 PIV를 zPIV로 자동변환 활성화</translation>
     </message>
     <message>
-        <source>Enable zPIV Automint</source>
-        <translation>zPIV 자동생성 활성화</translation>
+        <source>Enable zSAPP Automint</source>
+        <translation>zSAPP 자동생성 활성화</translation>
     </message>
     <message>
-        <source>Enable automatic zPIV minting from specific addresses</source>
-        <translation>특정 주소들로부터 자동으로 zPIV 민트되는 것을 허용</translation>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
+        <translation>특정 주소들로부터 자동으로 zSAPP 민트되는 것을 허용</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Automint 주소 사용</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
-        <translation>PIV수신시 자동변환 zPIV 비율 (최소값:10%)</translation>
+        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
+        <translation>PIV수신시 자동변환 zSAPP 비율 (최소값:10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
-        <translation>자동 변환되는 zPIV 비율</translation>
+        <source>Percentage of autominted zSAPP</source>
+        <translation>자동 변환되는 zSAPP 비율</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
+        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
         <translation>이 디노미네이션의 PIV가 충분해질 때까지 Zerocoin으로 자동전환은 보류됩니다.</translation>
     </message>
     <message>
-        <source>Preferred Automint zPIV Denomination</source>
-        <translation>선호하는 자동생성 zPIV 디노미네이션 </translation>
+        <source>Preferred Automint zSAPP Denomination</source>
+        <translation>선호하는 자동생성 zSAPP 디노미네이션 </translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
@@ -2463,8 +2463,8 @@ Address: %4
         <translation>맞춤 백업 경로 :</translation>
     </message>
     <message>
-        <source>Custom zPIV Backup Path:</source>
-        <translation>맞춤 zPIV 백업 경로 :</translation>
+        <source>Custom zSAPP Backup Path:</source>
+        <translation>맞춤 zSAPP 백업 경로 :</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -2792,8 +2792,8 @@ Address: %4
         <translation>금액</translation>
     </message>
     <message>
-        <source>PIV</source>
-        <translation>PIV</translation>
+        <source>SAPP</source>
+        <translation>SAPP</translation>
     </message>
     <message>
         <source>D7VFR83SQbiezrW72hjcWJtcfip5krte2Z </source>
@@ -2882,8 +2882,8 @@ Address: %4
         <translation>권장</translation>
     </message>
     <message>
-        <source>PIV/kilobyte</source>
-        <translation>PIV/Kilobyte</translation>
+        <source>SAPP/kilobyte</source>
+        <translation>SAPP/Kilobyte</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -4979,8 +4979,8 @@ Sappre Coin Core Wallet</translation>
         <translation>-whitelist: '%s' 에 지정된 넷마스크가 유효하지 않습니다.</translation>
     </message>
     <message>
-        <source>Recalculating PIV supply...</source>
-        <translation>PIV 공급 재계산중...</translation>
+        <source>Recalculating SAPP supply...</source>
+        <translation>SAPP 공급 재계산중...</translation>
     </message>
     <message>
         <source>Reindexing zerocoin database...</source>
@@ -5403,8 +5403,8 @@ Sappre Coin Core Wallet</translation>
         <translation>sporks와 동기화 중입니다...</translation>
     </message>
     <message>
-        <source>Syncing zPIV wallet...</source>
-        <translation>zPIV 지갑 동기화중...</translation>
+        <source>Syncing zSAPP wallet...</source>
+        <translation>zSAPP 지갑 동기화중...</translation>
     </message>
     <message>
         <source>This help message</source>
@@ -5499,8 +5499,8 @@ Sappre Coin Core Wallet</translation>
         <translation>JSON-RPC 연결 사용자 이름</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zPIV</source>
-        <translation>Value is below the smallest available denomination (= 1) of zPIV</translation>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
+        <translation>Value is below the smallest available denomination (= 1) of zSAPP</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -5544,7 +5544,7 @@ Sappre Coin Core Wallet</translation>
     </message>
     <message>
         <source>You don't have enough Zerocoins in your wallet</source>
-        <translation>지갑에 zPIV 가 부족합니다.</translation>
+        <translation>지갑에 zSAPP 가 부족합니다.</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>

@@ -1,8 +1,8 @@
-/usr/bin/pivx-cli		--	gen_context(system_u:object_r:pivx_exec_t,s0)
-/usr/sbin/pivxd		--	gen_context(system_u:object_r:pivx_exec_t,s0)
-/usr/lib(64)?/pivx/pivxd		--	gen_context(system_u:object_r:pivx_exec_t,s0)
+/usr/bin/sapphire-cli		--	gen_context(system_u:object_r:sapphire_exec_t,s0)
+/usr/sbin/sapphired		--	gen_context(system_u:object_r:sapphire_exec_t,s0)
+/usr/lib(64)?/sapphire/sapphired		--	gen_context(system_u:object_r:sapphire_exec_t,s0)
 
-/etc/pivx(/.*)?		gen_context(system_u:object_r:pivx_conf_t,s0)
-/var/lib/pivx(/.*)?		gen_context(system_u:object_r:pivx_var_lib_t,s0)
+/etc/sapphire(/.*)?		gen_context(system_u:object_r:sapphire_conf_t,s0)
+/var/lib/sapphire(/.*)?		gen_context(system_u:object_r:sapphire_var_lib_t,s0)
 
-(/var)?/run/pivxd(/.*)?   gen_context(system_u:object_r:pivx_var_run_t,s0)
+(/var)?/run/sapphired(/.*)?   gen_context(system_u:object_r:sapphire_var_run_t,s0)

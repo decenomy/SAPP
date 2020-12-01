@@ -1553,17 +1553,17 @@ bool AppInit2()
                     LOCK(cs_main);
                     chainHeight = chainActive.Height();
 
-                    // initialize PIV and zPIV supply to 0
+                    // initialize SAPP and zSAPP supply to 0
                     mapZerocoinSupply.clear();
                     for (auto& denom : libzerocoin::zerocoinDenomList) mapZerocoinSupply.insert(std::make_pair(denom, 0));
                     nMoneySupply = 0;
 
-                    // Load PIV and zPIV supply from DB
+                    // Load SAPP and zSAPP supply from DB
                     if (chainHeight >= 0) {
                         const uint256& tipHash = chainActive[chainHeight]->GetBlockHash();
                         CLegacyBlockIndex bi;
 
-                        // Load zPIV supply map
+                        // Load zSAPP supply map
                         if (!fReindexZerocoin && consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC) &&
                                 !zerocoinDB->ReadZCSupply(mapZerocoinSupply)) {
                             // try first reading legacy block index from DB
@@ -1575,7 +1575,7 @@ bool AppInit2()
                             }
                         }
 
-                        // Load PIV supply amount
+                        // Load SAPP supply amount
                         if (!fReindexMoneySupply && !pblocktree->ReadMoneySupply(nMoneySupply)) {
                             // try first reading legacy block index from DB
                             if (pblocktree->ReadLegacyBlockIndex(tipHash, bi)) {

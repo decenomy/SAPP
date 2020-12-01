@@ -361,7 +361,7 @@ za staking</translation>
     </message>
     <message>
         <source>SAPP will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>SAPP će se sada zatvoriti kako bi se dovršio proces šifriranja. Ne zaboravite da šifriranje Vašeg novčanika ne može u potpunosti zaštititi vaše PIV od krađje zlonamjernog softvera koji zarazi vaše računalo.</translation>
+        <translation>SAPP će se sada zatvoriti kako bi se dovršio proces šifriranja. Ne zaboravite da šifriranje Vašeg novčanika ne može u potpunosti zaštititi vaše SAPP od krađje zlonamjernog softvera koji zarazi vaše računalo.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -442,8 +442,8 @@ za staking</translation>
         <translation>Ušteđjevina</translation>
     </message>
     <message>
-        <source>0,00 PIV</source>
-        <translation>0,00 PIV</translation>
+        <source>0,00 SAPP</source>
+        <translation>0,00 SAPP</translation>
     </message>
     <message>
         <source>address</source>
@@ -484,8 +484,8 @@ za staking</translation>
         <translation>Odabir novčića</translation>
     </message>
     <message>
-        <source>Select PIV Outputs to Spend</source>
-        <translation>Odaberi PIV za potrošiti</translation>
+        <source>Select SAPP Outputs to Spend</source>
+        <translation>Odaberi SAPP za potrošiti</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -512,8 +512,8 @@ za staking</translation>
         <translation>Iznos</translation>
     </message>
     <message>
-        <source>0.00 PIV</source>
-        <translation>0.00 PIV</translation>
+        <source>0.00 SAPP</source>
+        <translation>0.00 SAPP</translation>
     </message>
     <message>
         <source>0</source>
@@ -765,15 +765,15 @@ za staking</translation>
     <message>
         <source>You can delegate your PIVs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>Možete delegirati svoje PIV-ove, dopuštajući hot node-u (24/7 online node) da stake-a za Vas, dok su Vaši ključevi offline na sigurnom.</translation>
+        <translation>Možete delegirati svoje SAPP-ove, dopuštajući hot node-u (24/7 online node) da stake-a za Vas, dok su Vaši ključevi offline na sigurnom.</translation>
     </message>
     <message>
         <source>Enter owner address</source>
         <translation>Unesi adresu vlasnika</translation>
     </message>
     <message>
-        <source>Accept PIV delegation / Delegate PIV</source>
-        <translation>Prihvati PIV delegaciju / Delegiraj PIV</translation>
+        <source>Accept SAPP delegation / Delegate SAPP</source>
+        <translation>Prihvati SAPP delegaciju / Delegiraj SAPP</translation>
     </message>
     <message>
         <source>Cold Staking address</source>
@@ -959,8 +959,8 @@ vlasnika</translation>
         <translation>Statistika stakinga</translation>
     </message>
     <message>
-        <source>How to get PIV</source>
-        <translation>Kako dobiti PIV</translation>
+        <source>How to get SAPP</source>
+        <translation>Kako dobiti SAPP</translation>
     </message>
     <message>
         <source>Sort by</source>
@@ -983,8 +983,8 @@ vlasnika</translation>
         <translation>Filtriraj prema</translation>
     </message>
     <message>
-        <source>Amount of PIV and zPIV staked.</source>
-        <translation>Iznos PIV i zPIV koji se stakea.</translation>
+        <source>Amount of SAPP and zSAPP staked.</source>
+        <translation>Iznos SAPP i zSAPP koji se stakea.</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1327,8 +1327,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Stvori novi Masternode Controller</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 PIV (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Da biste stvoriti SAPP Masternode, morate odvojiti 10,000 PIV (jedinica SAPP-a) prema mreži (međjutim, ti novčići su i dalje vaši i nikad neće napustiti vaše vlasništvo). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt; Možete isključiti node i otključati novčiće u bilo kojem trenutku.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 SAPP (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Da biste stvoriti SAPP Masternode, morate odvojiti 10,000 SAPP (jedinica SAPP-a) prema mreži (međjutim, ti novčići su i dalje vaši i nikad neće napustiti vaše vlasništvo). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt; Možete isključiti node i otključati novčiće u bilo kojem trenutku.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1347,8 +1347,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Obavezno imajte tu količinu novčića.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 PIV will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transakcija od 10,000 PIV će biti napravljena&lt;/p&gt;&lt;p&gt;u novu praznu adresu u Vašem novčaniku.&lt;/p&gt;&lt;p&gt;Adresa je označena pod imenom Masternode-a.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transakcija od 10,000 SAPP će biti napravljena&lt;/p&gt;&lt;p&gt;u novu praznu adresu u Vašem novčaniku.&lt;/p&gt;&lt;p&gt;Adresa je označena pod imenom Masternode-a.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Address of the node that must always be online running the actual master node.</source>
@@ -1844,36 +1844,36 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Mapiranje porta koristeći &amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of PIV units to zPIV</source>
-        <translation>Omogući automatsko stvaranje PIV jedinica na zPIV</translation>
+        <source>Enable automatic minting of SAPP units to zSAPP</source>
+        <translation>Omogući automatsko stvaranje SAPP jedinica na zSAPP</translation>
     </message>
     <message>
-        <source>Enable zPIV Automint</source>
-        <translation>Omogući automatsko stvaranje zPIV-a</translation>
+        <source>Enable zSAPP Automint</source>
+        <translation>Omogući automatsko stvaranje zSAPP-a</translation>
     </message>
     <message>
-        <source>Enable automatic zPIV minting from specific addresses</source>
-        <translation>Omogući automatsko stvaranje zPIV-a s određjenih adresa</translation>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
+        <translation>Omogući automatsko stvaranje zSAPP-a s određjenih adresa</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Omogući Automint adrese</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
-        <translation>Postotak dolaznih PIV koji se automatski pretvara u zPIV putem Zerocoin Protokola (min: 10%)</translation>
+        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
+        <translation>Postotak dolaznih SAPP koji se automatski pretvara u zSAPP putem Zerocoin Protokola (min: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
-        <translation>Postotak automatski stvorenog zPIV-a</translation>
+        <source>Percentage of autominted zSAPP</source>
+        <translation>Postotak automatski stvorenog zSAPP-a</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
-        <translation>Pričekajte s automatskom pretvorbom u Zerocoin dok ne bude dostupno dovoljno PIV-a za ovu denominaciju</translation>
+        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
+        <translation>Pričekajte s automatskom pretvorbom u Zerocoin dok ne bude dostupno dovoljno SAPP-a za ovu denominaciju</translation>
     </message>
     <message>
-        <source>Preferred Automint zPIV Denomination</source>
-        <translation>Preferirana denominacija za automatsko stvaranje zPIV-a</translation>
+        <source>Preferred Automint zSAPP Denomination</source>
+        <translation>Preferirana denominacija za automatsko stvaranje zSAPP-a</translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
@@ -2663,8 +2663,8 @@ Adresa: %4
         <translation>Put prilagođenog sigurnosnog kopiranja:</translation>
     </message>
     <message>
-        <source>Custom zPIV Backup Path:</source>
-        <translation>Prilagođeni put zPIV sigurnosne kopije:</translation>
+        <source>Custom zSAPP Backup Path:</source>
+        <translation>Prilagođeni put zSAPP sigurnosne kopije:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -3007,8 +3007,8 @@ Adresa: %4
         <translation>Iznos</translation>
     </message>
     <message>
-        <source>PIV</source>
-        <translation>PIV</translation>
+        <source>SAPP</source>
+        <translation>SAPP</translation>
     </message>
     <message>
         <source>D7VFR83SQbiezrW72hjcWJtcfip5krte2Z </source>
@@ -3121,8 +3121,8 @@ Adresa: %4
         <translation>Preporučeno</translation>
     </message>
     <message>
-        <source>PIV/kilobyte</source>
-        <translation>PIV/kilobajt</translation>
+        <source>SAPP/kilobyte</source>
+        <translation>SAPP/kilobajt</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -3739,8 +3739,8 @@ Došlo je do greške prilikom spremanja popisa adresa u %1. Molimo pokušajte po
         <translation>1) Što je SAPP?</translation>
     </message>
     <message>
-        <source>2) Why are my PIV unspendable?</source>
-        <translation>2) Zašto se moji PIV ne mogu potrošiti?</translation>
+        <source>2) Why are my SAPP unspendable?</source>
+        <translation>2) Zašto se moji SAPP ne mogu potrošiti?</translation>
     </message>
     <message>
         <source>https://SAPP.org/</source>
@@ -3761,7 +3761,7 @@ Došlo je do greške prilikom spremanja popisa adresa u %1. Molimo pokušajte po
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  SAPP incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zPIV) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            SAPP utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of SAPP to participate in earning block rewards
@@ -3775,7 +3775,7 @@ SAPP je oblik digitalnog online novca koji koristi blockchain tehnologiju
 koji se lako može slati i primati globalno, trenutno, i gotovo bez naknade.
 SAPP uključuje vodeću sigurnost  i privatnost na tržištu
 i takođjer je prva PoS (Proof of Stake) kriptovaluta
-koja je implementirala ZeroCoin (zPIV) i Zerocoin staking.
+koja je implementirala ZeroCoin (zSAPP) i Zerocoin staking.
 &lt;/p&gt;&lt;p align="justify"&gt;
 SAPP koristi algoritam konsenzusa Proof of Stake (PoS),
 omogućujući svim vlasnicima SAPP-a sudjelovanje u zarađi blokovih nagrada
@@ -3789,8 +3789,8 @@ vodjenje Masternode-ova za stvaranje i glasanje o prijedlozima.
         <translation>2</translation>
     </message>
     <message>
-        <source>Why are my PIV unspendable?</source>
-        <translation>Zašto se moji PIV ne mogu potrošiti?</translation>
+        <source>Why are my SAPP unspendable?</source>
+        <translation>Zašto se moji SAPP ne mogu potrošiti?</translation>
     </message>
     <message>
         <source>
@@ -3817,8 +3817,8 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
         <translation>3</translation>
     </message>
     <message>
-        <source>How do I stake PIV?</source>
-        <translation>Kako stakeat PIV?</translation>
+        <source>How do I stake SAPP?</source>
+        <translation>Kako stakeat SAPP?</translation>
     </message>
     <message>
         <source>4</source>
@@ -3845,14 +3845,14 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
         <translation>Što je Masternode Controller?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 10,000 PIV collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Masternode Controller novčanik je mjesto gdje zalog od 10,000 PIV može stajati tijekom Controller-Remote podešavanja masternode-a. To je novčanik koji može aktivirati Remote masternode novčanik(e) i omogućiti Vam držanje zaloga novčića offline dok Remote masternode novčanik ostaje online.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 10,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Masternode Controller novčanik je mjesto gdje zalog od 10,000 SAPP može stajati tijekom Controller-Remote podešavanja masternode-a. To je novčanik koji može aktivirati Remote masternode novčanik(e) i omogućiti Vam držanje zaloga novčića offline dok Remote masternode novčanik ostaje online.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            A masternode is a computer running a full node SAPP core wallet with a
-                           requirement of 10,000 PIV secured collateral to provide extra services
+                           requirement of 10,000 SAPP secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3884,7 +3884,7 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;10,000 PIV per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;10,000 SAPP per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -3894,7 +3894,7 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
 Masternode je računalo koje pokreće full node Sappre Coin Core novčanik sa
-zahtjevanih 10,000 PIV-a osiguranog zaloga da pruži dodatne usluge
+zahtjevanih 10,000 SAPP-a osiguranog zaloga da pruži dodatne usluge
 mreži, i zauzvrat redovito primi dio nagrade blokova.
 Te usluge uključuju:
 &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3926,7 +3926,7 @@ Povlastice masternode-ova:
 Zahtjevi:
 &lt;/p&gt;&lt;p align="justify"&gt;
 &lt;ul&gt;
-&lt;li&gt;10,000 PIV po svakom Masternode-u&lt;/li&gt;
+&lt;li&gt;10,000 SAPP po svakom Masternode-u&lt;/li&gt;
 &lt;li&gt;Mora biti pohranjem u Core novčaniku&lt;/li&gt;
 &lt;li&gt;Mora biti jedinstvena IP adresa&lt;/li&gt;
 &lt;li&gt;Masternode novčanik treba ostati online&lt;/li&gt;
@@ -5697,8 +5697,8 @@ SAPP temeljni novčanik</translation>
         <translation>Nevažeća mrežna maska specificirana u kategoriji -whitelist: '%s'</translation>
     </message>
     <message>
-        <source>Recalculating PIV supply...</source>
-        <translation>Preračunavanje PIV-a u optjecaju...</translation>
+        <source>Recalculating SAPP supply...</source>
+        <translation>Preračunavanje SAPP-a u optjecaju...</translation>
     </message>
     <message>
         <source>Reindexing zerocoin database...</source>
@@ -6171,8 +6171,8 @@ SAPP temeljni novčanik</translation>
         <translation>Sinkronizacija sporkova...</translation>
     </message>
     <message>
-        <source>Syncing zPIV wallet...</source>
-        <translation>Sinkronizacija zPIV novčanika...</translation>
+        <source>Syncing zSAPP wallet...</source>
+        <translation>Sinkronizacija zSAPP novčanika...</translation>
     </message>
     <message>
         <source>This help message</source>
@@ -6283,8 +6283,8 @@ SAPP temeljni novčanik</translation>
         <translation>Korisničko ime za JSON-RPC veze</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zPIV</source>
-        <translation>Vrijednost je niža od najmanje dostupne denominacije (= 1) zPIV-a</translation>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
+        <translation>Vrijednost je niža od najmanje dostupne denominacije (= 1) zSAPP-a</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6366,8 +6366,8 @@ SAPP temeljni novčanik</translation>
         <translation>Pošalji</translation>
     </message>
     <message>
-        <source>Send public coins (PIV)</source>
-        <translation>Pošalji javne novčiće (PIV)</translation>
+        <source>Send public coins (SAPP)</source>
+        <translation>Pošalji javne novčiće (SAPP)</translation>
     </message>
     <message>
         <source>SAPP address or contact label</source>

@@ -591,7 +591,7 @@ class PivxTestFramework():
             #   35 rewards spendable (55 mature blocks - 20 spent rewards)
             # - Node 3 gets 50 mature blocks (pow) + 34 immmature (14 pow + 20 pos)
             #   30 rewards spendable (50 mature blocks - 20 spent rewards)
-            # - Nodes 2 and 3 mint one zerocoin for each denom (tot 6666 PIV) on block 301/302
+            # - Nodes 2 and 3 mint one zerocoin for each denom (tot 6666 SAPP) on block 301/302
             #   8 mature zc + 8/3 rewards spendable (35/30 - 27 spent) + change 83.92
             #
             # Block 331-336 will mature last 6 pow blocks mined by node 2.
@@ -632,8 +632,8 @@ class PivxTestFramework():
                     nBlocks += 1
                     # Mint zerocoins with node-2 at block 301 and with node-3 at block 302
                     if nBlocks == 301 or nBlocks == 302:
-                        # mints 7 zerocoins, one for each denom (tot 6666 PIV), fee = 0.01 * 8
-                        # consumes 27 utxos (tot 6750 PIV), change = 6750 - 6666 - fee
+                        # mints 7 zerocoins, one for each denom (tot 6666 SAPP), fee = 0.01 * 8
+                        # consumes 27 utxos (tot 6750 SAPP), change = 6750 - 6666 - fee
                         res.append(self.nodes[nBlocks-299].mintzerocoin(6666))
                         self.sync_all()
                         # lock the change output (so it's not used as stake input in generate_pos)
@@ -694,7 +694,7 @@ class PivxTestFramework():
         # 62 pow + 20 pos (26 immature)
         # - Nodes 3 gets 84 blocks:
         # 64 pow + 20 pos (34 immature)
-        # - Nodes 2 and 3 have 6666 PIV worth of zerocoins
+        # - Nodes 2 and 3 have 6666 SAPP worth of zerocoins
         zc_tot = sum(vZC_DENOMS)
         zc_fee = len(vZC_DENOMS) * 0.01
         used_utxos = (zc_tot // 250) + 1
@@ -801,11 +801,11 @@ class PivxTestFramework():
         block_txes = []
         for uniqueness in spendingPrevOuts:
             if is_zerocoin(uniqueness):
-                # spend zPIV
+                # spend zSAPP
                 _, serialHash, _ = spendingPrevOuts[uniqueness]
                 raw_spend = rpc_conn.createrawzerocoinspend(serialHash, "", False)
             else:
-                # spend PIV
+                # spend SAPP
                 value_out = int(spendingPrevOuts[uniqueness][0] - DEFAULT_FEE * COIN)
                 scriptPubKey = CScript([to_pubKey, OP_CHECKSIG])
                 prevout = COutPoint()
@@ -908,7 +908,7 @@ class PivxTestFramework():
         # Don't add tx doublespending the coinstake input, unless fDoubleSpend=True
         for tx in vtx:
             if not fDoubleSpend:
-                # assume txes don't double spend zPIV inputs when fDoubleSpend is false. It needs to
+                # assume txes don't double spend zSAPP inputs when fDoubleSpend is false. It needs to
                 # be checked outside until a convenient tx.spends(zerocoin) is added to the framework.
                 if not isZPoS and tx.spends(prevout):
                     continue

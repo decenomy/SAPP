@@ -418,8 +418,8 @@ for staking</source>
         <translation>存款</translation>
     </message>
     <message>
-        <source>0,00 PIV</source>
-        <translation>0,00 PIV</translation>
+        <source>0,00 SAPP</source>
+        <translation>0,00 SAPP</translation>
     </message>
     <message>
         <source>address</source>
@@ -460,7 +460,7 @@ for staking</source>
         <translation>币选择</translation>
     </message>
     <message>
-        <source>Select PIV Outputs to Spend</source>
+        <source>Select SAPP Outputs to Spend</source>
         <translation>选择PIV支出花费</translation>
     </message>
     <message>
@@ -488,8 +488,8 @@ for staking</source>
         <translation>金额</translation>
     </message>
     <message>
-        <source>0.00 PIV</source>
-        <translation>0.00 PIV</translation>
+        <source>0.00 SAPP</source>
+        <translation>0.00 SAPP</translation>
     </message>
     <message>
         <source>0</source>
@@ -749,7 +749,7 @@ stake on your behalf, while you keep the keys securely offline.</source>
         <translation>输入所有者地址</translation>
     </message>
     <message>
-        <source>Accept PIV delegation / Delegate PIV</source>
+        <source>Accept SAPP delegation / Delegate SAPP</source>
         <translation>接受PIV委托／委托PIV </translation>
     </message>
     <message>
@@ -945,8 +945,8 @@ address</source>
         <translation>过滤</translation>
     </message>
     <message>
-        <source>Amount of PIV and zPIV staked.</source>
-        <translation>已加注的PIV 和 zPIV 金额</translation>
+        <source>Amount of SAPP and zSAPP staked.</source>
+        <translation>已加注的PIV 和 zSAPP 金额</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1285,7 +1285,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>创建新的主节点控制器</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 PIV (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a SAPP Masternode you must dedicate 10,000 SAPP (the unit of SAPP) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;要去创建一个SAPP主节点，你必须奉献10,000 PIV（SAPP的单位）到网络（但是这些币还是属于你的，一直为你所有）。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;你可以在任何时候关闭该节点并解锁币。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -1305,7 +1305,7 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>确保你有这么多币</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 PIV will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将进行10,000 PIV的交易&lt;/p&gt;&lt;p&gt;到您的钱包空地址&lt;/p&gt;&lt;p&gt;地址被标记在主节点的名称之下&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
@@ -1748,15 +1748,15 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>端口使用&amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of PIV units to zPIV</source>
+        <source>Enable automatic minting of SAPP units to zSAPP</source>
         <translation>启动自动铸造PIV到zPIV</translation>
     </message>
     <message>
-        <source>Enable zPIV Automint</source>
+        <source>Enable zSAPP Automint</source>
         <translation>启动自动铸造zPIV</translation>
     </message>
     <message>
-        <source>Enable automatic zPIV minting from specific addresses</source>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
         <translation>启用从特定地址自动生成zPIV</translation>
     </message>
     <message>
@@ -1764,19 +1764,19 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>启动自动铸造地址</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
+        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
         <translation>通过零币协议自动转换为zPIV的传入PIV的百分比(最小:10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
+        <source>Percentage of autominted zSAPP</source>
         <translation>自动铸造的zPIV百分比</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
+        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
         <translation>等待自动转换为零币，直到足够的PIV为这种面额可用</translation>
     </message>
     <message>
-        <source>Preferred Automint zPIV Denomination</source>
+        <source>Preferred Automint zSAPP Denomination</source>
         <translation>首选自动铸造zPIV面额</translation>
     </message>
     <message>
@@ -2511,7 +2511,7 @@ Address: %4
         <translation>自定义备份路径:</translation>
     </message>
     <message>
-        <source>Custom zPIV Backup Path:</source>
+        <source>Custom zSAPP Backup Path:</source>
         <translation>自定义zPIV备份路径:</translation>
     </message>
     <message>
@@ -2839,8 +2839,8 @@ Address: %4
         <translation>金额</translation>
     </message>
     <message>
-        <source>PIV</source>
-        <translation>PIV</translation>
+        <source>SAPP</source>
+        <translation>SAPP</translation>
     </message>
     <message>
         <source>D7VFR83SQbiezrW72hjcWJtcfip5krte2Z </source>
@@ -2945,8 +2945,8 @@ Address: %4
         <translation>已推荐</translation>
     </message>
     <message>
-        <source>PIV/kilobyte</source>
-        <translation>PIV/k字节</translation>
+        <source>SAPP/kilobyte</source>
+        <translation>SAPP/k字节</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -3523,7 +3523,7 @@ There was an error trying to save the address list to %1. Please try again.</sou
         <translation>1）什么是SAPP?</translation>
     </message>
     <message>
-        <source>2) Why are my PIV unspendable?</source>
+        <source>2) Why are my SAPP unspendable?</source>
         <translation>2) 我的PIV为什么不能用？</translation>
     </message>
     <message>
@@ -3541,7 +3541,7 @@ There was an error trying to save the address list to %1. Please try again.</sou
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  SAPP incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zPIV) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            SAPP utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of SAPP to participate in earning block rewards
@@ -3555,7 +3555,7 @@ SAPP是一种使用区块链技术的数字在线货币
 全球范围内快捷交易，即时，基本为
 零的交易费用。SAPP是市场上领先的安全和
 隐私加密货币，也是第一个PoS(股权证明)加密货币
-实现零币(zPIV)和零币加注。
+实现零币(zSAPP)和零币加注。
 &lt;/p&gt;&lt;p align="justify"&gt;
 SAPP使用了一个股权证明(PoS)一致系统算法，
 允许所有SAPP的所有者参与赚取区块奖励
@@ -3567,7 +3567,7 @@ SAPP使用了一个股权证明(PoS)一致系统算法，
         <translation>2</translation>
     </message>
     <message>
-        <source>Why are my PIV unspendable?</source>
+        <source>Why are my SAPP unspendable?</source>
         <translation>我的PIV为什么不能用？</translation>
     </message>
     <message>
@@ -3619,14 +3619,14 @@ SAPP使用了一个股权证明(PoS)一致系统算法，
         <translation>什么是主节点控制器？</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 10,000 PIV collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 10,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;主节点控制器钱包是控制器-远程主节点建立期间10,000 PIV抵押可以驻留的地方。这是一个可以激活远程主节点钱包(s)的钱包，可以让你的抵押币离线但远程主节点保持在线。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            A masternode is a computer running a full node SAPP core wallet with a
-                           requirement of 10,000 PIV secured collateral to provide extra services
+                           requirement of 10,000 SAPP secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3658,7 +3658,7 @@ SAPP使用了一个股权证明(PoS)一致系统算法，
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;10,000 PIV per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;10,000 SAPP per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -3700,7 +3700,7 @@ SAPP使用了一个股权证明(PoS)一致系统算法，
 要求：
 &lt;/p&gt;&lt;p align="justify"&gt;
 &lt;ul&gt;
-&lt;li&gt;每个主节点实例有10,000 PIV&lt;/li&gt;
+&lt;li&gt;每个主节点实例有10,000 SAPP&lt;/li&gt;
 &lt;li&gt;必须存储在核心钱包&lt;/li&gt;
 &lt;li&gt;需要专用IP地址&lt;/li&gt;
 主节点钱包保持在线&lt;li&gt;
@@ -5377,7 +5377,7 @@ SAPP核心钱包</translation>
         <translation>白名单中指定的无效网络掩码:'%s'</translation>
     </message>
     <message>
-        <source>Recalculating PIV supply...</source>
+        <source>Recalculating SAPP supply...</source>
         <translation>重新计算PIV供应量……</translation>
     </message>
     <message>
@@ -5829,7 +5829,7 @@ SAPP核心钱包</translation>
         <translation>正在同步分叉...</translation>
     </message>
     <message>
-        <source>Syncing zPIV wallet...</source>
+        <source>Syncing zSAPP wallet...</source>
         <translation>正在同步zPIV钱包……</translation>
     </message>
     <message>
@@ -5933,7 +5933,7 @@ SAPP核心钱包</translation>
         <translation>JSON-RPC连接的用户名</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zPIV</source>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
         <translation>值小于zPIV的最小可用面额(= 1)</translation>
     </message>
     <message>

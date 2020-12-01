@@ -628,10 +628,10 @@ void TopBar::updateBalances(const interfaces::WalletBalances& newBalance)
     }
     ui->labelTitle1->setText(nLockedBalance > 0 ? tr("Available (Locked included)") : tr("Available"));
 
-    // PIV Total
+    // SAPP Total
     QString totalPiv = GUIUtil::formatBalance(newBalance.balance, nDisplayUnit);
 
-    // PIV
+    // SAPP
     // Top
     ui->labelAmountTopPiv->setText(totalPiv);
     // Expanded
