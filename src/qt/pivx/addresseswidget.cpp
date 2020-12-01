@@ -58,7 +58,7 @@ public:
 };
 
 
-AddressesWidget::AddressesWidget(SAPPGUI* parent) :
+AddressesWidget::AddressesWidget(PIVXGUI* parent) :
     PWidget(parent),
     ui(new Ui::AddressesWidget)
 {

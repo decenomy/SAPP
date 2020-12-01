@@ -24,7 +24,7 @@
 #include <QSpacerItem>
 #include <atomic>
 
-class SAPPGUI;
+class PIVXGUI;
 class WalletModel;
 class CSDelegationHolder;
 
@@ -41,7 +41,7 @@ class ColdStakingWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit ColdStakingWidget(SAPPGUI* parent);
+    explicit ColdStakingWidget(PIVXGUI* parent);
     ~ColdStakingWidget();
 
     void loadWalletModel() override;

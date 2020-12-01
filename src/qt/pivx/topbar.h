@@ -12,7 +12,7 @@
 #include <QTimer>
 #include <QProgressBar>
 
-class SAPPGUI;
+class PIVXGUI;
 class WalletModel;
 class ClientModel;
 
@@ -25,7 +25,7 @@ class TopBar : public PWidget
     Q_OBJECT
 
 public:
-    explicit TopBar(SAPPGUI* _mainWindow, QWidget *parent = nullptr);
+    explicit TopBar(PIVXGUI* _mainWindow, QWidget *parent = nullptr);
     ~TopBar();
 
     void showTop();

@@ -7,7 +7,7 @@
 
 #include <QDialog>
 
-class SAPPGUI;
+class PIVXGUI;
 
 namespace Ui {
 class SettingsFaqWidget;
@@ -18,7 +18,7 @@ class SettingsFaqWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsFaqWidget(SAPPGUI *parent = nullptr);
+    explicit SettingsFaqWidget(PIVXGUI *parent = nullptr);
     ~SettingsFaqWidget();
 
     void showEvent(QShowEvent *event) override;

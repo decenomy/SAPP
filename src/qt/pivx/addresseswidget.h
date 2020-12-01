@@ -15,7 +15,7 @@
 
 class AddressViewDelegate;
 class TooltipMenu;
-class SAPPGUI;
+class PIVXGUI;
 class WalletModel;
 
 namespace Ui {
@@ -31,7 +31,7 @@ class AddressesWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit AddressesWidget(SAPPGUI* parent);
+    explicit AddressesWidget(PIVXGUI* parent);
     ~AddressesWidget();
 
     void loadWalletModel() override;

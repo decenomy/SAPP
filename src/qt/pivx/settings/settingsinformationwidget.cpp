@@ -14,7 +14,7 @@
 
 #include <QDir>
 
-SettingsInformationWidget::SettingsInformationWidget(SAPPGUI* _window,QWidget *parent) :
+SettingsInformationWidget::SettingsInformationWidget(PIVXGUI* _window,QWidget *parent) :
     PWidget(_window,parent),
     ui(new Ui::SettingsInformationWidget)
 {

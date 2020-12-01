@@ -9,7 +9,7 @@
 #include "clientmodel.h"
 #include "qt/pivx/qtutils.h"
 
-SettingsWalletOptionsWidget::SettingsWalletOptionsWidget(SAPPGUI* _window, QWidget *parent) :
+SettingsWalletOptionsWidget::SettingsWalletOptionsWidget(PIVXGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsWalletOptionsWidget)
 {

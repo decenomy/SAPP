@@ -14,7 +14,7 @@
 #include <QWidget>
 #include <QPixmap>
 
-class SAPPGUI;
+class PIVXGUI;
 class SendCoinsRecipient;
 
 namespace Ui {
@@ -30,7 +30,7 @@ class ReceiveWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit ReceiveWidget(SAPPGUI* parent);
+    explicit ReceiveWidget(PIVXGUI* parent);
     ~ReceiveWidget();
 
     void loadWalletModel() override;

@@ -36,9 +36,9 @@
 #define BASE_WINDOW_MIN_WIDTH 1100
 
 
-const QString SAPPGUI::DEFAULT_WALLET = "~Default";
+const QString PIVXGUI::DEFAULT_WALLET = "~Default";
 
-SAPPGUI::SAPPGUI(const NetworkStyle* networkStyle, QWidget* parent) :
+PIVXGUI::PIVXGUI(const NetworkStyle* networkStyle, QWidget* parent) :
         QMainWindow(parent),
         clientModel(0){
 
@@ -165,7 +165,7 @@ SAPPGUI::SAPPGUI(const NetworkStyle* networkStyle, QWidget* parent) :
 
 }
 
-void SAPPGUI::createActions(const NetworkStyle* networkStyle)
+void PIVXGUI::createActions(const NetworkStyle* networkStyle)
 {
     toggleHideAction = new QAction(networkStyle->getAppIcon(), tr("&Show / Hide"), this);
     toggleHideAction->setStatusTip(tr("Show or hide the main Window"));
@@ -175,14 +175,14 @@ void SAPPGUI::createActions(const NetworkStyle* networkStyle)
     quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     quitAction->setMenuRole(QAction::QuitRole);
 
-    connect(toggleHideAction, &QAction::triggered, this, &SAPPGUI::toggleHidden);
+    connect(toggleHideAction, &QAction::triggered, this, &PIVXGUI::toggleHidden);
     connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
 }
 
 /**
  * Here add every event connection
  */
-void SAPPGUI::connectActions()
+void PIVXGUI::connectActions()
 {
     QShortcut *consoleShort = new QShortcut(this);
     consoleShort->setKey(QKeySequence(SHORT_KEY + Qt::Key_C));
@@ -191,22 +191,22 @@ void SAPPGUI::connectActions()
         settingsWidget->showDebugConsole();
         goToSettings();
     });
-    connect(topBar, &TopBar::showHide, this, &SAPPGUI::showHide);
-    connect(topBar, &TopBar::themeChanged, this, &SAPPGUI::changeTheme);
+    connect(topBar, &TopBar::showHide, this, &PIVXGUI::showHide);
+    connect(topBar, &TopBar::themeChanged, this, &PIVXGUI::changeTheme);
     connect(topBar, &TopBar::onShowHideColdStakingChanged, navMenu, &NavMenuWidget::onShowHideColdStakingChanged);
-    connect(settingsWidget, &SettingsWidget::showHide, this, &SAPPGUI::showHide);
-    connect(sendWidget, &SendWidget::showHide, this, &SAPPGUI::showHide);
-    connect(receiveWidget, &ReceiveWidget::showHide, this, &SAPPGUI::showHide);
-    connect(addressesWidget, &AddressesWidget::showHide, this, &SAPPGUI::showHide);
-    connect(masterNodesWidget, &MasterNodesWidget::showHide, this, &SAPPGUI::showHide);
-    connect(masterNodesWidget, &MasterNodesWidget::execDialog, this, &SAPPGUI::execDialog);
-    connect(coldStakingWidget, &ColdStakingWidget::showHide, this, &SAPPGUI::showHide);
-    connect(coldStakingWidget, &ColdStakingWidget::execDialog, this, &SAPPGUI::execDialog);
-    connect(settingsWidget, &SettingsWidget::execDialog, this, &SAPPGUI::execDialog);
+    connect(settingsWidget, &SettingsWidget::showHide, this, &PIVXGUI::showHide);
+    connect(sendWidget, &SendWidget::showHide, this, &PIVXGUI::showHide);
+    connect(receiveWidget, &ReceiveWidget::showHide, this, &PIVXGUI::showHide);
+    connect(addressesWidget, &AddressesWidget::showHide, this, &PIVXGUI::showHide);
+    connect(masterNodesWidget, &MasterNodesWidget::showHide, this, &PIVXGUI::showHide);
+    connect(masterNodesWidget, &MasterNodesWidget::execDialog, this, &PIVXGUI::execDialog);
+    connect(coldStakingWidget, &ColdStakingWidget::showHide, this, &PIVXGUI::showHide);
+    connect(coldStakingWidget, &ColdStakingWidget::execDialog, this, &PIVXGUI::execDialog);
+    connect(settingsWidget, &SettingsWidget::execDialog, this, &PIVXGUI::execDialog);
 }
 
 
-void SAPPGUI::createTrayIcon(const NetworkStyle* networkStyle)
+void PIVXGUI::createTrayIcon(const NetworkStyle* networkStyle)
 {
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
@@ -218,7 +218,7 @@ void SAPPGUI::createTrayIcon(const NetworkStyle* networkStyle)
     notificator = new Notificator(QApplication::applicationName(), trayIcon, this);
 }
 
-SAPPGUI::~SAPPGUI()
+PIVXGUI::~PIVXGUI()
 {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
@@ -233,14 +233,14 @@ SAPPGUI::~SAPPGUI()
 
 
 /** Get restart command-line parameters and request restart */
-void SAPPGUI::handleRestart(QStringList args)
+void PIVXGUI::handleRestart(QStringList args)
 {
     if (!ShutdownRequested())
         Q_EMIT requestedRestart(args);
 }
 
 
-void SAPPGUI::setClientModel(ClientModel* clientModel)
+void PIVXGUI::setClientModel(ClientModel* clientModel)
 {
     this->clientModel = clientModel;
     if (this->clientModel) {
@@ -254,7 +254,7 @@ void SAPPGUI::setClientModel(ClientModel* clientModel)
         settingsWidget->setClientModel(clientModel);
 
         // Receive and report messages from client model
-        connect(clientModel, &ClientModel::message, this, &SAPPGUI::message);
+        connect(clientModel, &ClientModel::message, this, &PIVXGUI::message);
         connect(topBar, &TopBar::walletSynced, dashboard, &DashboardWidget::walletSynced);
         connect(topBar, &TopBar::walletSynced, coldStakingWidget, &ColdStakingWidget::walletSynced);
 
@@ -278,7 +278,7 @@ void SAPPGUI::setClientModel(ClientModel* clientModel)
     }
 }
 
-void SAPPGUI::createTrayIconMenu()
+void PIVXGUI::createTrayIconMenu()
 {
 #ifndef Q_OS_MAC
     // return if trayIcon is unset (only on non-macOSes)
@@ -288,11 +288,11 @@ void SAPPGUI::createTrayIconMenu()
     trayIconMenu = new QMenu(this);
     trayIcon->setContextMenu(trayIconMenu);
 
-    connect(trayIcon, &QSystemTrayIcon::activated, this, &SAPPGUI::trayIconActivated);
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &PIVXGUI::trayIconActivated);
 #else
     // Note: On macOS, the Dock icon is used to provide the tray's functionality.
     MacDockIconHandler* dockIconHandler = MacDockIconHandler::instance();
-    connect(dockIconHandler, &MacDockIconHandler::dockIconClicked, this, &SAPPGUI::macosDockIconActivated);
+    connect(dockIconHandler, &MacDockIconHandler::dockIconClicked, this, &PIVXGUI::macosDockIconActivated);
 
     trayIconMenu = new QMenu(this);
     trayIconMenu->setAsDockMenu();
@@ -309,7 +309,7 @@ void SAPPGUI::createTrayIconMenu()
 }
 
 #ifndef Q_OS_MAC
-void SAPPGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+void PIVXGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger) {
         // Click on system tray icon triggers show/hide of the main window
@@ -317,14 +317,14 @@ void SAPPGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 #else
-void SAPPGUI::macosDockIconActivated()
+void PIVXGUI::macosDockIconActivated()
  {
      show();
      activateWindow();
  }
 #endif
 
-void SAPPGUI::changeEvent(QEvent* e)
+void PIVXGUI::changeEvent(QEvent* e)
 {
     QMainWindow::changeEvent(e);
 #ifndef Q_OS_MAC // Ignored on Mac
@@ -332,7 +332,7 @@ void SAPPGUI::changeEvent(QEvent* e)
         if (clientModel && clientModel->getOptionsModel() && clientModel->getOptionsModel()->getMinimizeToTray()) {
             QWindowStateChangeEvent* wsevt = static_cast<QWindowStateChangeEvent*>(e);
             if (!(wsevt->oldState() & Qt::WindowMinimized) && isMinimized()) {
-                QTimer::singleShot(0, this, &SAPPGUI::hide);
+                QTimer::singleShot(0, this, &PIVXGUI::hide);
                 e->ignore();
             }
         }
@@ -340,7 +340,7 @@ void SAPPGUI::changeEvent(QEvent* e)
 #endif
 }
 
-void SAPPGUI::closeEvent(QCloseEvent* event)
+void PIVXGUI::closeEvent(QCloseEvent* event)
 {
 #ifndef Q_OS_MAC // Ignored on Mac
     if (clientModel && clientModel->getOptionsModel()) {
@@ -353,7 +353,7 @@ void SAPPGUI::closeEvent(QCloseEvent* event)
 }
 
 
-void SAPPGUI::messageInfo(const QString& text)
+void PIVXGUI::messageInfo(const QString& text)
 {
     if (!this->snackBar) this->snackBar = new SnackBar(this, this);
     this->snackBar->setText(text);
@@ -362,7 +362,7 @@ void SAPPGUI::messageInfo(const QString& text)
 }
 
 
-void SAPPGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret)
+void PIVXGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret)
 {
     QString strTitle =  tr("Sappre Coin Core"); // default title
     // Default to information icon
@@ -421,7 +421,7 @@ void SAPPGUI::message(const QString& title, const QString& message, unsigned int
     }
 }
 
-bool SAPPGUI::openStandardDialog(QString title, QString body, QString okBtn, QString cancelBtn)
+bool PIVXGUI::openStandardDialog(QString title, QString body, QString okBtn, QString cancelBtn)
 {
     DefaultDialog *dialog;
     if (isVisible()) {
@@ -444,7 +444,7 @@ bool SAPPGUI::openStandardDialog(QString title, QString body, QString okBtn, QSt
 }
 
 
-void SAPPGUI::showNormalIfMinimized(bool fToggleHidden)
+void PIVXGUI::showNormalIfMinimized(bool fToggleHidden)
 {
     if (!clientModel)
         return;
@@ -455,12 +455,12 @@ void SAPPGUI::showNormalIfMinimized(bool fToggleHidden)
     }
 }
 
-void SAPPGUI::toggleHidden()
+void PIVXGUI::toggleHidden()
 {
     showNormalIfMinimized(true);
 }
 
-void SAPPGUI::detectShutdown()
+void PIVXGUI::detectShutdown()
 {
     if (ShutdownRequested()) {
         if (rpcConsole)
@@ -469,7 +469,7 @@ void SAPPGUI::detectShutdown()
     }
 }
 
-void SAPPGUI::goToDashboard()
+void PIVXGUI::goToDashboard()
 {
     if (stackedContainer->currentWidget() != dashboard) {
         stackedContainer->setCurrentWidget(dashboard);
@@ -477,48 +477,48 @@ void SAPPGUI::goToDashboard()
     }
 }
 
-void SAPPGUI::goToSend()
+void PIVXGUI::goToSend()
 {
     showTop(sendWidget);
 }
 
-void SAPPGUI::goToAddresses()
+void PIVXGUI::goToAddresses()
 {
     showTop(addressesWidget);
 }
 
-void SAPPGUI::goToMasterNodes()
+void PIVXGUI::goToMasterNodes()
 {
     showTop(masterNodesWidget);
 }
 
-void SAPPGUI::goToColdStaking()
+void PIVXGUI::goToColdStaking()
 {
     showTop(coldStakingWidget);
 }
 
-void SAPPGUI::goToSettings(){
+void PIVXGUI::goToSettings(){
     showTop(settingsWidget);
 }
 
-void SAPPGUI::goToSettingsInfo()
+void PIVXGUI::goToSettingsInfo()
 {
     navMenu->selectSettings();
     settingsWidget->showInformation();
     goToSettings();
 }
 
-void SAPPGUI::goToReceive()
+void PIVXGUI::goToReceive()
 {
     showTop(receiveWidget);
 }
 
-void SAPPGUI::openNetworkMonitor()
+void PIVXGUI::openNetworkMonitor()
 {
     settingsWidget->openNetworkMonitor();
 }
 
-void SAPPGUI::showTop(QWidget* view)
+void PIVXGUI::showTop(QWidget* view)
 {
     if (stackedContainer->currentWidget() != view) {
         stackedContainer->setCurrentWidget(view);
@@ -526,7 +526,7 @@ void SAPPGUI::showTop(QWidget* view)
     }
 }
 
-void SAPPGUI::changeTheme(bool isLightTheme)
+void PIVXGUI::changeTheme(bool isLightTheme)
 {
 
     QString css = GUIUtil::loadStyleSheet();
@@ -539,7 +539,7 @@ void SAPPGUI::changeTheme(bool isLightTheme)
     updateStyle(this);
 }
 
-void SAPPGUI::resizeEvent(QResizeEvent* event)
+void PIVXGUI::resizeEvent(QResizeEvent* event)
 {
     // Parent..
     QMainWindow::resizeEvent(event);
@@ -549,12 +549,12 @@ void SAPPGUI::resizeEvent(QResizeEvent* event)
     Q_EMIT windowResizeEvent(event);
 }
 
-bool SAPPGUI::execDialog(QDialog *dialog, int xDiv, int yDiv)
+bool PIVXGUI::execDialog(QDialog *dialog, int xDiv, int yDiv)
 {
     return openDialogWithOpaqueBackgroundY(dialog, this);
 }
 
-void SAPPGUI::showHide(bool show)
+void PIVXGUI::showHide(bool show)
 {
     if (!op) op = new QLabel(this);
     if (!show) {
@@ -582,12 +582,12 @@ void SAPPGUI::showHide(bool show)
     }
 }
 
-int SAPPGUI::getNavWidth()
+int PIVXGUI::getNavWidth()
 {
     return this->navMenu->width();
 }
 
-void SAPPGUI::openFAQ(int section)
+void PIVXGUI::openFAQ(int section)
 {
     showHide(true);
     SettingsFaqWidget* dialog = new SettingsFaqWidget(this);
@@ -598,7 +598,7 @@ void SAPPGUI::openFAQ(int section)
 
 
 #ifdef ENABLE_WALLET
-bool SAPPGUI::addWallet(const QString& name, WalletModel* walletModel)
+bool PIVXGUI::addWallet(const QString& name, WalletModel* walletModel)
 {
     // Single wallet supported for now..
     if (!stackedContainer || !clientModel || !walletModel)
@@ -616,33 +616,33 @@ bool SAPPGUI::addWallet(const QString& name, WalletModel* walletModel)
     settingsWidget->setWalletModel(walletModel);
 
     // Connect actions..
-    connect(walletModel, &WalletModel::message, this, &SAPPGUI::message);
-    connect(masterNodesWidget, &MasterNodesWidget::message, this, &SAPPGUI::message);
-    connect(coldStakingWidget, &ColdStakingWidget::message, this, &SAPPGUI::message);
-    connect(topBar, &TopBar::message, this, &SAPPGUI::message);
-    connect(sendWidget, &SendWidget::message,this, &SAPPGUI::message);
-    connect(receiveWidget, &ReceiveWidget::message,this, &SAPPGUI::message);
-    connect(addressesWidget, &AddressesWidget::message,this, &SAPPGUI::message);
-    connect(settingsWidget, &SettingsWidget::message, this, &SAPPGUI::message);
+    connect(walletModel, &WalletModel::message, this, &PIVXGUI::message);
+    connect(masterNodesWidget, &MasterNodesWidget::message, this, &PIVXGUI::message);
+    connect(coldStakingWidget, &ColdStakingWidget::message, this, &PIVXGUI::message);
+    connect(topBar, &TopBar::message, this, &PIVXGUI::message);
+    connect(sendWidget, &SendWidget::message,this, &PIVXGUI::message);
+    connect(receiveWidget, &ReceiveWidget::message,this, &PIVXGUI::message);
+    connect(addressesWidget, &AddressesWidget::message,this, &PIVXGUI::message);
+    connect(settingsWidget, &SettingsWidget::message, this, &PIVXGUI::message);
 
     // Pass through transaction notifications
-    connect(dashboard, &DashboardWidget::incomingTransaction, this, &SAPPGUI::incomingTransaction);
+    connect(dashboard, &DashboardWidget::incomingTransaction, this, &PIVXGUI::incomingTransaction);
 
     return true;
 }
 
-bool SAPPGUI::setCurrentWallet(const QString& name)
+bool PIVXGUI::setCurrentWallet(const QString& name)
 {
     // Single wallet supported.
     return true;
 }
 
-void SAPPGUI::removeAllWallets()
+void PIVXGUI::removeAllWallets()
 {
     // Single wallet supported.
 }
 
-void SAPPGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address)
+void PIVXGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address)
 {
     // Only send notifications when not disabled
     if (!bdisableSystemnotifications) {
@@ -665,7 +665,7 @@ void SAPPGUI::incomingTransaction(const QString& date, int unit, const CAmount& 
 #endif // ENABLE_WALLET
 
 
-static bool ThreadSafeMessageBox(SAPPGUI* gui, const std::string& message, const std::string& caption, unsigned int style)
+static bool ThreadSafeMessageBox(PIVXGUI* gui, const std::string& message, const std::string& caption, unsigned int style)
 {
     bool modal = (style & CClientUIInterface::MODAL);
     // The SECURE flag has no effect in the Qt GUI.
@@ -684,13 +684,13 @@ static bool ThreadSafeMessageBox(SAPPGUI* gui, const std::string& message, const
 }
 
 
-void SAPPGUI::subscribeToCoreSignals()
+void PIVXGUI::subscribeToCoreSignals()
 {
     // Connect signals to client
     uiInterface.ThreadSafeMessageBox.connect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
 }
 
-void SAPPGUI::unsubscribeFromCoreSignals()
+void PIVXGUI::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
     uiInterface.ThreadSafeMessageBox.disconnect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));

@@ -22,7 +22,7 @@ class SettingsMainOptionsWidget : public PWidget
     Q_OBJECT
 
 public:
-    explicit SettingsMainOptionsWidget(SAPPGUI* _window, QWidget *parent = nullptr);
+    explicit SettingsMainOptionsWidget(PIVXGUI* _window, QWidget *parent = nullptr);
     ~SettingsMainOptionsWidget();
 
     void setMapper(QDataWidgetMapper *mapper);

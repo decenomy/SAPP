@@ -23,7 +23,7 @@
 #define REQUEST_LOAD_TASK 1
 #define CHART_LOAD_MIN_TIME_INTERVAL 15
 
-DashboardWidget::DashboardWidget(SAPPGUI* parent) :
+DashboardWidget::DashboardWidget(PIVXGUI* parent) :
     PWidget(parent),
     ui(new Ui::DashboardWidget)
 {
@@ -144,7 +144,7 @@ bool hasCharts = false;
     connect(ui->pushButtonMonth, &QPushButton::clicked, [this](){setChartShow(MONTH);});
     connect(ui->pushButtonAll, &QPushButton::clicked, [this](){setChartShow(ALL);});
     if (window)
-        connect(window, &SAPPGUI::windowResizeEvent, this, &DashboardWidget::windowResizeEvent);
+        connect(window, &PIVXGUI::windowResizeEvent, this, &DashboardWidget::windowResizeEvent);
 #endif
 
     if (hasCharts) {
@@ -205,8 +205,8 @@ void DashboardWidget::loadWalletModel()
             ui->comboBoxSort->setVisible(false);
         }
 
-        connect(ui->pushImgEmpty, &QPushButton::clicked, window, &SAPPGUI::openFAQ);
-        connect(ui->btnHowTo, &QPushButton::clicked, window, &SAPPGUI::openFAQ);
+        connect(ui->pushImgEmpty, &QPushButton::clicked, window, &PIVXGUI::openFAQ);
+        connect(ui->btnHowTo, &QPushButton::clicked, window, &PIVXGUI::openFAQ);
         connect(txModel, &TransactionTableModel::txArrived, this, &DashboardWidget::onTxArrived);
 
         // Notification pop-up for new transaction

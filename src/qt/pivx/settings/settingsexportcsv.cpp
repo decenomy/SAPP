@@ -11,7 +11,7 @@
 #include "qt/pivx/qtutils.h"
 #include "guiinterface.h"
 
-SettingsExportCSV::SettingsExportCSV(SAPPGUI* _window, QWidget *parent) :
+SettingsExportCSV::SettingsExportCSV(PIVXGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsExportCSV)
 {

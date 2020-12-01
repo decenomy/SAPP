@@ -71,7 +71,7 @@ private:
     CSRow *cachedRow = nullptr;
 };
 
-ColdStakingWidget::ColdStakingWidget(SAPPGUI* parent) :
+ColdStakingWidget::ColdStakingWidget(PIVXGUI* parent) :
     PWidget(parent),
     ui(new Ui::ColdStakingWidget),
     isLoading(false)

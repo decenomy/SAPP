@@ -8,7 +8,7 @@
 #include <QMetaObject>
 #include "qt/pivx/qtutils.h"
 
-SettingsFaqWidget::SettingsFaqWidget(SAPPGUI *parent) :
+SettingsFaqWidget::SettingsFaqWidget(PIVXGUI *parent) :
     QDialog(parent),
     ui(new Ui::SettingsFaqWidget)
 {
@@ -82,7 +82,7 @@ SettingsFaqWidget::SettingsFaqWidget(SAPPGUI *parent) :
     connect(ui->pushButton_MNController, &QPushButton::clicked, [this](){onFaqClicked(ui->widget_MNController);});
 
     if (parent)
-        connect(parent, &SAPPGUI::windowResizeEvent, this, &SettingsFaqWidget::windowResizeEvent);
+        connect(parent, &PIVXGUI::windowResizeEvent, this, &SettingsFaqWidget::windowResizeEvent);
 }
 
 void SettingsFaqWidget::showEvent(QShowEvent *event)

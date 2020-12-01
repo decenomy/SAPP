@@ -2546,7 +2546,7 @@ https://www.transifex.com/pivx-project/pivx-project-translations</source>
     </message>
 </context>
 <context>
-    <name>SAPPGUI</name>
+    <name>PIVXGUI</name>
     <message>
         <location filename="../pivx/pivxgui.cpp" line="+69"/>
         <location line="+298"/>

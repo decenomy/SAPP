@@ -21,7 +21,7 @@
 #define DECORATION_SIZE 70
 #define NUM_ITEMS 3
 
-ReceiveWidget::ReceiveWidget(SAPPGUI* parent) :
+ReceiveWidget::ReceiveWidget(PIVXGUI* parent) :
     PWidget(parent),
     ui(new Ui::ReceiveWidget)
 {

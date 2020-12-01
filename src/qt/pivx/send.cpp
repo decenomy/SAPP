@@ -18,7 +18,7 @@
 #include "script/standard.h"
 #include "openuridialog.h"
 
-SendWidget::SendWidget(SAPPGUI* parent) :
+SendWidget::SendWidget(PIVXGUI* parent) :
     PWidget(parent),
     ui(new Ui::send),
     coinIcon(new QPushButton()),

@@ -9,7 +9,7 @@
 #include "qt/pivx/focuseddialog.h"
 #include "qt/pivx/snackbar.h"
 
-class SAPPGUI;
+class PIVXGUI;
 class WalletModel;
 
 namespace Ui {
@@ -21,7 +21,7 @@ class SendCustomFeeDialog : public FocusedDialog
     Q_OBJECT
 
 public:
-    explicit SendCustomFeeDialog(SAPPGUI* parent, WalletModel* model);
+    explicit SendCustomFeeDialog(PIVXGUI* parent, WalletModel* model);
     ~SendCustomFeeDialog();
 
     void showEvent(QShowEvent* event) override;

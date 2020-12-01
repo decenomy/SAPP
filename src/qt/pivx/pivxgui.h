@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef PIVX_CORE_NEW_GUI_SAPPGUI_H
-#define PIVX_CORE_NEW_GUI_SAPPGUI_H
+#ifndef PIVX_CORE_NEW_GUI_PIVXGUI_H
+#define PIVX_CORE_NEW_GUI_PIVXGUI_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/pivx-config.h"
@@ -37,15 +37,15 @@ class WalletModel;
   SAPP GUI main class. This class represents the main window of the SAPP UI. It communicates with both the client and
   wallet models to give the user an up-to-date view of the current core state.
 */
-class SAPPGUI : public QMainWindow
+class PIVXGUI : public QMainWindow
 {
     Q_OBJECT
 
 public:
     static const QString DEFAULT_WALLET;
 
-    explicit SAPPGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
-    ~SAPPGUI();
+    explicit PIVXGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
+    ~PIVXGUI();
 
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
@@ -189,4 +189,4 @@ Q_SIGNALS:
 };
 
 
-#endif //PIVX_CORE_NEW_GUI_SAPPGUI_H
+#endif //PIVX_CORE_NEW_GUI_PIVXGUI_H

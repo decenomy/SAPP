@@ -208,7 +208,7 @@ public:
     /// Get process return value
     int getReturnValue() { return returnValue; }
 
-    /// Get window identifier of QMainWindow (SAPPGUI)
+    /// Get window identifier of QMainWindow (PIVXGUI)
     WId getMainWinId() const;
 
 public Q_SLOTS:
@@ -229,7 +229,7 @@ private:
     QThread* coreThread;
     OptionsModel* optionsModel;
     ClientModel* clientModel;
-    SAPPGUI* window;
+    PIVXGUI* window;
     QTimer* pollShutdownTimer;
 #ifdef ENABLE_WALLET
     PaymentServer* paymentServer;
@@ -359,10 +359,10 @@ void BitcoinApplication::createOptionsModel()
 
 void BitcoinApplication::createWindow(const NetworkStyle* networkStyle)
 {
-    window = new SAPPGUI(networkStyle, 0);
+    window = new PIVXGUI(networkStyle, 0);
 
     pollShutdownTimer = new QTimer(window);
-    connect(pollShutdownTimer, &QTimer::timeout, window, &SAPPGUI::detectShutdown);
+    connect(pollShutdownTimer, &QTimer::timeout, window, &PIVXGUI::detectShutdown);
     pollShutdownTimer->start(200);
 }
 
@@ -410,7 +410,7 @@ void BitcoinApplication::startThread()
     connect(executor, &BitcoinCore::runawayException, this, &BitcoinApplication::handleRunawayException);
     connect(this, &BitcoinApplication::requestedInitialize, executor, &BitcoinCore::initialize);
     connect(this, &BitcoinApplication::requestedShutdown, executor, &BitcoinCore::shutdown);
-    connect(window, &SAPPGUI::requestedRestart, executor, &BitcoinCore::restart);
+    connect(window, &PIVXGUI::requestedRestart, executor, &BitcoinCore::restart);
     /*  make sure executor object is deleted in its own thread */
     connect(this, &BitcoinApplication::stopThread, executor, &QObject::deleteLater);
     connect(this, &BitcoinApplication::stopThread, coreThread, &QThread::quit);
@@ -476,8 +476,8 @@ void BitcoinApplication::initializeResult(int retval)
         if (pwalletMain) {
             walletModel = new WalletModel(pwalletMain, optionsModel);
 
-            window->addWallet(SAPPGUI::DEFAULT_WALLET, walletModel);
-            window->setCurrentWallet(SAPPGUI::DEFAULT_WALLET);
+            window->addWallet(PIVXGUI::DEFAULT_WALLET, walletModel);
+            window->setCurrentWallet(PIVXGUI::DEFAULT_WALLET);
 
             connect(walletModel, &WalletModel::coinsSent,
                     paymentServer, &PaymentServer::fetchPaymentACK);
@@ -495,8 +495,8 @@ void BitcoinApplication::initializeResult(int retval)
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
         // SAPP: URIs or payment requests:
-        //connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &SAPPGUI::handlePaymentRequest);
-        connect(window, &SAPPGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
+        //connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &PIVXGUI::handlePaymentRequest);
+        connect(window, &PIVXGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
         connect(paymentServer, &PaymentServer::message, [this](const QString& title, const QString& message, unsigned int style) {
           window->message(title, message, style);
         });

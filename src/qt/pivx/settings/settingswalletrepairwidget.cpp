@@ -6,7 +6,7 @@
 #include "qt/pivx/settings/forms/ui_settingswalletrepairwidget.h"
 #include "qt/pivx/qtutils.h"
 
-SettingsWalletRepairWidget::SettingsWalletRepairWidget(SAPPGUI* _window, QWidget *parent) :
+SettingsWalletRepairWidget::SettingsWalletRepairWidget(PIVXGUI* _window, QWidget *parent) :
     PWidget(_window, parent),
     ui(new Ui::SettingsWalletRepairWidget)
 {
@@ -118,7 +118,7 @@ void SettingsWalletRepairWidget::buildParameterlist(QString arg)
     // Append repair parameter to command line.
     args.append(arg);
 
-    // Send command-line arguments to SAPPGUI::handleRestart()
+    // Send command-line arguments to PIVXGUI::handleRestart()
     Q_EMIT handleRestart(args);
 }
 

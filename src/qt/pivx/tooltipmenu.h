@@ -9,7 +9,7 @@
 #include <QWidget>
 #include <QModelIndex>
 
-class SAPPGUI;
+class PIVXGUI;
 class WalletModel;
 
 namespace Ui {
@@ -25,7 +25,7 @@ class TooltipMenu : public PWidget
     Q_OBJECT
 
 public:
-    explicit TooltipMenu(SAPPGUI* _window, QWidget *parent = nullptr);
+    explicit TooltipMenu(PIVXGUI* _window, QWidget *parent = nullptr);
     ~TooltipMenu() override;
 
     void setIndex(const QModelIndex &index);

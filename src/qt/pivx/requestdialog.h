@@ -12,7 +12,7 @@
 #include <QPixmap>
 
 class WalletModel;
-class SAPPGUI;
+class PIVXGUI;
 
 namespace Ui {
 class RequestDialog;

@@ -36,7 +36,7 @@ bool openDialog(QDialog* widget, QWidget* gui)
     return widget->exec();
 }
 
-void closeDialog(QDialog* widget, SAPPGUI* gui)
+void closeDialog(QDialog* widget, PIVXGUI* gui)
 {
     widget->setWindowFlags(Qt::CustomizeWindowHint);
     widget->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -57,7 +57,7 @@ void openDialogFullScreen(QWidget* parent, QWidget* dialog)
     dialog->resize(parent->width(), parent->height());
 }
 
-bool openDialogWithOpaqueBackgroundY(QDialog* widget, SAPPGUI* gui, double posX, int posY)
+bool openDialogWithOpaqueBackgroundY(QDialog* widget, PIVXGUI* gui, double posX, int posY)
 {
     widget->setWindowFlags(Qt::CustomizeWindowHint);
     widget->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -74,12 +74,12 @@ bool openDialogWithOpaqueBackgroundY(QDialog* widget, SAPPGUI* gui, double posX,
     return res;
 }
 
-bool openDialogWithOpaqueBackground(QDialog* widget, SAPPGUI* gui, double posX)
+bool openDialogWithOpaqueBackground(QDialog* widget, PIVXGUI* gui, double posX)
 {
     return openDialogWithOpaqueBackgroundY(widget, gui, posX, 5);
 }
 
-bool openDialogWithOpaqueBackgroundFullScreen(QDialog* widget, SAPPGUI* gui)
+bool openDialogWithOpaqueBackgroundFullScreen(QDialog* widget, PIVXGUI* gui)
 {
     widget->setWindowFlags(Qt::CustomizeWindowHint);
     widget->setAttribute(Qt::WA_TranslucentBackground, true);

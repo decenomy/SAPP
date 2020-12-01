@@ -190,7 +190,7 @@ void AskPassphraseDialog::accept()
         );
         if (ret) {
             newpassCache = newpass1;
-            SAPPGUI* window = static_cast<SAPPGUI*>(parentWidget());
+            PIVXGUI* window = static_cast<PIVXGUI*>(parentWidget());
             LoadingDialog *dialog = new LoadingDialog(window);
             dialog->execute(this, 1);
             openDialogWithOpaqueBackgroundFullScreen(dialog, window);
@@ -310,7 +310,7 @@ bool AskPassphraseDialog::eventFilter(QObject* object, QEvent* event)
 
 bool AskPassphraseDialog::openStandardDialog(QString title, QString body, QString okBtn, QString cancelBtn)
 {
-    SAPPGUI* gui = static_cast<SAPPGUI*>(parentWidget());
+    PIVXGUI* gui = static_cast<PIVXGUI*>(parentWidget());
     DefaultDialog *confirmDialog = new DefaultDialog(gui);
     confirmDialog->setText(title, body, okBtn, cancelBtn);
     confirmDialog->adjustSize();
@@ -343,7 +343,7 @@ void AskPassphraseDialog::updateWarningsLabel()
 void AskPassphraseDialog::warningMessage()
 {
     hide();
-    static_cast<SAPPGUI*>(parentWidget())->showHide(true);
+    static_cast<PIVXGUI*>(parentWidget())->showHide(true);
     openStandardDialog(
             tr("Wallet encrypted"),
             "<qt>" +

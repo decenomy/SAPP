@@ -1925,7 +1925,7 @@ https://www.transifex.com/pivx-project/pivx-project-translations </translation>
     </message>
 </context>
 <context>
-    <name>SAPPGUI</name>
+    <name>PIVXGUI</name>
     <message>
         <source>Sappre Coin Core</source>
         <translation>Sappre Coin Core</translation>

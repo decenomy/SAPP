@@ -11,7 +11,7 @@
 #include "qt/pivx/prunnable.h"
 #include "walletmodel.h"
 
-class SAPPGUI;
+class PIVXGUI;
 class ClientModel;
 class WalletModel;
 class WorkerTask;
@@ -30,13 +30,13 @@ class PWidget : public QWidget, public Runnable, public Translator
 {
     Q_OBJECT
 public:
-    explicit PWidget(SAPPGUI* _window = nullptr, QWidget *parent = nullptr);
+    explicit PWidget(PIVXGUI* _window = nullptr, QWidget *parent = nullptr);
     explicit PWidget(PWidget *parent = nullptr);
 
     void setClientModel(ClientModel* model);
     void setWalletModel(WalletModel* model);
 
-    SAPPGUI* getWindow() { return this->window; }
+    PIVXGUI* getWindow() { return this->window; }
 
     void run(int type) override;
     void onError(QString error, int type) override;
@@ -56,7 +56,7 @@ protected Q_SLOTS:
     void onChangeTheme(bool isLightTheme, QString &theme);
 
 protected:
-    SAPPGUI* window = nullptr;
+    PIVXGUI* window = nullptr;
     ClientModel* clientModel = nullptr;
     WalletModel* walletModel = nullptr;
 

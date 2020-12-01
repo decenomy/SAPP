@@ -10,7 +10,7 @@
 #include "optionsmodel.h"
 #include <QScrollBar>
 
-NavMenuWidget::NavMenuWidget(SAPPGUI *mainWindow, QWidget *parent) :
+NavMenuWidget::NavMenuWidget(PIVXGUI *mainWindow, QWidget *parent) :
     PWidget(mainWindow, parent),
     ui(new Ui::NavMenuWidget)
 {
