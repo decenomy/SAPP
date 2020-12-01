@@ -15,7 +15,7 @@
 const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         {
                 /*.strName =*/ "Base",
-                /*.strInfo =*/ "PIVX network",
+                /*.strInfo =*/ "Sapphire network",
         },
         {
                 /*.strName =*/ "PoS",
@@ -50,8 +50,8 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
                 /*.strInfo =*/ "new message sigs - start block v7 - time protocol - zc spend v4",
         },
         {
-                /*.strName =*/ "v5_dummy",
-                /*.strInfo =*/ "Placeholder for future PIVX version 5.0 upgrade",
+                /*.strName =*/ "v2_dummy",
+                /*.strInfo =*/ "Placeholder for future Sapphire version 2.0 upgrade",
         },
         {
                 /*.strName =*/ "Test_dummy",

@@ -270,7 +270,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "pivx";
+    const char* pszModule = "sapphire";
 #endif
     if (pex)
         return strprintf(
@@ -290,13 +290,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-// Windows < Vista: C:\Documents and Settings\Username\Application Data\PIVX
-// Windows >= Vista: C:\Users\Username\AppData\Roaming\PIVX
-// Mac: ~/Library/Application Support/PIVX
-// Unix: ~/.pivx
+// Windows < Vista: C:\Documents and Settings\Username\Application Data\Sapphire
+// Windows >= Vista: C:\Users\Username\AppData\Roaming\Sapphire
+// Mac: ~/Library/Application Support/Sapphire
+// Unix: ~/.sapphire
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "PIVX";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Sapphire";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -308,10 +308,10 @@ fs::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "PIVX";
+    return pathRet / "Sapphire";
 #else
     // Unix
-    return pathRet / ".pivx";
+    return pathRet / ".sapphire";
 #endif
 #endif
 }
@@ -324,13 +324,13 @@ static RecursiveMutex csPathCached;
 static fs::path ZC_GetBaseParamsDir()
 {
     // Copied from GetDefaultDataDir and adapter for zcash params.
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\PIVXParams
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\PIVXParams
-    // Mac: ~/Library/Application Support/PIVXParams
-    // Unix: ~/.pivx-params
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\SapphireParams
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\SapphireParams
+    // Mac: ~/Library/Application Support/SapphireParams
+    // Unix: ~/.sapphire-params
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "PIVXParams";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "SapphireParams";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -342,10 +342,10 @@ static fs::path ZC_GetBaseParamsDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "PIVXParams";
+    return pathRet / "SapphireParams";
 #else
     // Unix
-    return pathRet / ".pivx-params";
+    return pathRet / ".sapphire-params";
 #endif
 #endif
 }

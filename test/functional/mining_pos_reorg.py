@@ -231,7 +231,7 @@ class ReorgStakeTest(PivxTestFramework):
         assert (not res or not utxo["spendable"])
 
         # Verify that PIV and zPIV supplies were properly updated after the spends and reorgs
-        self.log.info("Check PIV and zPIV supply...")
+        self.log.info("Check SAPP and zSAPP supply...")
         expected_money_supply += 250.0 * (self.nodes[1].getblockcount() - 330)
         spent_coin_0 = mints[0]["denomination"]
         spent_coin_1 = mints[1]["denomination"]
