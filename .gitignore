@@ -7,6 +7,13 @@ reset-files.bash
 *.tar.gz
 
 *.exe
+src/pivx
+src/pivxd
+src/pivx-cli
+src/pivx-tx
+src/bench/bench_pivx
+src/test/test_pivx
+src/qt/test/test_pivx-qt
 src/sapphire
 src/sapphired
 src/sapphire-cli
@@ -67,6 +74,7 @@ src/qt/test/moc*.cpp
 *.o-*
 *.patch
 .sapphire
+.pivx
 *.a
 *.pb.cc
 *.pb.h
@@ -86,7 +94,8 @@ src/qt/test/moc*.cpp
 *.qm
 Makefile
 sapphire-qt
-SAPP-Qt.app
+pivx-qt
+Sapphire-Qt.app
 background.tiff*
 
 # Rust
@@ -97,6 +106,7 @@ target/
 # Unit-tests
 Makefile.test
 sapphire-qt_test
+pivx-qt_test
 src/test/buildenv.py
 
 # Resources cpp
@@ -113,6 +123,7 @@ build
 *.gcno
 /*.info
 test_pivx.coverage/
+test_sapphire.coverage/
 total.coverage/
 coverage_percent.txt
 

@@ -85,8 +85,8 @@
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 
-const char * const PIVX_CONF_FILENAME = "pivx.conf";
-const char * const PIVX_PID_FILENAME = "pivx.pid";
+const char * const PIVX_CONF_FILENAME = "sapphire.conf";
+const char * const PIVX_PID_FILENAME = "sapphire.pid";
 const char * const PIVX_MASTERNODE_CONF_FILENAME = "masternode.conf";
 
 
