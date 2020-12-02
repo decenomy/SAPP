@@ -3919,17 +3919,17 @@ PIVX nutzt einen PoS Konsensalgorithmus, der es den Besitzern von PIVX erlaubt, 
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            We have support channels in most of our official chat groups, for example
-                           &lt;a style='color: #b088ff' href='https://discord.PIVX.org'&gt;
+                           &lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
                            #support in our Discord&lt;/a&gt;.
                            If you prefer to submit a ticket, You can do so at
-                           &lt;a style='color: #b088ff' href='https://PIVX.freshdesk.com'&gt;
+                           &lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
                            our Freshdesk support site&lt;/a&gt;.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
 Wir haben Support-Kanäle in den meisten unserer offiziellen Chatgruppen, z.B.
-&lt;a style='color: #b088ff' href='https://discord.PIVX.org'&gt;
+&lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
 #support in Discord&lt;/a&gt;
 Wenn Sie bevorzugen, uns ein Ticket zu schicken, besuchen Sie
 &lt;a style='color: #b088ff' href='https://PIVX.freshdesk.com'&gt;
