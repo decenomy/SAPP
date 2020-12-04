@@ -364,8 +364,8 @@ para staking</translation>
         <translation>CANCELAR</translation>
     </message>
     <message>
-        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>Sapphire se cerrará para finalizar el proceso de encriptación. Recuerda que encriptar tu wallet no garantiza que sus PIVs no sean robados mediante malware de tu computadora.</translation>
+        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</source>
+        <translation>Sapphire se cerrará para finalizar el proceso de encriptación. Recuerda que encriptar tu wallet no garantiza que sus SAPPs no sean robados mediante malware de tu computadora.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -450,8 +450,8 @@ para staking</translation>
         <translation>Ahorros</translation>
     </message>
     <message>
-        <source>0,00 PIV</source>
-        <translation>0,00 PIV</translation>
+        <source>0,00 SAPP</source>
+        <translation>0,00 SAPP</translation>
     </message>
     <message>
         <source>address</source>
@@ -492,8 +492,8 @@ para staking</translation>
         <translation>Selección de Moneda</translation>
     </message>
     <message>
-        <source>Select PIV Outputs to Spend</source>
-        <translation>Seleccionar Salidas PIV para Gastar</translation>
+        <source>Select SAPP Outputs to Spend</source>
+        <translation>Seleccionar Salidas SAPP para Gastar</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -520,8 +520,8 @@ para staking</translation>
         <translation>Cantidad</translation>
     </message>
     <message>
-        <source>0.00 PIV</source>
-        <translation>0.00 PIV</translation>
+        <source>0.00 SAPP</source>
+        <translation>0.00 SAPP</translation>
     </message>
     <message>
         <source>0</source>
@@ -775,9 +775,9 @@ para staking</translation>
         <translation>Error al cargar las delegaciones: %1</translation>
     </message>
     <message>
-        <source>You can delegate your PIVs, letting a hot node (24/7 online node)
+        <source>You can delegate your SAPPs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>Puedes delegar tus PIV, dejando un nodo activo (nodo en línea 24/7)
+        <translation>Puedes delegar tus SAPP, dejando un nodo activo (nodo en línea 24/7)
 Haga Stake en tu nombre, manteniendo las llaves en un lugar seguro fuera de línea.</translation>
     </message>
     <message>
@@ -785,8 +785,8 @@ Haga Stake en tu nombre, manteniendo las llaves en un lugar seguro fuera de lín
         <translation>Ingresa la dirección del propietario</translation>
     </message>
     <message>
-        <source>Accept PIV delegation / Delegate PIV</source>
-        <translation>Aceptar delegación de PIV / PIV Delegados</translation>
+        <source>Accept SAPP delegation / Delegate SAPP</source>
+        <translation>Aceptar delegación de SAPP / SAPP Delegados</translation>
     </message>
     <message>
         <source>Cold Staking address</source>
@@ -992,8 +992,8 @@ del propietario </translation>
         <translation>Ver el historial de su cuenta</translation>
     </message>
     <message>
-        <source>How to get PIV</source>
-        <translation>Cómo obtener PIV</translation>
+        <source>How to get SAPP</source>
+        <translation>Cómo obtener SAPP</translation>
     </message>
     <message>
         <source>Sort by</source>
@@ -1016,8 +1016,8 @@ del propietario </translation>
         <translation>Filtrar por</translation>
     </message>
     <message>
-        <source>Amount of PIV and zPIV staked.</source>
-        <translation>Cantidad de PIV y zPIV por stake.</translation>
+        <source>Amount of SAPP and zSAPP staked.</source>
+        <translation>Cantidad de SAPP y zSAPP por stake.</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1363,8 +1363,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Crear Nuevo Controlador de Masternode</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 10,000 PIV (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Para crear un Masternode de Sapphire debes desponer 10.000 PIV (la unidad de Sapphire) a la red (sin embargo, estas monedas siguen siendo tuyas y nunca saldrán de tu posesión). Puedes desactivar el nodo y desbloquear las monedas en cualquier momento.</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 200,000 SAPP (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Para crear un Masternode de Sapphire debes desponer 200.000 SAPP (la unidad de Sapphire) a la red (sin embargo, estas monedas siguen siendo tuyas y nunca saldrán de tu posesión). Puedes desactivar el nodo y desbloquear las monedas en cualquier momento.</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1383,8 +1383,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Asegúrate de tener esta cantidad de monedas.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 10,000 PIV will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Una transacción de 10,000 PIV se hará a una nueva dirección vacía en tu wallet.  La dirección está etiquetada bajo el nombre de masternode. </translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Una transacción de 200.000 SAPP se hará a una nueva dirección vacía en tu wallet.  La dirección está etiquetada bajo el nombre de masternode. </translation>
     </message>
     <message>
         <source>Address of the node that must always be online running the actual master node.</source>
@@ -1561,8 +1561,8 @@ Espere unos minutos más (las garantías de masternode requieren %1 confirmacion
         <translation>Datos de Masternode copiados al portapapeles.</translation>
     </message>
     <message>
-        <source>Not enough balance to create a masternode, 10,000 %1 required.</source>
-        <translation>No hay suficiente saldo para crear un masternode, se requiere 10,000 %1.</translation>
+        <source>Not enough balance to create a masternode, 200,000 %1 required.</source>
+        <translation>No hay suficiente saldo para crear un masternode, se requiere 200.000 %1.</translation>
     </message>
     <message>
         <source>Remote Masternode Data</source>
@@ -1895,36 +1895,36 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Mapear un puerto utilizando &amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of PIV units to zPIV</source>
-        <translation>Activar la conversión automática de unidades PIV a zPIV</translation>
+        <source>Enable automatic minting of SAPP units to zSAPP</source>
+        <translation>Activar la conversión automática de unidades SAPP a zSAPP</translation>
     </message>
     <message>
-        <source>Enable zPIV Automint</source>
-        <translation>Activar zPIV Automint</translation>
+        <source>Enable zSAPP Automint</source>
+        <translation>Activar zSAPP Automint</translation>
     </message>
     <message>
-        <source>Enable automatic zPIV minting from specific addresses</source>
-        <translation>Habilita la conversión automática de zPIV desde direcciones específicas</translation>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
+        <translation>Habilita la conversión automática de zSAPP desde direcciones específicas</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Habilitar direcciones de Auto-acuñamiento</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
-        <translation>Porcentaje de PIV entrantes que serán automáticamente convertidos a zPIV a través del Protocolo Zerocoin (mín: 10%)</translation>
+        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
+        <translation>Porcentaje de SAPP entrantes que serán automáticamente convertidos a zSAPP a través del Protocolo Zerocoin (mín: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
-        <translation>Porcentaje de zPIV autogenerados</translation>
+        <source>Percentage of autominted zSAPP</source>
+        <translation>Porcentaje de zSAPP autogenerados</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
-        <translation>Esperar con la conversión automática a Zerocoin hasta que hayan suficientes PIV disponibles para este tamaño de esa denominación</translation>
+        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
+        <translation>Esperar con la conversión automática a Zerocoin hasta que hayan suficientes SAPP disponibles para este tamaño de esa denominación</translation>
     </message>
     <message>
-        <source>Preferred Automint zPIV Denomination</source>
-        <translation>Tamaño de billete zPIV preferido en la creación automática de dinero</translation>
+        <source>Preferred Automint zSAPP Denomination</source>
+        <translation>Tamaño de billete zSAPP preferido en la creación automática de dinero</translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
@@ -2718,8 +2718,8 @@ Dirección: %4
         <translation>Ruta personalizada de la copia de seguridad:</translation>
     </message>
     <message>
-        <source>Custom zPIV Backup Path:</source>
-        <translation>Ruta personalizada de la copia de seguridad zPIV:</translation>
+        <source>Custom zSAPP Backup Path:</source>
+        <translation>Ruta personalizada de la copia de seguridad zSAPP:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -2940,8 +2940,8 @@ Dirección: %4
         <translation>Sin dirección </translation>
     </message>
     <message>
-        <source>Scan the QR code or copy the address to receive PIV</source>
-        <translation>Escanee el código QR o copie la dirección para recibir PIV</translation>
+        <source>Scan the QR code or copy the address to receive SAPP</source>
+        <translation>Escanee el código QR o copie la dirección para recibir SAPP</translation>
     </message>
     <message>
         <source>Add Label</source>
@@ -3070,8 +3070,8 @@ Dirección: %4
         <translation>Cantidad</translation>
     </message>
     <message>
-        <source>PIV</source>
-        <translation>PIV</translation>
+        <source>SAPP</source>
+        <translation>SAPP</translation>
     </message>
     <message>
         <source>Instead of sharing only a Sapphire address, you can create a payment request, bundling up more information</source>
@@ -3196,8 +3196,8 @@ Dirección: %4
         <translation>Recomendada</translation>
     </message>
     <message>
-        <source>PIV/kilobyte</source>
-        <translation>PIV/kilobyte</translation>
+        <source>SAPP/kilobyte</source>
+        <translation>SAPP/kilobyte</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -3839,8 +3839,8 @@ Ha habido un error al tratar de guardar la libreta de direcciones en %1. Por fav
         <translation>1) ¿Qué es Sapphire?</translation>
     </message>
     <message>
-        <source>2) Why are my PIV unspendable?</source>
-        <translation>2) ¿Por qué mis PIV no se pueden gastar?</translation>
+        <source>2) Why are my SAPP unspendable?</source>
+        <translation>2) ¿Por qué mis SAPP no se pueden gastar?</translation>
     </message>
     <message>
         <source>https://sappcoin.com/</source>
@@ -3861,7 +3861,7 @@ Ha habido un error al tratar de guardar la libreta de direcciones en %1. Por fav
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  Sapphire incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zPIV) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of Sapphire to participate in earning block rewards
@@ -3871,7 +3871,7 @@ Ha habido un error al tratar de guardar la libreta de direcciones en %1. Por fav
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-Sapphire es una forma de dinero digital en línea que utiliza la tecnología blockchain que se puede transferir a nivel global, de forma instantánea  y con comisiones casi nulas. Sapphire incorpora un sistema de seguridad y privacidad líder en el mercado y es también la primera criptomoneda PoS (Proof of Stake) que implementa el sistema de Stake de ZeroCoin(zPIV) y Zerocoin.
+Sapphire es una forma de dinero digital en línea que utiliza la tecnología blockchain que se puede transferir a nivel global, de forma instantánea  y con comisiones casi nulas. Sapphire incorpora un sistema de seguridad y privacidad líder en el mercado y es también la primera criptomoneda PoS (Proof of Stake) que implementa el sistema de Stake de ZeroCoin(zSAPP) y Zerocoin.
 &lt;/p&gt;&lt;p align="justify"&gt;
 Sapphire utiliza un algoritmo de consenso de Prueba de Stake (PoS), que permite a todos los propietarios de Sapphire participar en la obtención de recompensas de los nuevos bloques generados mientras aseguran la red con wallet de nodo completo , así como también ejecutan Masternodos para crear y votar las propuestas.
 . &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
@@ -3881,8 +3881,8 @@ Sapphire utiliza un algoritmo de consenso de Prueba de Stake (PoS), que permite 
         <translation>2</translation>
     </message>
     <message>
-        <source>Why are my PIV unspendable?</source>
-        <translation>¿Por qué mi PIV no se pueden gastar?</translation>
+        <source>Why are my SAPP unspendable?</source>
+        <translation>¿Por qué mi SAPP no se pueden gastar?</translation>
     </message>
     <message>
         <source>
@@ -3906,8 +3906,8 @@ Tu cartera Sapphire también necesita estar completamente sincronizada para que 
         <translation>3</translation>
     </message>
     <message>
-        <source>How do I stake PIV?</source>
-        <translation>¿Cómo apuesto PIV?</translation>
+        <source>How do I stake SAPP?</source>
+        <translation>¿Cómo apuesto SAPP?</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"&gt;&lt;li align="justify" style=" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Make sure your wallet is completely synchronized and you are using the latest release. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You must have a balance of Sapphire with a minimum of 600 confirmations. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Your wallet must stay online and be unlocked for staking purposes. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Once all those steps are followed staking should be enabled. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You can see the status of staking in the wallet by mousing over the package icon in the row on the top left of the wallet interface. There package will be lit up and will state &amp;quot;Staking Enabled&amp;quot; to indicate it is staking. Using the command line interface (sapphire-cli); the command &lt;span style=" font-style:italic;"&gt;getstakingstatus&lt;/span&gt; will confirm that staking is active. &lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</source>
@@ -3938,14 +3938,14 @@ Tu cartera Sapphire también necesita estar completamente sincronizada para que 
         <translation>¿Qué es un Controlador de Masternode?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 10,000 PIV collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Una wallet del controlador Masternode es donde la garantía de 10,000 PIV puede almacenarse durante la configuración de un masternode controlador-remoto. Esta es una wallet que puede activar la wallet (s) del masternode remoto y te permite mantener tus monedas colaterales fuera de línea mientras el masternode remoto permanece en línea. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Una wallet del controlador Masternode es donde la garantía de 200.000 SAPP puede almacenarse durante la configuración de un masternode controlador-remoto. Esta es una wallet que puede activar la wallet (s) del masternode remoto y te permite mantener tus monedas colaterales fuera de línea mientras el masternode remoto permanece en línea. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            A masternode is a computer running a full node Sapphire core wallet with a
-                           requirement of 10,000 PIV secured collateral to provide extra services
+                           requirement of 200,000 SAPP secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3977,7 +3977,7 @@ Tu cartera Sapphire también necesita estar completamente sincronizada para que 
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;10,000 PIV per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;200,000 SAPP per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -3987,7 +3987,7 @@ Tu cartera Sapphire también necesita estar completamente sincronizada para que 
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
 Un Masternode es un ordenador que ejecuta una Core Wallet de Sapphire de nodo
-completo con un requisito de 10.000 PIV de garantía asegurados para prestar servicios
+completo con un requisito de 200.000 SAPP de garantía asegurados para prestar servicios
 adicionales a la red y a cambio, recibir una parte de la recompensa del bloque
 regularmente. Estos servicios incluyen:
 &lt;/p&gt;&lt;p align="justify"&gt;
@@ -4018,7 +4018,7 @@ Ventajas de los Masternodes:
 Requisitos:
 &lt;/p&gt;
 &lt;p align="justify"&gt;&lt;ul&gt;
-&lt;li&gt;10.000 PIV por cada instancia de Masternode&lt;/li&gt;
+&lt;li&gt;200.000 SAPP por cada instancia de Masternode&lt;/li&gt;
 &lt;li&gt;Debe guardarse en una wallet principal&lt;/li&gt;
 &lt;li&gt;Necesita una dirección IP dedicada&lt;/li&gt;
 &lt;li&gt;La wallet Masternode permanecerá en línea&lt;/li&gt;
@@ -4030,8 +4030,8 @@ Requisitos:
         <translation>Preguntas Frecuentes</translation>
     </message>
     <message>
-        <source>3) How do I stake PIV?</source>
-        <translation>3) ¿Cómo apuesto PIV?</translation>
+        <source>3) How do I stake SAPP?</source>
+        <translation>3) ¿Cómo apuesto SAPP?</translation>
     </message>
     <message>
         <source>4) Where I should go if I need support?</source>
@@ -5889,8 +5889,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Máscara de red inválida especificada en -whitelist: '%s'</translation>
     </message>
     <message>
-        <source>Recalculating PIV supply...</source>
-        <translation>Recalculando suministro PIV...</translation>
+        <source>Recalculating SAPP supply...</source>
+        <translation>Recalculando suministro SAPP...</translation>
     </message>
     <message>
         <source>Reindexing zerocoin database...</source>
@@ -6193,8 +6193,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Las tarifas (en %s/Kb) inferiores a esto se consideran tarifa cero para la creación de transacciones (predeterminado: %s)</translation>
     </message>
     <message>
-        <source>Minimum positive amount (in PIV) allowed by GUI and RPC for the stake split threshold (default: %s)</source>
-        <translation>Cantidad mínima positiva (en PIV) permitida por GUI y RPC para el umbral de división de participación (predeterminado: %s)</translation>
+        <source>Minimum positive amount (in SAPP) allowed by GUI and RPC for the stake split threshold (default: %s)</source>
+        <translation>Cantidad mínima positiva (en SAPP) permitida por GUI y RPC para el umbral de división de participación (predeterminado: %s)</translation>
     </message>
     <message>
         <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
@@ -6493,8 +6493,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Sincronizando con la red... </translation>
     </message>
     <message>
-        <source>Syncing zPIV wallet...</source>
-        <translation>Sincronizando la wallet zPIV...</translation>
+        <source>Syncing zSAPP wallet...</source>
+        <translation>Sincronizando la wallet zSAPP...</translation>
     </message>
     <message>
         <source>The threshold value cannot be less than %s</source>
@@ -6613,8 +6613,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Nombre de usuario para conexiones JSON-RPC</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zPIV</source>
-        <translation>El valor está por debajo de la denominación más pequeña disponible (= 1) de zPIV</translation>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
+        <translation>El valor está por debajo de la denominación más pequeña disponible (= 1) de zSAPP</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6700,8 +6700,8 @@ Ejecute 'sapling-fetch-params' o './util/fetch-params.sh' y luego reinicie.</tra
         <translation>Enviar</translation>
     </message>
     <message>
-        <source>Send public coins (PIV)</source>
-        <translation>Enviar monedas públicas (PIV)</translation>
+        <source>Send public coins (SAPP)</source>
+        <translation>Enviar monedas públicas (SAPP)</translation>
     </message>
     <message>
         <source>Sapphire address or contact label</source>
