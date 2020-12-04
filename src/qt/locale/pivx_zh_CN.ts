@@ -95,11 +95,11 @@
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>选择发送PIVX coin的地址</translation>
+        <translation>选择发送Sapphire coin的地址</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>选择接收PIVX coin的地址</translation>
+        <translation>选择接收Sapphire coin的地址</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
@@ -114,12 +114,12 @@
         <translation>接收地址</translation>
     </message>
     <message>
-        <source>These are your PIVX addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>这是用于发送PIVX的地址。在发送PIVX之前，请认真核查发送金额和接收地址。</translation>
+        <source>These are your Sapphire addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>这是用于发送Sapphire的地址。在发送Sapphire之前，请认真核查发送金额和接收地址。</translation>
     </message>
     <message>
-        <source>These are your PIVX addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>这是用于接收PIVX的钱包地址。建议每一笔交易都使用一个新的钱包地址。</translation>
+        <source>These are your Sapphire addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>这是用于接收Sapphire的钱包地址。建议每一笔交易都使用一个新的钱包地址。</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -348,8 +348,8 @@ for staking</source>
         <translation>删除</translation>
     </message>
     <message>
-        <source>PIVX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>PIVX将关闭以完成加密过程。但是，仅仅加密您的钱包是不够的，因为它并不能阻止恶意软件从您的电脑里面偷取PIVs。</translation>
+        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
+        <translation>Sapphire将关闭以完成加密过程。但是，仅仅加密您的钱包是不够的，因为它并不能阻止恶意软件从您的电脑里面偷取PIVs。</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -1041,8 +1041,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>编辑发送地址</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid PIVX address.</source>
-        <translation>所输入的地址“%1”不是有效的PIVX地址。</translation>
+        <source>The entered address "%1" is not a valid Sapphire address.</source>
+        <translation>所输入的地址“%1”不是有效的Sapphire地址。</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1094,16 +1094,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>版本</translation>
     </message>
     <message>
-        <source>PIVX Core</source>
-        <translation>PIVX Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-位)</translation>
     </message>
     <message>
-        <source>About PIVX Core</source>
-        <translation>关于PIVX Core</translation>
+        <source>About Sapphire Core</source>
+        <translation>关于Sapphire Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1157,16 +1157,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>欢迎</translation>
     </message>
     <message>
-        <source>Welcome to PIVX Core.</source>
-        <translation>欢迎使用 PIVX Core</translation>
+        <source>Welcome to Sapphire Core.</source>
+        <translation>欢迎使用 Sapphire Core</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where PIVX Core will store its data.</source>
-        <translation>由于这是该程序第一次启动，您可以选择存储PIVX Core 数据的位置。</translation>
+        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
+        <translation>由于这是该程序第一次启动，您可以选择存储Sapphire Core 数据的位置。</translation>
     </message>
     <message>
-        <source>PIVX Core will download and store a copy of the PIVX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>PIVX Core将下载并存储PIVX区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
+        <source>Sapphire Core will download and store a copy of the Sapphire block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Sapphire Core将下载并存储Sapphire区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1185,8 +1185,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>好的</translation>
     </message>
     <message>
-        <source>PIVX Core</source>
-        <translation>PIVX Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1285,8 +1285,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>创建新的主节点控制器</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a PIVX Masternode you must dedicate 10,000 PIV (the unit of PIVX) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;要去创建一个PIVX主节点，你必须奉献10,000 PIV（PIVX的单位）到网络（但是这些币还是属于你的，一直为你所有）。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;你可以在任何时候关闭该节点并解锁币。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 10,000 PIV (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;要去创建一个Sapphire主节点，你必须奉献10,000 PIV（Sapphire的单位）到网络（但是这些币还是属于你的，一直为你所有）。&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;你可以在任何时候关闭该节点并解锁币。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1488,7 +1488,7 @@ Please wait few more minutes (masternode collaterals require %1 confirmations).<
 on a remote server to your clipboard.
 
 
-You will only have to paste the data in the pivx.conf file
+You will only have to paste the data in the sapphire.conf file
 of your remote server and start it, then start the Masternode using
 this controller wallet (select the Masternode in the list and press "start").
 </source>
@@ -1496,7 +1496,7 @@ this controller wallet (select the Masternode in the list and press "start").
 到剪贴板的远程服务器上。
 
 
-您只需将数据粘贴到pivx.conf文件中
+您只需将数据粘贴到sapphire.conf文件中
 ，然后使用主节点启动它
 这个控制器钱包(在列表中选择主节点并按“开始”)。
 </translation>
@@ -1636,8 +1636,8 @@ Are you sure?</source>
         <translation>解析的数据太大</translation>
     </message>
     <message>
-        <source>Invalid URI, not starting with "pivx" prefix</source>
-        <translation>无效的URI，不是以“ pivx”前缀开头</translation>
+        <source>Invalid URI, not starting with "sapphire" prefix</source>
+        <translation>无效的URI，不是以“ sapphire”前缀开头</translation>
     </message>
 </context>
 <context>
@@ -1682,8 +1682,8 @@ Are you sure?</source>
         <translation>如果您要禁用未经确认发送，在至少有一个确认之前&lt;br/&gt;不能更改。&lt;br/&gt;这也将影响您的余额计算。</translation>
     </message>
     <message>
-        <source>Automatically open the PIVX client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自动打开路由器上的PIVX钱包使用的端口。 这只有当您的路由器支持UPnP并且该享生效时才有用。</translation>
+        <source>Automatically open the Sapphire client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>自动打开路由器上的Sapphire钱包使用的端口。 这只有当您的路由器支持UPnP并且该享生效时才有用。</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1702,12 +1702,12 @@ Are you sure?</source>
         <translation>专家</translation>
     </message>
     <message>
-        <source>Automatically start PIVX after logging in to the system.</source>
-        <translation>登录系统后自动启动PIVX。</translation>
+        <source>Automatically start Sapphire after logging in to the system.</source>
+        <translation>登录系统后自动启动Sapphire。</translation>
     </message>
     <message>
-        <source>&amp;Start PIVX on system login</source>
-        <translation>&amp;开机启动PIVX</translation>
+        <source>&amp;Start Sapphire on system login</source>
+        <translation>&amp;开机启动Sapphire</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1734,8 +1734,8 @@ Are you sure?</source>
         <translation>&amp;网络</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting PIVX.</source>
-        <translation>可以在这里设置用户界面语言。此设置将在重新启动PIVX后生效。</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Sapphire.</source>
+        <translation>可以在这里设置用户界面语言。此设置将在重新启动Sapphire后生效。</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -1784,8 +1784,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>股权分割阈值:</translation>
     </message>
     <message>
-        <source>Connect to the PIVX network through a SOCKS5 proxy.</source>
-        <translation>通过SOCKS5代理连接到PIVX网络。</translation>
+        <source>Connect to the Sapphire network through a SOCKS5 proxy.</source>
+        <translation>通过SOCKS5代理连接到Sapphire网络。</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1841,7 +1841,7 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>选择显示发送PIVX的默认单位。</translation>
+        <translation>选择显示发送Sapphire的默认单位。</translation>
     </message>
     <message>
         <source>Decimal digits</source>
@@ -1931,8 +1931,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
 <context>
     <name>PIVXGUI</name>
     <message>
-        <source>PIVX Core</source>
-        <translation>PIVX Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -1959,8 +1959,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>关闭应用</translation>
     </message>
     <message>
-        <source>PIVX Core client</source>
-        <translation>PIVX Core 客户端</translation>
+        <source>Sapphire Core client</source>
+        <translation>Sapphire Core 客户端</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2026,12 +2026,12 @@ Address: %4
         <translation>无效支付地址%1</translation>
     </message>
     <message>
-        <source>Cannot start pivx: click-to-pay handler</source>
-        <translation>无法启动pivx:点击支付处理程序</translation>
+        <source>Cannot start Sapphire: click-to-pay handler</source>
+        <translation>无法启动Sapphire:点击支付处理程序</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid PIVX address or malformed URI parameters.</source>
-        <translation>URI不能被解析!这可能是由无效的PIVX地址或格式错误的URI参数造成的。</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Sapphire address or malformed URI parameters.</source>
+        <translation>URI不能被解析!这可能是由无效的Sapphire地址或格式错误的URI参数造成的。</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2116,8 +2116,8 @@ Address: %4
         <translation>金额</translation>
     </message>
     <message>
-        <source>Enter PIVX address (e.g. %1)</source>
-        <translation>输入PIVX a地址(e.g. %1)</translation>
+        <source>Enter Sapphire address (e.g. %1)</source>
+        <translation>输入Sapphire a地址(e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2160,12 +2160,12 @@ Address: %4
         <translation>%1 毫秒</translation>
     </message>
     <message>
-        <source>A fatal error occurred. PIVX can no longer continue safely and will quit.</source>
-        <translation>发生了一个致命的错误。PIVX不能继续安全，将退出。</translation>
+        <source>A fatal error occurred. Sapphire can no longer continue safely and will quit.</source>
+        <translation>发生了一个致命的错误。Sapphire不能继续安全，将退出。</translation>
     </message>
     <message>
-        <source>PIVX Core</source>
-        <translation>PIVX Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2184,8 +2184,8 @@ Address: %4
         <translation>读取主节点配置文件出错:%1</translation>
     </message>
     <message>
-        <source>PIVX Core didn't yet exit safely...</source>
-        <translation>PIVX核心尚未安全退出……</translation>
+        <source>Sapphire Core didn't yet exit safely...</source>
+        <translation>Sapphire核心尚未安全退出……</translation>
     </message>
     <message>
         <source>Contact</source>
@@ -2367,8 +2367,8 @@ Address: %4
         <translation>区块链</translation>
     </message>
     <message>
-        <source>Open the PIVX debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>从当前数据目录打开PIVX调试日志文件。对于大型日志文件，这可能需要几秒钟。</translation>
+        <source>Open the Sapphire debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>从当前数据目录打开Sapphire调试日志文件。对于大型日志文件，这可能需要几秒钟。</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -2591,8 +2591,8 @@ Address: %4
         <translation>出：</translation>
     </message>
     <message>
-        <source>Welcome to the PIVX RPC console.</source>
-        <translation>欢迎访问PIVX RPC控制台</translation>
+        <source>Welcome to the Sapphire RPC console.</source>
+        <translation>欢迎访问Sapphire RPC控制台</translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
@@ -2918,8 +2918,8 @@ Address: %4
         <translation>自定义更改地址</translation>
     </message>
     <message>
-        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" PIVX address</source>
-        <translation>输入值减去输出值所得的值的其余部分归为“更改”PIVX地址</translation>
+        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Sapphire address</source>
+        <translation>输入值减去输出值所得的值的其余部分归为“更改”Sapphire地址</translation>
     </message>
     <message>
         <source>SAVE</source>
@@ -3209,8 +3209,8 @@ These coins will no longer be cold-staked.</source>
         <translation>解密钥匙</translation>
     </message>
     <message>
-        <source>PIVX address</source>
-        <translation>PIVX地址</translation>
+        <source>Sapphire address</source>
+        <translation>Sapphire地址</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -3334,8 +3334,8 @@ Verify that you have installed a predetermined text editor.</source>
 确认您已经安装了预定的文本编辑器</translation>
     </message>
     <message>
-        <source>Welcome to the PIVX RPC console.</source>
-        <translation>欢迎访问PIVX RPC控制台</translation>
+        <source>Welcome to the Sapphire RPC console.</source>
+        <translation>欢迎访问Sapphire RPC控制台</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
@@ -3444,12 +3444,12 @@ Verify that you have installed a predetermined text editor.</source>
         <translation>导出地址列表</translation>
     </message>
     <message>
-        <source>PIVX_tx_csv_export(*.csv)</source>
-        <translation>PIVX_tx_csv_export(*.csv)</translation>
+        <source>Sapphire_tx_csv_export(*.csv)</source>
+        <translation>Sapphire_tx_csv_export(*.csv)</translation>
     </message>
     <message>
-        <source>PIVX_addresses_csv_export(*.csv)</source>
-        <translation>PIVX_addresses_csv_export(*.csv)</translation>
+        <source>Sapphire_addresses_csv_export(*.csv)</source>
+        <translation>Sapphire_addresses_csv_export(*.csv)</translation>
     </message>
     <message>
         <source>Please select a folder to export the csv file first.</source>
@@ -3519,8 +3519,8 @@ There was an error trying to save the address list to %1. Please try again.</sou
         <translation>来自</translation>
     </message>
     <message>
-        <source>1) What is PIVX?</source>
-        <translation>1）什么是PIVX?</translation>
+        <source>1) What is Sapphire?</source>
+        <translation>1）什么是Sapphire?</translation>
     </message>
     <message>
         <source>2) Why are my PIV unspendable?</source>
@@ -3531,34 +3531,34 @@ There was an error trying to save the address list to %1. Please try again.</sou
         <translation>1</translation>
     </message>
     <message>
-        <source>What is PIVX?</source>
-        <translation>PIVX是什么?</translation>
+        <source>What is Sapphire?</source>
+        <translation>Sapphire是什么?</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           PIVX is a form of digital online money using blockchain technology
+                           Sapphire is a form of digital online money using blockchain technology
                            that can be easily transferred globally, instantly, and with near
-                           zero fees.  PIVX incorporates market leading security &amp;
+                           zero fees.  Sapphire incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
                            to implement ZeroCoin(zPIV) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           PIVX utilizes a Proof of Stake (PoS) consensus system algorithm,
-                           allowing all owners of PIVX to participate in earning block rewards
+                           Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
+                           allowing all owners of Sapphire to participate in earning block rewards
                            while securing the network with full node wallets, as well as to
                            run Masternodes to create and vote on proposals.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-PIVX是一种使用区块链技术的数字在线货币
+Sapphire是一种使用区块链技术的数字在线货币
 全球范围内快捷交易，即时，基本为
-零的交易费用。PIVX是市场上领先的安全和
+零的交易费用。Sapphire是市场上领先的安全和
 隐私加密货币，也是第一个PoS(股权证明)加密货币
 实现零币(zPIV)和零币加注。
 &lt;/p&gt;&lt;p align="justify"&gt;
-PIVX使用了一个股权证明(PoS)一致系统算法，
-允许所有PIVX的所有者参与赚取区块奖励
+Sapphire使用了一个股权证明(PoS)一致系统算法，
+允许所有Sapphire的所有者参与赚取区块奖励
 同时保护网络与完整的节点钱包，以及
 运行主节点创建和投票来进行提案。</translation>
     </message>
@@ -3573,19 +3573,19 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Newly received PIVX requires 6 confirmations on the network
+                           Newly received Sapphire requires 6 confirmations on the network
                            to become eligible for spending which can take ~6 minutes.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Your PIVX wallet also needs to be completely synchronized
+                           Your Sapphire wallet also needs to be completely synchronized
                            to see and spend balances on the network.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-接收到的PIVX需要网络上的6个确认
+接收到的Sapphire需要网络上的6个确认
 才能成为有资格的花费，可以花~6分钟。
 &lt;/p&gt;&lt;p align="justify"&gt;
-您的PIVX钱包也需要完全同步
+您的Sapphire钱包也需要完全同步
 查看网络收支余额。
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </translation>
@@ -3625,7 +3625,7 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           A masternode is a computer running a full node PIVX core wallet with a
+                           A masternode is a computer running a full node Sapphire core wallet with a
                            requirement of 10,000 PIV secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
@@ -3648,10 +3648,10 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
                            Masternode Perks:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;Participate in PIVX Governance&lt;/li&gt;
+                           &lt;li&gt;Participate in Sapphire Governance&lt;/li&gt;
                            &lt;li&gt;Earn Masternode Rewards&lt;/li&gt;
                            &lt;li&gt;Commodity option for future sale&lt;/li&gt;
-                           &lt;li&gt;Help secure the PIVX network&lt;/li&gt;
+                           &lt;li&gt;Help secure the Sapphire network&lt;/li&gt;
                            &lt;/ul&gt;
                            &lt;/p&gt;&lt;p align="justify"&gt;
 
@@ -3667,7 +3667,7 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-主节点是运行完整节点PIVX核心钱包的计算机
+主节点是运行完整节点Sapphire核心钱包的计算机
 需要10,000个PIV作抵押以提供额外服务
 到网络，会收到一部分的区块奖励作为定期
 回报
@@ -3690,10 +3690,10 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
 主节点福利：
 &lt;/p&gt;&lt;p align="justify"&gt;
 &lt;ul&gt;
-&lt;li&gt;参与PIVX治理&lt;/li&gt;
+&lt;li&gt;参与Sapphire治理&lt;/li&gt;
 &lt;li&gt;赢取主节点奖励&lt;/li&gt;
 &lt;li&gt;商品期货期权&lt;/li&gt;
-&lt;li&gt;帮助保护PIVX网络&lt;/li&gt;
+&lt;li&gt;帮助保护Sapphire网络&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/p&gt;&lt;p align="justify"&gt;
 
@@ -3821,8 +3821,8 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
         <translation>无法打开备份文件夹</translation>
     </message>
     <message>
-        <source>Unable to open pivx.conf with default application</source>
-        <translation>无法使用默认应用程序打开pivx.conf</translation>
+        <source>Unable to open sapphire.conf with default application</source>
+        <translation>无法使用默认应用程序打开sapphire.conf</translation>
     </message>
     <message>
         <source>In:</source>
@@ -3872,8 +3872,8 @@ PIVX使用了一个股权证明(PoS)一致系统算法，
         <translation>脚本&amp;验证线程数</translation>
     </message>
     <message>
-        <source>Start PIVX on system login</source>
-        <translation>开机启动PIVX</translation>
+        <source>Start Sapphire on system login</source>
+        <translation>开机启动Sapphire</translation>
     </message>
     <message>
         <source>Minimize to the tray instead of the taskbar</source>
@@ -3960,8 +3960,8 @@ Are you sure?
         <translation>查看列表</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other PIVX addresses after it matures.</source>
-        <translation>成熟以后，多重花费允许您自动发送高达 100% 的股权或主节点奖励到其他PIVX地址列表</translation>
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Sapphire addresses after it matures.</source>
+        <translation>成熟以后，多重花费允许您自动发送高达 100% 的股权或主节点奖励到其他Sapphire地址列表</translation>
     </message>
     <message>
         <source>Active</source>
@@ -4079,8 +4079,8 @@ Check one or both of the check boxes to send on stake and/or masternode rewards<
         <translation>消息 </translation>
     </message>
     <message>
-        <source>PIVX address or contact label</source>
-        <translation>PIVX 地址或者联系人标签</translation>
+        <source>Sapphire address or contact label</source>
+        <translation>Sapphire 地址或者联系人标签</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -4356,8 +4356,8 @@ Check one or both of the check boxes to send on stake and/or masternode rewards<
         <translation>常见问题</translation>
     </message>
     <message>
-        <source>About PIVX</source>
-        <translation>关于PIVX </translation>
+        <source>About Sapphire</source>
+        <translation>关于Sapphire </translation>
     </message>
     <message>
         <source>Settings</source>
@@ -4423,8 +4423,8 @@ Are you sure?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>PIVX Core is shutting down...</source>
-        <translation>PIVX 核心正在关闭...</translation>
+        <source>Sapphire Core is shutting down...</source>
+        <translation>Sapphire 核心正在关闭...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4453,8 +4453,8 @@ Are you sure?
         <translation>正在下载…</translation>
     </message>
     <message>
-        <source>PIVX Core</source>
-        <translation>PIVX Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
 </context>
 <context>
@@ -4897,25 +4897,25 @@ backup will be created.
     </message>
     <message>
         <source>Welcome to
-PIVX Core Wallet</source>
+		Sapphire Core Wallet</source>
         <translation>欢迎
-PIVX核心钱包</translation>
+		Sapphire核心钱包</translation>
     </message>
     <message>
-        <source>PIVX is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
-        <translation>PIVX是世界上最先进的隐私保护技术，由经验丰富的开发人员和密码专家开发。</translation>
+        <source>Sapphire is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
+        <translation>Sapphire是世界上最先进的隐私保护技术，由经验丰富的开发人员和密码专家开发。</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - PIVX believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;正如我们的宣言所说:隐私是一项不容协商的基本人权;它赋予用户随时随地与任何人共享数据的自由——PIVX相信自我主权&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Sapphire believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;正如我们的宣言所说:隐私是一项不容协商的基本人权;它赋予用户随时随地与任何人共享数据的自由——Sapphire相信自我主权&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>The masternode network is PIVX's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
-        <translation>主节点网络是PIVX在区块链之上的第二层网络，它使我们的DAO能够提供去中心的治理。</translation>
+        <source>The masternode network is Sapphire's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
+        <translation>主节点网络是Sapphire在区块链之上的第二层网络，它使我们的DAO能够提供去中心的治理。</translation>
     </message>
     <message>
-        <source>How PIVX respects your privacy?</source>
-        <translation>PIVX 到底是怎么尊重你的隐私的？</translation>
+        <source>How Sapphire respects your privacy?</source>
+        <translation>Sapphire 到底是怎么尊重你的隐私的？</translation>
     </message>
     <message>
         <source>What is a Masternode?</source>
@@ -4949,8 +4949,8 @@ PIVX核心钱包</translation>
         <translation>绑定到给定地址监听JSON-RPC连接。使用[主机]: IPv6的端口符号。可以多次指定此选项(默认:绑定到所有接口)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. PIVX Core is probably already running.</source>
-        <translation>无法获取数据目录%s锁。PIVX核心可能已经在运行了。</translation>
+        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
+        <translation>无法获取数据目录%s锁。Sapphire核心可能已经在运行了。</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -5113,8 +5113,8 @@ PIVX核心钱包</translation>
         <translation>网络版本字符串的总长度(%i)超过最大长度(%i)。减少任务的数量或大小。</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. PIVX Core is probably already running.</source>
-        <translation>无法绑定到此计算机上的%s。PIVX核心可能已经在运行了。</translation>
+        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
+        <translation>无法绑定到此计算机上的%s。Sapphire核心可能已经在运行了。</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5129,8 +5129,8 @@ PIVX核心钱包</translation>
         <translation>警告:-支付tx费用设置的非常高!这是您发送交易时要支付的交易费。</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong PIVX Core will not work properly.</source>
-        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，PIVX Core将无法正常工作。</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，Sapphire Core将无法正常工作。</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5205,8 +5205,8 @@ PIVX核心钱包</translation>
         <translation>版权所有(C) 2014-%i的达世核心开发者</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The PIVX Core Developers</source>
-        <translation>版权所有(C) 2015-%i PIVX核心开发者</translation>
+        <source>Copyright (C) 2015-%i The Sapphire Core Developers</source>
+        <translation>版权所有(C) 2015-%i Sapphire核心开发者</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5345,8 +5345,8 @@ PIVX核心钱包</translation>
         <translation>信息</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. PIVX Core is shutting down.</source>
-        <translation>初始化完整性检查失败。PIVX核心快要关闭了。</translation>
+        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
+        <translation>初始化完整性检查失败。Sapphire核心快要关闭了。</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5401,8 +5401,8 @@ PIVX核心钱包</translation>
         <translation>这是一个预发行测试版本 - 您自己承担风险 - 不要用于商业应用！</translation>
     </message>
     <message>
-        <source>Disable all PIVX specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>禁用所有PIVX特定功能(主节点, 零币, SwiftX, budget)(0-1，默认值:%u)</translation>
+        <source>Disable all Sapphire specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>禁用所有Sapphire特定功能(主节点, 零币, SwiftX, budget)(0-1，默认值:%u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -5645,8 +5645,8 @@ PIVX核心钱包</translation>
         <translation>准备重新同步……</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong PIVX Core will not work properly.</source>
-        <translation>请检查您的电脑的日期和时间是否正确!如果你的时间错误，PIVX Core将无法正常工作。</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <translation>请检查您的电脑的日期和时间是否正确!如果你的时间错误，Sapphire Core将无法正常工作。</translation>
     </message>
     <message>
         <source>Specify location of debug log file: this can be an absolute path or a path relative to the data directory (default: %s)</source>
@@ -5949,8 +5949,8 @@ PIVX核心钱包</translation>
         <translation>钱包%s驻留在数据目录%s之外</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart PIVX Core to complete</source>
-        <translation>钱包需要重写:重新启动PIVX核心完成</translation>
+        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
+        <translation>钱包需要重写:重新启动Sapphire核心完成</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6016,8 +6016,8 @@ PIVX核心钱包</translation>
         <translation>发送</translation>
     </message>
     <message>
-        <source>PIVX address or contact label</source>
-        <translation>PIVX 地址或者联系人标签</translation>
+        <source>Sapphire address or contact label</source>
+        <translation>Sapphire 地址或者联系人标签</translation>
     </message>
     <message>
         <source>Amount</source>
