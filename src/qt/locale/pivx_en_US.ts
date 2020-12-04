@@ -364,8 +364,8 @@ for staking</translation>
         <translation>CANCEL</translation>
     </message>
     <message>
-        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</translation>
+        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</source>
+        <translation>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -1015,8 +1015,8 @@ address</translation>
         <translation>Filter by</translation>
     </message>
     <message>
-        <source>Amount of PIV and zPIV staked.</source>
-        <translation>Amount of PIV and zPIV staked.</translation>
+        <source>Amount of PIV and zSAPP staked.</source>
+        <translation>Amount of PIV and zSAPP staked.</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1900,36 +1900,36 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Map port using &amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of PIV units to zPIV</source>
-        <translation>Enable automatic minting of PIV units to zPIV</translation>
+        <source>Enable automatic minting of PIV units to zSAPP</source>
+        <translation>Enable automatic minting of PIV units to zSAPP</translation>
     </message>
     <message>
-        <source>Enable zPIV Automint</source>
-        <translation>Enable zPIV Automint</translation>
+        <source>Enable zSAPP Automint</source>
+        <translation>Enable zSAPP Automint</translation>
     </message>
     <message>
-        <source>Enable automatic zPIV minting from specific addresses</source>
-        <translation>Enable automatic zPIV minting from specific addresses</translation>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
+        <translation>Enable automatic zSAPP minting from specific addresses</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Enable Automint Addresses</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
-        <translation>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</translation>
+        <source>Percentage of incoming PIV which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
+        <translation>Percentage of incoming PIV which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
-        <translation>Percentage of autominted zPIV</translation>
+        <source>Percentage of autominted zSAPP</source>
+        <translation>Percentage of autominted zSAPP</translation>
     </message>
     <message>
         <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
         <translation>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</translation>
     </message>
     <message>
-        <source>Preferred Automint zPIV Denomination</source>
-        <translation>Preferred Automint zPIV Denomination</translation>
+        <source>Preferred Automint zSAPP Denomination</source>
+        <translation>Preferred Automint zSAPP Denomination</translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
@@ -2723,8 +2723,8 @@ Address: %4
         <translation>Custom Backup Path:</translation>
     </message>
     <message>
-        <source>Custom zPIV Backup Path:</source>
-        <translation>Custom zPIV Backup Path:</translation>
+        <source>Custom zSAPP Backup Path:</source>
+        <translation>Custom zSAPP Backup Path:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -3867,7 +3867,7 @@ There was an error trying to save the address list to %1. Please try again.</tra
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  Sapphire incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zPIV) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of Sapphire to participate in earning block rewards
@@ -3881,7 +3881,7 @@ There was an error trying to save the address list to %1. Please try again.</tra
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  Sapphire incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zPIV) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of Sapphire to participate in earning block rewards
@@ -6590,8 +6590,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Synchronizing sporks...</translation>
     </message>
     <message>
-        <source>Syncing zPIV wallet...</source>
-        <translation>Syncing zPIV wallet...</translation>
+        <source>Syncing zSAPP wallet...</source>
+        <translation>Syncing zSAPP wallet...</translation>
     </message>
     <message>
         <source>The threshold value cannot be less than %s</source>
@@ -6714,8 +6714,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Username for JSON-RPC connections</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zPIV</source>
-        <translation>Value is below the smallest available denomination (= 1) of zPIV</translation>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
+        <translation>Value is below the smallest available denomination (= 1) of zSAPP</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6801,8 +6801,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Send</translation>
     </message>
     <message>
-        <source>Send public coins (PIV)</source>
-        <translation>Send public coins (PIV)</translation>
+        <source>Send public coins (SAPP)</source>
+        <translation>Send public coins (SAPP)</translation>
     </message>
     <message>
         <source>Sapphire address or contact label</source>
