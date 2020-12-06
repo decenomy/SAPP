@@ -5,9 +5,9 @@ if BUILD_BITCOIND
 endif
 
 if ENABLE_QT
-  dist_man1_MANS+=pivx-qt.1
+  dist_man1_MANS+=sapphire-qt.1
 endif
 
 if BUILD_BITCOIN_UTILS
-  dist_man1_MANS+=pivx-cli.1 pivx-tx.1
+  dist_man1_MANS+=sapphire-cli.1 sapphire-tx.1
 endif

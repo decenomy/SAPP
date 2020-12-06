@@ -384,7 +384,7 @@ rm -rf %{buildroot}
 %attr(0644,root,root) %{_datadir}/pixmaps/*.svg
 %attr(0644,root,root) %{_datadir}/pixmaps/*.png
 %attr(0644,root,root) %{_datadir}/pixmaps/*.xpm
-%attr(0644,root,root) %{_mandir}/man1/pivx-qt.1*
+%attr(0644,root,root) %{_mandir}/man1/sapphire-qt.1*
 %endif
 
 %files libs
@@ -423,7 +423,7 @@ rm -rf %{buildroot}
 %attr(0755,root,root) %{_bindir}/pivx-cli
 %attr(0755,root,root) %{_bindir}/pivx-tx
 %attr(0755,root,root) %{_bindir}/bench_pivx
-%attr(0644,root,root) %{_mandir}/man1/pivx-cli.1*
+%attr(0644,root,root) %{_mandir}/man1/sapphire-cli.1*
 
 
 
