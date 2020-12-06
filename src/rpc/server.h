@@ -128,7 +128,7 @@ public:
 };
 
 /**
- * PIVX RPC command dispatcher.
+ * Sapphire RPC command dispatcher.
  */
 class CRPCTable
 {

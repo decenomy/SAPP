@@ -983,7 +983,7 @@ DBErrors CWalletDB::ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx)
 void ThreadFlushWalletDB()
 {
     // Make this thread recognisable as the wallet flushing thread
-    util::ThreadRename("pivx-wallet");
+    util::ThreadRename("sapphire-wallet");
 
     static bool fOneThread;
     if (fOneThread)

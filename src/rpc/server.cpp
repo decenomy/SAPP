@@ -359,32 +359,32 @@ static const CRPCCommand vRPCCommands[] =
         { "hidden",             "waitforblock",           &waitforblock,           true },
         { "hidden",             "waitforblockheight",     &waitforblockheight,     true },
 
-        /* PIVX features */
-        {"pivx", "listmasternodes", &listmasternodes, true },
-        {"pivx", "getmasternodecount", &getmasternodecount, true },
-        {"pivx", "createmasternodebroadcast", &createmasternodebroadcast, true },
-        {"pivx", "decodemasternodebroadcast", &decodemasternodebroadcast, true },
-        {"pivx", "relaymasternodebroadcast", &relaymasternodebroadcast, true },
-        {"pivx", "masternodecurrent", &masternodecurrent, true },
-        {"pivx", "startmasternode", &startmasternode, true },
-        {"pivx", "createmasternodekey", &createmasternodekey, true },
-        {"pivx", "getmasternodeoutputs", &getmasternodeoutputs, true },
-        {"pivx", "listmasternodeconf", &listmasternodeconf, true },
-        {"pivx", "getmasternodestatus", &getmasternodestatus, true },
-        {"pivx", "getmasternodewinners", &getmasternodewinners, true },
-        {"pivx", "getmasternodescores", &getmasternodescores, true },
-        {"pivx", "preparebudget", &preparebudget, true },
-        {"pivx", "submitbudget", &submitbudget, true },
-        {"pivx", "mnbudgetvote", &mnbudgetvote, true },
-        {"pivx", "getbudgetvotes", &getbudgetvotes, true },
-        {"pivx", "getnextsuperblock", &getnextsuperblock, true },
-        {"pivx", "getbudgetprojection", &getbudgetprojection, true },
-        {"pivx", "getbudgetinfo", &getbudgetinfo, true },
-        {"pivx", "mnbudgetrawvote", &mnbudgetrawvote, true },
-        {"pivx", "mnfinalbudget", &mnfinalbudget, true },
-        {"pivx", "checkbudgets", &checkbudgets, true },
-        {"pivx", "mnsync", &mnsync, true },
-        {"pivx", "spork", &spork, true },
+        /* Sapphire features */
+        {"sapphire", "listmasternodes", &listmasternodes, true },
+        {"sapphire", "getmasternodecount", &getmasternodecount, true },
+        {"sapphire", "createmasternodebroadcast", &createmasternodebroadcast, true },
+        {"sapphire", "decodemasternodebroadcast", &decodemasternodebroadcast, true },
+        {"sapphire", "relaymasternodebroadcast", &relaymasternodebroadcast, true },
+        {"sapphire", "masternodecurrent", &masternodecurrent, true },
+        {"sapphire", "startmasternode", &startmasternode, true },
+        {"sapphire", "createmasternodekey", &createmasternodekey, true },
+        {"sapphire", "getmasternodeoutputs", &getmasternodeoutputs, true },
+        {"sapphire", "listmasternodeconf", &listmasternodeconf, true },
+        {"sapphire", "getmasternodestatus", &getmasternodestatus, true },
+        {"sapphire", "getmasternodewinners", &getmasternodewinners, true },
+        {"sapphire", "getmasternodescores", &getmasternodescores, true },
+        {"sapphire", "preparebudget", &preparebudget, true },
+        {"sapphire", "submitbudget", &submitbudget, true },
+        {"sapphire", "mnbudgetvote", &mnbudgetvote, true },
+        {"sapphire", "getbudgetvotes", &getbudgetvotes, true },
+        {"sapphire", "getnextsuperblock", &getnextsuperblock, true },
+        {"sapphire", "getbudgetprojection", &getbudgetprojection, true },
+        {"sapphire", "getbudgetinfo", &getbudgetinfo, true },
+        {"sapphire", "mnbudgetrawvote", &mnbudgetrawvote, true },
+        {"sapphire", "mnfinalbudget", &mnfinalbudget, true },
+        {"sapphire", "checkbudgets", &checkbudgets, true },
+        {"sapphire", "mnsync", &mnsync, true },
+        {"sapphire", "spork", &spork, true },
 
 #ifdef ENABLE_WALLET
         /* Wallet */
@@ -597,7 +597,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(std::string methodname, std::string args)
 {
-    return "> pivx-cli " + methodname + " " + args + "\n";
+    return "> sapphire-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(std::string methodname, std::string args)

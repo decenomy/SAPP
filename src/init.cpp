@@ -214,7 +214,7 @@ void PrepareShutdown()
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
     /// module was initialized.
-    util::ThreadRename("pivx-shutoff");
+    util::ThreadRename("sapphire-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopHTTPRPC();
     StopREST();
@@ -644,7 +644,7 @@ struct CImportingNow {
 
 void ThreadImport(std::vector<fs::path> vImportFiles)
 {
-    util::ThreadRename("pivx-loadblk");
+    util::ThreadRename("sapphire-loadblk");
 
     // -reindex
     if (fReindex) {
@@ -702,7 +702,7 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
 }
 
 /** Sanity checks
- *  Ensure that PIVX is running in a usable environment with all
+ *  Ensure that Sapphire is running in a usable environment with all
  *  necessary library support.
  */
 bool InitSanityCheck(void)
@@ -965,7 +965,7 @@ void InitLogging()
     LogPrintf("Sapphire version %s (%s)\n", version_string, CLIENT_DATE);
 }
 
-/** Initialize pivx.
+/** Initialize sapphire.
  *  @pre Parameters should be parsed and config file should be read.
  */
 bool AppInit2()
@@ -1125,7 +1125,7 @@ bool AppInit2()
 
     std::string strDataDir = GetDataDir().string();
 
-    // Make sure only a single PIVX process is using the data directory.
+    // Make sure only a single Sapphire process is using the data directory.
     fs::path pathLockFile = GetDataDir() / ".lock";
     FILE* file = fsbridge::fopen(pathLockFile, "a"); // empty lock file; created if it doesn't exist.
     if (file) fclose(file);

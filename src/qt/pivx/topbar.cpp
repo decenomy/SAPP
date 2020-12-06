@@ -550,7 +550,7 @@ void TopBar::loadWalletModel()
     connect(walletModel, &WalletModel::encryptionStatusChanged, this, &TopBar::refreshStatus);
     // Ask for passphrase if needed
     connect(walletModel, &WalletModel::requireUnlock, this, &TopBar::unlockWallet);
-    // update the display unit, to not use the default ("PIVX")
+    // update the display unit, to not use the default ("Sapphire")
     updateDisplayUnit();
 
     refreshStatus();

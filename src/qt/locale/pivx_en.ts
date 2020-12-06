@@ -5120,7 +5120,7 @@ There was an error trying to save the address list to %1. Please try again.</sou
     </message>
     <message>
         <location line="+4"/>
-        <source>Unable to open pivx.conf with default application</source>
+        <source>Unable to open sapphire.conf with default application</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

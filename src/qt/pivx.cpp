@@ -585,7 +585,7 @@ int main(int argc, char* argv[])
     if (!Intro::pickDataDirectory())
         return 0;
 
-    /// 6. Determine availability of data directory and parse pivx.conf
+    /// 6. Determine availability of data directory and parse sapphire.conf
     /// - Do not call GetDataDir(true) before this step finishes
     if (!fs::is_directory(GetDataDir(false))) {
         QMessageBox::critical(0, QObject::tr("Sapphire Core"),
@@ -642,7 +642,7 @@ int main(int argc, char* argv[])
         exit(0);
 
     // Start up the payment server early, too, so impatient users that click on
-    // pivx: links repeatedly have their payment requests routed to this process:
+    // sapphire: links repeatedly have their payment requests routed to this process:
     app.createPaymentServer();
 #endif
 
