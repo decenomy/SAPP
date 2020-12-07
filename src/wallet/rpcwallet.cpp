@@ -3689,8 +3689,6 @@ unsigned int sumMultiSend()
 
 UniValue multisend(const JSONRPCRequest& request)
 {
-    throw std::runtime_error("Multisend is disabled in this wallet version");
-    /* disable multisend
     CWalletDB walletdb(pwalletMain->strWalletFile);
     bool fFileBacked;
     //MultiSend Commands
@@ -3839,7 +3837,6 @@ UniValue multisend(const JSONRPCRequest& request)
         }
     }
     return printMultiSend();
-    */
 }
 
 UniValue getzerocoinbalance(const JSONRPCRequest& request)

@@ -76,8 +76,12 @@ SettingsWidget::SettingsWidget(PIVXGUI* parent) :
         ui->pushButtonTools5,
     };
 
-    /* disable multisend for now */
-    ui->pushButtonFile3->setVisible(false);
+    // /* disable multisend for now */
+    // ui->pushButtonFile3->setVisible(false);
+
+	// Enable multisend
+	ui->pushButtonFile3->setVisible(true);
+
 
     menus.insert(ui->pushButtonFile, ui->fileButtonsWidget);
     menus.insert(ui->pushButtonConfiguration, ui->configurationButtonsWidget);

@@ -4147,11 +4147,9 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
     }
 
     if (pwalletMain) {
-        /* disable multisend
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
         if (pwalletMain->isMultiSendEnabled())
             pwalletMain->MultiSend();
-        */
 
         // If turned on Auto Combine will scan wallet for dust to combine
         if (pwalletMain->fCombineDust)
