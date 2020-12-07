@@ -3948,9 +3948,6 @@ per vedere e spendere i saldi sulla rete.
                            We have support channels in most of our official chat groups, for example
                            &lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
                            #support in our Discord&lt;/a&gt;.
-                           If you prefer to submit a ticket, You can do so at
-                           &lt;a style='color: #b088ff' href='https://PIVX.freshdesk.com'&gt;
-                           our Freshdesk support site&lt;/a&gt;.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
@@ -3958,9 +3955,6 @@ per vedere e spendere i saldi sulla rete.
                            Abbiamo canali di supporto nella maggior parte dei nostri gruppi di chat ufficiali, ad esempio
                            &lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
                            #support nel nostro Discord&lt;/a&gt;.
-                           Se preferisci aprire un ticket, puoi farlo su
-                           &lt;a style='color: #b088ff' href='https://PIVX.FreshDesk.com'&gt;
-                           il nostro sito di supporto Freshdesk&lt;/a&gt;.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </translation>
     </message>
