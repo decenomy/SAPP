@@ -519,7 +519,7 @@
             <item>
              <widget class="QLabel" name="labelMessage">
               <property name="text">
-               <string>Amount of PIV and zPIV staked.</string>
+               <string>Amount of PIV and zSAPP staked.</string>
               </property>
              </widget>
             </item>
@@ -577,7 +577,7 @@
           <item>
            <widget class="QLabel" name="labelAmountZpiv">
             <property name="text">
-             <string notr="true">0 zPIV</string>
+             <string notr="true">0 zSAPP</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -736,7 +736,7 @@
                 <item>
                  <widget class="QLabel" name="labelZpiv">
                   <property name="text">
-                   <string notr="true">zPIV</string>
+                   <string notr="true">zSAPP</string>
                   </property>
                  </widget>
                 </item>

@@ -124,7 +124,7 @@ enum AvailableCoinsType {
     STAKEABLE_COINS = 6                             // UTXO's that are valid for staking
 };
 
-// Possible states for zPIV send
+// Possible states for zSAPP send
 enum ZerocoinSpendStatus {
     ZPIV_SPEND_OKAY = 0,                            // No error
     ZPIV_SPEND_ERROR = 1,                           // Unspecified class of errors, more details are (hopefully) in the returning text
@@ -737,7 +737,7 @@ public:
     CAmount GetImmatureZerocoinBalance() const;
     std::map<libzerocoin::CoinDenomination, CAmount> GetMyZerocoinDistribution() const;
 
-    // zPIV wallet
+    // zSAPP wallet
     std::unique_ptr<CzPIVTracker> zpivTracker{nullptr};
     void setZWallet(CzPIVWallet* zwallet);
     CzPIVWallet* getZWallet();

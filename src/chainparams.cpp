@@ -216,8 +216,8 @@ public:
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
-		//TODO: There is no STAKING_ADDRESS part in the old code. Keeping the PIVX value for now. Find a proper value and set it for SAPP!
-        base58Prefixes[STAKING_ADDRESS] = std::vector<unsigned char>(1, 63);     // starting with 'S'
+		//TODO: There is no STAKING_ADDRESS part in the old code. Keeping the SAPP value for now. Find a proper value and set it for SAPP!
+        base58Prefixes[STAKING_ADDRESS] = std::vector<unsigned char>(1, 28);     // starting with 'C'
         base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 25);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x3f)(0x17)(0x37)(0x37).convert_to_container<std::vector<unsigned char> >(); // starting with SAPP
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x3f)(0x17)(0x37)(0x3f).convert_to_container<std::vector<unsigned char> >(); // starting with SAPS

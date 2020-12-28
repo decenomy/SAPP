@@ -11,7 +11,7 @@
 
 class CScheduler;
 class CWallet;
-class CzPIVWallet;
+class CzSAPPWallet;
 
 namespace boost
 {
