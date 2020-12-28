@@ -86,8 +86,6 @@ void SelectBaseParams(CBaseChainParams::Network network)
 
 CBaseChainParams::Network NetworkIdFromCommandLine()
 {
-    // bool fRegTest = gArgs.GetBoolArg("-regtest", false);
-    // bool fTestNet = gArgs.GetBoolArg("-testnet", false);
     bool fRegTest = GetBoolArg("-regtest", false);
     bool fTestNet = GetBoolArg("-testnet", false);
 
