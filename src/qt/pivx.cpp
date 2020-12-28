@@ -149,7 +149,7 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, cons
     }
 }
 
-/** Class encapsulating PIVX Core startup and shutdown.
+/** Class encapsulating SAPP Core startup and shutdown.
  * Allows running startup and shutdown in a different thread from the UI thread.
  */
 class BitcoinCore : public QObject
@@ -176,7 +176,7 @@ private:
     void handleRunawayException(const std::exception* e);
 };
 
-/** Main PIVX application object */
+/** Main SAPP application object */
 class BitcoinApplication : public QApplication
 {
     Q_OBJECT
@@ -208,7 +208,7 @@ public:
     /// Get process return value
     int getReturnValue() { return returnValue; }
 
-    /// Get window identifier of QMainWindow (PIVXGUI)
+    /// Get window identifier of QMainWindow (SAPPGUI)
     WId getMainWinId() const;
 
 public Q_SLOTS:
@@ -494,7 +494,7 @@ void BitcoinApplication::initializeResult(int retval)
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
-        // PIVX: URIs or payment requests:
+        // SAPP: URIs or payment requests:
         //connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &PIVXGUI::handlePaymentRequest);
         connect(window, &PIVXGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
         connect(paymentServer, &PaymentServer::message, [this](const QString& title, const QString& message, unsigned int style) {

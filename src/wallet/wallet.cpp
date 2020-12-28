@@ -1524,7 +1524,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
                     ret++;
             }
 
-            // Will try to rescan it if zPIV upgrade is active.
+            // Will try to rescan it if zSAPP upgrade is active.
             doZPivRescan(pindex, block, setAddedToWallet, consensus, fCheckZPIV);
 
             pindex = chainActive.Next(pindex);
@@ -3905,7 +3905,7 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
     fVerifyingBlocks = false;
 
     if (!zwalletInstance->GetMasterSeed().IsNull()) {
-        //Inititalize zPIVWallet
+        //Inititalize zSAPPWallet
         uiInterface.InitMessage(_("Syncing zSAPP wallet..."));
 
         //Load zerocoin mint hashes to memory

@@ -152,7 +152,7 @@ bool ContextualCheckZerocoinSpend(const CTransaction& tx, const libzerocoin::Coi
 bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const libzerocoin::CoinSpend* spend, int nHeight, const uint256& hashBlock)
 {
     const Consensus::Params& consensus = Params().GetConsensus();
-    //Check to see if the zPIV is properly signed
+    //Check to see if the zSAPP is properly signed
     if (consensus.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_ZC_V2)) {
         try {
             if (!spend->HasValidSignature())
