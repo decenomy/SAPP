@@ -5197,6 +5197,12 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         if (pfrom->DisconnectOldProtocol(nVersion, ActiveProtocol(), strCommand))
             return false;
 
+        if (pfrom->nServices == NODE_NONE && sporkManager.IsSporkActive(SPORK_100_SERVICES_ENFORCEMENT)) {
+            LOCK(cs_main);
+            Misbehaving(pfrom->GetId(), 100);
+            return error("No services on version message");
+        }
+
         if (nVersion == 10300)
             nVersion = 300;
         if (!vRecv.empty())
@@ -5224,12 +5230,6 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         // Be shy and don't send version until we hear
         if (pfrom->fInbound)
             PushNodeVersion(pfrom, connman, GetAdjustedTime());
-
-        if (pfrom->nServices == NODE_NONE && sporkManager.IsSporkActive(SPORK_100_SERVICES_ENFORCEMENT)) {
-            LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), 100);
-            return error("No services on version message");
-        }
 
         connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::VERACK));
 
