@@ -459,15 +459,12 @@ CAmount CMasternode::GetBlockValue(int nHeight)
 }
 
 /**
- * Dummy masternode payment function
+ * Masternode payment function
  */
-
 CAmount CMasternode::GetMasternodePayment()
 {
-    return ((95/100) * CMasternode::GetBlockValue(chainActive.Height())); // 95% of the block reward
+    return (95 * CMasternode::GetBlockValue(chainActive.Height())) / 100; // 95% of the block reward
 }
-
-
 
 CMasternodeBroadcast::CMasternodeBroadcast() :
         CMasternode()
