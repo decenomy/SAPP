@@ -54,6 +54,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QTranslator>
+#include <QFontDatabase>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -552,6 +553,40 @@ int main(int argc, char* argv[])
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
     BitcoinApplication app(argc, argv);
+
+    // Add custom app font
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Black.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-BlackItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-BoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-ExtraBold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-ExtraBoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-ExtraLight.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-ExtraLightItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Italic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Light.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-LightItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Medium.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-MediumItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Regular.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-SemiBold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-SemiBoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-Thin.ttf");
+    QFontDatabase::addApplicationFont(":/font/Montserrat-ThinItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-Black.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-BlackItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-Bold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-BoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-ExtraBold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-ExtraBoldItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-ExtraLight.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-ExtraLightItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-Italic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-Light.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-LightItalic.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-Regular.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-SemiBold.ttf");
+    QFontDatabase::addApplicationFont(":/font/Nunito-SemiBoldItalic.ttf");
 
     // Register meta types used for QMetaObject::invokeMethod
     qRegisterMetaType<bool*>();
