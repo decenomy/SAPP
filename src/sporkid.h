@@ -26,6 +26,8 @@ enum SporkId : int32_t {
     SPORK_18_ZEROCOIN_PUBLICSPEND_V4            = 10018,
     SPORK_19_UPGRADE_CYCLE_FACTOR               = 10019,
 
+    SPORK_100_SERVICES_ENFORCEMENT              = 10100,
+
     SPORK_INVALID                               = -1
 };
 

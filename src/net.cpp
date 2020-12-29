@@ -470,7 +470,8 @@ bool CNode::DisconnectOldProtocol(int nVersionIn, int nVersionRequired, std::str
     fDisconnect = false;
     if (nVersionIn < nVersionRequired) {
         LogPrintf("%s : peer=%d using obsolete version %i; disconnecting\n", __func__, id, nVersionIn);
-        g_connman->PushMessage(this, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strLastCommand, REJECT_OBSOLETE, strprintf("Version must be %d or greater", ActiveProtocol())));
+        g_connman->PushMessage(this, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strLastCommand, REJECT_OBSOLETE, strprintf("Protocol version must be %d or greater", ActiveProtocol())));
+        g_connman->Ban(addr, BanReasonNodeMisbehaving, 300); // just to back off
         fDisconnect = true;
     }
 
