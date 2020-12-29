@@ -2,6 +2,10 @@
 HH       CONTAINER
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
+* {
+    font-family: Nunito;
+}
+
 *[cssClass="container"] {
     background-color:#FFFFFF;
 }
@@ -71,32 +75,31 @@ QPushButton[cssClass="img-nav-logo"] {
     qproperty-iconSize: 24px 40px;
     background-color:transparent;
     font-size:14px;
-    color: #ffffff;
+    color: #938da5;
 }
 
 *[cssClass="btn-nav-receive"]:checked {
-    background-color: #ffffff;
-    padding-top: 25px;
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #3c2559, stop: 1 #1f162b);
     font-size:14px;
-    color: #000000;
+    color: #B088FF;
 }
 
-*[cssClass="btn-nav-receive"]:checked:hover  {
-    background-color: #ffffff;
-    color: #000000;
+*[cssClass="btn-nav-receive"]:checked:hover {
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #3c2559, stop: 1 #1f162b);
+    color: #B088FF;
 }
 
 *[cssClass="btn-nav-receive"]:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #777777;
+    background-color: #1A000000;
+    color: #938da5;
 }
 
 *[cssClass="btn-nav-receive-active"] {
     qproperty-icon:url("://ic-nav-receive-active")  ;
     qproperty-iconSize: 24px 40px;
-    background-color: #ffffff;
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #3c2559, stop: 1 #1f162b);
     font-size:14px;
-    color: #000000;
+    color: #B088FF;
 }
 
 /*HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
@@ -359,27 +362,27 @@ HH       TOP BAR
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="container-top"] {
-    background-color:#FFFFFF;
+    background-color:#dfdfdf;
     border-image: url("://bg-dashboard-banner") 0 0 0 0 stretch stretch;
 }
 
 *[cssClass="container-topbar-no-image"] {
-    background-color:#FFFFFF;
+    background-color:#dfdfdf;
 }
 
 *[cssClass="text-title-topbar"] {
-    color:#a3a3a4;
+    color:#818181;
     font-size:16px;
     font-weight: ligther;
 }
 
 *[cssClass="amount-topbar"] {
-    color:#FFFFFF;
+    color:#474747;
     font-size:35px;
 }
 
 *[cssClass="amount-small-topbar"] {
-    color:#FFFFFF;
+    color:#474747;
     font-size:22px;
 }
 

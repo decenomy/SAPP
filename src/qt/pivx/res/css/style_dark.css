@@ -2,6 +2,10 @@
 HH       CONTAINER
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
+* {
+    font-family: Nunito;
+}
+
 *[cssClass="container"] {
     background-color:#0f0b16;
 }
@@ -57,12 +61,12 @@ HH       NAVIGATION
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="container-nav"] {
-    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #0f0b16, stop: 1 #4f3c74);
+    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #40444B, stop: 1 #000000);
 }
 
 QPushButton[cssClass="img-nav-logo"] {
     qproperty-icon: url("://img-nav-logo");
-    qproperty-iconSize: 49px 60px;
+    qproperty-iconSize: 96px 96px;
 }
 
 *[cssClass="btn-nav-receive"] {
@@ -399,27 +403,27 @@ HH       TOP BAR
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="container-top"] {
-    background-color:#000000;
+    background-color:#686868;
     border-image: url("://bg-dashboard-banner") 0 0 0 0 stretch stretch;
 }
 
 *[cssClass="container-topbar-no-image"] {
-    background-color:#000000;
+    background-color:#696969;
 }
 
 *[cssClass="text-title-topbar"] {
-    color:#a3a3a4;
+    color:#535353;
     font-size:16px;
     font-weight: ligther;
 }
 
 *[cssClass="amount-topbar"] {
-    color:#FFFFFF;
+    color:#3d3d3d;
     font-size:35px;
 }
 
 *[cssClass="amount-small-topbar"] {
-    color:#FFFFFF;
+    color:#3d3d3d;
     font-size:22px;
 }
 
