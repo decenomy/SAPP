@@ -505,7 +505,7 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
         if (masternodePayments.IsScheduled(mn, nBlockHeight)) continue;
 
         //it's too new, wait for a cycle
-		if (sporkManager.IsSporkActive(SPORK_19_UPGRADE_CYCLE_FACTOR))
+		if (sporkManager.IsSporkActive(SPORK_20_UPGRADE_CYCLE_FACTOR))
         {
             if (fFilterSigTime && mn.sigTime + (nMnCount * 1.0 * 60) > GetAdjustedTime()) continue;
         }
