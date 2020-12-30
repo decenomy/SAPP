@@ -2,6 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2019 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -119,7 +120,7 @@ bool AppInit(int argc, char* argv[])
 #ifndef WIN32
         fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon) {
-            fprintf(stdout, "PIVX server starting\n");
+            fprintf(stdout, "Sapphire server starting\n");
 
             // Daemonize
             pid_t pid = fork();

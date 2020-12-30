@@ -1,4 +1,5 @@
 // Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -223,7 +224,7 @@ void DashboardWidget::loadWalletModel()
         connect(walletModel->getOptionsModel(), &OptionsModel::hideChartsChanged, this, &DashboardWidget::onHideChartsChanged);
 #endif
     }
-    // update the display unit, to not use the default ("PIV")
+    // update the display unit, to not use the default ("SAPP")
     updateDisplayUnit();
 }
 
@@ -521,7 +522,7 @@ void DashboardWidget::updateStakeFilter()
     }
 }
 
-// pair PIV, zPIV
+// pair PIV, zSAPP
 const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
 {
     updateStakeFilter();
@@ -577,7 +578,7 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
     }
 
     chartData = new ChartData();
-    chartData->amountsByCache = getAmountBy(); // pair PIV, zPIV
+    chartData->amountsByCache = getAmountBy(); // pair PIV, zSAPP
 
     std::pair<int,int> range = getChartRange(chartData->amountsByCache);
     if (range.first == 0 && range.second == 0) {

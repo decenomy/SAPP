@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2017-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +12,7 @@
 
 class CScheduler;
 class CWallet;
-class CzPIVWallet;
+class CzSAPPWallet;
 
 namespace boost
 {
@@ -30,7 +31,7 @@ void InitLogging();
 void InitParameterInteraction();
 bool AppInit2();
 
-/** Initialize PIVX core: Basic context setup.
+/** Initialize Sapphire core: Basic context setup.
  *  @note This can be done before daemonization. Do not call Shutdown() if this function fails.
  *  @pre Parameters should be parsed and config file should be read.
  */

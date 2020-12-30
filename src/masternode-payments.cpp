@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -336,7 +337,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, const CBloc
     }
 
     if (hasPayment) {
-        CAmount masternodePayment = GetMasternodePayment();
+        CAmount masternodePayment = CMasternode::GetMasternodePayment();
         if (fProofOfStake) {
             /**For Proof Of Stake vout[0] must be null
              * Stake reward can be split into many different outputs, so we must
@@ -369,7 +370,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, const CBloc
             txNew.vout.resize(2);
             txNew.vout[1].scriptPubKey = payee;
             txNew.vout[1].nValue = masternodePayment;
-            txNew.vout[0].nValue = GetBlockValue(pindexPrev->nHeight) - masternodePayment;
+            txNew.vout[0].nValue = CMasternode::GetBlockValue(pindexPrev->nHeight) - masternodePayment;
         }
 
         CTxDestination address1;
@@ -551,7 +552,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     if (nMaxSignatures < MNPAYMENTS_SIGNATURES_REQUIRED) return true;
 
     std::string strPayeesPossible = "";
-    CAmount requiredMasternodePayment = GetMasternodePayment();
+    CAmount requiredMasternodePayment = CMasternode::GetMasternodePayment();
 
     for (CMasternodePayee& payee : vecPayments) {
         bool found = false;

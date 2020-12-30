@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -121,8 +122,8 @@ struct Params {
     int height_ZC_RecalcAccumulators;
 
     // validation by-pass
-    int64_t nPivxBadBlockTime;
-    unsigned int nPivxBadBlockBits;
+    // int64_t nPivxBadBlockTime;
+    // unsigned int nPivxBadBlockBits;
 
     // Map with network updates
     NetworkUpgrade vUpgrades[MAX_NETWORK_UPGRADES];

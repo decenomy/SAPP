@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.0
-Name=PIVX Core
-Comment=PIVX P2P Cryptocurrency
-Comment[fr]=PIVX, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=PIVX, eşten eşe kriptografik sanal para birimi
+Name=Sapphire Core
+Comment=Sapphire P2P Cryptocurrency
+Comment[fr]=Sapphire, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Sapphire, eşten eşe kriptografik sanal para birimi
 Exec=pivx-qt %u
 Terminal=false
 Type=Application

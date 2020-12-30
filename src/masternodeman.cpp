@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -504,7 +505,14 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
         if (masternodePayments.IsScheduled(mn, nBlockHeight)) continue;
 
         //it's too new, wait for a cycle
-        if (fFilterSigTime && mn.sigTime + (nMnCount * 2.6 * 60) > GetAdjustedTime()) continue;
+		if (sporkManager.IsSporkActive(SPORK_20_UPGRADE_CYCLE_FACTOR))
+        {
+            if (fFilterSigTime && mn.sigTime + (nMnCount * 1.0 * 60) > GetAdjustedTime()) continue;
+        }
+        else
+        {
+            if (fFilterSigTime && mn.sigTime + (nMnCount * 2.6 * 60) > GetAdjustedTime()) continue;
+        }
 
         //make sure it has as many confirmations as there are masternodes
         if (pcoinsTip->GetCoinDepthAtHeight(mn.vin.prevout, nBlockHeight) < nMnCount) continue;
@@ -831,7 +839,7 @@ void ThreadCheckMasternodes()
     if (fLiteMode) return; //disable all Masternode related functionality
 
     // Make this thread recognisable as the wallet flushing thread
-    util::ThreadRename("pivx-masternodeman");
+    util::ThreadRename("sapphire-masternodeman");
     LogPrintf("Masternodes thread started\n");
 
     unsigned int c = 0;

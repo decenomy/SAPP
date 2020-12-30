@@ -1,4 +1,5 @@
 // Copyright (c) 2017 Pieter Wuille
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 

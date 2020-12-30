@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -264,8 +265,12 @@ public:
 
     /// Is the input associated with collateral public key? (and there is 10000 PIV - checking if valid masternode)
     bool IsInputAssociatedWithPubkey() const;
-};
 
+	// Masternode collateral and reward schedules
+	static CAmount GetMasternodeCollateral(int nHeight);
+	static CAmount GetBlockValue(int nHeight);
+	static CAmount GetMasternodePayment();
+};
 
 //
 // The Masternode Broadcast Class : Contains a different serialize method for sending masternodes through the network
@@ -284,6 +289,8 @@ public:
     uint256 GetHash() const;
 
     void Relay();
+
+    std::string GetOldStrMessage() const;
 
     // special sign/verify
     bool Sign(const CKey& key, const CPubKey& pubKey);

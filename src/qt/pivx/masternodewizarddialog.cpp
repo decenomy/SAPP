@@ -1,4 +1,5 @@
 // Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -262,7 +263,7 @@ bool MasterNodeWizardDialog::createMN()
         int indexOut = -1;
         for (int i=0; i < (int)walletTx->vout.size(); i++) {
             CTxOut& out = walletTx->vout[i];
-            if (out.nValue == 10000 * COIN) {
+            if (out.nValue == CMasternode::GetMasternodeCollateral(chainActive.Height())) {
                 indexOut = i;
                 break;
             }

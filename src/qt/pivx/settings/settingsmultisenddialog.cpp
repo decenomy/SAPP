@@ -1,4 +1,6 @@
 // Copyright (c) 2019 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,7 +34,7 @@ SettingsMultisendDialog::SettingsMultisendDialog(QWidget *parent) :
     initCssEditLine(ui->lineEditLabel, true);
 
     // Address
-    ui->labelSubtitleAddress->setText("PIVX address or contact label");
+    ui->labelSubtitleAddress->setText("Sapphire address or contact label");
     setCssProperty(ui->labelSubtitleAddress, "text-title2-dialog");
     ui->lineEditAddress->setPlaceholderText("Enter address");
     initCssEditLine(ui->lineEditAddress, true);

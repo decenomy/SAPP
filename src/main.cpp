@@ -4,7 +4,8 @@
 // Copyright (c) 2011-2013 The PPCoin developers
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
-// Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2019-2020 The PIVX Developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -57,10 +58,10 @@
 #include <boost/foreach.hpp>
 #include <atomic>
 #include <queue>
-
+#include <set>
 
 #if defined(NDEBUG)
-#error "PIVX cannot be compiled without assertions."
+#error "SAPP cannot be compiled without assertions."
 #endif
 
 /**
@@ -98,6 +99,25 @@ bool fTxIndex = true;
 bool fCheckBlockIndex = false;
 bool fVerifyingBlocks = false;
 size_t nCoinCacheUsage = 5000 * 300;
+
+// banned addresses
+std::set<std::string> bannedAddresses = {
+    "Sd2xcwvvtRH8P8sLemSiPjadTfBd9myPbW", 
+    "STFSLXfG31Xr8Symk78aG6jCu391yp8kWD", 
+    "SbPoXEFrMJwes3mysfgGzP2mAtw1SmrC7H", 
+    "ScM5iV4aJEwMipWGHHcS8E1qLsarwk6DuK", 
+    "Sfv6SUgcSgmmpwp3UypfYgnK1x97rfC9Dj", 
+    "SY6UdUKC8yxci8vXgvQYMgeUNRDvymEhM3", 
+    "SdaX6DR3gdpakcFrKJfCDB6GJjC4J9XJ8M", 
+    "Sh412EAoGLvn1WnTUCZbHiUGCk2dzmdQoA", 
+    "ST74xpmzemL4ELiBpyDmirzgahujSUiYmM", 
+    "SaWmWbLSghhn8JAE8JQfdLQy9cvf1ADKUD", 
+    "Sic7sZBNkijna4zNLSVgTBkfr2ebP6c9wk", 
+    "Sh8N9R2Li5Wm5B7g3xxfEotp9Vpp38baJM", 
+    "SVAjKY5p9NPSNwG7PLK3VzeXUdJjm2W7CY",
+};
+
+int bannedAddressesStartHeight = 586593;
 
 /* If the tip is older than this (in seconds), the node is considered to be in initial block download. */
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
@@ -864,7 +884,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
 
     // Check transaction
     int chainHeight = chainActive.Height();
-    bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT);
+    bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_18_COLDSTAKING_ENFORCEMENT);
     if (!CheckTransaction(tx, consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC),
             true, state, isBlockBetweenFakeSerialAttackRange(chainHeight), fColdStakingActive))
         return error("%s : transaction checks for %s failed with %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
@@ -899,6 +919,27 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
         if (mapLockedInputs.count(in.prevout)) {
             if (mapLockedInputs[in.prevout] != tx.GetHash()) {
                 return state.DoS(0, false, REJECT_INVALID, "tx-lock-conflict");
+            }
+        }
+    }
+
+    // ----------- banned transaction scanning -----------
+    if (!bannedAddresses.empty())
+    {
+        for (unsigned int i = 0; i < tx.vin.size(); ++i)
+        {
+            uint256 hashBlock;
+            CTransaction txPrev;
+            if (GetTransaction(tx.vin[i].prevout.hash, txPrev, hashBlock, true))
+            { // get the vin's previous transaction
+                CTxDestination source;
+                if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source))
+                { // extract the destination of the previous transaction's vout[n]
+                    std::string addr = EncodeDestination(source);
+                    if (bannedAddresses.find(addr) != bannedAddresses.end()) {
+                        return error("%s : Banned address %s tried to send a transaction %s (rejecting it).", __func__, addr.c_str(), txPrev.GetHash().ToString().c_str());
+                    }
+                }
             }
         }
     }
@@ -961,9 +1002,9 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
                     return state.Invalid(false, REJECT_INVALID, "bad-txns-invalid-inputs");
             }
 
-            // Reject legacy zPIV mints
+            // Reject legacy zSAPP mints
             if (!Params().IsRegTestNet() && tx.HasZerocoinMintOutputs())
-                return state.Invalid(error("%s : tried to include zPIV mint output in tx %s",
+                return state.Invalid(error("%s : tried to include zSAPP mint output in tx %s",
                         __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-zc-spend-mint");
 
             // Bring the best block into scope
@@ -1496,61 +1537,6 @@ double ConvertBitsToDouble(unsigned int nBits)
     }
 
     return dDiff;
-}
-
-int64_t GetBlockValue(int nHeight)
-{
-    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight < 200 && nHeight > 0)
-            return 250000 * COIN;
-    }
-
-    if (Params().IsRegTestNet()) {
-        if (nHeight == 0)
-            return 250 * COIN;
-
-    }
-
-    const Consensus::Params& consensus = Params().GetConsensus();
-    const bool isPoSActive = consensus.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_POS);
-    int64_t nSubsidy = 0;
-    if (nHeight == 0) {
-        nSubsidy = 60001 * COIN;
-    } else if (nHeight < 86400 && nHeight > 0) {
-        nSubsidy = 250 * COIN;
-    } else if (nHeight < (Params().NetworkID() == CBaseChainParams::TESTNET ? 145000 : 151200) && nHeight >= 86400) {
-        nSubsidy = 225 * COIN;
-    } else if (nHeight >= 151200 && !isPoSActive) {
-        nSubsidy = 45 * COIN;
-    } else if (isPoSActive && nHeight <= 302399) {
-        nSubsidy = 45 * COIN;
-    } else if (nHeight <= 345599 && nHeight >= 302400) {
-        nSubsidy = 40.5 * COIN;
-    } else if (nHeight <= 388799 && nHeight >= 345600) {
-        nSubsidy = 36 * COIN;
-    } else if (nHeight <= 431999 && nHeight >= 388800) {
-        nSubsidy = 31.5 * COIN;
-    } else if (nHeight <= 475199 && nHeight >= 432000) {
-        nSubsidy = 27 * COIN;
-    } else if (nHeight <= 518399 && nHeight >= 475200) {
-        nSubsidy = 22.5 * COIN;
-    } else if (nHeight <= 561599 && nHeight >= 518400) {
-        nSubsidy = 18 * COIN;
-    } else if (nHeight <= 604799 && nHeight >= 561600) {
-        nSubsidy = 13.5 * COIN;
-    } else if (nHeight <= 647999 && nHeight >= 604800) {
-        nSubsidy = 9 * COIN;
-    } else if (!consensus.NetworkUpgradeActive(nHeight, Consensus::UPGRADE_ZC_V2)) {
-        nSubsidy = 4.5 * COIN;
-    } else {
-        nSubsidy = 5 * COIN;
-    }
-    return nSubsidy;
-}
-
-int64_t GetMasternodePayment()
-{
-    return 3 * COIN;
 }
 
 bool IsInitialBlockDownload()
@@ -2086,9 +2072,9 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         return DISCONNECT_FAILED;
     }
 
-    //Track zPIV money supply
+    //Track zSAPP money supply
     if (!UpdateZPIVSupplyDisconnect(block, pindex)) {
-        error("%s: Failed to calculate new zPIV supply", __func__);
+        error("%s: Failed to calculate new zSAPP supply", __func__);
         return DISCONNECT_FAILED;
     }
 
@@ -2184,7 +2170,7 @@ static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck()
 {
-    util::ThreadRename("pivx-scriptch");
+    util::ThreadRename("sapphire-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -2394,7 +2380,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
-    CAmount nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
+    CAmount nExpectedMint = CMasternode::GetBlockValue(pindex->pprev->nHeight + 1);
     if (block.IsProofOfWork())
         nExpectedMint += nFees;
 
@@ -2433,7 +2419,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         setDirtyBlockIndex.insert(pindex);
     }
 
-    //Record zPIV serials
+    //Record zSAPP serials
     if (pwalletMain) {
         std::set<uint256> setAddedTx;
         for (const std::pair<libzerocoin::CoinSpend, uint256>& pSpend : vSpends) {
@@ -2478,13 +2464,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // add this block to the view's block chain
     view.SetBestBlock(pindex->GetBlockHash());
 
-    // Update zPIV money supply map
+    // Update zSAPP money supply map
     if (!UpdateZPIVSupplyConnect(block, pindex, fJustCheck)) {
-        return state.DoS(100, error("%s: Failed to calculate new zPIV supply for block=%s height=%d", __func__,
+        return state.DoS(100, error("%s: Failed to calculate new zSAPP supply for block=%s height=%d", __func__,
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
     }
 
-    // A one-time event where the zPIV supply was off (due to serial duplication off-chain on main net)
+    // A one-time event where the zSAPP supply was off (due to serial duplication off-chain on main net)
     if (Params().NetworkID() == CBaseChainParams::MAIN && pindex->nHeight == consensus.height_last_ZC_WrappedSerials + 1
             && GetZerocoinSupply() != consensus.ZC_WrappedSerialsSupply + GetWrapppedSerialInflationAmount()) {
         RecalculatePIVSupply(consensus.vUpgrades[Consensus::UPGRADE_ZC].nActivationHeight, false);
@@ -3364,16 +3350,16 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
     if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
-    if (Params().IsRegTestNet()) return true;
+    // if (Params().IsRegTestNet()) return true;
 
-    // Version 4 header must be used after consensus.ZC_TimeStart. And never before.
-    if (block.GetBlockTime() > Params().GetConsensus().ZC_TimeStart) {
-        if(block.nVersion < 4)
-            return state.DoS(50,false, REJECT_INVALID, "block-version", "must be above 4 after ZC_TimeStart");
-    } else {
-        if (block.nVersion >= 4)
-            return state.DoS(50,false, REJECT_INVALID, "block-version", "must be below 4 before ZC_TimeStart");
-    }
+    // // Version 4 header must be used after consensus.ZC_TimeStart. And never before.
+    // if (block.GetBlockTime() > Params().GetConsensus().ZC_TimeStart) {
+    //     if(block.nVersion < 4)
+    //         return state.DoS(50,false, REJECT_INVALID, "block-version", "must be above 4 after ZC_TimeStart");
+    // } else {
+    //     if (block.nVersion >= 4)
+    //         return state.DoS(50,false, REJECT_INVALID, "block-version", "must be below 4 before ZC_TimeStart");
+    // }
 
     return true;
 }
@@ -3386,7 +3372,7 @@ bool CheckColdStakeFreeOutput(const CTransaction& tx, const int nHeight)
     const unsigned int outs = tx.vout.size();
     const CTxOut& lastOut = tx.vout[outs-1];
     if (outs >=3 && lastOut.scriptPubKey != tx.vout[outs-2].scriptPubKey) {
-        if (lastOut.nValue == GetMasternodePayment())
+        if (lastOut.nValue == CMasternode::GetMasternodePayment())
             return true;
 
         // This could be a budget block.
@@ -3400,7 +3386,7 @@ bool CheckColdStakeFreeOutput(const CTransaction& tx, const int nHeight)
             CTransaction txPrev; uint256 hashBlock;
             if (!GetTransaction(tx.vin[0].prevout.hash, txPrev, hashBlock, true))
                 return error("%s : read txPrev failed: %s",  __func__, tx.vin[0].prevout.hash.GetHex());
-            CAmount amtIn = txPrev.vout[tx.vin[0].prevout.n].nValue + GetBlockValue(nHeight - 1);
+            CAmount amtIn = txPrev.vout[tx.vin[0].prevout.n].nValue + CMasternode::GetBlockValue(nHeight - 1);
             CAmount amtOut = 0;
             for (unsigned int i = 1; i < outs-1; i++) amtOut += tx.vout[i].nValue;
             if (amtOut != amtIn)
@@ -3517,7 +3503,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                 nHeight = (*mi).second->nHeight + 1;
         }
 
-        // PIVX
+        // SAPP
         // It is entierly possible that we don't have enough data and this could fail
         // (i.e. the block could indeed be valid). Store the block for later consideration
         // but issue an initial reject message.
@@ -3531,7 +3517,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             }
 
             // set Cold Staking Spork
-            fColdStakingActive = sporkManager.IsSporkActive(SPORK_17_COLDSTAKING_ENFORCEMENT);
+            fColdStakingActive = sporkManager.IsSporkActive(SPORK_18_COLDSTAKING_ENFORCEMENT);
 
             // check masternode/budget payment
             if (!IsBlockPayeeValid(block, nHeight)) {
@@ -3559,7 +3545,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                                              strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
 
-        // double check that there are no double spent zPIV spends in this block
+        // double check that there are no double spent zSAPP spends in this block
         if (tx.HasZerocoinSpendInputs()) {
             for (const CTxIn& txIn : tx.vin) {
                 bool isPublicSpend = txIn.IsZerocoinPublicSpend();
@@ -3581,7 +3567,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                         spend = TxInToZerocoinSpend(txIn);
                     }
                     if (std::count(vBlockSerials.begin(), vBlockSerials.end(), spend.getCoinSerialNumber()))
-                        return state.DoS(100, error("%s : Double spending of zPIV serial %s in block\n Block: %s",
+                        return state.DoS(100, error("%s : Double spending of zSAPP serial %s in block\n Block: %s",
                                                     __func__, spend.getCoinSerialNumber().GetHex(), block.ToString()));
                     vBlockSerials.emplace_back(spend.getCoinSerialNumber());
                 }
@@ -3604,37 +3590,37 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     return true;
 }
 
-bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
-{
-    if (pindexPrev == NULL)
-        return error("%s : null pindexPrev for block %s", __func__, block.GetHash().GetHex());
+// bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
+// {
+//     if (pindexPrev == NULL)
+//         return error("%s : null pindexPrev for block %s", __func__, block.GetHash().GetHex());
 
-    unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block);
+//     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block);
 
-    if (!Params().IsRegTestNet() && block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= 68589)) {
-        double n1 = ConvertBitsToDouble(block.nBits);
-        double n2 = ConvertBitsToDouble(nBitsRequired);
+//     if (!Params().IsRegTestNet() && block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= 68589)) {
+//         double n1 = ConvertBitsToDouble(block.nBits);
+//         double n2 = ConvertBitsToDouble(nBitsRequired);
 
-        if (std::abs(n1 - n2) > n1 * 0.5)
-            return error("%s : incorrect proof of work (DGW pre-fork) - %f %f %f at %d", __func__, std::abs(n1 - n2), n1, n2, pindexPrev->nHeight + 1);
+//         if (std::abs(n1 - n2) > n1 * 0.5)
+//             return error("%s : incorrect proof of work (DGW pre-fork) - %f %f %f at %d", __func__, std::abs(n1 - n2), n1, n2, pindexPrev->nHeight + 1);
 
-        return true;
-    }
+//         return true;
+//     }
 
-    if (block.nBits != nBitsRequired) {
-        // Pivx Specific reference to the block with the wrong threshold was used.
-        const Consensus::Params& consensus = Params().GetConsensus();
-        if ((block.nTime == (uint32_t) consensus.nPivxBadBlockTime) &&
-                (block.nBits == (uint32_t) consensus.nPivxBadBlockBits)) {
-            // accept PIVX block minted with incorrect proof of work threshold
-            return true;
-        }
+//     if (block.nBits != nBitsRequired) {
+//         // Sapphire Specific reference to the block with the wrong threshold was used.
+//         const Consensus::Params& consensus = Params().GetConsensus();
+//         if ((block.nTime == (uint32_t) consensus.nPivxBadBlockTime) &&
+//                 (block.nBits == (uint32_t) consensus.nPivxBadBlockBits)) {
+//             // accept SAPP block minted with incorrect proof of work threshold
+//             return true;
+//         }
 
-        return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
-    }
+//         return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 bool CheckBlockTime(const CBlockHeader& block, CValidationState& state, CBlockIndex* const pindexPrev)
 {
@@ -3738,19 +3724,45 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     const int nHeight = pindexPrev == nullptr ? 0 : pindexPrev->nHeight + 1;
 
     // Check that all transactions are finalized
-    for (const CTransaction& tx : block.vtx)
+    for (const CTransaction& tx : block.vtx) {
         if (!IsFinalTx(tx, nHeight, block.GetBlockTime())) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
         }
+    }
 
-    // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
-    if (pindexPrev) { // pindexPrev is only null on the first block which is a version 1 block.
-        CScript expect = CScript() << nHeight;
-        if (block.vtx[0].vin[0].scriptSig.size() < expect.size() ||
-            !std::equal(expect.begin(), expect.end(), block.vtx[0].vin[0].scriptSig.begin())) {
-            return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+    // Check that all transactions are not banned
+    if (nHeight > bannedAddressesStartHeight && !bannedAddresses.empty())
+    {
+        for (const CTransaction &tx : block.vtx) {
+            if (!tx.IsCoinBase()) {
+                for (unsigned int i = 0; i < tx.vin.size(); ++i)
+                {
+                    uint256 hashBlock;
+                    CTransaction txPrev;
+                    if (GetTransaction(tx.vin[i].prevout.hash, txPrev, hashBlock, true))
+                    { // get the vin's previous transaction
+                        CTxDestination source;
+                        if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source))
+                        { // extract the destination of the previous transaction's vout[n]
+                            std::string addr = EncodeDestination(source);
+                            if (bannedAddresses.find(addr) != bannedAddresses.end()) {
+                                return state.DoS(100, error("%s : Banned address %s tried to send a transaction %s (rejecting it).", __func__, addr.c_str(), txPrev.GetHash().ToString().c_str()), REJECT_INVALID, "bad-txns-banned");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
+    // // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
+    // if (pindexPrev) { // pindexPrev is only null on the first block which is a version 1 block.
+    //     CScript expect = CScript() << nHeight;
+    //     if (block.vtx[0].vin[0].scriptSig.size() < expect.size() ||
+    //         !std::equal(expect.begin(), expect.end(), block.vtx[0].vin[0].scriptSig.begin())) {
+    //         return state.DoS(100, false, REJECT_INVALID, "bad-cb-height", false, "block height mismatch in coinbase");
+    //     }
+    // }
 
     return true;
 }
@@ -3846,8 +3858,8 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
         }
     }
 
-    if (block.GetHash() != consensus.hashGenesisBlock && !CheckWork(block, pindexPrev))
-        return false;
+    // if (block.GetHash() != consensus.hashGenesisBlock && !CheckWork(block, pindexPrev))
+    //     return false;
 
     bool isPoS = block.IsProofOfStake();
     if (isPoS) {
@@ -4003,7 +4015,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
             // Split height
             splitHeight = prev->nHeight;
 
-            // Now that this loop if completed. Check if we have zPIV inputs.
+            // Now that this loop if completed. Check if we have zSAPP inputs.
             if(hasZPIVInputs) {
                 for (const CTxIn& zPivInput : zPIVInputs) {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(zPivInput);
@@ -5251,6 +5263,12 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         if (pfrom->DisconnectOldProtocol(nVersion, ActiveProtocol(), strCommand))
             return false;
 
+        if (pfrom->nServices == NODE_NONE && sporkManager.IsSporkActive(SPORK_101_SERVICES_ENFORCEMENT)) {
+            LOCK(cs_main);
+            Misbehaving(pfrom->GetId(), 100);
+            return error("No services on version message");
+        }
+
         if (nVersion == 10300)
             nVersion = 300;
         if (!vRecv.empty())
@@ -5355,14 +5373,14 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             pfrom->fDisconnect = true;
         }
 
-        // PIVX: We use certain sporks during IBD, so check to see if they are
+        // SAPP: We use certain sporks during IBD, so check to see if they are
         // available. If not, ask the first peer connected for them.
         // TODO: Move this to an instant broadcast of the sporks.
         bool fMissingSporks = !pSporkDB->SporkExists(SPORK_14_NEW_PROTOCOL_ENFORCEMENT) ||
                               !pSporkDB->SporkExists(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2) ||
                               !pSporkDB->SporkExists(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) ||
-                              !pSporkDB->SporkExists(SPORK_17_COLDSTAKING_ENFORCEMENT) ||
-                              !pSporkDB->SporkExists(SPORK_18_ZEROCOIN_PUBLICSPEND_V4);
+                              !pSporkDB->SporkExists(SPORK_18_COLDSTAKING_ENFORCEMENT) ||
+                              !pSporkDB->SporkExists(SPORK_19_ZEROCOIN_PUBLICSPEND_V4);
 
         if (fMissingSporks || !fRequestedSporksIDB){
             LogPrintf("asking peer for sporks\n");

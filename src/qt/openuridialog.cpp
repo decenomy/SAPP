@@ -1,4 +1,5 @@
 // Copyright (c) 2019 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -17,7 +18,7 @@ OpenURIDialog::OpenURIDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
 {
     ui->setupUi(this);
     this->setStyleSheet(parent->styleSheet());
-    ui->uriEdit->setPlaceholderText("pivx:");
+    ui->uriEdit->setPlaceholderText("sapphire:");
 
     ui->labelSubtitle->setText("URI");
     setCssProperty(ui->labelSubtitle, "text-title2-dialog");
@@ -79,8 +80,8 @@ void OpenURIDialog::on_selectFileButton_clicked()
         }
 
         QString str = QString::fromStdString(std::string(r.constData(), r.length()));
-        if (!str.startsWith("pivx")) {
-            inform(tr("Invalid URI, not starting with \"pivx\" prefix"));
+        if (!str.startsWith("sapphire")) {
+            inform(tr("Invalid URI, not starting with \"sapphire\" prefix"));
         }
         ui->uriEdit->setText(str);
     }

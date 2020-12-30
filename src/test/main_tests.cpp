@@ -1,6 +1,7 @@
 // Copyright (c) 2014 The Bitcoin Core developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,6 +9,7 @@
 #include "main.h"
 #include "primitives/transaction.h"
 #include "script/sign.h"
+#include "masternode.h"
 #include "test_pivx.h"
 #include <boost/test/unit_test.hpp>
 
@@ -118,28 +120,28 @@ BOOST_AUTO_TEST_CASE(subsidy_limit_test)
     CAmount nSum = 0;
     for (int nHeight = 0; nHeight < 1; nHeight += 1) {
         /* premine in block 1 (60,001 PIV) */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = CMasternode::GetBlockValue(nHeight);
         BOOST_CHECK(nSubsidy <= 60001 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 1; nHeight < 86400; nHeight += 1) {
         /* PoW Phase One */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = CMasternode::GetBlockValue(nHeight);
         BOOST_CHECK(nSubsidy <= 250 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 86400; nHeight < 151200; nHeight += 1) {
         /* PoW Phase Two */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = CMasternode::GetBlockValue(nHeight);
         BOOST_CHECK(nSubsidy <= 225 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 151200; nHeight < 259200; nHeight += 1) {
         /* PoW Phase Two */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = CMasternode::GetBlockValue(nHeight);
         BOOST_CHECK(nSubsidy <= 45 * COIN);
         BOOST_CHECK(Params().GetConsensus().MoneyRange(nSubsidy));
         nSum += nSubsidy;

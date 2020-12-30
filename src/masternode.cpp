@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -307,11 +308,162 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
     uint256 hash;
     if(GetTransaction(vin.prevout.hash, txVin, hash, true)) {
         for (CTxOut out : txVin.vout) {
-            if (out.nValue == 10000 * COIN && out.scriptPubKey == payee) return true;
+            if (out.nValue == CMasternode::GetMasternodeCollateral(chainActive.Height()) && out.scriptPubKey == payee) return true;
         }
     }
 
     return false;
+}
+
+/**
+ * Masternode collateral change schedule
+ */
+
+CAmount CMasternode::GetMasternodeCollateral(int nHeight)
+{
+	if (nHeight <= 2000 && nHeight > 500) {
+		return 10 * COIN;
+	} else if (nHeight <= 20000 && nHeight > 2000) {
+		return 50 * COIN;
+	} else if (nHeight <= 30000 && nHeight > 20000) {
+		return 500 * COIN;
+	} else if (nHeight <= 40000 && nHeight > 30000) {
+		return 750 * COIN;
+	} else if (nHeight <= 50000 && nHeight > 40000) {
+		return 1000 * COIN;
+	} else if (nHeight <= 60000 && nHeight > 50000) {
+		return 1250 * COIN;
+	} else if (nHeight <= 100000 && nHeight > 60000) {
+		return 2500 * COIN;
+	} else if (nHeight <= 130000 && nHeight > 100000) {
+		return 5000 * COIN;
+	} else if (nHeight <= 150000 && nHeight > 130000) {
+		return 10000 * COIN;
+	} else if (nHeight <= 175000 && nHeight > 150000) {
+		return 20000 * COIN;
+	} else if (nHeight <= 200000 && nHeight > 175000) {
+		return 30000 * COIN;
+	} else if (nHeight <= 250000 && nHeight > 200000) {
+		return 40000 * COIN;
+	} else if (nHeight <= 400000 && nHeight > 250000) {
+		return 50000 * COIN;
+	} else if (nHeight <= 450000 && nHeight > 400000) {
+		return 75000 * COIN;
+	} else if (nHeight <= 500000 && nHeight > 450000) {
+		return 100000 * COIN;
+	} else if (nHeight <= 550000 && nHeight > 500000) {
+		return 125000 * COIN;
+	} else if (nHeight <= 600000 && nHeight > 550000) {
+		return 150000 * COIN;
+	} else if (nHeight <= 650000 && nHeight > 600000) {
+		return 175000 * COIN;
+	} else if (nHeight > 650000) {
+		return 200000 * COIN;
+	}
+}
+
+/**
+ * Masternode reward change schedule
+ */
+
+CAmount CMasternode::GetBlockValue(int nHeight)
+{
+    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
+        if (nHeight < 200 && nHeight > 0)
+            return 250000 * COIN;
+    }
+
+    if (Params().IsRegTestNet()) {
+        if (nHeight == 0)
+            return 250 * COIN;
+
+    }
+
+    //Create a fork to ensure all old wallets update
+    if (nHeight == 574010)
+    {
+        return 801 * COIN;
+    }
+
+    if (nHeight == 585330)
+    {
+        return 801 * COIN;
+    }
+
+    if (nHeight == 586594)
+    { // to be set at phase 2 compile
+        return 801 * COIN;
+    }
+
+    CAmount nSubsidy = 0;
+    if (nHeight == 1)
+        nSubsidy = 300000 * COIN;
+    else if (nHeight <= 500)
+        nSubsidy = 1 * COIN;
+    else if (nHeight <= 2000 && nHeight > 500)
+        nSubsidy = 1 * COIN;
+    else if (nHeight <= 20000 && nHeight > 2000)
+        nSubsidy = 2 * COIN;
+    else if (nHeight <= 30000 && nHeight > 20000)
+        nSubsidy = 10 * COIN;
+    else if (nHeight <= 40000 && nHeight > 30000)
+        nSubsidy = 15 * COIN;
+    else if (nHeight <= 50000 && nHeight > 40000)
+        nSubsidy = 20 * COIN;
+    else if (nHeight <= 60000 && nHeight > 50000)
+        nSubsidy = 25 * COIN;
+    else if (nHeight <= 100000 && nHeight > 60000)
+        nSubsidy = 50 * COIN;
+    else if (nHeight <= 130000 && nHeight > 100000)
+        nSubsidy = 100 * COIN;
+    else if (nHeight <= 150000 && nHeight > 130000)
+        nSubsidy = 150 * COIN;
+    else if (nHeight <= 175000 && nHeight > 150000)
+        nSubsidy = 250 * COIN;
+    else if (nHeight <= 200000 && nHeight > 175000)
+        nSubsidy = 400 * COIN;
+    else if (nHeight <= 250000 && nHeight > 200000)
+        nSubsidy = 500 * COIN;
+    else if (nHeight <= 300000 && nHeight > 250000)
+        nSubsidy = 450 * COIN;
+    else if (nHeight <= 400000 && nHeight > 300000)
+        nSubsidy = 400 * COIN;
+    else if (nHeight <= 450000 && nHeight > 400000)
+        nSubsidy = 500 * COIN;
+    else if (nHeight <= 500000 && nHeight > 450000)
+        nSubsidy = 600 * COIN;
+    else if (nHeight <= 550000 && nHeight > 500000)
+        nSubsidy = 700 * COIN;
+    else if (nHeight <= 600000 && nHeight > 550000)
+        nSubsidy = 800 * COIN;
+    else if (nHeight <= 650000 && nHeight > 600000)
+        nSubsidy = 900 * COIN;
+    else if (nHeight <= 700000 && nHeight > 650000)
+        nSubsidy = 1000 * COIN;
+    else if (nHeight <= 750000 && nHeight > 700000)
+        nSubsidy = 900 * COIN;
+    else if (nHeight <= 800000 && nHeight > 750000)
+        nSubsidy = 800 * COIN;
+    else if (nHeight <= 850000 && nHeight > 800000)
+        nSubsidy = 700 * COIN;
+    else if (nHeight <= 900000 && nHeight > 850000)
+        nSubsidy = 600 * COIN;
+    else if (nHeight <= 950000 && nHeight > 900000)
+        nSubsidy = 500 * COIN;
+    else if (nHeight <= 1000000 && nHeight > 950000)
+        nSubsidy = 450 * COIN;
+    else
+        nSubsidy = 400 * COIN;
+
+    return nSubsidy;
+}
+
+/**
+ * Masternode payment function
+ */
+CAmount CMasternode::GetMasternodePayment()
+{
+    return (95 * CMasternode::GetBlockValue(chainActive.Height())) / 100; // 95% of the block reward
 }
 
 CMasternodeBroadcast::CMasternodeBroadcast() :
@@ -441,17 +593,30 @@ bool CMasternodeBroadcast::Sign(const std::string strSignKey)
     return Sign(key, pubkey);
 }
 
+std::string CMasternodeBroadcast::GetOldStrMessage() const
+{
+    std::string strMessage;
+
+    std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
+    std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
+    strMessage = addr.ToString() + std::to_string(sigTime) + vchPubKey + vchPubKey2 + std::to_string(protocolVersion);
+
+    return strMessage;
+}
+
 bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
-    std::string strMessage = (
+    const std::string strMessage = (
                             nMessVersion == MessageVersion::MESS_VER_HASH ?
                             GetSignatureHash().GetHex() :
                             GetStrMessage()
                             );
 
-    if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError))
+    if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError) &&
+       !CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetOldStrMessage(), strError)) {
         return error("%s : VerifyMessage (nMessVersion=%d) failed: %s", __func__, nMessVersion, strError);
+	}
 
     return true;
 }
@@ -514,15 +679,17 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     std::string strError = "";
     if (!CheckSignature())
     {
-        // don't ban for old masternodes, their sigs could be broken because of the bug
+        // masternodes older than this proto version use old strMessage format for mnannounce
         nDos = protocolVersion < MIN_PEER_MNANNOUNCE ? 0 : 100;
         return error("%s : Got bad Masternode address signature", __func__);
     }
 
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        if (addr.GetPort() != 51472) return false;
-    } else if (addr.GetPort() == 51472)
-        return false;
+    if(addr.GetPort() != Params().GetDefaultPort()) {
+		return error(
+			"%s : Invalid port %u for masternode %s, only %d is supported on %s-net.", 
+			__func__, addr.GetPort(), addr.ToString(), Params().GetDefaultPort(),
+			Params().NetworkIDString());
+	}
 
     //search existing Masternode list, this is where we update existing Masternodes with new mnb broadcasts
     CMasternode* pmn = mnodeman.Find(vin);
@@ -616,13 +783,13 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
     }
 
     // verify that sig time is legit in past
-    // should be at least not earlier than block when 1000 PIV tx got MASTERNODE_MIN_CONFIRMATIONS
+    // should be at least not earlier than block when 1000 SAPP tx got MASTERNODE_MIN_CONFIRMATIONS
     uint256 hashBlock = UINT256_ZERO;
     CTransaction tx2;
     GetTransaction(vin.prevout.hash, tx2, hashBlock, true);
     BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
     if (mi != mapBlockIndex.end() && (*mi).second) {
-        CBlockIndex* pMNIndex = (*mi).second;                                                        // block for 1000 PIVX tx -> 1 confirmation
+        CBlockIndex* pMNIndex = (*mi).second;                                                        // block for 1000 SAPP tx -> 1 confirmation
         CBlockIndex* pConfIndex = chainActive[pMNIndex->nHeight + MASTERNODE_MIN_CONFIRMATIONS - 1]; // block where tx got MASTERNODE_MIN_CONFIRMATIONS
         if (pConfIndex->GetBlockTime() > sigTime) {
             LogPrint(BCLog::MASTERNODE,"mnb - Bad sigTime %d for Masternode %s (%i conf block is at %d)\n",

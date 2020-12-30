@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2016 The Dash developers
 // Copyright (c) 2016-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,8 +22,11 @@ enum SporkId : int32_t {
     SPORK_14_NEW_PROTOCOL_ENFORCEMENT           = 10013,
     SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2         = 10014,
     SPORK_16_ZEROCOIN_MAINTENANCE_MODE          = 10015,
-    SPORK_17_COLDSTAKING_ENFORCEMENT            = 10017,
-    SPORK_18_ZEROCOIN_PUBLICSPEND_V4            = 10018,
+    SPORK_18_COLDSTAKING_ENFORCEMENT            = 10017,
+    SPORK_19_ZEROCOIN_PUBLICSPEND_V4            = 10018,
+    SPORK_20_UPGRADE_CYCLE_FACTOR               = 10019,
+
+    SPORK_101_SERVICES_ENFORCEMENT              = 10100,
 
     SPORK_INVALID                               = -1
 };

@@ -1,4 +1,5 @@
 // Copyright (c) 2019-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -126,8 +127,8 @@ MasterNodesWidget::MasterNodesWidget(PIVXGUI *parent) :
         onStartAllClicked(REQUEST_START_MISSING);
     });
     connect(ui->listMn, &QListView::clicked, this, &MasterNodesWidget::onMNClicked);
-    connect(ui->btnAbout, &OptionButton::clicked, [this](){window->openFAQ(9);});
-    connect(ui->btnAboutController, &OptionButton::clicked, [this](){window->openFAQ(10);});
+    connect(ui->btnAbout, &OptionButton::clicked, [this](){window->openFAQ(5);});
+    connect(ui->btnAboutController, &OptionButton::clicked, [this](){window->openFAQ(6);});
 }
 
 void MasterNodesWidget::showEvent(QShowEvent *event)
@@ -350,7 +351,7 @@ void MasterNodesWidget::onInfoMNClicked()
     if (dialog->exportMN) {
         if (ask(tr("Remote Masternode Data"),
                 tr("You are just about to export the required data to run a Masternode\non a remote server to your clipboard.\n\n\n"
-                   "You will only have to paste the data in the pivx.conf file\nof your remote server and start it, "
+                   "You will only have to paste the data in the sapphire.conf file\nof your remote server and start it, "
                    "then start the Masternode using\nthis controller wallet (select the Masternode in the list and press \"start\").\n"
                 ))) {
             // export data

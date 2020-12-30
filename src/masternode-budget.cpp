@@ -1,5 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -496,7 +497,7 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, bool fProofOfSta
         ++it;
     }
 
-    CAmount blockValue = GetBlockValue(chainHeight);
+    CAmount blockValue = CMasternode::GetBlockValue(chainHeight);
 
     if (fProofOfStake) {
         if (nHighestCount > 0) {

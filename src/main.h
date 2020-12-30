@@ -5,6 +5,7 @@
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2020 The PIVX developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -242,11 +243,9 @@ bool GetOutput(const uint256& hash, unsigned int index, CValidationState& state,
 
 // ***TODO***
 double ConvertBitsToDouble(unsigned int nBits);
-int64_t GetMasternodePayment();
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool fProofOfStake);
 
 bool ActivateBestChain(CValidationState& state, const CBlock* pblock = NULL, bool fAlreadyChecked = false, CConnman* connman = nullptr);
-CAmount GetBlockValue(int nHeight);
 
 /** Create a new block index entry for a given block hash */
 CBlockIndex* InsertBlockIndex(uint256 hash);
