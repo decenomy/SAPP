@@ -135,9 +135,18 @@ bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int 
     nTimeTx = (fRegTest ? GetAdjustedTime() : GetCurrentTimeSlot());
     if (nTimeTx <= pindexPrev->nTime && !fRegTest) return false;
 
-    // Verify Proof Of Stake
-    CStakeKernel stakeKernel(pindexPrev, stakeInput, nBits, nTimeTx);
-    return stakeKernel.CheckKernelHash(true);
+    for(int i = 0; i < (Params().GetConsensus().IsTimeProtocolV2(nHeightTx) ? Params().GetConsensus().nTimeSlotLength : 1); i++) 
+    {
+        // Verify Proof Of Stake
+        CStakeKernel stakeKernel(pindexPrev, stakeInput, nBits, nTimeTx);
+        if(stakeKernel.CheckKernelHash(true)) 
+        {
+            return true;
+        }
+        nTimeTx++;
+    }
+
+    return false;
 }
 
 
