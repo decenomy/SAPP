@@ -22,6 +22,8 @@ class CMasternodeBlockPayees;
 
 extern CMasternodePayments masternodePayments;
 
+#define MNPAYMENTS_SIGNATURES_TOTAL_PREVIOUS 14
+
 #define MNPAYMENTS_SIGNATURES_REQUIRED 6
 #define MNPAYMENTS_SIGNATURES_TOTAL 10
 
