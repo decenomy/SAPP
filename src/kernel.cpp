@@ -135,7 +135,9 @@ bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int 
     nTimeTx = (fRegTest ? GetAdjustedTime() : GetCurrentTimeSlot());
     if (nTimeTx <= pindexPrev->nTime && !fRegTest) return false;
 
-    for(int i = 0; i < (Params().GetConsensus().IsTimeProtocolV2(nHeightTx) ? Params().GetConsensus().nTimeSlotLength : 1); i++) 
+    int slotRange = Params().GetConsensus().IsTimeProtocolV2(nHeightTx) ? 1 : Params().GetConsensus().nTimeSlotLength;
+
+    for(int i = 0; i < slotRange; i++) 
     {
         // Verify Proof Of Stake
         CStakeKernel stakeKernel(pindexPrev, stakeInput, nBits, nTimeTx);
@@ -148,7 +150,6 @@ bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int 
 
     return false;
 }
-
 
 /*
  * CheckProofOfStake    Check if block has valid proof of stake
