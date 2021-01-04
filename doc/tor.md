@@ -47,11 +47,11 @@ versions of Tor see [Section 3](#3-automatically-listen-on-tor).*
 
 	HiddenServiceDir /var/lib/tor/sapphire-service/
 	HiddenServiceVersion 2
-	HiddenServicePort 51472 127.0.0.1:51472
+	HiddenServicePort 45328 127.0.0.1:45328
 	HiddenServicePort 61472 127.0.0.1:61472
 
 The directory can be different of course, but (both) port numbers should be equal to
-your sapphired's P2P listen port (51472 by default).
+your sapphired's P2P listen port (45328 by default).
 
 	-externalip=X   You can tell sapphire about its publicly reachable address using
 	                this option, and this can be a v2 .onion address (v3 .onion
@@ -87,7 +87,7 @@ as well, use `discover` instead:
 
 	./sapphired ... -discover
 
-and open port 51472 on your firewall (or use -upnp).
+and open port 45328 on your firewall (or use -upnp).
 
 If you only want to use Tor to reach .onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
