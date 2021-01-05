@@ -30,7 +30,6 @@ private:
     std::string notCapableReason;
 
 public:
-
     CActiveMasternode()
     {
         vin = nullopt;

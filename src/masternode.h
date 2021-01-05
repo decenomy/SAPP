@@ -56,8 +56,7 @@ public:
         READWRITE(blockHash);
         READWRITE(sigTime);
         READWRITE(vchSig);
-        try
-        {
+        try {
             READWRITE(nMessVersion);
         } catch (...) {
             nMessVersion = MessageVersion::MESS_VER_STRMESS;
@@ -69,7 +68,7 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override { return GetHash(); }
     std::string GetStrMessage() const override;
-    const CTxIn GetVin() const override  { return vin; };
+    const CTxIn GetVin() const override { return vin; };
     bool IsNull() { return blockHash.IsNull() || vin.prevout.IsNull(); }
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
@@ -266,10 +265,10 @@ public:
     /// Is the input associated with collateral public key? (and there is 10000 PIV - checking if valid masternode)
     bool IsInputAssociatedWithPubkey() const;
 
-	// Masternode collateral and reward schedules
-	static CAmount GetMasternodeCollateral(int nHeight);
-	static CAmount GetBlockValue(int nHeight);
-	static CAmount GetMasternodePayment();
+    // Masternode collateral and reward schedules
+    static CAmount GetMasternodeCollateral(int nHeight);
+    static CAmount GetBlockValue(int nHeight);
+    static CAmount GetMasternodePayment();
 };
 
 //
@@ -310,7 +309,7 @@ public:
         READWRITE(sigTime);
         READWRITE(protocolVersion);
         READWRITE(lastPing);
-        READWRITE(nMessVersion);    // abuse nLastDsq (which will be removed) for old serialization
+        READWRITE(nMessVersion); // abuse nLastDsq (which will be removed) for old serialization
         if (ser_action.ForRead())
             nLastDsq = 0;
     }
