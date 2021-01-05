@@ -38,6 +38,7 @@ enum SporkId : int32_t {
 
 
     SPORK_101_SERVICES_ENFORCEMENT              = 10100,
+    SPORK_102_FORCE_ENABLED_MASTERNODE          = 10101,
 
     SPORK_INVALID                               = -1
 };

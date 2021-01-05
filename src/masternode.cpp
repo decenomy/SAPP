@@ -610,10 +610,10 @@ bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
     const std::string strMessage = (
-                            nMessVersion == MessageVersion::MESS_VER_HASH ?
-                            GetSignatureHash().GetHex() :
-                            GetStrMessage()
-                            );
+        nMessVersion == MessageVersion::MESS_VER_HASH ?
+        GetSignatureHash().GetHex() :
+        GetStrMessage()
+    );
 
     if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError) &&
        !CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetOldStrMessage(), strError)) {
