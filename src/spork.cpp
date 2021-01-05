@@ -29,6 +29,7 @@ std::vector<CSporkDef> sporkDefs = {
     MAKE_SPORK_DEF(SPORK_20_UPGRADE_CYCLE_FACTOR,           4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_101_SERVICES_ENFORCEMENT,          4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_102_FORCE_ENABLED_MASTERNODE,      4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_103_PING_MESSAGE_SALT,             0),             // OFF        
 
 	// Unused dummy sporks.
 	//TODO: Needed to be removed in the future when the old nodes cut from the network.
