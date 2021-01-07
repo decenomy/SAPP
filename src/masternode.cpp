@@ -559,11 +559,15 @@ bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollater
 bool CMasternodeBroadcast::Sign(const CKey& key, const CPubKey& pubKey)
 {
     std::string strError = "";
-    nMessVersion = MessageVersion::MESS_VER_HASH;
-    const std::string strMessage =
-        Params().GetConsensus().NetworkUpgradeActive(chainActive.Height(), Consensus::UPGRADE_POS_V2) ?
-            GetSignatureHash().GetHex() :
-            GetOldStrMessage();
+    std::string strMessage;
+
+    if(Params().GetConsensus().NetworkUpgradeActive(chainActive.Height(), Consensus::UPGRADE_POS_V2)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
+        strMessage = GetSignatureHash().GetHex();
+    } else {
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
+        strMessage = GetOldStrMessage();
+    }
 
     if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
         return error("%s : SignMessage() (nMessVersion=%d) failed", __func__, nMessVersion);
