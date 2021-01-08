@@ -28,7 +28,7 @@ fi
 	chmod +x share/genbuild.sh
 	chmod +x autogen.sh
 	./autogen.sh
-	./configure --prefix=$(pwd)/depends/x86_64-w64-mingw32 --disable-debug --disable-tests --disable-bench CFLAGS="-O3" CXXFLAGS="-O3"
+	./configure --prefix=$(pwd)/depends/x86_64-w64-mingw32 --disable-debug --disable-tests --disable-bench --disable-online-rust CFLAGS="-O3" CXXFLAGS="-O3"
 	make -j$(echo $CPU_CORES) HOST=x86_64-w64-mingw32
 	cd ..
 
