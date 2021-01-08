@@ -33,7 +33,7 @@ packages:
 - "ca-certificates"
 - "python3"
 remotes:
-- "url": "https://github.com/mitchelvanamstel/SAPP_1_4"
+- "url": "https://github.com/sappcoin-com/SAPP"
   "dir": "pivx"
 files: []
 script: |

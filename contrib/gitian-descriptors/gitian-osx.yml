@@ -29,7 +29,7 @@ packages:
 - "python3-setuptools"
 - "fonts-tuffy"
 remotes:
-- "url": "https://github.com/mitchelvanamstel/SAPP_1_4"
+- "url": "https://github.com/sappcoin-com/SAPP"
   "dir": "pivx"
 files:
 - "MacOSX10.11.sdk.tar.gz"
