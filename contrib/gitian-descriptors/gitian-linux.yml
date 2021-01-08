@@ -1,5 +1,5 @@
 ---
-name: "sapphire-linux-4.3"
+name: "sapphire-linux-1.4"
 enable_cache: true
 distro: "ubuntu"
 suites:
