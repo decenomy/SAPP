@@ -960,7 +960,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
                 if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)) { // extract the destination of the previous transaction's vout[n]
                     std::string addr = EncodeDestination(source);
                     if (bannedAddressesV2.find(addr) != bannedAddressesV2.end()) {
-                        return error("%s : Banned address %s tried to send a transaction %s (rejecting it).", __func__, addr.c_str(), txPrev.GetHash().ToString().c_str());
+                        return state.DoS(0, false, REJECT_INVALID, "bad-txns-invalid-outputs");
                     }
                 }
             }
