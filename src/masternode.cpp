@@ -854,7 +854,7 @@ std::string CMasternodePing::GetStrMessage() const
 {
     int64_t salt = sporkManager.GetSporkValue(SPORK_103_PING_MESSAGE_SALT);
 
-    if (salt > 0) {
+    if (salt == 4070908800ULL) {
         return vin.ToString() + blockHash.ToString() + std::to_string(sigTime) + std::to_string(salt);
     } else {
         return vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
