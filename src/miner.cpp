@@ -228,12 +228,17 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     unsigned int nBlockMaxSize = GetArg("-blockmaxsize", DEFAULT_BLOCK_MAX_SIZE);
     // Limit to betweeen 1K and MAX_BLOCK_SIZE-1K for sanity:
     unsigned int nBlockMaxSizeNetwork = MAX_BLOCK_SIZE_CURRENT;
+    unsigned int nBlockMaxSizeSpork = (unsigned int)sporkManager.GetSporkValue(SPORK_105_MAX_BLOCK_SIZE);
+
     nBlockMaxSize = std::max(
         (unsigned int)1000, 
         std::min(
-            (unsigned int)sporkManager.GetSporkValue(SPORK_105_MAX_BLOCK_SIZE), 
-            nBlockMaxSizeNetwork, 
-            nBlockMaxSize));
+            std::min(
+                nBlockMaxSizeSpork, 
+                nBlockMaxSizeNetwork), 
+            nBlockMaxSize
+        )
+    );
 
     // How much of the block should be dedicated to high-priority transactions,
     // included regardless of the fees they pay
