@@ -11,7 +11,7 @@ fi
 	sudo apt install git zip unzip build-essential libtool bsdmainutils autotools-dev autoconf pkg-config automake python3 -y
 
 # Clone SAPP code from SAPP official Github repository
-	git clone https://github.com/sappcoin-com/SAPP_1_4
+	git clone https://github.com/sappcoin-com/SAPP
 
 # Entering SAPP directory
 	cd SAPP
