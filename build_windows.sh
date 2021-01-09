@@ -12,7 +12,7 @@ fi
 	echo "1" | sudo update-alternatives --config x86_64-w64-mingw32-g++
 
 # Clone SAPP code from SAPP official Github repository
-	git clone https://github.com/sappcoin-com/SAPP_1_4
+	git clone https://github.com/sappcoin-com/SAPP
 
 # Entering SAPP directory
 	cd SAPP
