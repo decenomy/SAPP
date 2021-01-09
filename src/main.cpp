@@ -3630,7 +3630,7 @@ bool CheckBlockTime(const CBlockHeader& block, CValidationState& state, CBlockIn
         return state.DoS(100, error("%s : block timestamp mask not valid", __func__), REJECT_INVALID, "invalid-time-mask");
 
     // Check block time limit
-    if(blockTime > sporkManager.GetSporkValue(SPORK_104_MAX_BLOCKS)) {
+    if(blockTime > sporkManager.GetSporkValue(SPORK_104_MAX_BLOCK_TIME)) {
         return state.Invalid(error("%s : block reached time limit", __func__), REJECT_INVALID, "time-limit");
     }
 

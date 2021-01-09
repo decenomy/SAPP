@@ -33,7 +33,7 @@ enum SporkId : int32_t {
     SPORK_101_SERVICES_ENFORCEMENT              = 10100,
     SPORK_102_FORCE_ENABLED_MASTERNODE          = 10101,
     SPORK_103_PING_MESSAGE_SALT                 = 10102,
-    SPORK_104_MAX_BLOCKS                        = 10103,
+    SPORK_104_MAX_BLOCK_TIME                    = 10103,
 
 	// Unused dummy sporks.
 	//TODO needed to be removed in the future when the old nodes cut from the network.
