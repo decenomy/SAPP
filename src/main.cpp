@@ -124,31 +124,6 @@ std::set<std::string> bannedAddresses = {
     "Sf3KBrFqmD3PBHrwTpdsFgUTctEz9mQn5Z",
 };
 
-std::set<std::string> bannedAddressesV2 = {
-    "Sd2xcwvvtRH8P8sLemSiPjadTfBd9myPbW",
-    "STFSLXfG31Xr8Symk78aG6jCu391yp8kWD",
-    "SbPoXEFrMJwes3mysfgGzP2mAtw1SmrC7H",
-    "ScM5iV4aJEwMipWGHHcS8E1qLsarwk6DuK",
-    "Sfv6SUgcSgmmpwp3UypfYgnK1x97rfC9Dj",
-    "SY6UdUKC8yxci8vXgvQYMgeUNRDvymEhM3",
-    "SdaX6DR3gdpakcFrKJfCDB6GJjC4J9XJ8M",
-    "Sh412EAoGLvn1WnTUCZbHiUGCk2dzmdQoA",
-    "ST74xpmzemL4ELiBpyDmirzgahujSUiYmM",
-    "SaWmWbLSghhn8JAE8JQfdLQy9cvf1ADKUD",
-    "Sic7sZBNkijna4zNLSVgTBkfr2ebP6c9wk",
-    "Sh8N9R2Li5Wm5B7g3xxfEotp9Vpp38baJM",
-    "SVAjKY5p9NPSNwG7PLK3VzeXUdJjm2W7CY",
-    "SQfMZVatpQR9b3KdKp992nxeEZNWkcz7d2",
-    "SNAgLi7pfHD6BDAkQQ74ixtT4o59wkqP8Y",
-    "SS6ZgTuvafGX98YqeHdu79wpGrR1KxuqMw",
-    "SMoP6U7uazpLdqZ18GQFVNNuV77UTK16wh",
-    "SjfZFjCv2PxNKQeDgW1RmsFjSpq5PngaZc",
-    "SPop7eX3kMjwojy1k1EHAqBoodhbski4tR",
-    "Sf3KBrFqmD3PBHrwTpdsFgUTctEz9mQn5Z",
-    "SfFQ3twBcziZAHMeULnrDSemaqZqHUpmj4",
-    "SPixuKa8Vnyi6RpcB8XTXh7TBqq6TqZ43b",
-};
-
 int bannedAddressesStartHeight = 586593;
 
 /* If the tip is older than this (in seconds), the node is considered to be in initial block download. */
@@ -951,7 +926,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
     }
 
     // ----------- banned transaction scanning -----------
-    if (!bannedAddressesV2.empty()) {
+    if (!bannedAddresses.empty()) {
         for (unsigned int i = 0; i < tx.vin.size(); ++i) {
             uint256 hashBlock;
             CTransaction txPrev;
@@ -959,7 +934,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
                 CTxDestination source;
                 if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)) { // extract the destination of the previous transaction's vout[n]
                     std::string addr = EncodeDestination(source);
-                    if (bannedAddressesV2.find(addr) != bannedAddressesV2.end()) {
+                    if (bannedAddresses.find(addr) != bannedAddresses.end()) {
                         return state.DoS(0, false, REJECT_INVALID, "bad-txns-invalid-outputs");
                     }
                 }
@@ -3752,11 +3727,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
                         if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)) { // extract the destination of the previous transaction's vout[n]
                             std::string addr = EncodeDestination(source);
 
-                            std::set<std::string>* banAddrList = (Params().GetConsensus().NetworkUpgradeActive(chainActive.Height(), Consensus::UPGRADE_POS_V2) ?
-                                                                      &bannedAddressesV2 :
-                                                                      &bannedAddresses);
-
-                            if (banAddrList->find(addr) != banAddrList->end()) {
+                            if (bannedAddresses.find(addr) != bannedAddresses.end()) {
                                 return state.DoS(100, error("%s : Banned address %s tried to send a transaction %s (rejecting it).", __func__, addr.c_str(), txPrev.GetHash().ToString().c_str()), REJECT_INVALID, "bad-txns-banned");
                             }
                         }
