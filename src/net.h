@@ -160,12 +160,15 @@ public:
     template<typename Callable>
     bool ForEachNodeContinueIf(Callable&& func)
     {
-        LOCK(cs_vNodes);
-        for (auto&& node : vNodes)
+        TRY_LOCK(cs_vNodes, lockRecv);
+        if (!lockRecv) return true;
+
+        for (auto&& node : vNodes) {
             if (NodeFullyConnected(node)) {
                 if (!func(node))
                     return false;
             }
+        }
         return true;
     };
 
