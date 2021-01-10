@@ -1,4 +1,4 @@
-Sappre Coin Core integration/staging repository
+Sapphire Coin Core integration/staging repository
 =================================================================
 
 
