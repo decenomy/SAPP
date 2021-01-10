@@ -7,7 +7,7 @@ then
 fi
 
 # Clone SAPP code from SAPP official Github repository
-	git clone https://github.com/sappcoin-com/SAPP_1_4
+	git clone https://github.com/sappcoin-com/SAPP
 
 # Entering SAPP directory
 	cd SAPP
