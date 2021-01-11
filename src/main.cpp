@@ -5599,7 +5599,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         CInv inv(MSG_TX, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
 
-        LOCK(cs_main);
+        //LOCK(cs_main);
 
         bool fMissingInputs = false;
         bool fMissingZerocoinInputs = false;
