@@ -747,6 +747,7 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
 
 void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
 {
+    LOCK(cs_main);
     LOCK(cs_mapMasternodePayeeVotes);
 
     int nHeight;
