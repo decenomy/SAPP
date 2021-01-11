@@ -485,6 +485,7 @@ CMasternode* CMasternodeMan::Find(const CPubKey& pubKeyMasternode)
 //
 CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight, bool fFilterSigTime, int& nCount)
 {
+    LOCK(cs_main);
     LOCK(cs);
 
     CMasternode* pBestMasternode = NULL;
