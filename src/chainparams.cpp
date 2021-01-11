@@ -135,7 +135,7 @@ public:
         consensus.nStakeMinAge = 60 * 60;
         consensus.nStakeMinDepth = 60;
         consensus.nStakeMinDepthV2 = 600;
-        consensus.nTargetTimespan = 1 * 60;
+        consensus.nTargetTimespan = 40 * 60;
         consensus.nTargetTimespanV2 = 4 * 60 * 60;
         consensus.nTargetSpacing = 1 * 60;
         consensus.nTimeSlotLength = 15;
