@@ -135,6 +135,8 @@ public:
         consensus.nStakeMinAge = 60 * 60;
         consensus.nStakeMinDepth = 60;
         consensus.nStakeMinDepthV2 = 600;
+        consensus.nTargetTimespan = 40 * 60;
+        consensus.nTargetTimespanV2 = 30 * 60;
         consensus.nTargetSpacing = 1 * 60;
         consensus.nTimeSlotLength = 15;
 
@@ -279,6 +281,8 @@ public:
         consensus.nStakeMinAge = 60 * 60;
         consensus.nStakeMinDepth = 60;
         consensus.nStakeMinDepthV2 = 600;
+        consensus.nTargetTimespan = 40 * 60;
+        consensus.nTargetTimespanV2 = 30 * 60;
         consensus.nTargetSpacing = 1 * 60;
         consensus.nTimeSlotLength = 15;
 
@@ -425,6 +429,8 @@ public:
         consensus.nProposalEstablishmentTime = 60 * 5;  // at least 5 min old to make it into a budget
         consensus.nStakeMinAge = 0;
         consensus.nStakeMinDepth = 2;
+        consensus.nTargetTimespan = 40 * 60;
+        consensus.nTargetTimespanV2 = 30 * 60;
         consensus.nTargetSpacing = 1 * 60;
         consensus.nTimeSlotLength = 15;
 

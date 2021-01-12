@@ -23,76 +23,94 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     if (Params().IsRegTestNet())
         return pindexLast->nBits;
 
+    /* current difficulty formula, pivx - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
+    const CBlockIndex* BlockLastSolved = pindexLast;
     const CBlockIndex* BlockReading = pindexLast;
     int64_t nActualTimespan = 0;
     int64_t LastBlockTime = 0;
-    
+    int64_t PastBlocksMin = 24;
+    int64_t PastBlocksMax = 24;
+    int64_t CountBlocks = 0;
+    uint256 PastDifficultyAverage;
+    uint256 PastDifficultyAveragePrev;
     const Consensus::Params& consensus = Params().GetConsensus();
 
-    if (BlockReading == NULL || BlockReading->nHeight == 0) {
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMin) {
         return consensus.powLimit.GetCompact();
     }
 
-    int nHeight = pindexLast->nHeight + 1;
+    if (consensus.NetworkUpgradeActive(pindexLast->nHeight + 1, Consensus::UPGRADE_POS)) {
+        const bool fTimeV2 = !Params().IsRegTestNet() && consensus.IsTimeProtocolV2(pindexLast->nHeight+1);
+        const uint256& bnTargetLimit = consensus.ProofOfStakeLimit(fTimeV2);
+        const int64_t& nTargetTimespan = consensus.TargetTimespan(fTimeV2);
 
-    const bool fTimeV2 = !Params().IsRegTestNet() && consensus.IsTimeProtocolV2(nHeight);
+        int64_t nActualSpacing = 0;
+        if (pindexLast->nHeight != 0)
+            nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
+        if (nActualSpacing < 0)
+            nActualSpacing = 1;
+        if (fTimeV2 && nActualSpacing > consensus.nTargetSpacing*10)
+            nActualSpacing = consensus.nTargetSpacing*10;
 
-    int64_t nTargetSpacing = consensus.nTargetSpacing;
-    int64_t PastBlocks;
+        // ppcoin: target change every block
+        // ppcoin: retarget with exponential moving toward target spacing
+        uint256 bnNew;
+        bnNew.SetCompact(pindexLast->nBits);
 
-    if(nHeight % ((24 * 60 * 60) / nTargetSpacing) == 0) { // 24h interval
-        PastBlocks = (24 * 60 * 60) / nTargetSpacing;
-    } else if(nHeight % ((12 * 60 * 60) / nTargetSpacing) == 0) { // 12 h interval
-        PastBlocks = (12 * 60 * 60) / nTargetSpacing;
-    } else if(nHeight % ((6 * 60 * 60) / nTargetSpacing) == 0) { // 6 h interval
-        PastBlocks = (6 * 60 * 60) / nTargetSpacing;
-    } else if(nHeight % ((3 * 60 * 60) / nTargetSpacing) == 0) { // 3 h interval
-        PastBlocks = (3 * 60 * 60) / nTargetSpacing;
-    } else if(nHeight % ((1 * 60 * 60) / nTargetSpacing) == 0) { // 1 h interval
-        PastBlocks = (1 * 60 * 60) / nTargetSpacing;
-    } else { // 30 min by default
-        PastBlocks = (30 * 60) / nTargetSpacing;
-    }
+        // on first block with V2 time protocol, reduce the difficulty by a factor 16
+        if (fTimeV2 && !consensus.IsTimeProtocolV2(pindexLast->nHeight))
+            bnNew <<= 4;
 
-    if (BlockReading->nHeight < PastBlocks) {
-        return consensus.powLimit.GetCompact();
+        int64_t nInterval = nTargetTimespan / consensus.nTargetSpacing;
+        bnNew *= ((nInterval - 1) * consensus.nTargetSpacing + nActualSpacing + nActualSpacing);
+        bnNew /= ((nInterval + 1) * consensus.nTargetSpacing);
+
+        if (bnNew <= 0 || bnNew > bnTargetLimit)
+            bnNew = bnTargetLimit;
+
+        return bnNew.GetCompact();
     }
 
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-        if (PastBlocks > 0 && i > PastBlocks) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) {
             break;
         }
+        CountBlocks++;
 
-        if (LastBlockTime > 0) { // if not the first one
+        if (CountBlocks <= PastBlocksMin) {
+            if (CountBlocks == 1) {
+                PastDifficultyAverage.SetCompact(BlockReading->nBits);
+            } else {
+                PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1);
+            }
+            PastDifficultyAveragePrev = PastDifficultyAverage;
+        }
+
+        if (LastBlockTime > 0) {
             int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
             nActualTimespan += Diff;
         }
         LastBlockTime = BlockReading->GetBlockTime();
 
-        if (BlockReading->pprev == NULL) { // this shouldn't happen
+        if (BlockReading->pprev == NULL) {
             assert(BlockReading);
             break;
         }
         BlockReading = BlockReading->pprev;
     }
 
-    uint256 bnNew;
-    bnNew.SetCompact(pindexLast->nBits);
+    uint256 bnNew(PastDifficultyAverage);
 
-    int64_t nTargetTimespan = PastBlocks * nTargetSpacing;
+    int64_t _nTargetTimespan = CountBlocks * consensus.nTargetSpacing;
 
-    if (nActualTimespan < nTargetTimespan / 3)
-        nActualTimespan = nTargetTimespan / 3;
-    if (nActualTimespan > nTargetTimespan * 3)
-        nActualTimespan = nTargetTimespan * 3;
-
-    // on first block with V2 time protocol, reduce the difficulty by a factor 16
-    if (fTimeV2 && !consensus.IsTimeProtocolV2(pindexLast->nHeight))
-        bnNew <<= 4;
+    if (nActualTimespan < _nTargetTimespan / 3)
+        nActualTimespan = _nTargetTimespan / 3;
+    if (nActualTimespan > _nTargetTimespan * 3)
+        nActualTimespan = _nTargetTimespan * 3;
 
     // Retarget
     bnNew *= nActualTimespan;
-    bnNew /= nTargetTimespan;
+    bnNew /= _nTargetTimespan;
 
     if (bnNew > consensus.powLimit) {
         bnNew = consensus.powLimit;

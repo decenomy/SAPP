@@ -357,7 +357,7 @@
 									</string>
 								</property>
 								<property name="text">
-									<string>VERSION 1.4.0.1</string>
+									<string>VERSION 1.4.1</string>
 								</property>
 								<property name="alignment">
 									<set>Qt::AlignTop|Qt::AlignHCenter</set>
