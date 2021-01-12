@@ -50,8 +50,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         PastBlocks = (3 * 60 * 60) / nTargetSpacing;
     } else if(nHeight % ((1 * 60 * 60) / nTargetSpacing) == 0) { // 1 h interval
         PastBlocks = (1 * 60 * 60) / nTargetSpacing;
-    } else { // 10 min by default
-        PastBlocks = (10 * 60) / nTargetSpacing;
+    } else { // 30 min by default
+        PastBlocks = (30 * 60) / nTargetSpacing;
     }
 
     if (BlockReading->nHeight < PastBlocks) {
