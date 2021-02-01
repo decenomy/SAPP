@@ -3735,14 +3735,16 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     //     }
     // }
 
-    // Size limits
-    unsigned int nMaxBlockSize = std::min(
-        (unsigned int)sporkManager.GetSporkValue(SPORK_105_MAX_BLOCK_SIZE), 
-        MAX_BLOCK_SIZE_CURRENT
-    );
+    if(nHeight != 0 && !IsInitialBlockDownload()) {
+        // Size limits
+        unsigned int nMaxBlockSize = std::min(
+            (unsigned int)sporkManager.GetSporkValue(SPORK_105_MAX_BLOCK_SIZE), 
+            MAX_BLOCK_SIZE_CURRENT
+        );
 
-    if (::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION) > nMaxBlockSize)
-        return state.DoS(100, false, REJECT_INVALID, "bad-blk-length", false, "size limits failed");
+        if (::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION) > nMaxBlockSize)
+            return state.DoS(100, false, REJECT_INVALID, "bad-blk-length", false, "size limits failed");
+    }
 
     return true;
 }
