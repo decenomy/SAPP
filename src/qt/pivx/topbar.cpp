@@ -346,7 +346,7 @@ void TopBar::onBtnConfClicked()
     ui->pushButtonConf->setChecked(false);
     
     if (!GUIUtil::openConfigfile())
-        inform(tr("Unable to open sap.conf with default application"));
+        inform(tr("Unable to open sapphire.conf with default application"));
 }
 
 void TopBar::onBtnMasternodesClicked()
