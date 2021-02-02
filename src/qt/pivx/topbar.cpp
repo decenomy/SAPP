@@ -86,6 +86,14 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
     ui->pushButtonStack->setButtonClassStyle("cssClass", "btn-check-stack-inactive");
     ui->pushButtonStack->setButtonText(tr("Staking Disabled"));
 
+    ui->pushButtonConf->setButtonClassStyle("cssClass", "btn-check-conf");
+    ui->pushButtonConf->setButtonText("sap.conf");
+    ui->pushButtonConf->setChecked(false);
+
+    ui->pushButtonMasternodes->setButtonClassStyle("cssClass", "btn-check-masternodes");
+    ui->pushButtonMasternodes->setButtonText("masternode.conf");
+    ui->pushButtonMasternodes->setChecked(false);
+
     ui->pushButtonColdStaking->setButtonClassStyle("cssClass", "btn-check-cold-staking-inactive");
     ui->pushButtonColdStaking->setButtonText(tr("Cold Staking Disabled"));
 
@@ -123,6 +131,8 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
     connect(ui->pushButtonLock, &ExpandableButton::Mouse_Pressed, this, &TopBar::onBtnLockClicked);
     connect(ui->pushButtonTheme, &ExpandableButton::Mouse_Pressed, this, &TopBar::onThemeClicked);
     connect(ui->pushButtonFAQ, &ExpandableButton::Mouse_Pressed, [this](){window->openFAQ();});
+    connect(ui->pushButtonConf, &ExpandableButton::Mouse_Pressed, this, &TopBar::onBtnConfClicked);
+    connect(ui->pushButtonMasternodes, &ExpandableButton::Mouse_Pressed, this, &TopBar::onBtnMasternodesClicked);
     connect(ui->pushButtonColdStaking, &ExpandableButton::Mouse_Pressed, this, &TopBar::onColdStakingClicked);
     connect(ui->pushButtonSync, &ExpandableButton::Mouse_HoverLeave, this, &TopBar::refreshProgressBarSize);
     connect(ui->pushButtonSync, &ExpandableButton::Mouse_Hover, this, &TopBar::refreshProgressBarSize);
@@ -329,6 +339,22 @@ void TopBar::showBottom()
     ui->bottom_container->setVisible(true);
     this->setFixedHeight(200);
     this->adjustSize();
+}
+
+void TopBar::onBtnConfClicked()
+{
+    ui->pushButtonConf->setChecked(false);
+    
+    if (!GUIUtil::openConfigfile())
+        inform(tr("Unable to open sap.conf with default application"));
+}
+
+void TopBar::onBtnMasternodesClicked()
+{
+    ui->pushButtonMasternodes->setChecked(false);
+    
+    if (!GUIUtil::openMNConfigfile())
+        inform(tr("Unable to open masternode.conf with default application"));
 }
 
 void TopBar::onColdStakingClicked()
