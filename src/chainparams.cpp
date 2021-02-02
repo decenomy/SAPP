@@ -91,10 +91,10 @@ static const Checkpoints::CCheckpointData dataTestnet = {
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of
-	(0, uint256S("0x00"));
+	(0, uint256S("0x001"));
 static const Checkpoints::CCheckpointData dataRegtest = {
     &mapCheckpointsRegtest,
-    1605265870,
+    1454124731,
     0,
     100};
 
