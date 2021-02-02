@@ -56,8 +56,7 @@ public:
         READWRITE(blockHash);
         READWRITE(sigTime);
         READWRITE(vchSig);
-        try
-        {
+        try {
             READWRITE(nMessVersion);
         } catch (...) {
             nMessVersion = MessageVersion::MESS_VER_STRMESS;
@@ -69,7 +68,7 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override { return GetHash(); }
     std::string GetStrMessage() const override;
-    const CTxIn GetVin() const override  { return vin; };
+    const CTxIn GetVin() const override { return vin; };
     bool IsNull() { return blockHash.IsNull() || vin.prevout.IsNull(); }
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
@@ -106,7 +105,7 @@ public:
 };
 
 //
-// The Masternode Class. It contains the input of the 10000 PIV, signature to prove
+// The Masternode Class. It contains the input of the 200000 SAPP, signature to prove
 // it's the one who own that ip address and code for calculating the payment election.
 //
 class CMasternode : public CSignedMessage
@@ -263,13 +262,13 @@ public:
     int64_t GetLastPaid();
     bool IsValidNetAddr();
 
-    /// Is the input associated with collateral public key? (and there is 10000 PIV - checking if valid masternode)
+    /// Is the input associated with collateral public key? (and there is 200000 SAPP - checking if valid masternode)
     bool IsInputAssociatedWithPubkey() const;
 
-	// Masternode collateral and reward schedules
-	static CAmount GetMasternodeCollateral(int nHeight);
-	static CAmount GetBlockValue(int nHeight);
-	static CAmount GetMasternodePayment();
+    // Masternode collateral and reward schedules
+    static CAmount GetMasternodeCollateral(int nHeight);
+    static CAmount GetBlockValue(int nHeight);
+    static CAmount GetMasternodePayment();
 };
 
 //
@@ -291,7 +290,6 @@ public:
     void Relay();
 
     std::string GetOldStrMessage() const;
-
     // special sign/verify
     bool Sign(const CKey& key, const CPubKey& pubKey);
     bool Sign(const std::string strSignKey);
@@ -310,7 +308,7 @@ public:
         READWRITE(sigTime);
         READWRITE(protocolVersion);
         READWRITE(lastPing);
-        READWRITE(nMessVersion);    // abuse nLastDsq (which will be removed) for old serialization
+        READWRITE(nMessVersion); // abuse nLastDsq (which will be removed) for old serialization
         if (ser_action.ForRead())
             nLastDsq = 0;
     }

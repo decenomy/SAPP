@@ -1,5 +1,5 @@
 ---
-name: "pivx-osx-4.3"
+name: "sapphire-osx-1.4"
 enable_cache: true
 distro: "ubuntu"
 suites:
@@ -29,7 +29,7 @@ packages:
 - "python3-setuptools"
 - "fonts-tuffy"
 remotes:
-- "url": "https://github.com/pivx-project/pivx.git"
+- "url": "https://github.com/sappcoin-com/SAPP"
   "dir": "pivx"
 files:
 - "MacOSX10.11.sdk.tar.gz"
@@ -106,16 +106,16 @@ script: |
 
   # Create the release tarball using (arbitrarily) the first host
   ./autogen.sh
-  CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
+  CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --disable-online-rust --prefix=/
   make dist
-  SOURCEDIST=`echo pivx-*.tar.gz`
+  SOURCEDIST=`echo sapphire-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
 
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
-  find pivx-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  find sapphire-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
   # Workaround for tarball not building with the bare tag version (prep)

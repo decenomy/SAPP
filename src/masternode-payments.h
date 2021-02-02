@@ -22,6 +22,8 @@ class CMasternodeBlockPayees;
 
 extern CMasternodePayments masternodePayments;
 
+#define MNPAYMENTS_SIGNATURES_TOTAL_PREVIOUS 14
+
 #define MNPAYMENTS_SIGNATURES_REQUIRED 6
 #define MNPAYMENTS_SIGNATURES_TOTAL 10
 
@@ -165,19 +167,19 @@ public:
     int nBlockHeight;
     CScript payee;
 
-    CMasternodePaymentWinner() :
-        CSignedMessage(),
-        vinMasternode(),
-        nBlockHeight(0),
-        payee()
-    {}
+    CMasternodePaymentWinner() : CSignedMessage(),
+                                 vinMasternode(),
+                                 nBlockHeight(0),
+                                 payee()
+    {
+    }
 
-    CMasternodePaymentWinner(CTxIn vinIn) :
-        CSignedMessage(),
-        vinMasternode(vinIn),
-        nBlockHeight(0),
-        payee()
-    {}
+    CMasternodePaymentWinner(CTxIn vinIn) : CSignedMessage(),
+                                            vinMasternode(vinIn),
+                                            nBlockHeight(0),
+                                            payee()
+    {
+    }
 
     uint256 GetHash() const;
 
@@ -203,8 +205,7 @@ public:
         READWRITE(nBlockHeight);
         READWRITE(*(CScriptBase*)(&payee));
         READWRITE(vchSig);
-        try
-        {
+        try {
             READWRITE(nMessVersion);
         } catch (...) {
             nMessVersion = MessageVersion::MESS_VER_STRMESS;

@@ -79,11 +79,12 @@ bool CHashSigner::VerifyHash(const uint256& hash, const CKeyID& keyID, const std
 
 bool CSignedMessage::Sign(const CKey& key, const CPubKey& pubKey)
 {
-    nMessVersion = MessageVersion::MESS_VER_HASH;
     std::string strError = "";
+
+    nMessVersion = MessageVersion::MESS_VER_HASH;
     uint256 hash = GetSignatureHash();
 
-    if(!CHashSigner::SignHash(hash, key, vchSig)) {
+    if (!CHashSigner::SignHash(hash, key, vchSig)) {
         return error("%s : SignHash() failed", __func__);
     }
 

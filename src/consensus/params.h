@@ -36,6 +36,7 @@ enum UpgradeIndex : uint32_t {
     UPGRADE_V4_0,
     UPGRADE_V5_DUMMY,
     UPGRADE_STAKE_MIN_DEPTH_V2,
+    UPGRADE_CHECK_WORK_V2,
     UPGRADE_TESTDUMMY,
     // NOTE: Also add new upgrades to NetworkUpgradeInfo in upgrades.cpp
     MAX_NETWORK_UPGRADES

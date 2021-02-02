@@ -82,6 +82,7 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
     ui->pushButtonTor->setButtonClassStyle("cssClass", "btn-check-tor-inactive");
     ui->pushButtonTor->setButtonText(tr("Tor Disabled"));
     ui->pushButtonTor->setChecked(false);
+    ui->pushButtonTor->setVisible(false);
 
     ui->pushButtonStack->setButtonClassStyle("cssClass", "btn-check-stack-inactive");
     ui->pushButtonStack->setButtonText(tr("Staking Disabled"));
@@ -96,6 +97,7 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
 
     ui->pushButtonColdStaking->setButtonClassStyle("cssClass", "btn-check-cold-staking-inactive");
     ui->pushButtonColdStaking->setButtonText(tr("Cold Staking Disabled"));
+    ui->pushButtonColdStaking->setVisible(false);
 
     ui->pushButtonSync->setButtonClassStyle("cssClass", "btn-check-sync");
     ui->pushButtonSync->setButtonText(tr(" %54 Synchronizing.."));
