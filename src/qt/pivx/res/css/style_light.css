@@ -546,18 +546,18 @@ QPushButton[cssClass="btn-check-stack"]:checked {
 QPushButton[cssClass="btn-check-conf"] {
     qproperty-icon: url("://ic-check-settings") ;
     qproperty-iconSize: 24px 24px;
-    color:#ffffff;
-    background-color:#50000000;
-    border-bottom:2px solid #000000;
+    color:#B3FFFFFF;
+    background-color:#405c4b7d;
+    border-bottom:2px solid #5C4B7D;
     border-radius:2px;
 }
 
 QPushButton[cssClass="btn-check-masternodes"] {
     qproperty-icon: url("://ic-check-settings") ;
     qproperty-iconSize: 24px 24px;
-    color:#ffffff;
-    background-color:#50000000;
-    border-bottom:2px solid #000000;
+    color:#B3FFFFFF;
+    background-color:#405c4b7d;
+    border-bottom:2px solid #5C4B7D;
     border-radius:2px;
 }
 
