@@ -202,14 +202,14 @@ public:
         nDefaultPort = 12341;
 
         // Note that of those with the service bits flag, most only support a subset of possible options
-        vSeeds.emplace_back(CDNSSeedData("seed1.sappcoin.com", "seed1.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed2.sappcoin.com", "seed2.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed3.sappcoin.com", "seed3.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed4.sappcoin.com", "seed4.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed5.sappcoin.com", "seed5.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed6.sappcoin.com", "seed6.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed7.sappcoin.com", "seed7.sappcoin.com", true));
-        vSeeds.emplace_back(CDNSSeedData("seed8.sappcoin.com", "seed8.sappcoin.com", true));
+        vSeeds.emplace_back(CDNSSeedData("seed1.dashdiamond.net", "seed1.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed2.dashdiamond.net", "seed2.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed3.dashdiamond.net", "seed3.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed4.dashdiamond.net", "seed4.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed5.dashdiamond.net", "seed5.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed6.dashdiamond.net", "seed6.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed7.dashdiamond.net", "seed7.dashdiamond.net", true));
+        vSeeds.emplace_back(CDNSSeedData("seed8.dashdiamond.net", "seed8.dashdiamond.net", true));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
