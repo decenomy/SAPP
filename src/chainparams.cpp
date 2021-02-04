@@ -211,18 +211,18 @@ public:
         vSeeds.emplace_back(CDNSSeedData("seed7.dashdiamond.net", "seed7.dashdiamond.net", true));
         vSeeds.emplace_back(CDNSSeedData("seed8.dashdiamond.net", "seed8.dashdiamond.net", true));
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 30); //D
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 83); //a
 		//TODO: There is no STAKING_ADDRESS part in the old code. Keeping the SAPP value for now. Find a proper value and set it for SAPP!
-        base58Prefixes[STAKING_ADDRESS] = std::vector<unsigned char>(1, 28);     // starting with 'C'
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 25);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x02)(0x2D)(0x25)(0x63).convert_to_container<std::vector<unsigned char> >();
+        //base58Prefixes[STAKING_ADDRESS] = std::vector<unsigned char>(1, 28);     // starting with 'C'
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 125); //s
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x02)(0x2D)(0x25)(0x73).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x02)(0x21)(0x31)(0x2B).convert_to_container<std::vector<unsigned char> >();
         // 	BIP44 coin type is from https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x08)(0x45).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x1d)(0xfc).convert_to_container<std::vector<unsigned char> >();
 
 		//TODO: By using fixseed creator python script, create fixed seeds in 'chainparamsseeds.h'
-        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
+        //vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // Sapling
 		//TODO: Set the parameters below for SAPP
