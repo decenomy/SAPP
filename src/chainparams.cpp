@@ -342,11 +342,11 @@ public:
          * a large 4-byte int at any alignment.
          */
 
-        pchMessageStart[0] = 0x46;
-        pchMessageStart[1] = 0x32;
-        pchMessageStart[2] = 0x64;
-        pchMessageStart[3] = 0x23;
-        nDefaultPort = 46328;
+        pchMessageStart[0] = 0x43;
+        pchMessageStart[1] = 0x76;
+        pchMessageStart[2] = 0x65;
+        pchMessageStart[3] = 0xba;
+        nDefaultPort = 51434;
 
         vFixedSeeds.clear();
         vSeeds.clear();
