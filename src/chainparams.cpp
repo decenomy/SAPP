@@ -195,11 +195,11 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
          */
-        pchMessageStart[0] = 0x13;
-        pchMessageStart[1] = 0xb2;
-        pchMessageStart[2] = 0x3e;
-        pchMessageStart[3] = 0x58;
-        nDefaultPort = 45328;
+        pchMessageStart[0] = 0xd9;
+        pchMessageStart[1] = 0xbd;
+        pchMessageStart[2] = 0xdb;
+        pchMessageStart[3] = 0x3d;
+        nDefaultPort = 12341;
 
         // Note that of those with the service bits flag, most only support a subset of possible options
         vSeeds.emplace_back(CDNSSeedData("seed1.sappcoin.com", "seed1.sappcoin.com", true));
