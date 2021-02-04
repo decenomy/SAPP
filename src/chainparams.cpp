@@ -437,12 +437,12 @@ public:
         consensus.nTime_RejectOldSporkKey = 0;
 
         // height based activations
-        consensus.height_last_ZC_AccumCheckpoint = 310;     // no checkpoints on regtest
-        consensus.height_last_ZC_WrappedSerials = -1;
-        consensus.height_start_InvalidUTXOsCheck = 999999999;
-        consensus.height_start_ZC_InvalidSerials = 999999999;
-        consensus.height_start_ZC_SerialRangeCheck = 300;
-        consensus.height_ZC_RecalcAccumulators = 999999999;
+        consensus.height_last_ZC_AccumCheckpoint = disabled; //310     // no checkpoints on regtest
+        consensus.height_last_ZC_WrappedSerials = disabled; //-1
+        consensus.height_start_InvalidUTXOsCheck = disabled; //999999999
+        consensus.height_start_ZC_InvalidSerials = disabled; //999999999
+        consensus.height_start_ZC_SerialRangeCheck = disabled; //300
+        consensus.height_ZC_RecalcAccumulators = disabled; //999999999
 
         // Zerocoin-related params
         consensus.ZC_Modulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -460,22 +460,22 @@ public:
 
         // Network upgrades
         consensus.vUpgrades[Consensus::BASE_NETWORK].nActivationHeight =
-                Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+                Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
                 Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
-        consensus.vUpgrades[Consensus::UPGRADE_POS].nActivationHeight           = 251;
-        consensus.vUpgrades[Consensus::UPGRADE_POS_V2].nActivationHeight        = 251;
-        consensus.vUpgrades[Consensus::UPGRADE_ZC].nActivationHeight            = 300;
-        consensus.vUpgrades[Consensus::UPGRADE_ZC_V2].nActivationHeight         = 300;
+        consensus.vUpgrades[Consensus::UPGRADE_POS].nActivationHeight           = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //251;
+        consensus.vUpgrades[Consensus::UPGRADE_POS_V2].nActivationHeight        = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //251;
+        consensus.vUpgrades[Consensus::UPGRADE_ZC].nActivationHeight            = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //300;
+        consensus.vUpgrades[Consensus::UPGRADE_ZC_V2].nActivationHeight         = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //300;
         consensus.vUpgrades[Consensus::UPGRADE_BIP65].nActivationHeight         =
-                Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
-        consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].nActivationHeight     = 400;
-        consensus.vUpgrades[Consensus::UPGRADE_V3_4].nActivationHeight          = 251;
+                Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].nActivationHeight     = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //400;
+        consensus.vUpgrades[Consensus::UPGRADE_V3_4].nActivationHeight          = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //251;
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].nActivationHeight          =
-                Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight       = 300;
-        consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = 1001;
-        consensus.vUpgrades[Consensus::UPGRADE_CHECK_WORK_V2].nActivationHeight = Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+                Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight       = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //300;
+        consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //1001;
+        consensus.vUpgrades[Consensus::UPGRADE_CHECK_WORK_V2].nActivationHeight = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
