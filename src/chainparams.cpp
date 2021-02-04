@@ -421,9 +421,9 @@ public:
         consensus.nProposalEstablishmentTime = 60 * 5;  // at least 5 min old to make it into a budget
         consensus.nStakeMinAge = 0;
         consensus.nStakeMinDepth = 2;
-        consensus.nTargetTimespan = 40 * 60;
-        consensus.nTargetTimespanV2 = 30 * 60;
-        consensus.nTargetSpacing = 1 * 60;
+        consensus.nTargetTimespan = 40 * 150;
+        consensus.nTargetTimespanV2 = 40 * 60;
+        consensus.nTargetSpacing = 1 * 150;
         consensus.nTimeSlotLength = 15;
 
         /* Spork Key for RegTest:
