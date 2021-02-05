@@ -221,7 +221,7 @@ void DashboardWidget::loadWalletModel()
         // chart filter
         stakesFilter = new TransactionFilterProxy();
         stakesFilter->setDynamicSortFilter(true);
-        stakesFilter->setOnlyStakes(true);
+        stakesFilter->setOnlyStakesandMN(true);
         stakesFilter->setSourceModel(txModel);
         hasStakes = stakesFilter->rowCount() > 0;
 
@@ -681,7 +681,7 @@ void DashboardWidget::onChartRefreshed()
     // init sets
     set0 = new QBarSet(CURRENCY_UNIT.c_str());
     set1 = new QBarSet("z" + QString(CURRENCY_UNIT.c_str()));
-    set2 = new QBarSet(QString(CURRENCY_UNIT.c_str()));
+    set2 = new QBarSet("MN_" + QString(CURRENCY_UNIT.c_str()));
     set0->setColor(QColor(92,75,125));
     set1->setColor(QColor(176,136,255));
     set2->setColor(QColor(176,136,255));
