@@ -157,6 +157,7 @@ private:
     QBarSeries *series = nullptr;
     QBarSet *set0 = nullptr;
     QBarSet *set1 = nullptr;
+    QBarSet *set2 = nullptr;
 
     QBarCategoryAxis *axisX = nullptr;
     QValueAxis *axisY = nullptr;
