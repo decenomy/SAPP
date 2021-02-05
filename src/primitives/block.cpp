@@ -16,7 +16,12 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-    if (nVersion < 4)  {
+    if (nVersion < 4)  
+        return XEVAN(BEGIN(nVersion), END(nNonce));
+    
+    return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
+    
+    /*if (nVersion < 4)  {
 #if defined(WORDS_BIGENDIAN)
         uint8_t data[80];
         WriteLE32(&data[0], nVersion);
@@ -31,7 +36,7 @@ uint256 CBlockHeader::GetHash() const
 #endif
     }
     // version >= 4
-    return SerializeHash(*this);
+    return SerializeHash(*this);*/
 }
 
 std::string CBlock::ToString() const
