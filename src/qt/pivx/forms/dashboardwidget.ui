@@ -574,6 +574,16 @@
             </property>
            </widget>
           </item>
+        <item>
+            <widget class="QLabel" name="labelAmountMNRewards">
+                <property name="text">
+                    <string>TextLabel</string>
+                </property>
+                <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                </property>
+            </widget>
+        </item>
           <item>
            <widget class="QLabel" name="labelAmountZpiv">
             <property name="text">
@@ -713,6 +723,33 @@
                    </size>
                   </property>
                  </spacer>
+                </item>
+
+                <item>
+                    <widget class="QLabel" name="labelSquareMNRewards">
+                        <property name="minimumSize">
+                            <size>
+                                <width>14</width>
+                                <height>14</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>14</width>
+                                <height>14</height>
+                            </size>
+                        </property>
+                        <property name="text">
+                            <string/>
+                        </property>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QLabel" name="labelMNRewards">
+                        <property name="text">
+                            <string>SAPP MN</string>
+                        </property>
+                    </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="labelSquarezPiv">

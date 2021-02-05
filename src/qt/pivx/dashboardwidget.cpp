@@ -52,11 +52,14 @@ DashboardWidget::DashboardWidget(PIVXGUI* parent) :
     setCssSubtitleScreen(ui->labelSubtitle);
 
     // Staking Information
+    ui->labelMessage->setText(tr("Amount of SAPP earned via Staking & Masternodes"));
     setCssSubtitleScreen(ui->labelMessage);
     setCssProperty(ui->labelSquarePiv, "square-chart-piv");
     setCssProperty(ui->labelSquarezPiv, "square-chart-zpiv");
     setCssProperty(ui->labelPiv, "text-chart-piv");
     setCssProperty(ui->labelZpiv, "text-chart-zpiv");
+	setCssProperty(ui->labelSquareMNRewards, "square-chart-mnrewards");
+	setCssProperty(ui->labelMNRewards, "text-chart-mnrewards");
 
     // Staking Amount
     QFont fontBold;
@@ -65,6 +68,8 @@ DashboardWidget::DashboardWidget(PIVXGUI* parent) :
     setCssProperty(ui->labelChart, "legend-chart");
     setCssProperty(ui->labelAmountPiv, "text-stake-piv-disable");
     setCssProperty(ui->labelAmountZpiv, "text-stake-zpiv-disable");
+	ui->labelAmountMNRewards->setText("0 SAPP");
+	setCssProperty(ui->labelAmountMNRewards, "text-stake-mnrewards-disable");
 
     setCssProperty({ui->pushButtonAll,  ui->pushButtonMonth, ui->pushButtonYear}, "btn-check-time");
     setCssProperty({ui->comboBoxMonths,  ui->comboBoxYears}, "btn-combo-chart-selected");
@@ -556,11 +561,17 @@ const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
         if (amountBy.contains(time)) {
             if (isPiv) {
                 amountBy[time].first += amount;
+            } else if (isMN) {
+                amountBy[time].second += amount;
+                hasMNRewards = true;
             } else
                 amountBy[time].second += amount;
         } else {
             if (isPiv) {
                 amountBy[time] = std::make_pair(amount, 0);
+            } else if (isMN) {
+                amountBy[time] = std::make_pair(0, amount);
+                hasMNRewards = true;
             } else {
                 amountBy[time] = std::make_pair(0, amount);
                 hasZpivStakes = true;
@@ -593,20 +604,24 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
         int num = (isOrderedByMonth && j > daysInMonth) ? (j % daysInMonth) : j;
         qreal piv = 0;
         qreal zpiv = 0;
+        qreal mnrewards = 0;
         if (chartData->amountsByCache.contains(num)) {
             std::pair <qint64, qint64> pair = chartData->amountsByCache[num];
             piv = (pair.first != 0) ? pair.first / 100000000 : 0;
             zpiv = (pair.second != 0) ? pair.second / 100000000 : 0;
+            mnrewards = (pair.second != 0) ? pair.second / 100000000 : 0;
             chartData->totalPiv += pair.first;
             chartData->totalZpiv += pair.second;
+            chartData->totalMNRewards += pair.second;
         }
 
         chartData->xLabels << ((withMonthNames) ? monthsNames[num - 1] : QString::number(num));
 
         chartData->valuesPiv.append(piv);
         chartData->valueszPiv.append(zpiv);
+        chartData->valuesMNRewards.append(mnrewards);
 
-        int max = std::max(piv, zpiv);
+        int max = std::max(std::max(piv, zpiv), mnrewards);
         if (max > chartData->maxValue) {
             chartData->maxValue = max;
         }
@@ -665,8 +680,10 @@ void DashboardWidget::onChartRefreshed()
     // init sets
     set0 = new QBarSet(CURRENCY_UNIT.c_str());
     set1 = new QBarSet("z" + QString(CURRENCY_UNIT.c_str()));
+    set2 = new QBarSet(QString(CURRENCY_UNIT.c_str()));
     set0->setColor(QColor(92,75,125));
     set1->setColor(QColor(176,136,255));
+    set2->setColor(QColor(176,136,255));
 
     if (!series) {
         series = new QBarSeries();
@@ -677,24 +694,32 @@ void DashboardWidget::onChartRefreshed()
 
     set0->append(chartData->valuesPiv);
     set1->append(chartData->valueszPiv);
+    set2->append(chartData->valuesMNRewards);
 
     // Total
     nDisplayUnit = walletModel->getOptionsModel()->getDisplayUnit();
-    if (chartData->totalPiv > 0 || chartData->totalZpiv > 0) {
+    if (chartData->totalPiv > 0 || chartData->totalZpiv > 0 || chartData->totalMNRewards ) {
         setCssProperty(ui->labelAmountPiv, "text-stake-piv");
         setCssProperty(ui->labelAmountZpiv, "text-stake-zpiv");
+        setCssProperty(ui->labelAmountMNRewards, "text-stake-mnrewards");
     } else {
         setCssProperty(ui->labelAmountPiv, "text-stake-piv-disable");
         setCssProperty(ui->labelAmountZpiv, "text-stake-zpiv-disable");
+        setCssProperty(ui->labelAmountMNRewards, "text-stake-mnrewards-disable");
     }
-    forceUpdateStyle({ui->labelAmountPiv, ui->labelAmountZpiv});
+
+    forceUpdateStyle({ui->labelAmountPiv, ui->labelAmountZpiv, ui->labelAmountMNRewards});
     ui->labelAmountPiv->setText(GUIUtil::formatBalance(chartData->totalPiv, nDisplayUnit));
     ui->labelAmountZpiv->setText(GUIUtil::formatBalance(chartData->totalZpiv, nDisplayUnit, true));
+	ui->labelAmountMNRewards->setText(GUIUtil::formatBalance(chartData->totalMNRewards, nDisplayUnit) +" MN");
 
     series->append(set0);
     if (hasZpivStakes)
         series->append(set1);
 
+	if(hasMNRewards)
+		series->append(set2);
+    
     // bar width
     if (chartShow == YEAR)
         series->setBarWidth(0.8);

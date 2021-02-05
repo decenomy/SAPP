@@ -83,8 +83,10 @@ public:
     qreal maxValue = 0;
     qint64 totalPiv = 0;
     qint64 totalZpiv = 0;
+    qint64 totalMNRewards = 0;
     QList<qreal> valuesPiv;
     QList<qreal> valueszPiv;
+    QList<qreal> valuesMNRewards;
     QStringList xLabels;
 };
 
@@ -166,6 +168,7 @@ private:
     int monthFilter = 0;
     int dayStart = 1;
     bool hasZpivStakes = false;
+    bool hasMNRewards = false;
 
     ChartData* chartData = nullptr;
     bool hasStakes = false;
