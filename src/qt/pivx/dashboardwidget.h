@@ -79,7 +79,7 @@ class ChartData {
 public:
     ChartData() {}
 
-    QMap<int, std::pair<qint64, qint64>> amountsByCache;
+    QMap<int, QMap<QString, qint64>> amountsByCache;
     qreal maxValue = 0;
     qint64 totalPiv = 0;
     qint64 totalZpiv = 0;
@@ -180,11 +180,11 @@ private:
     bool refreshChart();
     void tryChartRefresh();
     void updateStakeFilter();
-    const QMap<int, std::pair<qint64, qint64>> getAmountBy();
+    const QMap<int, QMap<QString, qint64>> getAmountBy();
     bool loadChartData(bool withMonthNames);
     void updateAxisX(const QStringList *arg = nullptr);
     void setChartShow(ChartShowType type);
-    std::pair<int, int> getChartRange(QMap<int, std::pair<qint64, qint64>> amountsBy);
+    std::pair<int, int> getChartRange(QMap<int, QMap<QString, qint64>> amountsBy);
 
 private Q_SLOTS:
     void onChartRefreshed();

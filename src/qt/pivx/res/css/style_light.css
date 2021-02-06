@@ -1787,7 +1787,7 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
     color:#b088ff;
     font-size:16px;
     padding:10px;
-    border-bottom: 5px solid #b088ff;
+    border-bottom: 5px solid #6666ff;
 }
 
 *[cssClass="text-stake-zpiv"] {
@@ -1817,7 +1817,7 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 }
 
 *[cssClass="text-chart-mnrewards"] {
-    color:#b088ff;
+    color:#6666ff;
     font-size:16px;
     padding-left:4px;
 }
@@ -1835,7 +1835,7 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 }
 
 *[cssClass="square-chart-mnrewards"] {
-    background-color:#b088ff;
+    background-color:#6666ff;
     border:none;
 }
 

@@ -13,6 +13,7 @@
 #include "clientmodel.h"
 #include "optionsmodel.h"
 #include "utiltime.h"
+#include <vector>
 #include <QPainter>
 #include <QModelIndex>
 #include <QList>
@@ -489,6 +490,7 @@ void DashboardWidget::changeChartColors()
     chart->setBackgroundBrush(QBrush(backgroundColor));
     if (set0) set0->setBorderColor(gridLineColorX);
     if (set1) set1->setBorderColor(gridLineColorX);
+    if (set2) set1->setBorderColor(gridLineColorX);
 }
 
 void DashboardWidget::updateStakeFilter()
@@ -528,11 +530,11 @@ void DashboardWidget::updateStakeFilter()
 }
 
 // pair PIV, zSAPP
-const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
+const QMap<int, QMap<QString, qint64>> DashboardWidget::getAmountBy()
 {
     updateStakeFilter();
     const int size = stakesFilter->rowCount();
-    QMap<int, std::pair<qint64, qint64>> amountBy;
+    QMap<int, QMap<QString, qint64>> amountBy;
     // Get all of the stakes
     for (int i = 0; i < size; ++i) {
         QModelIndex modelIndex = stakesFilter->index(i, TransactionTableModel::ToAddress);
@@ -561,20 +563,26 @@ const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
         }
         if (amountBy.contains(time)) {
             if (isPiv) {
-                amountBy[time].first += amount;
+                amountBy[time]["piv"] += amount;
             } else if (isMN) {
-                amountBy[time].second += amount;
+                amountBy[time]["mn"] += amount;
                 hasMNRewards = true;
             } else
-                amountBy[time].second += amount;
+                amountBy[time]["zpiv"] += amount;
         } else {
             if (isPiv) {
-                amountBy[time] = std::make_pair(amount, 0);
+                amountBy[time]["piv"] = amount;
+                amountBy[time]["mn"] = 0;
+                amountBy[time]["zpiv"] = 0;
             } else if (isMN) {
-                amountBy[time] = std::make_pair(0, amount);
+                amountBy[time]["piv"] = 0;
+                amountBy[time]["mn"] = amount;
+                amountBy[time]["zpiv"] = 0;
                 hasMNRewards = true;
             } else {
-                amountBy[time] = std::make_pair(0, amount);
+                amountBy[time]["piv"] = 0;
+                amountBy[time]["mn"] = 0;
+                amountBy[time]["zpiv"] = amount;
                 hasZpivStakes = true;
             }
         }
@@ -590,7 +598,7 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
     }
 
     chartData = new ChartData();
-    chartData->amountsByCache = getAmountBy(); // pair PIV, zSAPP
+    chartData->amountsByCache = getAmountBy(); 
 
     std::pair<int,int> range = getChartRange(chartData->amountsByCache);
     if (range.first == 0 && range.second == 0) {
@@ -607,13 +615,13 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
         qreal zpiv = 0;
         qreal mnrewards = 0;
         if (chartData->amountsByCache.contains(num)) {
-            std::pair <qint64, qint64> pair = chartData->amountsByCache[num];
-            piv = (pair.first != 0) ? pair.first / 100000000 : 0;
-            zpiv = (pair.second != 0) ? pair.second / 100000000 : 0;
-            mnrewards = (pair.second != 0) ? pair.second / 100000000 : 0;
-            chartData->totalPiv += pair.first;
-            chartData->totalZpiv += pair.second;
-            chartData->totalMNRewards += pair.second;
+            QMap<QString, qint64> pair = chartData->amountsByCache[num];
+            piv = (pair["piv"] != 0) ? pair["piv"] / 100000000 : 0;
+            zpiv = (pair["zpiv"] != 0) ? pair["zpiv"] / 100000000 : 0;
+            mnrewards = (pair["mn"] != 0) ? pair["mn"] / 100000000 : 0;
+            chartData->totalPiv += pair["piv"];
+            chartData->totalZpiv += pair["zpiv"];
+            chartData->totalMNRewards += pair["mn"];
         }
 
         chartData->xLabels << ((withMonthNames) ? monthsNames[num - 1] : QString::number(num));
@@ -684,7 +692,7 @@ void DashboardWidget::onChartRefreshed()
     set2 = new QBarSet("MN_" + QString(CURRENCY_UNIT.c_str()));
     set0->setColor(QColor(92,75,125));
     set1->setColor(QColor(176,136,255));
-    set2->setColor(QColor(176,136,255));
+    set2->setColor(QColor(102,102,255));
 
     if (!series) {
         series = new QBarSeries();
@@ -778,7 +786,7 @@ void DashboardWidget::onChartRefreshed()
     isLoading = false;
 }
 
-std::pair<int, int> DashboardWidget::getChartRange(QMap<int, std::pair<qint64, qint64>> amountsBy)
+std::pair<int, int> DashboardWidget::getChartRange(QMap<int, QMap<QString, qint64>> amountsBy)
 {
     switch (chartShow) {
         case YEAR:
