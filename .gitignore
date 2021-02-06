@@ -160,6 +160,7 @@ pivxd-new-gui.*
 
 # for Visual Studio Code
 
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
