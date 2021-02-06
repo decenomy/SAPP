@@ -720,13 +720,13 @@ void DashboardWidget::onChartRefreshed()
     forceUpdateStyle({ui->labelAmountPiv, ui->labelAmountZpiv, ui->labelAmountMNRewards});
     ui->labelAmountPiv->setText(GUIUtil::formatBalance(chartData->totalPiv, nDisplayUnit));
     ui->labelAmountZpiv->setText(GUIUtil::formatBalance(chartData->totalZpiv, nDisplayUnit, true));
-	ui->labelAmountMNRewards->setText(GUIUtil::formatBalance(chartData->totalMNRewards, nDisplayUnit) +" MN");
+	ui->labelAmountMNRewards->setText(GUIUtil::formatBalance(chartData->totalMNRewards, nDisplayUnit));
 
     series->append(set0);
     if (hasZpivStakes)
         series->append(set1);
 
-	if(hasMNRewards)
+	//if(hasMNRewards)
 		series->append(set2);
     
     // bar width
