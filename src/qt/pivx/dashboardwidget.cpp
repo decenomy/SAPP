@@ -13,7 +13,6 @@
 #include "clientmodel.h"
 #include "optionsmodel.h"
 #include "utiltime.h"
-#include <vector>
 #include <QPainter>
 #include <QModelIndex>
 #include <QList>
@@ -726,7 +725,7 @@ void DashboardWidget::onChartRefreshed()
     if (hasZpivStakes)
         series->append(set1);
 
-	//if(hasMNRewards)
+	if(hasMNRewards)
 		series->append(set2);
     
     // bar width
