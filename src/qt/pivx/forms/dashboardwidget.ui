@@ -512,7 +512,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Staking Rewards</string>
+               <string>Rewards Chart</string>
               </property>
              </widget>
             </item>
