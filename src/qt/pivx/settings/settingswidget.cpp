@@ -402,6 +402,11 @@ void SettingsWidget::onAboutClicked()
 
 }
 
+void SettingsWidget::showPeers()
+{
+    settingsInformationWidget->showPeers();
+}
+
 void SettingsWidget::openNetworkMonitor()
 {
     settingsInformationWidget->openNetworkMonitor();

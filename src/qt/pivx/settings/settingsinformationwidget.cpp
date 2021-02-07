@@ -152,6 +152,15 @@ void SettingsInformationWidget::setMasternodeCount(const QString& strMasternodes
     ui->labelInfoMasternodes->setText(strMasternodes);
 }
 
+void SettingsInformationWidget::showPeers()
+{
+    if (!rpcConsole) {
+        rpcConsole = new RPCConsole(0);
+        rpcConsole->setClientModel(clientModel);
+    }
+    rpcConsole->showPeers();
+}
+
 void SettingsInformationWidget::openNetworkMonitor()
 {
     if (!rpcConsole) {

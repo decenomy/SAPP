@@ -514,6 +514,11 @@ void PIVXGUI::goToReceive()
     showTop(receiveWidget);
 }
 
+void PIVXGUI::showPeers()
+{
+    settingsWidget->showPeers();
+}
+
 void PIVXGUI::openNetworkMonitor()
 {
     settingsWidget->openNetworkMonitor();
