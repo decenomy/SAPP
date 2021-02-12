@@ -71,12 +71,13 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
     (0, uint256("0x00000e474f09929213ecad858b8c24002f8146cb459b98e5f665c27eea85f279"))
-    (200, uint256("0x00000f964b400fbde1d5ad611abe92237eb983a916c9f1dd545fa56ebf271f77"));
+    (200, uint256("0x00000f964b400fbde1d5ad611abe92237eb983a916c9f1dd545fa56ebf271f77"))
+    (292000, uint256("0xb8ba9affa9b7460e048511205d43e8e57cecd8c24158c954ba29d24c8659e524"));
 
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-     1567820599, // * UNIX timestamp of last checkpoint block
-    206,          // * total number of transactions between genesis and last checkpoint
+    1612441147, // * UNIX timestamp of last checkpoint block
+    935465,          // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the UpdateTip debug.log lines)
     2000        // * estimated number of transactions per day after checkpoint
 };
