@@ -371,34 +371,38 @@ CAmount CMasternode::GetBlockValue(int nHeight)
         nSubsidy = 5 * COIN;
     } else if (prevHeight <= 350000 && prevHeight > 210240) {
         nSubsidy = 4.5 * COIN;
-    } else if (prevHeight <= 500000 && prevHeight > 350000) {
+    } else if (nHeight <= 500000 && prevHeight > 350000) {
         nSubsidy = 25 * COIN;
-    } else if (prevHeight <= 600000 && prevHeight > 500000) {
+    } else if (nHeight <= 600000 && nHeight > 500000) {
         nSubsidy = 60 * COIN;
-    } else if (prevHeight <= 700000 && prevHeight > 600000) {
+    } else if (nHeight <= 700000 && nHeight > 600000) {
         nSubsidy = 100 * COIN;
-    } else if (prevHeight <= 800000 && prevHeight > 700000) {
+    } else if (nHeight <= 800000 && nHeight > 700000) {
         nSubsidy = 200 * COIN;
-    } else if (prevHeight <= 900000 && prevHeight > 800000) {
+    } else if (nHeight <= 900000 && nHeight > 800000) {
         nSubsidy = 300 * COIN;
-    } else if (prevHeight <= 1000000 && prevHeight > 900000) {
+    } else if (nHeight <= 1000000 && nHeight > 900000) {
         nSubsidy = 450 * COIN;
-    } else if (prevHeight <= 1100000 && prevHeight > 1000000) {
+    } else if (nHeight <= 1100000 && nHeight > 1000000) {
         nSubsidy = 400 * COIN;
-    } else if (prevHeight <= 1200000 && prevHeight > 1100000) {
+    } else if (nHeight <= 1200000 && nHeight > 1100000) {
         nSubsidy = 300 * COIN;
-    } else if (prevHeight <= 1300000 && prevHeight > 1200000) {
+    } else if (nHeight <= 1300000 && nHeight > 1200000) {
         nSubsidy = 250 * COIN;
-    } else if (prevHeight <= 1400000 && prevHeight > 1300000) {
+    } else if (nHeight <= 1400000 && nHeight > 1300000) {
         nSubsidy = 200 * COIN;
-    } else if (prevHeight <= 1500000 && prevHeight > 1400000) {
+    } else if (nHeight <= 1500000 && nHeight > 1400000) {
         nSubsidy = 150 * COIN;
-    } else if (prevHeight <= 1600000 && prevHeight > 1500000) {
+    } else if (nHeight <= 1600000 && nHeight > 1500000) {
         nSubsidy = 100 * COIN;
-    } else if (prevHeight <= 1700000 && prevHeight > 1600000) {
+    } else if (nHeight <= 1700000 && nHeight > 1600000) {
         nSubsidy = 80 * COIN;
     } else {
         nSubsidy = 50 * COIN;
+    }
+
+    if(Params().IsLiquiMiningBlock(prevHeight + 1)) {
+        nSubsidy += Params().GetLiquiMiningValue(prevHeight + 1);
     }
 
     return nSubsidy;

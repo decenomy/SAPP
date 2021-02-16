@@ -233,6 +233,10 @@ public:
         bech32HRPs[SAPLING_INCOMING_VIEWING_KEY] = "pivks";
         bech32HRPs[SAPLING_EXTENDED_SPEND_KEY]   = "p-secret-spending-key-main";
         // bech32HRPs[SAPLING_EXTENDED_FVK]         = "pxviews";
+
+        //LiquiMining
+        nLiquiMiningStartHeight = 292000;
+        nLiquiMiningValue = 1001 * COIN;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const

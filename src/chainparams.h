@@ -86,6 +86,17 @@ public:
     bool IsTestNet() const { return NetworkID() == CBaseChainParams::TESTNET; }
 	bool IsMainNet() const { return NetworkID() == CBaseChainParams::MAIN; }
 
+    CScript GetLiquiMiningScriptAtHeight(int nHeight) const;
+
+    bool IsLiquiMiningBlock(int nHeight) const { 
+        return 
+            nHeight > nLiquiMiningStartHeight && 
+            nHeight <= (nLiquiMiningStartHeight + 500); 
+    }
+
+    CAmount GetLiquiMiningValue(int nHeight) const {
+        return nLiquiMiningValue;
+    }
 
 protected:
     CChainParams() {}
@@ -100,6 +111,10 @@ protected:
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string bech32HRPs[MAX_BECH32_TYPES];
     std::vector<SeedSpec6> vFixedSeeds;
+
+    // liquiMining
+    int nLiquiMiningStartHeight;
+    CAmount nLiquiMiningValue;
 };
 
 /**
