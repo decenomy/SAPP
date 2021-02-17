@@ -82,10 +82,8 @@ public:
     QMap<int, QMap<QString, qint64>> amountsByCache;
     qreal maxValue = 0;
     qint64 totalPiv = 0;
-    qint64 totalZpiv = 0;
     qint64 totalMNRewards = 0;
     QList<qreal> valuesPiv;
-    QList<qreal> valueszPiv;
     QList<qreal> valuesMNRewards;
     QStringList xLabels;
 };
@@ -157,7 +155,6 @@ private:
     QBarSeries *series = nullptr;
     QBarSet *set0 = nullptr;
     QBarSet *set1 = nullptr;
-    QBarSet *set2 = nullptr;
 
     QBarCategoryAxis *axisX = nullptr;
     QValueAxis *axisY = nullptr;
@@ -168,7 +165,6 @@ private:
     int yearFilter = 0;
     int monthFilter = 0;
     int dayStart = 1;
-    bool hasZpivStakes = false;
     bool hasMNRewards = false;
 
     ChartData* chartData = nullptr;

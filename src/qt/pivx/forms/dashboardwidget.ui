@@ -583,17 +583,7 @@
                     <set>Qt::AlignCenter</set>
                 </property>
             </widget>
-        </item>
-          <item>
-           <widget class="QLabel" name="labelAmountZpiv">
-            <property name="text">
-             <string notr="true">0 zSAPP</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
+        </item> 
          </layout>
         </item>
         <item>
@@ -751,32 +741,7 @@
                         </property>
                     </widget>
                 </item>
-                <item>
-                 <widget class="QLabel" name="labelSquarezPiv">
-                  <property name="minimumSize">
-                   <size>
-                    <width>14</width>
-                    <height>14</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>14</width>
-                    <height>14</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="labelZpiv">
-                  <property name="text">
-                   <string notr="true">zSAPP</string>
-                  </property>
-                 </widget>
-                </item>
+                
                </layout>
               </item>
               <item>
