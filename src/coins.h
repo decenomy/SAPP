@@ -268,7 +268,7 @@ public:
     size_t DynamicMemoryUsage() const;
 
     /** 
-     * Amount of sapphire coming in to a transaction
+     * Amount of dashdiamond coming in to a transaction
      * Note that lightweight clients may not know anything besides the hash of previous transactions,
      * so may not be able to calculate this.
      *

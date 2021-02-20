@@ -12,7 +12,7 @@
 #include <vector>
 
 /**
- * CBaseChainParams defines the base parameters (shared between sapphire-cli and sapphired)
+ * CBaseChainParams defines the base parameters (shared between dashdiamond-cli and dashdiamondd)
  * of a given instance of the Sapphire system.
  */
 class CBaseChainParams

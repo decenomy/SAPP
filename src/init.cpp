@@ -216,7 +216,7 @@ void PrepareShutdown()
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
     /// module was initialized.
-    util::ThreadRename("sapphire-shutoff");
+    util::ThreadRename("dashdiamond-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopHTTPRPC();
     StopREST();
@@ -646,7 +646,7 @@ struct CImportingNow {
 
 void ThreadImport(std::vector<fs::path> vImportFiles)
 {
-    util::ThreadRename("sapphire-loadblk");
+    util::ThreadRename("dashdiamond-loadblk");
 
     // -reindex
     if (fReindex) {
@@ -967,7 +967,7 @@ void InitLogging()
     LogPrintf("Sapphire version %s (%s)\n", version_string, CLIENT_DATE);
 }
 
-/** Initialize sapphire.
+/** Initialize dashdiamond.
  *  @pre Parameters should be parsed and config file should be read.
  */
 bool AppInit2()

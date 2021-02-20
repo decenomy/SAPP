@@ -2165,7 +2165,7 @@ static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck()
 {
-    util::ThreadRename("sapphire-scriptch");
+    util::ThreadRename("dashdiamond-scriptch");
     scriptcheckqueue.Thread();
 }
 

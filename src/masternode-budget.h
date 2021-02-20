@@ -415,7 +415,7 @@ public:
 
     // Verify and vote on finalized budget
     void CheckAndVote();
-    //total sapphire paid out by this budget
+    //total dashdiamond paid out by this budget
     CAmount GetTotalPayout() const;
     //vote on this finalized budget as a masternode
     void SubmitVote();

@@ -76,9 +76,9 @@ static bool AppInitRPC(int argc, char* argv[])
         std::string strUsage = _("Sapphire Core RPC client version") + " " + FormatFullVersion() + "\n";
         if (!mapArgs.count("-version")) {
             strUsage += "\n" + _("Usage:") + "\n" +
-                        "  sapphire-cli [options] <command> [params]  " + _("Send command to Sapphire Core") + "\n" +
-                        "  sapphire-cli [options] help                " + _("List commands") + "\n" +
-                        "  sapphire-cli [options] help <command>      " + _("Get help for a command") + "\n";
+                        "  dashdiamond-cli [options] <command> [params]  " + _("Send command to Sapphire Core") + "\n" +
+                        "  dashdiamond-cli [options] help                " + _("List commands") + "\n" +
+                        "  dashdiamond-cli [options] help <command>      " + _("Get help for a command") + "\n";
 
             strUsage += "\n" + HelpMessageCli();
         }

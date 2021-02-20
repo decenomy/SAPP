@@ -577,7 +577,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
     LogPrintf("SapphireMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    util::ThreadRename("sapphire-miner");
+    util::ThreadRename("dashdiamond-miner");
     const Consensus::Params& consensus = Params().GetConsensus();
     const int64_t nSpacingMillis = consensus.nTargetSpacing * 1000;
 
