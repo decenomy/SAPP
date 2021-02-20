@@ -16,14 +16,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Sapphire"
-            VALUE "FileDescription",    "sapphired (OSS daemon/client for Sapphire)"
+            VALUE "CompanyName",        "dashd"
+            VALUE "FileDescription",    "dashdd (OSS daemon/client for Sapphire)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "sapphired"
+            VALUE "InternalName",       "dashdd"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "sapphired.exe"
-            VALUE "ProductName",        "sapphired"
+            VALUE "OriginalFilename",   "dashdd.exe"
+            VALUE "ProductName",        "dashdd"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

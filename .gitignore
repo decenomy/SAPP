@@ -18,6 +18,10 @@ src/sapphire
 src/sapphired
 src/sapphire-cli
 src/sapphire-tx
+src/dashdd
+src/dashd-tx
+src/dashd-cli
+src/qt/dashd-qt
 src/bench/bench_sapphire
 src/test/test_sapphire
 src/qt/test/test_sapphire-qt
