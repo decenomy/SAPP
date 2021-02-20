@@ -578,6 +578,8 @@ std::string LicenseInfo()
            "\n" +
            FormatParagraph(strprintf(_("Copyright (C) 2020-%i Sapphire Core Developers"), COPYRIGHT_YEAR)) + "\n" +
            "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2021-%i Dash Diamond Core Developers"), COPYRIGHT_YEAR)) + "\n" +
+           "\n" +
            FormatParagraph(_("This is experimental software.")) + "\n" +
            "\n" +
            FormatParagraph(_("Distributed under the MIT software license, see the accompanying file COPYING or <http://www.opensource.org/licenses/mit-license.php>.")) + "\n" +
@@ -704,7 +706,7 @@ void ThreadImport(std::vector<fs::path> vImportFiles)
 }
 
 /** Sanity checks
- *  Ensure that Sapphire is running in a usable environment with all
+ *  Ensure that Dash Diamond is running in a usable environment with all
  *  necessary library support.
  */
 bool InitSanityCheck(void)
@@ -964,7 +966,7 @@ void InitLogging()
 #else
     version_string += " (release build)";
 #endif
-    LogPrintf("Sapphire version %s (%s)\n", version_string, CLIENT_DATE);
+    LogPrintf("Dash Diamond version %s (%s)\n", version_string, CLIENT_DATE);
 }
 
 /** Initialize dashdiamond.
@@ -1123,11 +1125,11 @@ bool AppInit2()
 
     // Sanity check
     if (!InitSanityCheck())
-        return UIError(_("Initialization sanity check failed. Sapphire Core is shutting down."));
+        return UIError(_("Initialization sanity check failed. Dash Diamond Core is shutting down."));
 
     std::string strDataDir = GetDataDir().string();
 
-    // Make sure only a single Sapphire process is using the data directory.
+    // Make sure only a single Dash Diamond process is using the data directory.
     fs::path pathLockFile = GetDataDir() / ".lock";
     FILE* file = fsbridge::fopen(pathLockFile, "a"); // empty lock file; created if it doesn't exist.
     if (file) fclose(file);
@@ -1135,7 +1137,7 @@ bool AppInit2()
 
     // Wait maximum 10 seconds if an old wallet is still running. Avoids lockup during restart
     if (!lock.timed_lock(boost::get_system_time() + boost::posix_time::seconds(10)))
-        return UIError(strprintf(_("Cannot obtain a lock on data directory %s. Sapphire Core is probably already running."), strDataDir));
+        return UIError(strprintf(_("Cannot obtain a lock on data directory %s. Dash Diamond Core is probably already running."), strDataDir));
 
 #ifndef WIN32
     CreatePidFile(GetPidFile(), getpid());
