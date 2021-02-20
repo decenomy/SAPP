@@ -477,6 +477,7 @@ def get_header_lines(header, start_year, end_year):
 CPP_HEADER = '''
 // Copyright (c) %s Sapphire Core developers
 // Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2019 The DECENOMY Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 '''
