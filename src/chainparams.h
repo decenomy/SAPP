@@ -98,6 +98,8 @@ public:
         return nLiquiMiningValue;
     }
 
+    CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
+
 protected:
     CChainParams() {}
 
