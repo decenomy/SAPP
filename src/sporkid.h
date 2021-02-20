@@ -19,8 +19,8 @@ enum SporkId : int32_t {
     SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT      = 10007,
     SPORK_9_MASTERNODE_BUDGET_ENFORCEMENT       = 10008,
     SPORK_13_ENABLE_SUPERBLOCKS                 = 10012,
-    SPORK_14_NEW_PROTOCOL_ENFORCEMENT           = 10013,
-    SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2         = 10014,
+    SPORK_14_MIN_PROTOCOL_ACCEPTED           = 10013,
+    SPORK_15_NOOP                               = 10014,
     SPORK_16_ZEROCOIN_MAINTENANCE_MODE          = 10015,
 
  	// SPORK_18_COLDSTAKING_ENFORCEMENT is being set to 10020 for compatibility with v1.3.3.x wallets.
