@@ -17,7 +17,7 @@
 const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         {
                 /*.strName =*/ "Base",
-                /*.strInfo =*/ "Sapphire network",
+                /*.strInfo =*/ "Dash Diamond network",
         },
         {
                 /*.strName =*/ "PoS",
@@ -53,7 +53,7 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         },
         {
                 /*.strName =*/ "v2_dummy",
-                /*.strInfo =*/ "Placeholder for future Sapphire version 2.0 upgrade",
+                /*.strInfo =*/ "Placeholder for future Dash Diamond version 2.0 upgrade",
         },
         {
                 /*.strName =*/ "Test_dummy",

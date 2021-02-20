@@ -92,7 +92,7 @@ const char * const PIVX_PID_FILENAME = "dashdiamond.pid";
 const char * const PIVX_MASTERNODE_CONF_FILENAME = "masternode.conf";
 
 
-// Sapphire only features
+// Dash Diamond only features
 // Masternode
 bool fMasterNode = false;
 std::string strMasterNodePrivKey = "";
@@ -292,13 +292,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-// Windows < Vista: C:\Documents and Settings\Username\Application Data\Sapphire
-// Windows >= Vista: C:\Users\Username\AppData\Roaming\Sapphire
-// Mac: ~/Library/Application Support/Sapphire
+// Windows < Vista: C:\Documents and Settings\Username\Application Data\DashDiamond
+// Windows >= Vista: C:\Users\Username\AppData\Roaming\DashDiamond
+// Mac: ~/Library/Application Support/DashDiamond
 // Unix: ~/.dashdiamond
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Sapphire";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "DashDiamond";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -310,7 +310,7 @@ fs::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "Sapphire";
+    return pathRet / "DashDiamond";
 #else
     // Unix
     return pathRet / ".dashdiamond";
@@ -326,13 +326,13 @@ static RecursiveMutex csPathCached;
 static fs::path ZC_GetBaseParamsDir()
 {
     // Copied from GetDefaultDataDir and adapter for zcash params.
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\SapphireParams
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\SapphireParams
-    // Mac: ~/Library/Application Support/SapphireParams
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\DashDiamondParams
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\DashDiamondParams
+    // Mac: ~/Library/Application Support/DashDiamondParams
     // Unix: ~/.dashdiamond-params
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "SapphireParams";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "DashDiamondParams";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -344,7 +344,7 @@ static fs::path ZC_GetBaseParamsDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "SapphireParams";
+    return pathRet / "DashDiamondParams";
 #else
     // Unix
     return pathRet / ".dashdiamond-params";

@@ -46,7 +46,7 @@ bool AcceptToMemoryPoolZerocoin(const CTransaction& tx, CAmount& nValueIn, int c
 bool DisconnectZerocoinTx(const CTransaction& tx, CAmount& nValueIn, CZerocoinDB* zerocoinDB)
 {
     /** UNDO ZEROCOIN DATABASING
-         * note we only undo zerocoin databasing in the following statement, value to and from Sapphire
+         * note we only undo zerocoin databasing in the following statement, value to and from Dash Diamond
          * addresses should still be handled by the typical bitcoin based undo code
          * */
     if (tx.ContainsZerocoins()) {
