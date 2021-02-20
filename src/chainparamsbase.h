@@ -13,7 +13,7 @@
 
 /**
  * CBaseChainParams defines the base parameters (shared between dashdiamond-cli and dashdiamondd)
- * of a given instance of the Sapphire system.
+ * of a given instance of the Dash Diamond system.
  */
 class CBaseChainParams
 {
