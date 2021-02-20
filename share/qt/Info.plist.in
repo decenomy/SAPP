@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Sapphire-Qt</string>
+  <string>DashDiamond-Qt</string>
 
   <key>CFBundleName</key>
-  <string>Sapphire-Qt</string>
+  <string>DashDiamond-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>io.dashdiamond.Sapphire-Qt</string>
+  <string>io.dashdiamond.DashDiamond-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -46,7 +46,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>io.dashdiamond.SapphirePayment</string>
+      <string>io.dashdiamond.DashDiamondPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>dashdiamond</string>
@@ -60,7 +60,7 @@
       <key>UTTypeIdentifier</key>
       <string>io.dashdiamond.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Sapphire payment request</string>
+      <string>DashDiamond payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
