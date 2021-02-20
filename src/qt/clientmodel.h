@@ -41,7 +41,7 @@ enum NumConnections {
     CONNECTIONS_ALL = (CONNECTIONS_IN | CONNECTIONS_OUT),
 };
 
-/** Model for Sapphire network client. */
+/** Model for Dash Diamond network client. */
 class ClientModel : public QObject
 {
     Q_OBJECT

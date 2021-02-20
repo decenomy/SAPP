@@ -15,7 +15,7 @@ static const int MODEL_UPDATE_DELAY = 1000;
 /* AskPassphraseDialog -- Maximum passphrase length */
 static const int MAX_PASSPHRASE_SIZE = 1024;
 
-/* Sapphire GUI -- Size of icons in status bar */
+/* Dash Diamond GUI -- Size of icons in status bar */
 static const int STATUSBAR_ICONSIZE = 16;
 
 static const bool DEFAULT_SPLASHSCREEN = true;
@@ -51,9 +51,9 @@ static const int MAX_URI_LENGTH = 255;
 #define EXPORT_IMAGE_SIZE 256
 
 
-#define QAPP_ORG_NAME "Sapphire"
+#define QAPP_ORG_NAME "Dash Diamond"
 #define QAPP_ORG_DOMAIN "sappcoin.com"
-#define QAPP_APP_NAME_DEFAULT "Sapphire-Qt"
-#define QAPP_APP_NAME_TESTNET "Sapphire-Qt-testnet"
+#define QAPP_APP_NAME_DEFAULT "DashDiamond-Qt"
+#define QAPP_APP_NAME_TESTNET "DashDiamond-Qt-testnet"
 
 #endif // BITCOIN_QT_GUICONSTANTS_H
