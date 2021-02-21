@@ -1333,7 +1333,7 @@
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>Custom zSAPP Backup Path:</string>
+          <string>Custom zDASHD Backup Path:</string>
          </property>
         </widget>
        </item>

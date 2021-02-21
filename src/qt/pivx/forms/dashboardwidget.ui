@@ -454,7 +454,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="text">
-            <string>How to get SAPP</string>
+            <string>How to get DASHD</string>
            </property>
           </widget>
          </item>
@@ -519,7 +519,7 @@
             <item>
              <widget class="QLabel" name="labelMessage">
               <property name="text">
-               <string>Amount of SAPP and zSAPP staked.</string>
+               <string>Amount of DASHD and zDASHD staked.</string>
               </property>
              </widget>
             </item>
@@ -567,7 +567,7 @@
           <item>
            <widget class="QLabel" name="labelAmountPiv">
             <property name="text">
-             <string notr="true">0 SAPP</string>
+             <string notr="true">0 DASHD</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -577,7 +577,7 @@
           <item>
            <widget class="QLabel" name="labelAmountZpiv">
             <property name="text">
-             <string notr="true">0 zSAPP</string>
+             <string notr="true">0 zDASHD</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -694,7 +694,7 @@
                 <item>
                  <widget class="QLabel" name="labelPiv">
                   <property name="text">
-                   <string notr="true">SAPP</string>
+                   <string notr="true">DASHD</string>
                   </property>
                  </widget>
                 </item>
@@ -736,7 +736,7 @@
                 <item>
                  <widget class="QLabel" name="labelZpiv">
                   <property name="text">
-                   <string notr="true">zSAPP</string>
+                   <string notr="true">zDASHD</string>
                   </property>
                  </widget>
                 </item>
