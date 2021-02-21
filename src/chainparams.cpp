@@ -216,7 +216,7 @@ public:
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 30); //D
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 83); //a
-		//TODO: There is no STAKING_ADDRESS part in the old code. Keeping the SAPP value for now. Find a proper value and set it for SAPP!
+		//TODO: There is no STAKING_ADDRESS part in the old code. Keeping the DASHD value for now. Find a proper value and set it for DASHD!
         //base58Prefixes[STAKING_ADDRESS] = std::vector<unsigned char>(1, 28);     // starting with 'C'
         base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 125); //s
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x02)(0x2D)(0x25)(0x73).convert_to_container<std::vector<unsigned char> >();
@@ -228,7 +228,7 @@ public:
         //vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // Sapling
-		//TODO: Set the parameters below for SAPP
+		//TODO: Set the parameters below for DASHD
         bech32HRPs[SAPLING_PAYMENT_ADDRESS]      = "ps";
         bech32HRPs[SAPLING_FULL_VIEWING_KEY]     = "pviews";
         bech32HRPs[SAPLING_INCOMING_VIEWING_KEY] = "pivks";

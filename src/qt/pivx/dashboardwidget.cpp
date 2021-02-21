@@ -225,7 +225,7 @@ void DashboardWidget::loadWalletModel()
         connect(walletModel->getOptionsModel(), &OptionsModel::hideChartsChanged, this, &DashboardWidget::onHideChartsChanged);
 #endif
     }
-    // update the display unit, to not use the default ("SAPP")
+    // update the display unit, to not use the default ("DASHD")
     updateDisplayUnit();
 }
 
