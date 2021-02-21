@@ -108,7 +108,7 @@ public:
     }
 };
 
-/** Interface to Sapphire wallet from Qt view code. */
+/** Interface to Dash Diamond wallet from Qt view code. */
 class WalletModel : public QObject
 {
     Q_OBJECT

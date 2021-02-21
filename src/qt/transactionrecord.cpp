@@ -194,7 +194,7 @@ bool TransactionRecord::decomposeCreditTransaction(const CWallet* wallet, const 
             sub.credit = txout.nValue;
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address)) {
-                // Received by Sapphire Address
+                // Received by Dash Diamond Address
                 sub.type = TransactionRecord::RecvWithAddress;
                 sub.address = EncodeDestination(address);
             } else {
@@ -275,7 +275,7 @@ bool TransactionRecord::decomposeDebitTransaction(const CWallet* wallet, const C
             //private keys that the change was sent to. Do not display a "sent to" here.
             if (wtx.HasZerocoinMintOutputs())
                 continue;
-            // Sent to Sapphire Address
+            // Sent to Dash Diamond Address
             sub.type = TransactionRecord::SendToAddress;
             sub.address = EncodeDestination(address);
         } else if (txout.IsZerocoinMint()){
