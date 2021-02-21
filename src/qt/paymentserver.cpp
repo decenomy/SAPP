@@ -44,14 +44,14 @@
 
 
 const int BITCOIN_IPC_CONNECT_TIMEOUT = 1000; // milliseconds
-const QString BITCOIN_IPC_PREFIX("sapphire:");
+const QString BITCOIN_IPC_PREFIX("dashdiamond:");
 // BIP70 payment protocol messages
 const char* BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
 const char* BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
 // BIP71 payment protocol media types
-const char* BIP71_MIMETYPE_PAYMENT = "application/sapphire-payment";
-const char* BIP71_MIMETYPE_PAYMENTACK = "application/sapphire-paymentack";
-const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/sapphire-paymentrequest";
+const char* BIP71_MIMETYPE_PAYMENT = "application/dashdiamond-payment";
+const char* BIP71_MIMETYPE_PAYMENTACK = "application/dashdiamond-paymentack";
+const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/dashdiamond-paymentrequest";
 // BIP70 max payment request size in bytes (DoS protection)
 const qint64 BIP70_MAX_PAYMENTREQUEST_SIZE = 50000;
 
@@ -78,7 +78,7 @@ namespace // Anon namespace
 //
 static QString ipcServerName()
 {
-    QString name("SapphireQt");
+    QString name("DashDiamondQt");
 
     // Append a simple hash of the datadir
     // Note that GetDataDir(true) returns a different path
@@ -185,11 +185,11 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
         if (arg.startsWith("-"))
             continue;
 
-        // If the sapphire: URI contains a payment request, we are not able to detect the
+        // If the dashdiamond: URI contains a payment request, we are not able to detect the
         // network as that would require fetching and parsing the payment request.
         // That means clicking such an URI which contains a testnet payment request
         // will start a mainnet instance and throw a "wrong network" error.
-        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // sapphire: URI
+        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // dashdiamond: URI
         {
             savedPaymentRequests.append(arg);
 
@@ -269,7 +269,7 @@ PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) : QObject(p
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // Install global event filter to catch QFileOpenEvents
-    // on Mac: sent when you click sapphire: links
+    // on Mac: sent when you click dashdiamond: links
     // other OSes: helpful when dealing with payment request files (in the future)
     if (parent)
         parent->installEventFilter(this);
@@ -285,7 +285,7 @@ PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) : QObject(p
         if (!uriServer->listen(name)) {
             // constructor is called early in init, so don't use "emit message()" here
             QMessageBox::critical(0, tr("Payment request error"),
-                tr("Cannot start sapphire: click-to-pay handler"));
+                tr("Cannot start dashdiamond: click-to-pay handler"));
         } else {
             connect(uriServer, &QLocalServer::newConnection, this, &PaymentServer::handleURIConnection);
             connect(this, &PaymentServer::receivedPaymentACK, this, &PaymentServer::handlePaymentACK);
@@ -299,12 +299,12 @@ PaymentServer::~PaymentServer()
 }
 
 //
-// OSX-specific way of handling sapphire: URIs and
+// OSX-specific way of handling dashdiamond: URIs and
 // PaymentRequest mime types
 //
 bool PaymentServer::eventFilter(QObject* object, QEvent* event)
 {
-    // clicking on sapphire: URIs creates FileOpen events on the Mac
+    // clicking on dashdiamond: URIs creates FileOpen events on the Mac
     if (event->type() == QEvent::FileOpen) {
         QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
         if (!fileEvent->file().isEmpty())
@@ -325,7 +325,7 @@ void PaymentServer::initNetManager()
     if (netManager != NULL)
         delete netManager;
 
-    // netManager is used to fetch paymentrequests given in sapphire: URIs
+    // netManager is used to fetch paymentrequests given in dashdiamond: URIs
     netManager = new QNetworkAccessManager(this);
 
     QNetworkProxy proxy;
@@ -360,7 +360,7 @@ void PaymentServer::handleURIOrFile(const QString& s)
         return;
     }
 
-    if (s.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // sapphire: URI
+    if (s.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // dashdiamond: URI
     {
         QUrlQuery uri((QUrl(s)));
         if (uri.hasQueryItem("r")) // payment request URI
@@ -392,7 +392,7 @@ void PaymentServer::handleURIOrFile(const QString& s)
                     Q_EMIT receivedPaymentRequest(recipient);
             } else
                 Q_EMIT message(tr("URI handling"),
-                    tr("URI cannot be parsed! This can be caused by an invalid Sapphire address or malformed URI parameters."),
+                    tr("URI cannot be parsed! This can be caused by an invalid Dash Diamond address or malformed URI parameters."),
                     CClientUIInterface::ICON_WARNING);
 
             return;
@@ -506,7 +506,7 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
             // Append destination address
             addresses.append(QString::fromStdString(EncodeDestination(dest)));
         } else if (!recipient.authenticatedMerchant.isEmpty()) {
-            // Insecure payments to custom sapphire addresses are not supported
+            // Insecure payments to custom dashdiamond addresses are not supported
             // (there is no good way to tell the user where they are paying in a way
             // they'd have a chance of understanding).
             Q_EMIT message(tr("Payment request rejected"),
