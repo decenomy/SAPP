@@ -122,12 +122,12 @@
         <translation>Receiving addresses</translation>
     </message>
     <message>
-        <source>These are your Sapphire addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>These are your Sapphire addresses for sending payments. Always check the amount and the receiving address before sending coins.</translation>
+        <source>These are your Dash Diamond addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>These are your Dash Diamond addresses for sending payments. Always check the amount and the receiving address before sending coins.</translation>
     </message>
     <message>
-        <source>These are your Sapphire addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>These are your Sapphire addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</translation>
+        <source>These are your Dash Diamond addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>These are your Dash Diamond addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -364,8 +364,8 @@ for staking</translation>
         <translation>CANCEL</translation>
     </message>
     <message>
-        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</source>
-        <translation>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</translation>
+        <source>Dash Diamond will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your DASHDs from being stolen by malware infecting your computer.</source>
+        <translation>Dash Diamond will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your DASHDs from being stolen by malware infecting your computer.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -450,8 +450,8 @@ for staking</translation>
         <translation>Savings</translation>
     </message>
     <message>
-        <source>0,00 SAPP</source>
-        <translation>0,00 SAPP</translation>
+        <source>0,00 DASHD</source>
+        <translation>0,00 DASHD</translation>
     </message>
     <message>
         <source>address</source>
@@ -492,8 +492,8 @@ for staking</translation>
         <translation>Coin Selection</translation>
     </message>
     <message>
-        <source>Select SAPP Outputs to Spend</source>
-        <translation>Select SAPP Outputs to Spend</translation>
+        <source>Select DASHD Outputs to Spend</source>
+        <translation>Select DASHD Outputs to Spend</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -520,8 +520,8 @@ for staking</translation>
         <translation>Amount</translation>
     </message>
     <message>
-        <source>0.00 SAPP</source>
-        <translation>0.00 SAPP</translation>
+        <source>0.00 DASHD</source>
+        <translation>0.00 DASHD</translation>
     </message>
     <message>
         <source>0</source>
@@ -775,9 +775,9 @@ for staking</translation>
         <translation>Error loading delegations: %1</translation>
     </message>
     <message>
-        <source>You can delegate your SAPPs, letting a hot node (24/7 online node)
+        <source>You can delegate your DASHDs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>You can delegate your SAPPs, letting a hot node (24/7 online node)
+        <translation>You can delegate your DASHDs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</translation>
     </message>
     <message>
@@ -785,8 +785,8 @@ stake on your behalf, while you keep the keys securely offline.</translation>
         <translation>Enter owner address</translation>
     </message>
     <message>
-        <source>Accept SAPP delegation / Delegate SAPP</source>
-        <translation>Accept SAPP delegation / Delegate SAPP</translation>
+        <source>Accept DASHD delegation / Delegate DASHD</source>
+        <translation>Accept DASHD delegation / Delegate DASHD</translation>
     </message>
     <message>
         <source>Cold Staking address</source>
@@ -991,8 +991,8 @@ address</translation>
         <translation>View your account's history</translation>
     </message>
     <message>
-        <source>How to get SAPP</source>
-        <translation>How to get SAPP</translation>
+        <source>How to get DASHD</source>
+        <translation>How to get DASHD</translation>
     </message>
     <message>
         <source>Sort by</source>
@@ -1015,8 +1015,8 @@ address</translation>
         <translation>Filter by</translation>
     </message>
     <message>
-        <source>Amount of SAPP and zSAPP staked.</source>
-        <translation>Amount of SAPP and zSAPP staked.</translation>
+        <source>Amount of DASHD and zDASHD staked.</source>
+        <translation>Amount of DASHD and zDASHD staked.</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1111,8 +1111,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Edit sending address</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Sapphire address.</source>
-        <translation>The entered address "%1" is not a valid Sapphire address.</translation>
+        <source>The entered address "%1" is not a valid Dash Diamond address.</source>
+        <translation>The entered address "%1" is not a valid Dash Diamond address.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1164,16 +1164,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>version</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Dash Diamond Core</source>
+        <translation>Dash Diamond Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Sapphire Core</source>
-        <translation>About Sapphire Core</translation>
+        <source>About Dash Diamond Core</source>
+        <translation>About Dash Diamond Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1227,16 +1227,16 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Welcome</translation>
     </message>
     <message>
-        <source>Welcome to Sapphire Core.</source>
-        <translation>Welcome to Sapphire Core.</translation>
+        <source>Welcome to Dash Diamond Core.</source>
+        <translation>Welcome to Dash Diamond Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
-        <translation>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</translation>
+        <source>As this is the first time the program is launched, you can choose where Dash Diamond Core will store its data.</source>
+        <translation>As this is the first time the program is launched, you can choose where Dash Diamond Core will store its data.</translation>
     </message>
     <message>
-        <source>Sapphire Core will download and store a copy of the Sapphire block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Sapphire Core will download and store a copy of the Sapphire block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</translation>
+        <source>Dash Diamond Core will download and store a copy of the Dash Diamond block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Dash Diamond Core will download and store a copy of the Dash Diamond block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1255,8 +1255,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>OK</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Dash Diamond Core</source>
+        <translation>Dash Diamond Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1363,8 +1363,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Create New Masternode Controller</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 200,000 SAPP (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 200,000 SAPP (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Dash Diamond Masternode you must dedicate 200,000 DASHD (the unit of Dash Diamond) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Dash Diamond Masternode you must dedicate 200,000 DASHD (the unit of Dash Diamond) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1383,8 +1383,8 @@ It will start automatically as soon as the wallet has enough confirmations on an
         <translation>Make sure you have this amount of coins.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 DASHD will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 DASHD will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Address of the node that must always be online running the actual master node.</source>
@@ -1590,7 +1590,7 @@ Please wait few more minutes (masternode collaterals require %1 confirmations).<
 on a remote server to your clipboard.
 
 
-You will only have to paste the data in the sapphire.conf file
+You will only have to paste the data in the dashdiamond.conf file
 of your remote server and start it, then start the Masternode using
 this controller wallet (select the Masternode in the list and press "start").
 </source>
@@ -1598,7 +1598,7 @@ this controller wallet (select the Masternode in the list and press "start").
 on a remote server to your clipboard.
 
 
-You will only have to paste the data in the sapphire.conf file
+You will only have to paste the data in the dashdiamond.conf file
 of your remote server and start it, then start the Masternode using
 this controller wallet (select the Masternode in the list and press "start").
 </translation>
@@ -1788,8 +1788,8 @@ STAKING</translation>
         <translation>Parsed data too large</translation>
     </message>
     <message>
-        <source>Invalid URI, not starting with "sapphire" prefix</source>
-        <translation>Invalid URI, not starting with "sapphire" prefix</translation>
+        <source>Invalid URI, not starting with "dashdiamond" prefix</source>
+        <translation>Invalid URI, not starting with "dashdiamond" prefix</translation>
     </message>
 </context>
 <context>
@@ -1834,8 +1834,8 @@ STAKING</translation>
         <translation>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</translation>
     </message>
     <message>
-        <source>Automatically open the Sapphire client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Automatically open the Sapphire client port on the router. This only works when your router supports UPnP and it is enabled.</translation>
+        <source>Automatically open the Dash Diamond client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Automatically open the Dash Diamond client port on the router. This only works when your router supports UPnP and it is enabled.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1854,12 +1854,12 @@ STAKING</translation>
         <translation>Expert</translation>
     </message>
     <message>
-        <source>Automatically start Sapphire after logging in to the system.</source>
-        <translation>Automatically start Sapphire after logging in to the system.</translation>
+        <source>Automatically start Dash Diamond after logging in to the system.</source>
+        <translation>Automatically start Dash Diamond after logging in to the system.</translation>
     </message>
     <message>
-        <source>&amp;Start Sapphire on system login</source>
-        <translation>&amp;Start Sapphire on system login</translation>
+        <source>&amp;Start Dash Diamond on system login</source>
+        <translation>&amp;Start Dash Diamond on system login</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1886,8 +1886,8 @@ STAKING</translation>
         <translation>&amp;Network</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Sapphire.</source>
-        <translation>The user interface language can be set here. This setting will take effect after restarting Sapphire.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Dash Diamond.</source>
+        <translation>The user interface language can be set here. This setting will take effect after restarting Dash Diamond.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -1900,44 +1900,44 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Map port using &amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of SAPP units to zSAPP</source>
-        <translation>Enable automatic minting of SAPP units to zSAPP</translation>
+        <source>Enable automatic minting of DASHD units to zDASHD</source>
+        <translation>Enable automatic minting of DASHD units to zDASHD</translation>
     </message>
     <message>
-        <source>Enable zSAPP Automint</source>
-        <translation>Enable zSAPP Automint</translation>
+        <source>Enable zDASHD Automint</source>
+        <translation>Enable zDASHD Automint</translation>
     </message>
     <message>
-        <source>Enable automatic zSAPP minting from specific addresses</source>
-        <translation>Enable automatic zSAPP minting from specific addresses</translation>
+        <source>Enable automatic zDASHD minting from specific addresses</source>
+        <translation>Enable automatic zDASHD minting from specific addresses</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Enable Automint Addresses</translation>
     </message>
     <message>
-        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
-        <translation>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</translation>
+        <source>Percentage of incoming DASHD which get automatically converted to zDASHD via Zerocoin Protocol (min: 10%)</source>
+        <translation>Percentage of incoming DASHD which get automatically converted to zDASHD via Zerocoin Protocol (min: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zSAPP</source>
-        <translation>Percentage of autominted zSAPP</translation>
+        <source>Percentage of autominted zDASHD</source>
+        <translation>Percentage of autominted zDASHD</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
-        <translation>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</translation>
+        <source>Wait with automatic conversion to Zerocoin until enough DASHD for this denomination is available</source>
+        <translation>Wait with automatic conversion to Zerocoin until enough DASHD for this denomination is available</translation>
     </message>
     <message>
-        <source>Preferred Automint zSAPP Denomination</source>
-        <translation>Preferred Automint zSAPP Denomination</translation>
+        <source>Preferred Automint zDASHD Denomination</source>
+        <translation>Preferred Automint zDASHD Denomination</translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
         <translation>Stake split threshold:</translation>
     </message>
     <message>
-        <source>Connect to the Sapphire network through a SOCKS5 proxy.</source>
-        <translation>Connect to the Sapphire network through a SOCKS5 proxy.</translation>
+        <source>Connect to the Dash Diamond network through a SOCKS5 proxy.</source>
+        <translation>Connect to the Dash Diamond network through a SOCKS5 proxy.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2083,8 +2083,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
 <context>
     <name>PIVXGUI</name>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Dash Diamond Core</source>
+        <translation>Dash Diamond Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -2111,8 +2111,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Quit application</translation>
     </message>
     <message>
-        <source>Sapphire Core client</source>
-        <translation>Sapphire Core client</translation>
+        <source>Dash Diamond Core client</source>
+        <translation>Dash Diamond Core client</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2178,12 +2178,12 @@ Address: %4
         <translation>Invalid payment address %1</translation>
     </message>
     <message>
-        <source>Cannot start Sapphire: click-to-pay handler</source>
-        <translation>Cannot start Sapphire: click-to-pay handler</translation>
+        <source>Cannot start Dash Diamond: click-to-pay handler</source>
+        <translation>Cannot start Dash Diamond: click-to-pay handler</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Sapphire address or malformed URI parameters.</source>
-        <translation>URI cannot be parsed! This can be caused by an invalid Sapphire address or malformed URI parameters.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Dash Diamond address or malformed URI parameters.</source>
+        <translation>URI cannot be parsed! This can be caused by an invalid Dash Diamond address or malformed URI parameters.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2272,8 +2272,8 @@ Address: %4
         <translation>Amount</translation>
     </message>
     <message>
-        <source>Enter Sapphire address (e.g. %1)</source>
-        <translation>Enter Sapphire address (e.g. %1)</translation>
+        <source>Enter Dash Diamond address (e.g. %1)</source>
+        <translation>Enter Dash Diamond address (e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2316,12 +2316,12 @@ Address: %4
         <translation>%1 ms</translation>
     </message>
     <message>
-        <source>A fatal error occurred. Sapphire can no longer continue safely and will quit.</source>
-        <translation>A fatal error occurred. Sapphire can no longer continue safely and will quit.</translation>
+        <source>A fatal error occurred. Dash Diamond can no longer continue safely and will quit.</source>
+        <translation>A fatal error occurred. Dash Diamond can no longer continue safely and will quit.</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Dash Diamond Core</source>
+        <translation>Dash Diamond Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2340,8 +2340,8 @@ Address: %4
         <translation>Error reading masternode configuration file: %1</translation>
     </message>
     <message>
-        <source>Sapphire Core didn't yet exit safely...</source>
-        <translation>Sapphire Core didn't yet exit safely...</translation>
+        <source>Dash Diamond Core didn't yet exit safely...</source>
+        <translation>Dash Diamond Core didn't yet exit safely...</translation>
     </message>
     <message>
         <source>Contact</source>
@@ -2579,8 +2579,8 @@ Address: %4
         <translation>Block chain</translation>
     </message>
     <message>
-        <source>Open the Sapphire debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Open the Sapphire debug log file from the current data directory. This can take a few seconds for large log files.</translation>
+        <source>Open the Dash Diamond debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Open the Dash Diamond debug log file from the current data directory. This can take a few seconds for large log files.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -2723,8 +2723,8 @@ Address: %4
         <translation>Custom Backup Path:</translation>
     </message>
     <message>
-        <source>Custom zSAPP Backup Path:</source>
-        <translation>Custom zSAPP Backup Path:</translation>
+        <source>Custom zDASHD Backup Path:</source>
+        <translation>Custom zDASHD Backup Path:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -2803,8 +2803,8 @@ Address: %4
         <translation>Out:</translation>
     </message>
     <message>
-        <source>Welcome to the Sapphire RPC console.</source>
-        <translation>Welcome to the Sapphire RPC console.</translation>
+        <source>Welcome to the Dash Diamond RPC console.</source>
+        <translation>Welcome to the Dash Diamond RPC console.</translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
@@ -2945,8 +2945,8 @@ Address: %4
         <translation>No address</translation>
     </message>
     <message>
-        <source>Scan the QR code or copy the address to receive SAPP</source>
-        <translation>Scan the QR code or copy the address to receive SAPP</translation>
+        <source>Scan the QR code or copy the address to receive DASHD</source>
+        <translation>Scan the QR code or copy the address to receive DASHD</translation>
     </message>
     <message>
         <source>Add Label</source>
@@ -3075,12 +3075,12 @@ Address: %4
         <translation>Amount</translation>
     </message>
     <message>
-        <source>SAPP</source>
-        <translation>SAPP</translation>
+        <source>DASHD</source>
+        <translation>DASHD</translation>
     </message>
     <message>
-        <source>Instead of sharing only a Sapphire address, you can create a payment request, bundling up more information</source>
-        <translation>Instead of sharing only a Sapphire address, you can create a payment request, bundling up more information</translation>
+        <source>Instead of sharing only a Dash Diamond address, you can create a payment request, bundling up more information</source>
+        <translation>Instead of sharing only a Dash Diamond address, you can create a payment request, bundling up more information</translation>
     </message>
     <message>
         <source>D7VFR83SQbiezrW72hjcWJtcfip5krte2Z </source>
@@ -3170,8 +3170,8 @@ Address: %4
         <translation>Custom Change Address</translation>
     </message>
     <message>
-        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Sapphire address</source>
-        <translation>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Sapphire address</translation>
+        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Dash Diamond address</source>
+        <translation>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Dash Diamond address</translation>
     </message>
     <message>
         <source>SAVE</source>
@@ -3201,8 +3201,8 @@ Address: %4
         <translation>Recommended</translation>
     </message>
     <message>
-        <source>SAPP/kilobyte</source>
-        <translation>SAPP/kilobyte</translation>
+        <source>DASHD/kilobyte</source>
+        <translation>DASHD/kilobyte</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -3485,9 +3485,9 @@ Remember to write it down and store it safely, otherwise you might lose access t
         <translation>BIP38 Tool</translation>
     </message>
     <message>
-        <source>Encrypt your Sapphire addresses (key pair actually) using BIP38 encryption.
+        <source>Encrypt your Dash Diamond addresses (key pair actually) using BIP38 encryption.
 Using this mechanism you can share your keys without middle-man risk, only need to store your passphrase safely</source>
-        <translation>Encrypt your Sapphire addresses (key pair actually) using BIP38 encryption.
+        <translation>Encrypt your Dash Diamond addresses (key pair actually) using BIP38 encryption.
 Using this mechanism you can share your keys without middle-man risk, only need to store your passphrase safely</translation>
     </message>
     <message>
@@ -3523,8 +3523,8 @@ Using this mechanism you can share your keys without middle-man risk, only need 
         <translation>DECRYPT KEY</translation>
     </message>
     <message>
-        <source>Sapphire address</source>
-        <translation>Sapphire address</translation>
+        <source>Dash Diamond address</source>
+        <translation>Dash Diamond address</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -3656,8 +3656,8 @@ Verify that you have installed a predetermined text editor.</source>
 Verify that you have installed a predetermined text editor.</translation>
     </message>
     <message>
-        <source>Welcome to the Sapphire RPC console.</source>
-        <translation>Welcome to the Sapphire RPC console.</translation>
+        <source>Welcome to the Dash Diamond RPC console.</source>
+        <translation>Welcome to the Dash Diamond RPC console.</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
@@ -3766,12 +3766,12 @@ Verify that you have installed a predetermined text editor.</translation>
         <translation>Export Address List</translation>
     </message>
     <message>
-        <source>Sapphire_tx_csv_export(*.csv)</source>
-        <translation>Sapphire_tx_csv_export(*.csv)</translation>
+        <source>dashdiamond_tx_csv_export(*.csv)</source>
+        <translation>dashdiamond_tx_csv_export(*.csv)</translation>
     </message>
     <message>
-        <source>Sapphire_addresses_csv_export(*.csv)</source>
-        <translation>Sapphire_addresses_csv_export(*.csv)</translation>
+        <source>dashdiamond_addresses_csv_export(*.csv)</source>
+        <translation>dashdiamond_addresses_csv_export(*.csv)</translation>
     </message>
     <message>
         <source>Please select a folder to export the csv file first.</source>
@@ -3841,12 +3841,12 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>Form</translation>
     </message>
     <message>
-        <source>1) What is Sapphire?</source>
-        <translation>1) What is Sapphire?</translation>
+        <source>1) What is Dash Diamond?</source>
+        <translation>1) What is Dash Diamond?</translation>
     </message>
     <message>
-        <source>2) Why are my SAPP unspendable?</source>
-        <translation>2) Why are my SAPP unspendable?</translation>
+        <source>2) Why are my DASHD unspendable?</source>
+        <translation>2) Why are my DASHD unspendable?</translation>
     </message>
     <message>
         <source>https://sappcoin.com/</source>
@@ -3857,34 +3857,34 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>1</translation>
     </message>
     <message>
-        <source>What is Sapphire?</source>
-        <translation>What is Sapphire?</translation>
+        <source>What is Dash Diamond?</source>
+        <translation>What is Dash Diamond?</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Sapphire is a form of digital online money using blockchain technology
+                           Dash Diamond is a form of digital online money using blockchain technology
                            that can be easily transferred globally, instantly, and with near
-                           zero fees.  Sapphire incorporates market leading security &amp;
+                           zero fees.  Dash Diamond incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
+                           to implement ZeroCoin(zDASHD) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
-                           allowing all owners of Sapphire to participate in earning block rewards
+                           Dash Diamond utilizes a Proof of Stake (PoS) consensus system algorithm,
+                           allowing all owners of Dash Diamond to participate in earning block rewards
                            while securing the network with full node wallets, as well as to
                            run Masternodes to create and vote on proposals.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Sapphire is a form of digital online money using blockchain technology
+                           Dash Diamond is a form of digital online money using blockchain technology
                            that can be easily transferred globally, instantly, and with near
-                           zero fees.  Sapphire incorporates market leading security &amp;
+                           zero fees.  Dash Diamond incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
+                           to implement ZeroCoin(zDASHD) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
-                           allowing all owners of Sapphire to participate in earning block rewards
+                           Dash Diamond utilizes a Proof of Stake (PoS) consensus system algorithm,
+                           allowing all owners of Dash Diamond to participate in earning block rewards
                            while securing the network with full node wallets, as well as to
                            run Masternodes to create and vote on proposals.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
@@ -3895,25 +3895,25 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>2</translation>
     </message>
     <message>
-        <source>Why are my SAPP unspendable?</source>
-        <translation>Why are my SAPP unspendable?</translation>
+        <source>Why are my DASHD unspendable?</source>
+        <translation>Why are my DASHD unspendable?</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Newly received Sapphire requires 6 confirmations on the network
+                           Newly received Dash Diamond requires 6 confirmations on the network
                            to become eligible for spending which can take ~6 minutes.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Your Sapphire wallet also needs to be completely synchronized
+                           Your Dash Diamond wallet also needs to be completely synchronized
                            to see and spend balances on the network.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Newly received Sapphire requires 6 confirmations on the network
+                           Newly received Dash Diamond requires 6 confirmations on the network
                            to become eligible for spending which can take ~6 minutes.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Your Sapphire wallet also needs to be completely synchronized
+                           Your Dash Diamond wallet also needs to be completely synchronized
                            to see and spend balances on the network.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </translation>
@@ -3923,12 +3923,12 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>3</translation>
     </message>
     <message>
-        <source>How do I stake SAPP?</source>
-        <translation>How do I stake SAPP?</translation>
+        <source>How do I stake DASHD?</source>
+        <translation>How do I stake DASHD?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"&gt;&lt;li align="justify" style=" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Make sure your wallet is completely synchronized and you are using the latest release. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You must have a balance of Sapphire with a minimum of 600 confirmations. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Your wallet must stay online and be unlocked for staking purposes. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Once all those steps are followed staking should be enabled. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You can see the status of staking in the wallet by mousing over the package icon in the row on the top left of the wallet interface. There package will be lit up and will state &amp;quot;Staking Enabled&amp;quot; to indicate it is staking. Using the command line interface (sapphire-cli); the command &lt;span style=" font-style:italic;"&gt;getstakingstatus&lt;/span&gt; will confirm that staking is active. &lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"&gt;&lt;li align="justify" style=" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Make sure your wallet is completely synchronized and you are using the latest release. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You must have a balance of Sapphire with a minimum of 600 confirmations. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Your wallet must stay online and be unlocked for staking purposes. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Once all those steps are followed staking should be enabled. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You can see the status of staking in the wallet by mousing over the package icon in the row on the top left of the wallet interface. There package will be lit up and will state &amp;quot;Staking Enabled&amp;quot; to indicate it is staking. Using the command line interface (sapphire-cli); the command &lt;span style=" font-style:italic;"&gt;getstakingstatus&lt;/span&gt; will confirm that staking is active. &lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"&gt;&lt;li align="justify" style=" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Make sure your wallet is completely synchronized and you are using the latest release. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You must have a balance of Dash Diamond with a minimum of 600 confirmations. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Your wallet must stay online and be unlocked for staking purposes. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Once all those steps are followed staking should be enabled. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You can see the status of staking in the wallet by mousing over the package icon in the row on the top left of the wallet interface. There package will be lit up and will state &amp;quot;Staking Enabled&amp;quot; to indicate it is staking. Using the command line interface (dashdiamond-cli); the command &lt;span style=" font-style:italic;"&gt;getstakingstatus&lt;/span&gt; will confirm that staking is active. &lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;ol style="margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;"&gt;&lt;li align="justify" style=" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Make sure your wallet is completely synchronized and you are using the latest release. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You must have a balance of Dash Diamond with a minimum of 600 confirmations. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Your wallet must stay online and be unlocked for staking purposes. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Once all those steps are followed staking should be enabled. &lt;/li&gt;&lt;li align="justify" style=" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;You can see the status of staking in the wallet by mousing over the package icon in the row on the top left of the wallet interface. There package will be lit up and will state &amp;quot;Staking Enabled&amp;quot; to indicate it is staking. Using the command line interface (dashdiamond-cli); the command &lt;span style=" font-style:italic;"&gt;getstakingstatus&lt;/span&gt; will confirm that staking is active. &lt;/li&gt;&lt;/ol&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>4</source>
@@ -3971,14 +3971,14 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>What is a Masternode Controller?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 DASHD collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 DASHD collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           A masternode is a computer running a full node Sapphire core wallet with a
-                           requirement of 200,000 SAPP secured collateral to provide extra services
+                           A masternode is a computer running a full node Dash Diamond core wallet with a
+                           requirement of 200,000 DASHD secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -4000,17 +4000,17 @@ There was an error trying to save the address list to %1. Please try again.</tra
                            Masternode Perks:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;Participate in Sapphire Governance&lt;/li&gt;
+                           &lt;li&gt;Participate in Dash Diamond Governance&lt;/li&gt;
                            &lt;li&gt;Earn Masternode Rewards&lt;/li&gt;
                            &lt;li&gt;Commodity option for future sale&lt;/li&gt;
-                           &lt;li&gt;Help secure the Sapphire network&lt;/li&gt;
+                           &lt;li&gt;Help secure the Dash Diamond network&lt;/li&gt;
                            &lt;/ul&gt;
                            &lt;/p&gt;&lt;p align="justify"&gt;
 
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;200,000 SAPP per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;200,000 DASHD per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -4019,8 +4019,8 @@ There was an error trying to save the address list to %1. Please try again.</tra
                          </source>
         <translation>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           A masternode is a computer running a full node Sapphire core wallet with a
-                           requirement of 200,000 SAPP secured collateral to provide extra services
+                           A masternode is a computer running a full node Dash Diamond core wallet with a
+                           requirement of 200,000 DASHD secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -4042,17 +4042,17 @@ There was an error trying to save the address list to %1. Please try again.</tra
                            Masternode Perks:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;Participate in Sapphire Governance&lt;/li&gt;
+                           &lt;li&gt;Participate in Dash Diamond Governance&lt;/li&gt;
                            &lt;li&gt;Earn Masternode Rewards&lt;/li&gt;
                            &lt;li&gt;Commodity option for future sale&lt;/li&gt;
-                           &lt;li&gt;Help secure the Sapphire network&lt;/li&gt;
+                           &lt;li&gt;Help secure the Dash Diamond network&lt;/li&gt;
                            &lt;/ul&gt;
                            &lt;/p&gt;&lt;p align="justify"&gt;
 
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;200,000 SAPP per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;200,000 DASHD per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -4065,8 +4065,8 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>Frequently Asked Questions</translation>
     </message>
     <message>
-        <source>3) How do I stake SAPP?</source>
-        <translation>3) How do I stake SAPP?</translation>
+        <source>3) How do I stake DASHD?</source>
+        <translation>3) How do I stake DASHD?</translation>
     </message>
     <message>
         <source>4) Where I should go if I need support?</source>
@@ -4188,8 +4188,8 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>Unable to open backups folder</translation>
     </message>
     <message>
-        <source>Unable to open sapphire.conf with default application</source>
-        <translation>Unable to open sapphire.conf with default application</translation>
+        <source>Unable to open dashdiamond.conf with default application</source>
+        <translation>Unable to open dashdiamond.conf with default application</translation>
     </message>
     <message>
         <source>In:</source>
@@ -4243,8 +4243,8 @@ There was an error trying to save the address list to %1. Please try again.</tra
         <translation>Number of script verification threads</translation>
     </message>
     <message>
-        <source>Start Sapphire on system login</source>
-        <translation>Start Sapphire on system login</translation>
+        <source>Start Dash Diamond on system login</source>
+        <translation>Start Dash Diamond on system login</translation>
     </message>
     <message>
         <source>Minimize to the tray instead of the taskbar</source>
@@ -4331,8 +4331,8 @@ Are you sure?
         <translation>CheckBox</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Sapphire addresses after it matures.</source>
-        <translation>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Sapphire addresses after it matures.</translation>
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Dash Diamond addresses after it matures.</source>
+        <translation>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Dash Diamond addresses after it matures.</translation>
     </message>
     <message>
         <source>Active</source>
@@ -4458,8 +4458,8 @@ Check one or both of the check boxes to send on stake and/or masternode rewards<
         <translation>Message</translation>
     </message>
     <message>
-        <source>Sapphire address or contact label</source>
-        <translation>Sapphire address or contact label</translation>
+        <source>Dash Diamond address or contact label</source>
+        <translation>Dash Diamond address or contact label</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -4779,8 +4779,8 @@ Check one or both of the check boxes to send on stake and/or masternode rewards<
         <translation>FAQ</translation>
     </message>
     <message>
-        <source>About Sapphire</source>
-        <translation>About Sapphire</translation>
+        <source>About Dash Diamond</source>
+        <translation>About Dash Diamond</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -4850,8 +4850,8 @@ Are you sure?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Sapphire Core is shutting down...</source>
-        <translation>Sapphire Core is shutting down...</translation>
+        <source>Dash Diamond Core is shutting down...</source>
+        <translation>Dash Diamond Core is shutting down...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4880,8 +4880,8 @@ Are you sure?
         <translation>Loading…</translation>
     </message>
     <message>
-        <source>Sapphire Core</source>
-        <translation>Sapphire Core</translation>
+        <source>Dash Diamond Core</source>
+        <translation>Dash Diamond Core</translation>
     </message>
 </context>
 <context>
@@ -5448,25 +5448,25 @@ Select fewer inputs with coin control.</translation>
     </message>
     <message>
         <source>Welcome to
-		Sapphire Core Wallet</source>
+		Dash Diamond Core Wallet</source>
         <translation>Welcome to
-		Sapphire Core Wallet</translation>
+		Dash Diamond Core Wallet</translation>
     </message>
     <message>
-        <source>Sapphire is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
-        <translation>Sapphire is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</translation>
+        <source>Dash Diamond is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
+        <translation>Dash Diamond is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Sapphire believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Sapphire believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Dash Diamond believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Dash Diamond believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>The masternode network is Sapphire's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
-        <translation>The masternode network is Sapphire's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</translation>
+        <source>The masternode network is Dash Diamond's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
+        <translation>The masternode network is Dash Diamond's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</translation>
     </message>
     <message>
-        <source>How Sapphire respects your privacy?</source>
-        <translation>How Sapphire respects your privacy?</translation>
+        <source>How Dash Diamond respects your privacy?</source>
+        <translation>How Dash Diamond respects your privacy?</translation>
     </message>
     <message>
         <source>What is a Masternode?</source>
@@ -5512,8 +5512,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
 Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
-        <translation>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</translation>
+        <source>Cannot obtain a lock on data directory %s. Dash Diamond Core is probably already running.</source>
+        <translation>Cannot obtain a lock on data directory %s. Dash Diamond Core is probably already running.</translation>
     </message>
     <message>
         <source>Cannot upgrade to Sapling wallet (already running Sapling support). Version: %d</source>
@@ -5680,8 +5680,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
-        <translation>Unable to bind to %s on this computer. Sapphire Core is probably already running.</translation>
+        <source>Unable to bind to %s on this computer. Dash Diamond Core is probably already running.</source>
+        <translation>Unable to bind to %s on this computer. Dash Diamond Core is probably already running.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5696,8 +5696,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Dash Diamond Core will not work properly.</source>
+        <translation>Warning: Please check that your computer's date and time are correct! If your clock is wrong Dash Diamond Core will not work properly.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5778,6 +5778,10 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
     <message>
         <source>Copyright (C) 2020-%i Sapphire Core Developers</source>
         <translation>Copyright (C) 2020-%i Sapphire Core Developers</translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2021-%i The DECENOMY Core Developers</source>
+        <translation>Copyright (C) 2021-%i The DECENOMY Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5916,8 +5920,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Information</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
-        <translation>Initialization sanity check failed. Sapphire Core is shutting down.</translation>
+        <source>Initialization sanity check failed. Dash Diamond Core is shutting down.</source>
+        <translation>Initialization sanity check failed. Dash Diamond Core is shutting down.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5948,8 +5952,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Invalid netmask specified in -whitelist: '%s'</translation>
     </message>
     <message>
-        <source>Recalculating SAPP supply...</source>
-        <translation>Recalculating SAPP supply...</translation>
+        <source>Recalculating DASHD supply...</source>
+        <translation>Recalculating DASHD supply...</translation>
     </message>
     <message>
         <source>Reindexing zerocoin database...</source>
@@ -5980,8 +5984,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>This is a pre-release test build - use at your own risk - do not use for staking or merchant applications!</translation>
     </message>
     <message>
-        <source>Disable all Sapphire specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>Disable all Sapphire specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</translation>
+        <source>Disable all Dash Diamond specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Disable all Dash Diamond specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -6276,12 +6280,12 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Fees (in %s/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</translation>
     </message>
     <message>
-        <source>Minimum positive amount (in SAPP) allowed by GUI and RPC for the stake split threshold (default: %s)</source>
-        <translation>Minimum positive amount (in SAPP) allowed by GUI and RPC for the stake split threshold (default: %s)</translation>
+        <source>Minimum positive amount (in DASHD) allowed by GUI and RPC for the stake split threshold (default: %s)</source>
+        <translation>Minimum positive amount (in DASHD) allowed by GUI and RPC for the stake split threshold (default: %s)</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
-        <translation>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Dash Diamond Core will not work properly.</source>
+        <translation>Please check that your computer's date and time are correct! If your clock is wrong Dash Diamond Core will not work properly.</translation>
     </message>
     <message>
         <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect/-noconnect)</source>
@@ -6324,8 +6328,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Error loading %s: Wallet corrupted</translation>
     </message>
     <message>
-        <source>Error loading %s: Wallet requires newer version of Sapphire Core</source>
-        <translation>Error loading %s: Wallet requires newer version of Sapphire Core</translation>
+        <source>Error loading %s: Wallet requires newer version of Dash Diamond Core</source>
+        <translation>Error loading %s: Wallet requires newer version of Dash Diamond Core</translation>
     </message>
     <message>
         <source>Error loading %s
@@ -6584,8 +6588,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Synchronizing sporks...</translation>
     </message>
     <message>
-        <source>Syncing zSAPP wallet...</source>
-        <translation>Syncing zSAPP wallet...</translation>
+        <source>Syncing zDASHD wallet...</source>
+        <translation>Syncing zDASHD wallet...</translation>
     </message>
     <message>
         <source>The threshold value cannot be less than %s</source>
@@ -6708,8 +6712,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Username for JSON-RPC connections</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
-        <translation>Value is below the smallest available denomination (= 1) of zSAPP</translation>
+        <source>Value is below the smallest available denomination (= 1) of zDASHD</source>
+        <translation>Value is below the smallest available denomination (= 1) of zDASHD</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6728,8 +6732,8 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Wallet debugging/testing options:</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
-        <translation>Wallet needed to be rewritten: restart Sapphire Core to complete</translation>
+        <source>Wallet needed to be rewritten: restart Dash Diamond Core to complete</source>
+        <translation>Wallet needed to be rewritten: restart Dash Diamond Core to complete</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6795,12 +6799,12 @@ Please run 'sapling-fetch-params' or './util/fetch-params.sh' and then restart.<
         <translation>Send</translation>
     </message>
     <message>
-        <source>Send public coins (SAPP)</source>
-        <translation>Send public coins (SAPP)</translation>
+        <source>Send public coins (DASHD)</source>
+        <translation>Send public coins (DASHD)</translation>
     </message>
     <message>
-        <source>Sapphire address or contact label</source>
-        <translation>Sapphire address or contact label</translation>
+        <source>Dash Diamond address or contact label</source>
+        <translation>Dash Diamond address or contact label</translation>
     </message>
     <message>
         <source>Amount</source>
