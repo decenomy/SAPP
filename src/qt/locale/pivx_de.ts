@@ -363,8 +363,8 @@ for staking</source>
         <translation>ABBRECHEN</translation>
     </message>
     <message>
-        <source>Dash Diamond will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</source>
-        <translation>Die Anwendung wird nun geschlossen um die Verschlüsselung abzuschließen. Bitte bedenken Sie, dass auch die Verschlüsselung nicht vollständig vor Diebstahl Ihrer SAPPs durch Schadsoftware schützt, die Ihren Computer befällt.</translation>
+        <source>Dash Diamond will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your DASHDs from being stolen by malware infecting your computer.</source>
+        <translation>Die Anwendung wird nun geschlossen um die Verschlüsselung abzuschließen. Bitte bedenken Sie, dass auch die Verschlüsselung nicht vollständig vor Diebstahl Ihrer DASHDs durch Schadsoftware schützt, die Ihren Computer befällt.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -774,9 +774,9 @@ for staking</source>
         <translation>Fehler beim Laden der Zuweisungen: %1</translation>
     </message>
     <message>
-        <source>You can delegate your SAPPs, letting a hot node (24/7 online node)
+        <source>You can delegate your DASHDs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>Sie können Ihre SAPPs zuweisen und einen Node (24/7) für Sie staken lassen, während Sie Ihre Schlüssel sicher offline verwahren. </translation>
+        <translation>Sie können Ihre DASHDs zuweisen und einen Node (24/7) für Sie staken lassen, während Sie Ihre Schlüssel sicher offline verwahren. </translation>
     </message>
     <message>
         <source>Enter owner address</source>
@@ -1359,7 +1359,7 @@ Das Staking wird automatisch gestartet, sobald die Wallet genügend Bestätigung
         <translation>Erzeuge neuen Masternode Controller</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Dash Diamond Masternode you must dedicate 200,000 DASHD (the unit of Dash Diamond) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Dash Diamond Masternode you must dedicate a collateral amount DASHD (the unit of Dash Diamond) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Um einen Dash Diamond Masternode zu erzeugen, müssen Sie 200.000 DASHD (die Einheit von Dash Diamond) dem Netzwerk zuweisen (diese Coins sind weiterhin Ihre und Sie werden Ihren Besitz nicht verlassen)&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;
 Sie können den Node jederzeit deaktivieren und die Coins entriegeln.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -1886,45 +1886,45 @@ STAKING</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/pivx-project/pivx-project-translations</source>
+        https://discord.gg/CeJb7Yxku3</source>
         <translation>Sprache fehlt oder ist unvollständig? Helfe mit und trage zur Übersetzung bei unter:
-https://www.transifex.com/pivx-project/pivx-project-translations</translation>
+        https://discord.gg/CeJb7Yxku3</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
         <translation>Port mit &amp;UPnP mappen</translation>
     </message>
     <message>
-        <source>Enable automatic minting of DASHD units to zSAPP</source>
-        <translation>Aktivieren Sie die automatische Prägung von DASHD-Einheiten zu zSAPP</translation>
+        <source>Enable automatic minting of DASHD units to zDASHD</source>
+        <translation>Aktivieren Sie die automatische Prägung von DASHD-Einheiten zu zDASHD</translation>
     </message>
     <message>
-        <source>Enable zSAPP Automint</source>
-        <translation>Aktivieren Sie zSAPP Automint</translation>
+        <source>Enable zDASHD Automint</source>
+        <translation>Aktivieren Sie zDASHD Automint</translation>
     </message>
     <message>
-        <source>Enable automatic zSAPP minting from specific addresses</source>
-        <translation>Automatisches zSAPP Minting von spezifischen Adressen erlauben</translation>
+        <source>Enable automatic zDASHD minting from specific addresses</source>
+        <translation>Automatisches zDASHD Minting von spezifischen Adressen erlauben</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Automint Adressen aktivieren</translation>
     </message>
     <message>
-        <source>Percentage of incoming DASHD which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
-        <translation>Anteil des eingehenden DASHD, welcher automatisch zu zSAPP via Zerocoin Protokoll konvertiert wird (min: 10%)</translation>
+        <source>Percentage of incoming DASHD which get automatically converted to zDASHD via Zerocoin Protocol (min: 10%)</source>
+        <translation>Anteil des eingehenden DASHD, welcher automatisch zu zDASHD via Zerocoin Protokoll konvertiert wird (min: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zSAPP</source>
-        <translation>Prozentsatz der automatisierten zSAPP</translation>
+        <source>Percentage of autominted zDASHD</source>
+        <translation>Prozentsatz der automatisierten zDASHD</translation>
     </message>
     <message>
         <source>Wait with automatic conversion to Zerocoin until enough DASHD for this denomination is available</source>
         <translation>Warte mit automatischer Konvertierung zu Zerocoin, bis genügend DASHD für diese Stückelung verfügbar ist</translation>
     </message>
     <message>
-        <source>Preferred Automint zSAPP Denomination</source>
-        <translation>Bevorzugte automatisierte zSAPP Stückelung </translation>
+        <source>Preferred Automint zDASHD Denomination</source>
+        <translation>Bevorzugte automatisierte zDASHD Stückelung </translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
@@ -2714,8 +2714,8 @@ Adresse: %4
         <translation>Benutzerdefinierter Sicherungspfad:</translation>
     </message>
     <message>
-        <source>Custom zSAPP Backup Path:</source>
-        <translation>Benutzerdefinierter zSAPP Sicherungspfad:</translation>
+        <source>Custom zDASHD Backup Path:</source>
+        <translation>Benutzerdefinierter zDASHD Sicherungspfad:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -3837,8 +3837,8 @@ Es gab ein Problem bei dem Versuch die Adressen unter %1 zu speichern. Bitte ver
         <translation>2) Wieso kann ich meine DASHD nicht ausgeben?</translation>
     </message>
     <message>
-        <source>https://sappcoin.com/</source>
-        <translation>https://sappcoin.com/</translation>
+        <source>https://dashdiamond.net/</source>
+        <translation>https://dashdiamond.net/</translation>
     </message>
     <message>
         <source>1</source>
@@ -3855,7 +3855,7 @@ Es gab ein Problem bei dem Versuch die Adressen unter %1 zu speichern. Bitte ver
                            that can be easily transferred globally, instantly, and with near
                            zero fees.  Dash Diamond incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
+                           to implement ZeroCoin(zDASHD) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            Dash Diamond utilizes a Proof of Stake (PoS) consensus system algorithm,
                            allowing all owners of Dash Diamond to participate in earning block rewards
@@ -3864,7 +3864,7 @@ Es gab ein Problem bei dem Versuch die Adressen unter %1 zu speichern. Bitte ver
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>Dash Diamond ist eine Form von digitalem Onlinegeld, das die Blockchaintechnologie verwendet und
-einfach, global, sofort und nahezu kostenlos versendet werden kann. Dash Diamond enthält marktführende Sicherheits- und Privatsphäretechnologien und ist auch die erste PoS (Proof of Stake) Kryptowährung, die ZeroCoin (zSAPP) und Zerocoin Staking verwendet.
+einfach, global, sofort und nahezu kostenlos versendet werden kann. Dash Diamond enthält marktführende Sicherheits- und Privatsphäretechnologien und ist auch die erste PoS (Proof of Stake) Kryptowährung, die ZeroCoin (zDASHD) und Zerocoin Staking verwendet.
 Dash Diamond nutzt einen PoS Konsensalgorithmus, der es den Besitzern von Dash Diamond erlaubt, an der Vergabe der Block Rewards teilzuhaben, während das Netzwerk durch Fullnode Wallets abgesichert ist. Darüber hinaus können Masternode Proposals einreichen und darüber abstimmen.</translation>
     </message>
     <message>
@@ -3919,14 +3919,14 @@ Dash Diamond nutzt einen PoS Konsensalgorithmus, der es den Besitzern von Dash D
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            We have support channels in most of our official chat groups, for example
-                           &lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
+                           &lt;a style='color: #b088ff' href='https://discord.gg/CeJb7Yxku3'&gt;
                            #support in our Discord&lt;/a&gt;.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
 Wir haben Support-Kanäle in den meisten unserer offiziellen Chatgruppen, z.B.
-&lt;a style='color: #b088ff' href='https://discord.gg/zgcXB76'&gt;
+&lt;a style='color: #b088ff' href='https://discord.gg/CeJb7Yxku3'&gt;
 #support in Discord&lt;/a&gt;
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -3939,14 +3939,14 @@ Wir haben Support-Kanäle in den meisten unserer offiziellen Chatgruppen, z.B.
         <translation>Was ist ein Masternode Controller?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 DASHD collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Ein Masternode Controller Wallet ist, wo die 200.000 DASHD Kollateral verweilen können, während ein Controller-Remote Masternode Setup erfolgt. Es ist ein Wallet, das remote Masternode Wallet(s) aktiviert und Ihnen erlaubt, ihre Kollateral-Münzen offline zu halten, während der remote Masternode online bleibt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt; </translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
                            A masternode is a computer running a full node Dash Diamond core wallet with a
-                           requirement of 200,000 DASHD secured collateral to provide extra services
+                           requirement of secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3978,7 +3978,7 @@ Wir haben Support-Kanäle in den meisten unserer offiziellen Chatgruppen, z.B.
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;200,000 DASHD per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;Enough collateral balance per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -5286,7 +5286,7 @@ BEDENKEN SIE: Nach dem Upgrade wird ein neues Backup erstellt.
     <name>WalletModel</name>
     <message>
         <source>Send Coins</source>
-        <translation>SAPPs überweisen</translation>
+        <translation>DASHDs überweisen</translation>
     </message>
     <message>
         <source>SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 %2.</source>
@@ -5345,7 +5345,7 @@ Wählen Sie weniger Eingänge über coin control aus.</translation>
     </message>
     <message>
         <source>Welcome to
-		Dash Diamond Core Wallet</source>
+Dash Diamond Core Wallet</source>
         <translation>Willkommen beim Dash Diamond Core Wallet</translation>
     </message>
     <message>
@@ -6414,8 +6414,8 @@ Halte den Transaktionsspeicherpool unter &lt;n&gt;  Megabyte (Standard: %u)</tra
         <translation>Synchronisiere Sporks....</translation>
     </message>
     <message>
-        <source>Syncing zSAPP wallet...</source>
-        <translation>Synchronisiere zSAPP Wallet... </translation>
+        <source>Syncing zDASHD wallet...</source>
+        <translation>Synchronisiere zDASHD Wallet... </translation>
     </message>
     <message>
         <source>The threshold value cannot be less than %s</source>
@@ -6535,8 +6535,8 @@ Der Schwellenwert darf nicht kleiner sein als %s</translation>
         <translation>Benutzername für JSON-RPC-Verbindungen</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
-        <translation>Der Betrag ist unterhalb des kleinsten Wertes (=1) an zSAPP</translation>
+        <source>Value is below the smallest available denomination (= 1) of zDASHD</source>
+        <translation>Der Betrag ist unterhalb des kleinsten Wertes (=1) an zDASHD</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
