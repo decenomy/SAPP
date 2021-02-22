@@ -179,7 +179,7 @@ private:
     void handleRunawayException(const std::exception* e);
 };
 
-/** Main SAPP application object */
+/** Main DASHD application object */
 class BitcoinApplication : public QApplication
 {
     Q_OBJECT
@@ -211,7 +211,7 @@ public:
     /// Get process return value
     int getReturnValue() { return returnValue; }
 
-    /// Get window identifier of QMainWindow (SAPPGUI)
+    /// Get window identifier of QMainWindow (DASHDGUI)
     WId getMainWinId() const;
 
 public Q_SLOTS:
@@ -497,7 +497,7 @@ void BitcoinApplication::initializeResult(int retval)
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
-        // SAPP: URIs or payment requests:
+        // DASHD: URIs or payment requests:
         //connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &PIVXGUI::handlePaymentRequest);
         connect(window, &PIVXGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
         connect(paymentServer, &PaymentServer::message, [this](const QString& title, const QString& message, unsigned int style) {

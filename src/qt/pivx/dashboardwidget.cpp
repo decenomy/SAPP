@@ -523,7 +523,7 @@ void DashboardWidget::updateStakeFilter()
     }
 }
 
-// pair PIV, zSAPP
+// pair DASHD, zDASHD
 const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
 {
     updateStakeFilter();
@@ -579,7 +579,7 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
     }
 
     chartData = new ChartData();
-    chartData->amountsByCache = getAmountBy(); // pair PIV, zSAPP
+    chartData->amountsByCache = getAmountBy(); // pair DASHD, zDASHD
 
     std::pair<int,int> range = getChartRange(chartData->amountsByCache);
     if (range.first == 0 && range.second == 0) {

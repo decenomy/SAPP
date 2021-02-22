@@ -17,7 +17,7 @@ bool AcceptToMemoryPoolZerocoin(const CTransaction& tx, CAmount& nValueIn, int c
     //Check that txid is not already in the chain
     int nHeightTx = 0;
     if (IsTransactionInChain(tx.GetHash(), nHeightTx))
-        return state.Invalid(error("%s : zSAPP spend tx %s already in block %d", __func__, tx.GetHash().GetHex(), nHeightTx),
+        return state.Invalid(error("%s : zDASHD spend tx %s already in block %d", __func__, tx.GetHash().GetHex(), nHeightTx),
                              REJECT_DUPLICATE, "bad-txns-inputs-spent");
 
     //Check for double spending of serial #'s
