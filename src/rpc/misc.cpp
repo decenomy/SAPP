@@ -70,17 +70,17 @@ UniValue getinfo(const JSONRPCRequest& request)
             "  \"difficulty\": xxxxxx,         (numeric) the current difficulty\n"
             "  \"testnet\": true|false,        (boolean) if the server is using testnet or not\n"
             "  \"moneysupply\" : \"supply\"    (numeric) The money supply when this block was added to the blockchain\n"
-            "  \"zSAPPsupply\" :\n"
+            "  \"zDASHDsupply\" :\n"
             "  {\n"
-            "     \"1\" : n,            (numeric) supply of 1 zSAPP denomination\n"
-            "     \"5\" : n,            (numeric) supply of 5 zSAPP denomination\n"
-            "     \"10\" : n,           (numeric) supply of 10 zSAPP denomination\n"
-            "     \"50\" : n,           (numeric) supply of 50 zSAPP denomination\n"
-            "     \"100\" : n,          (numeric) supply of 100 zSAPP denomination\n"
-            "     \"500\" : n,          (numeric) supply of 500 zSAPP denomination\n"
-            "     \"1000\" : n,         (numeric) supply of 1000 zSAPP denomination\n"
-            "     \"5000\" : n,         (numeric) supply of 5000 zSAPP denomination\n"
-            "     \"total\" : n,        (numeric) The total supply of all zSAPP denominations\n"
+            "     \"1\" : n,            (numeric) supply of 1 zDASHD denomination\n"
+            "     \"5\" : n,            (numeric) supply of 5 zDASHD denomination\n"
+            "     \"10\" : n,           (numeric) supply of 10 zDASHD denomination\n"
+            "     \"50\" : n,           (numeric) supply of 50 zDASHD denomination\n"
+            "     \"100\" : n,          (numeric) supply of 100 zDASHD denomination\n"
+            "     \"500\" : n,          (numeric) supply of 500 zDASHD denomination\n"
+            "     \"1000\" : n,         (numeric) supply of 1000 zDASHD denomination\n"
+            "     \"5000\" : n,         (numeric) supply of 5000 zDASHD denomination\n"
+            "     \"total\" : n,        (numeric) The total supply of all zDASHD denominations\n"
             "  }\n"
             "  \"keypoololdest\": xxxxxx,      (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
             "  \"keypoolsize\": xxxx,          (numeric) how many new keys are pre-generated\n"
@@ -157,7 +157,7 @@ UniValue getinfo(const JSONRPCRequest& request)
             zpivObj.push_back(Pair(std::to_string(denom), ValueFromAmount(mapZerocoinSupply.at(denom) * (denom*COIN))));
     }
     zpivObj.push_back(Pair("total", ValueFromAmount(GetZerocoinSupply())));
-    obj.push_back(Pair("zSAPPsupply", zpivObj));
+    obj.push_back(Pair("zDASHDsupply", zpivObj));
 
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
@@ -745,7 +745,7 @@ UniValue getstakingstatus(const JSONRPCRequest& request)
             "  \"mnsync\": true|false,              (boolean) whether the required masternode/spork data is synced\n"
             "  \"walletunlocked\": true|false,      (boolean) whether the wallet is unlocked\n"
             "  \"stakeablecoins\": n                (numeric) number of stakeable UTXOs\n"
-            "  \"stakingbalance\": d                (numeric) SAPP value of the stakeable coins (minus reserve balance, if any)\n"
+            "  \"stakingbalance\": d                (numeric) DASHD value of the stakeable coins (minus reserve balance, if any)\n"
             "  \"stakesplitthreshold\": d           (numeric) value of the current threshold for stake split\n"
             "  \"lastattempt_age\": n               (numeric) seconds since last stake attempt\n"
             "  \"lastattempt_depth\": n             (numeric) depth of the block on top of which the last stake attempt was made\n"

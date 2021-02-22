@@ -991,7 +991,7 @@ UniValue sendtoaddress(const JSONRPCRequest& request)
 
             "\nArguments:\n"
             "1. \"sapphireaddress\"  (string, required) The sapphire address to send to.\n"
-            "2. \"amount\"      (numeric, required) The amount in SAPP to send. eg 0.1\n"
+            "2. \"amount\"      (numeric, required) The amount in DASHD to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
@@ -1134,7 +1134,7 @@ UniValue delegatestake(const JSONRPCRequest& request)
 
             "\nArguments:\n"
             "1. \"stakingaddress\"      (string, required) The sapphire staking address to delegate.\n"
-            "2. \"amount\"              (numeric, required) The amount in SAPP to delegate for staking. eg 100\n"
+            "2. \"amount\"              (numeric, required) The amount in DASHD to delegate for staking. eg 100\n"
             "3. \"owneraddress\"        (string, optional) The sapphire address corresponding to the key that will be able to spend the stake. \n"
             "                               If not provided, or empty string, a new wallet address is generated.\n"
             "4. \"fExternalOwner\"      (boolean, optional, default = false) use the provided 'owneraddress' anyway, even if not present in this wallet.\n"
@@ -1179,7 +1179,7 @@ UniValue rawdelegatestake(const JSONRPCRequest& request)
 
             "\nArguments:\n"
             "1. \"stakingaddress\"      (string, required) The sapphire staking address to delegate.\n"
-            "2. \"amount\"              (numeric, required) The amount in SAPP to delegate for staking. eg 100\n"
+            "2. \"amount\"              (numeric, required) The amount in DASHD to delegate for staking. eg 100\n"
             "3. \"owneraddress\"        (string, optional) The sapphire address corresponding to the key that will be able to spend the stake. \n"
             "                               If not provided, or empty string, a new wallet address is generated.\n"
             "4. \"fExternalOwner\"      (boolean, optional, default = false) use the provided 'owneraddress' anyway, even if not present in this wallet.\n"
@@ -1206,7 +1206,7 @@ UniValue rawdelegatestake(const JSONRPCRequest& request)
             "  ],\n"
             "  \"vout\" : [              (array of json objects)\n"
             "     {\n"
-            "       \"value\" : x.xxx,            (numeric) The value in SAPP\n"
+            "       \"value\" : x.xxx,            (numeric) The value in DASHD\n"
             "       \"n\" : n,                    (numeric) index\n"
             "       \"scriptPubKey\" : {          (json object)\n"
             "         \"asm\" : \"asm\",          (string) the asm\n"
@@ -1251,7 +1251,7 @@ UniValue sendtoaddressix(const JSONRPCRequest& request)
 
             "\nArguments:\n"
             "1. \"sapphireaddress\"  (string, required) The sapphire address to send to.\n"
-            "2. \"amount\"      (numeric, required) The amount in SAPP to send. eg 0.1\n"
+            "2. \"amount\"      (numeric, required) The amount in DASHD to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
@@ -1304,7 +1304,7 @@ UniValue listaddressgroupings(const JSONRPCRequest& request)
             "  [\n"
             "    [\n"
             "      \"sapphireaddress\",     (string) The sapphire address\n"
-            "      amount,                 (numeric) The amount in SAPP\n"
+            "      amount,                 (numeric) The amount in DASHD\n"
             "      \"label\"             (string, optional) The label\n"
             "    ]\n"
             "    ,...\n"
@@ -1403,7 +1403,7 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
             "2. minconf             (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
 
             "\nResult:\n"
-            "amount   (numeric) The total amount in SAPP received at this address.\n"
+            "amount   (numeric) The total amount in DASHD received at this address.\n"
 
             "\nExamples:\n"
             "\nThe amount from transactions with at least 1 confirmation\n" +
@@ -1466,7 +1466,7 @@ UniValue getreceivedbylabel(const JSONRPCRequest& request)
             "2. minconf          (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
 
             "\nResult:\n"
-            "amount              (numeric) The total amount in SAPP received for this label.\n"
+            "amount              (numeric) The total amount in DASHD received for this label.\n"
 
             "\nExamples:\n"
             "\nAmount received by the default label with at least 1 confirmation\n" +
@@ -1530,7 +1530,7 @@ UniValue getbalance(const JSONRPCRequest& request)
             "                    To use this argument, start sapphired with -deprecatedrpc=accounts. Also include balance delegated to cold stakers\n"
 
             "\nResult:\n"
-            "amount              (numeric) The total amount in SAPP received for this account.\n"
+            "amount              (numeric) The total amount in DASHD received for this account.\n"
 
             "\nExamples:\n"
             "\nThe total amount in the wallet\n" +
@@ -1584,7 +1584,7 @@ UniValue getcoldstakingbalance(const JSONRPCRequest& request)
             "                        The selected account, or \"*\" for entire wallet. It may be the default account using \"\".\n"
 
             "\nResult:\n"
-            "amount              (numeric) The total amount in SAPP received for this account in P2CS contracts.\n"
+            "amount              (numeric) The total amount in DASHD received for this account in P2CS contracts.\n"
 
             "\nExamples:\n"
             "\nThe total amount in the wallet\n" +
@@ -1622,7 +1622,7 @@ UniValue getdelegatedbalance(const JSONRPCRequest& request)
             "                        The selected account, or \"*\" for entire wallet. It may be the default account using \"\".\n"
 
             "\nResult:\n"
-            "amount              (numeric) The total amount in SAPP received for this account in P2CS contracts.\n"
+            "amount              (numeric) The total amount in DASHD received for this account in P2CS contracts.\n"
 
             "\nExamples:\n"
             "\nThe total amount in the wallet\n" +
@@ -1673,7 +1673,7 @@ UniValue movecmd(const JSONRPCRequest& request)
             "\nArguments:\n"
             "1. \"fromaccount\"   (string, required) The name of the account to move funds from. May be the default account using \"\".\n"
             "2. \"toaccount\"     (string, required) The name of the account to move funds to. May be the default account using \"\".\n"
-            "3. amount            (numeric, required) Quantity of SAPP to move between accounts.\n"
+            "3. amount            (numeric, required) Quantity of DASHD to move between accounts.\n"
             "4. minconf           (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"       (string, optional) An optional comment, stored in the wallet only.\n"
 
@@ -1681,9 +1681,9 @@ UniValue movecmd(const JSONRPCRequest& request)
             "true|false           (boolean) true if successful.\n"
 
             "\nExamples:\n"
-            "\nMove 0.01 SAPP from the default account to the account named tabby\n" +
+            "\nMove 0.01 DASHD from the default account to the account named tabby\n" +
             HelpExampleCli("move", "\"\" \"tabby\" 0.01") +
-            "\nMove 0.01 SAPP from timotei to akiko with a comment\n" +
+            "\nMove 0.01 DASHD from timotei to akiko with a comment\n" +
             HelpExampleCli("move", "\"timotei\" \"akiko\" 0.01 1 \"happy birthday!\"") +
             "\nAs a json rpc call\n" +
             HelpExampleRpc("move", "\"timotei\", \"akiko\", 0.01, 1, \"happy birthday!\""));
@@ -1752,7 +1752,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) The name of the account to send funds from. May be the default account using \"\".\n"
             "2. \"tosapphireaddress\"  (string, required) The sapphire address to send funds to.\n"
-            "3. amount                (numeric, required) The amount in SAPP. (transaction fee is added on top).\n"
+            "3. amount                (numeric, required) The amount in DASHD. (transaction fee is added on top).\n"
             "4. minconf               (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"           (string, optional) A comment used to store what the transaction is for. \n"
             "                                     This is not part of the transaction, just kept in your wallet.\n"
@@ -1765,7 +1765,7 @@ UniValue sendfrom(const JSONRPCRequest& request)
             "\"transactionid\"        (string) The transaction id.\n"
 
             "\nExamples:\n"
-            "\nSend 0.01 SAPP from the default account to the address, must have at least 1 confirmation\n" +
+            "\nSend 0.01 DASHD from the default account to the address, must have at least 1 confirmation\n" +
             HelpExampleCli("sendfrom", "\"\" \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.01") +
             "\nSend 0.01 from the tabby account to the given address, funds must have at least 6 confirmations\n" +
             HelpExampleCli("sendfrom", "\"tabby\" \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.01 6 \"donation\" \"seans outpost\"") +
@@ -1822,7 +1822,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "1. \"dummy\"               (string, required) Must be set to \"\" for backwards compatibility.\n"
             "2. \"amounts\"             (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount   (numeric) The sapphire address is the key, the numeric amount in SAPP is the value\n"
+            "      \"address\":amount   (numeric) The sapphire address is the key, the numeric amount in DASHD is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
@@ -1850,7 +1850,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "1. \"fromaccount\"         (string, required) DEPRECATED. The account to send the funds from. Should be \"\" for the default account\n"
             "2. \"amounts\"             (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount   (numeric) The sapphire address is the key, the numeric amount in SAPP is the value\n"
+            "      \"address\":amount   (numeric) The sapphire address is the key, the numeric amount in DASHD is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
@@ -2166,7 +2166,7 @@ UniValue listreceivedbyaddress(const JSONRPCRequest& request)
             "    \"involvesWatchonly\" : \"true\",    (bool) Only returned if imported addresses were involved in transaction\n"
             "    \"address\" : \"receivingaddress\",  (string) The receiving address\n"
             "    \"account\" : \"accountname\",       (string) DEPRECATED. Backwards compatible alias for label.\n"
-            "    \"amount\" : x.xxx,                  (numeric) The total amount in SAPP received by the address\n"
+            "    \"amount\" : x.xxx,                  (numeric) The total amount in DASHD received by the address\n"
             "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
             "    \"bcconfirmations\" : n              (numeric) The number of blockchain confirmations of the most recent transaction included\n"
             "    \"label\" : \"label\",               (string) The label of the receiving address. The default label is \"\".\n"
@@ -2413,11 +2413,11 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "                                                transaction between accounts, and not associated with an address,\n"
             "                                                transaction id or block. 'send' and 'receive' transactions are \n"
             "                                                associated with an address, transaction id and block details\n"
-            "    \"amount\": x.xxx,          (numeric) The amount in SAPP. This is negative for the 'send' category, and for the\n"
+            "    \"amount\": x.xxx,          (numeric) The amount in DASHD. This is negative for the 'send' category, and for the\n"
             "                                         'move' category for moves outbound. It is positive for the 'receive' category,\n"
             "                                         and for the 'move' category for inbound funds.\n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"fee\": x.xxx,             (numeric) The amount of the fee in SAPP. This is negative and only available for the \n"
+            "    \"fee\": x.xxx,             (numeric) The amount of the fee in DASHD. This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
             "                                         'receive' category of transactions.\n"
@@ -2468,11 +2468,11 @@ UniValue listtransactions(const JSONRPCRequest& request)
             "                                                transaction between accounts, and not associated with an address,\n"
             "                                                transaction id or block. 'send' and 'receive' transactions are \n"
             "                                                associated with an address, transaction id and block details\n"
-            "    \"amount\": x.xxx,          (numeric) The amount in SAPP. This is negative for the 'send' category, and for the\n"
+            "    \"amount\": x.xxx,          (numeric) The amount in DASHD. This is negative for the 'send' category, and for the\n"
             "                                         'move' category for moves outbound. It is positive for the 'receive' category,\n"
             "                                         and for the 'move' category for inbound funds.\n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"fee\": x.xxx,             (numeric) The amount of the fee in SAPP. This is negative and only available for the \n"
+            "    \"fee\": x.xxx,             (numeric) The amount of the fee in DASHD. This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
             "                                         'receive' category of transactions.\n"
@@ -2679,10 +2679,10 @@ UniValue listsinceblock(const JSONRPCRequest& request)
             "    \"account\":\"accountname\",       (string) DEPRECATED. This field will be removed in v5.0. To see this deprecated field, start sapphired with -deprecatedrpc=accounts. The account name associated with the transaction. Will be \"\" for the default account.\n"
             "    \"address\":\"sapphireaddress\",    (string) The sapphire address of the transaction. Not present for move transactions (category = move).\n"
             "    \"category\":\"send|receive\",     (string) The transaction category. 'send' has negative amounts, 'receive' has positive amounts.\n"
-            "    \"amount\": x.xxx,          (numeric) The amount in SAPP. This is negative for the 'send' category, and for the 'move' category for moves \n"
+            "    \"amount\": x.xxx,          (numeric) The amount in DASHD. This is negative for the 'send' category, and for the 'move' category for moves \n"
             "                                          outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.\n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"fee\": x.xxx,             (numeric) The amount of the fee in SAPP. This is negative and only available for the 'send' category of transactions.\n"
+            "    \"fee\": x.xxx,             (numeric) The amount of the fee in DASHD. This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"bcconfirmations\" : n,    (numeric) The number of blockchain confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockhash\": \"hashvalue\",     (string) The block hash containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
@@ -2762,7 +2762,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
 
             "\nResult:\n"
             "{\n"
-            "  \"amount\" : x.xxx,        (numeric) The transaction amount in SAPP\n"
+            "  \"amount\" : x.xxx,        (numeric) The transaction amount in DASHD\n"
             "  \"confirmations\" : n,     (numeric) The number of confirmations\n"
             "  \"bcconfirmations\" : n,   (numeric) The number of blockchain confirmations\n"
             "  \"blockhash\" : \"hash\",  (string) The block hash\n"
@@ -2776,7 +2776,7 @@ UniValue gettransaction(const JSONRPCRequest& request)
             "      \"account\" : \"accountname\",  (string) DEPRECATED.This field will be removed in v5.0. To see this deprecated field, start sapphired with -deprecatedrpc=accounts. The account name involved in the transaction, can be \"\" for the default account.\n"
             "      \"address\" : \"sapphireaddress\",   (string) The sapphire address involved in the transaction\n"
             "      \"category\" : \"send|receive\",    (string) The category, either 'send' or 'receive'\n"
-            "      \"amount\" : x.xxx                  (numeric) The amount in SAPP\n"
+            "      \"amount\" : x.xxx                  (numeric) The amount in DASHD\n"
             "      \"vout\" : n,                       (numeric) the vout value\n"
             "    }\n"
             "    ,...\n"
@@ -2930,7 +2930,7 @@ UniValue walletpassphrase(const JSONRPCRequest& request)
         throw std::runtime_error(
             "walletpassphrase \"passphrase\" timeout ( stakingonly )\n"
             "\nStores the wallet decryption key in memory for 'timeout' seconds.\n"
-            "This is needed prior to performing transactions related to private keys such as sending SAPPs\n"
+            "This is needed prior to performing transactions related to private keys such as sending DASHDs\n"
 
             "\nArguments:\n"
             "1. \"passphrase\"     (string, required) The wallet passphrase\n"
@@ -3095,7 +3095,7 @@ UniValue encryptwallet(const JSONRPCRequest& request)
             "\nExamples:\n"
             "\nEncrypt you wallet\n" +
             HelpExampleCli("encryptwallet", "\"my pass phrase\"") +
-            "\nNow set the passphrase to use the wallet, such as for signing or sending SAPPs\n" +
+            "\nNow set the passphrase to use the wallet, such as for signing or sending DASHDs\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
             "\nNow we can so something like sign\n" +
             HelpExampleCli("signmessage", "\"sapphireaddress\" \"test message\"") +
@@ -3163,7 +3163,7 @@ UniValue listunspent(const JSONRPCRequest& request)
                 "    \"account\" : \"account\",  (string) DEPRECATED.This field will be removed in v5.0. To see this deprecated field, start sapphired with -deprecatedrpc=accounts. Backwards compatible alias for label.\n"
                 "    \"scriptPubKey\" : \"key\", (string) the script key\n"
                 "    \"redeemScript\" : \"key\", (string) the redeemscript key\n"
-                "    \"amount\" : x.xxx,         (numeric) the transaction amount in SAPP\n"
+                "    \"amount\" : x.xxx,         (numeric) the transaction amount in DASHD\n"
                 "    \"confirmations\" : n,      (numeric) The number of confirmations\n"
                 "    \"spendable\" : true|false  (boolean) Whether we have the private keys to spend this output\n"
                 "    \"solvable\" : xxx          (bool) Whether we know how to spend this output, ignoring the lack of keys\n"
@@ -3191,7 +3191,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             const UniValue& input = inputs[inx];
             CTxDestination dest = DecodeDestination(input.get_str());
             if (!IsValidDestination(dest))
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid SAPP address: ") + input.get_str());
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid DASHD address: ") + input.get_str());
             if (destinations.count(dest))
                 throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ") + input.get_str());
             destinations.insert(dest);
@@ -3276,7 +3276,7 @@ UniValue lockunspent(const JSONRPCRequest& request)
             "lockunspent unlock [{\"txid\":\"txid\",\"vout\":n},...]\n"
             "\nUpdates list of temporarily unspendable outputs.\n"
             "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
-            "A locked transaction output will not be chosen by automatic coin selection, when spending SAPPs.\n"
+            "A locked transaction output will not be chosen by automatic coin selection, when spending DASHDs.\n"
             "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
             "is always cleared (by virtue of process exit) when a node stops or fails.\n"
             "Also see the listunspent call\n"
@@ -3440,7 +3440,7 @@ UniValue settxfee(const JSONRPCRequest& request)
             "\nSet the transaction fee per kB.\n"
 
             "\nArguments:\n"
-            "1. amount         (numeric, required) The transaction fee in SAPP/kB rounded to the nearest 0.00000001\n"
+            "1. amount         (numeric, required) The transaction fee in DASHD/kB rounded to the nearest 0.00000001\n"
 
             "\nResult\n"
             "true|false        (boolean) Returns true if successful\n"
@@ -3468,20 +3468,20 @@ UniValue getwalletinfo(const JSONRPCRequest& request)
             "\nResult:\n"
             "{\n"
             "  \"walletversion\": xxxxx,                  (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,                      (numeric) the total SAPP balance of the wallet (cold balance excluded)\n"
-            "  \"delegated_balance\": xxxxx,              (numeric) the SAPP balance held in P2CS (cold staking) contracts\n"
-            "  \"cold_staking_balance\": xx,              (numeric) the SAPP balance held in cold staking addresses\n"
-            "  \"unconfirmed_balance\": xxx,              (numeric) the total unconfirmed balance of the wallet in SAPP\n"
-            "  \"immature_delegated_balance\": xxxxxx,    (numeric) the delegated immature balance of the wallet in SAPP\n"
-            "  \"immature_cold_staking_balance\": xxxxxx, (numeric) the cold-staking immature balance of the wallet in SAPP\n"
-            "  \"immature_balance\": xxxxxx,              (numeric) the total immature balance of the wallet in SAPP\n"
+            "  \"balance\": xxxxxxx,                      (numeric) the total DASHD balance of the wallet (cold balance excluded)\n"
+            "  \"delegated_balance\": xxxxx,              (numeric) the DASHD balance held in P2CS (cold staking) contracts\n"
+            "  \"cold_staking_balance\": xx,              (numeric) the DASHD balance held in cold staking addresses\n"
+            "  \"unconfirmed_balance\": xxx,              (numeric) the total unconfirmed balance of the wallet in DASHD\n"
+            "  \"immature_delegated_balance\": xxxxxx,    (numeric) the delegated immature balance of the wallet in DASHD\n"
+            "  \"immature_cold_staking_balance\": xxxxxx, (numeric) the cold-staking immature balance of the wallet in DASHD\n"
+            "  \"immature_balance\": xxxxxx,              (numeric) the total immature balance of the wallet in DASHD\n"
             "  \"txcount\": xxxxxxx,                      (numeric) the total number of transactions in the wallet\n"
             "  \"keypoololdest\": xxxxxx,                 (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
             "  \"keypoolsize\": xxxx,               (numeric) how many new keys are pre-generated (only counts external keys)\n"
             "  \"keypoolsize_hd_internal\": xxxx,   (numeric) how many new keys are pre-generated for internal use (used for change outputs, only appears if the wallet is using this feature, otherwise external keys are used)\n"
             "  \"keypoolsize_hd_staking\": xxxx,    (numeric) how many new keys are pre-generated for staking use (used for staking contracts, only appears if the wallet is using this feature)\n"
             "  \"unlocked_until\": ttt,                   (numeric) the timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked for transfers, or 0 if the wallet is locked\n"
-            "  \"paytxfee\": x.xxxx                       (numeric) the transaction fee configuration, set in SAPP/kB\n"
+            "  \"paytxfee\": x.xxxx                       (numeric) the transaction fee configuration, set in DASHD/kB\n"
             "  \"hdseedid\": \"<hash160>\"            (string, optional) the Hash160 of the HD seed (only present when HD is enabled)\n"
             "}\n"
 
@@ -3532,11 +3532,11 @@ UniValue setstakesplitthreshold(const JSONRPCRequest& request)
             "Whenever a successful stake is found, the stake amount is split across as many outputs (each with a value\n"
             "higher than the threshold) as possible.\n"
             "E.g. If the coinstake input + the block reward is 2000, and the split threshold is 499, the corresponding\n"
-            "coinstake transaction will have 4 outputs (of 500 SAPP each)."
+            "coinstake transaction will have 4 outputs (of 500 DASHD each)."
             + HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
-            "1. value                   (numeric, required) Threshold value (in SAPP).\n"
+            "1. value                   (numeric, required) Threshold value (in DASHD).\n"
             "                                     Set to 0 to disable stake-splitting\n"
             "                                     If > 0, it must be >= " + FormatMoney(CWallet::minStakeSplitThreshold) + "\n"
 
@@ -3804,7 +3804,7 @@ UniValue multisend(const JSONRPCRequest& request)
     std::string strAddress = request.params[0].get_str();
     CBitcoinAddress address(strAddress);
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid SAPP address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid DASHD address");
     if (std::stoi(request.params[1].get_str().c_str()) < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     if (pwalletMain->IsLocked())
@@ -3850,11 +3850,11 @@ UniValue getzerocoinbalance(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
             "getzerocoinbalance\n"
-            "\nReturn the wallet's total zSAPP balance.\n" +
+            "\nReturn the wallet's total zDASHD balance.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult:\n"
-            "amount         (numeric) Total zSAPP balance.\n"
+            "amount         (numeric) Total zDASHD balance.\n"
 
             "\nExamples:\n" +
             HelpExampleCli("getzerocoinbalance", "") + HelpExampleRpc("getzerocoinbalance", ""));
@@ -3878,7 +3878,7 @@ UniValue listmintedzerocoins(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 2)
         throw std::runtime_error(
             "listmintedzerocoins (fVerbose) (fMatureOnly)\n"
-            "\nList all zSAPP mints in the wallet.\n" +
+            "\nList all zDASHD mints in the wallet.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
@@ -3897,7 +3897,7 @@ UniValue listmintedzerocoins(const JSONRPCRequest& request)
             "  {\n"
             "    \"serial hash\": \"xxx\",   (string) Mint serial hash in hex format.\n"
             "    \"version\": n,   (numeric) Zerocoin version number.\n"
-            "    \"zSAPP ID\": \"xxx\",   (string) Pubcoin in hex format.\n"
+            "    \"zDASHD ID\": \"xxx\",   (string) Pubcoin in hex format.\n"
             "    \"denomination\": n,   (numeric) Coin denomination.\n"
             "    \"mint height\": n     (numeric) Height of the block containing this mint.\n"
             "    \"confirmations\": n   (numeric) Number of confirmations.\n"
@@ -3930,7 +3930,7 @@ UniValue listmintedzerocoins(const JSONRPCRequest& request)
             UniValue objMint(UniValue::VOBJ);
             objMint.push_back(Pair("serial hash", m.hashSerial.GetHex()));  // Serial hash
             objMint.push_back(Pair("version", m.nVersion));                 // Zerocoin version
-            objMint.push_back(Pair("zSAPP ID", m.hashPubcoin.GetHex()));     // PubCoin
+            objMint.push_back(Pair("zDASHD ID", m.hashPubcoin.GetHex()));     // PubCoin
             int denom = libzerocoin::ZerocoinDenominationToInt(m.denom);
             objMint.push_back(Pair("denomination", denom));                 // Denomination
             objMint.push_back(Pair("mint height", m.nHeight));              // Mint Height
@@ -4007,7 +4007,7 @@ UniValue listspentzerocoins(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
             "listspentzerocoins\n"
-            "\nList all the spent zSAPP mints in the wallet.\n" +
+            "\nList all the spent zDASHD mints in the wallet.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult:\n"
@@ -4039,11 +4039,11 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
             "mintzerocoin amount ( utxos )\n"
-            "\nMint the specified zSAPP amount\n" +
+            "\nMint the specified zDASHD amount\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
-            "1. amount      (numeric, required) Enter an amount of Piv to convert to zSAPP\n"
+            "1. amount      (numeric, required) Enter an amount of Piv to convert to zDASHD\n"
             "2. utxos       (string, optional) A json array of objects.\n"
             "                   Each object needs the txid (string) and vout (numeric)\n"
             "  [\n"
@@ -4080,7 +4080,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
 
 
     if (!Params().IsRegTestNet())
-        throw JSONRPCError(RPC_WALLET_ERROR, "zSAPP minting is DISABLED");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zDASHD minting is DISABLED");
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -4094,7 +4094,7 @@ UniValue mintzerocoin(const JSONRPCRequest& request)
 
     int64_t nTime = GetTimeMillis();
     if(sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zSAPP is currently disabled due to maintenance.");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zDASHD is currently disabled due to maintenance.");
 
     EnsureWalletIsUnlocked(true);
 
@@ -4159,7 +4159,7 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() > 2 || request.params.size() < 1)
         throw std::runtime_error(
             "spendzerocoin amount ( \"address\" )\n"
-            "\nSpend zSAPP to a SAPP address.\n" +
+            "\nSpend zDASHD to a DASHD address.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
@@ -4183,8 +4183,8 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
             "  ],\n"
             "  \"outputs\": [                 (array) JSON array of output objects.\n"
             "    {\n"
-            "      \"value\": amount,         (numeric) Value in SAPP.\n"
-            "      \"address\": \"xxx\"         (string) SAPP address or \"zerocoinmint\" for reminted change.\n"
+            "      \"value\": amount,         (numeric) Value in DASHD.\n"
+            "      \"address\": \"xxx\"         (string) DASHD address or \"zerocoinmint\" for reminted change.\n"
             "    }\n"
             "    ,...\n"
             "  ]\n"
@@ -4197,7 +4197,7 @@ UniValue spendzerocoin(const JSONRPCRequest& request)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if(sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zSAPP is currently disabled due to maintenance.");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zDASHD is currently disabled due to maintenance.");
 
     CAmount nAmount = AmountFromValue(request.params[0]);        // Spending amount
     const std::string address_str = (request.params.size() > 1 ? request.params[1].get_str() : "");
@@ -4212,7 +4212,7 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 1 || request.params.size() > 2)
         throw std::runtime_error(
             "spendzerocoinmints mints_list ( \"address\" ) \n"
-            "\nSpend zSAPP mints to a zSAPP address.\n" +
+            "\nSpend zDASHD mints to a zDASHD address.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
@@ -4235,8 +4235,8 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
             "  ],\n"
             "  \"outputs\": [                 (array) JSON array of output objects.\n"
             "    {\n"
-            "      \"value\": amount,         (numeric) Value in SAPP.\n"
-            "      \"address\": \"xxx\"         (string) SAPP address or \"zerocoinmint\" for reminted change.\n"
+            "      \"value\": amount,         (numeric) Value in DASHD.\n"
+            "      \"address\": \"xxx\"         (string) DASHD address or \"zerocoinmint\" for reminted change.\n"
             "    }\n"
             "    ,...\n"
             "  ]\n"
@@ -4249,7 +4249,7 @@ UniValue spendzerocoinmints(const JSONRPCRequest& request)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if(sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zSAPP is currently disabled due to maintenance.");
+        throw JSONRPCError(RPC_WALLET_ERROR, "zDASHD is currently disabled due to maintenance.");
 
     UniValue arrMints = request.params[0].get_array();
     const std::string address_str = (request.params.size() > 1 ? request.params[1].get_str() : "");
@@ -4537,12 +4537,12 @@ UniValue exportzerocoins(const JSONRPCRequest& request)
 
             "\nArguments:\n"
             "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-            "2. \"denomination\"         (integer, optional) Export a specific denomination of zSAPP\n"
+            "2. \"denomination\"         (integer, optional) Export a specific denomination of zDASHD\n"
 
             "\nResult:\n"
             "[                   (array of json object)\n"
             "  {\n"
-            "    \"id\": \"serial hash\",  (string) the mint's zSAPP serial hash \n"
+            "    \"id\": \"serial hash\",  (string) the mint's zDASHD serial hash \n"
             "    \"d\": n,         (numeric) the mint's zerocoin denomination \n"
             "    \"p\": \"pubcoin\", (string) The public coin\n"
             "    \"s\": \"serial\",  (string) The secret serial number\n"
@@ -4550,8 +4550,8 @@ UniValue exportzerocoins(const JSONRPCRequest& request)
             "    \"t\": \"txid\",    (string) The txid that the coin was minted in\n"
             "    \"h\": n,         (numeric) The height the tx was added to the blockchain\n"
             "    \"u\": used,      (boolean) Whether the mint has been spent\n"
-            "    \"v\": version,   (numeric) The version of the zSAPP\n"
-            "    \"k\": \"privkey\"  (string) The zSAPP private key (V2+ zSAPP only)\n"
+            "    \"v\": version,   (numeric) The version of the zDASHD\n"
+            "    \"k\": \"privkey\"  (string) The zDASHD private key (V2+ zDASHD only)\n"
             "  }\n"
             "  ,...\n"
             "]\n"
@@ -4620,7 +4620,7 @@ UniValue importzerocoins(const JSONRPCRequest& request)
             "\nResult:\n"
             "{\n"
             "  \"added\": n,        (numeric) The quantity of zerocoin mints that were added\n"
-            "  \"value\": amount    (numeric) The total zSAPP value of zerocoin mints that were added\n"
+            "  \"value\": amount    (numeric) The total zDASHD value of zerocoin mints that were added\n"
             "}\n"
 
             "\nExamples\n" +
@@ -4698,7 +4698,7 @@ UniValue reconsiderzerocoins(const JSONRPCRequest& request)
     if(request.fHelp || !request.params.empty())
         throw std::runtime_error(
             "reconsiderzerocoins\n"
-            "\nCheck archived zSAPP list to see if any mints were added to the blockchain.\n" +
+            "\nCheck archived zDASHD list to see if any mints were added to the blockchain.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult:\n"
@@ -4783,11 +4783,11 @@ UniValue getzpivseed(const JSONRPCRequest& request)
     if(request.fHelp || !request.params.empty())
         throw std::runtime_error(
             "getzpivseed\n"
-            "\nCheck archived zSAPP list to see if any mints were added to the blockchain.\n" +
+            "\nCheck archived zDASHD list to see if any mints were added to the blockchain.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult\n"
-            "\"seed\" : s,  (string) The deterministic zSAPP seed.\n"
+            "\"seed\" : s,  (string) The deterministic zDASHD seed.\n"
 
             "\nExamples\n" +
             HelpExampleCli("getzpivseed", "") + HelpExampleRpc("getzpivseed", ""));
@@ -4808,12 +4808,12 @@ UniValue generatemintlist(const JSONRPCRequest& request)
     if(request.fHelp || request.params.size() != 2)
         throw std::runtime_error(
             "generatemintlist\n"
-            "\nShow mints that are derived from the deterministic zSAPP seed.\n" +
+            "\nShow mints that are derived from the deterministic zDASHD seed.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments\n"
-            "1. \"count\"  : n,  (numeric) Which sequential zSAPP to start with.\n"
-            "2. \"range\"  : n,  (numeric) How many zSAPP to generate.\n"
+            "1. \"count\"  : n,  (numeric) Which sequential zDASHD to start with.\n"
+            "2. \"range\"  : n,  (numeric) How many zDASHD to generate.\n"
 
             "\nResult:\n"
             "[\n"
@@ -4856,7 +4856,7 @@ UniValue dzpivstate(const JSONRPCRequest& request) {
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
                 "dzpivstate\n"
-                        "\nThe current state of the mintpool of the deterministic zSAPP wallet.\n" +
+                        "\nThe current state of the mintpool of the deterministic zDASHD wallet.\n" +
                 HelpRequiringPassphrase() + "\n"
 
                         "\nExamples\n" +
@@ -4908,12 +4908,12 @@ UniValue searchdzpiv(const JSONRPCRequest& request)
     if(request.fHelp || request.params.size() != 3)
         throw std::runtime_error(
             "searchdzpiv\n"
-            "\nMake an extended search for deterministically generated zSAPP that have not yet been recognized by the wallet.\n" +
+            "\nMake an extended search for deterministically generated zDASHD that have not yet been recognized by the wallet.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments\n"
-            "1. \"count\"       (numeric) Which sequential zSAPP to start with.\n"
-            "2. \"range\"       (numeric) How many zSAPP to generate.\n"
+            "1. \"count\"       (numeric) Which sequential zDASHD to start with.\n"
+            "2. \"range\"       (numeric) How many zDASHD to generate.\n"
             "3. \"threads\"     (numeric) How many threads should this operation consume.\n"
 
             "\nExamples\n" +
@@ -4980,7 +4980,7 @@ UniValue spendrawzerocoin(const JSONRPCRequest& request)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (sporkManager.IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-            throw JSONRPCError(RPC_WALLET_ERROR, "zSAPP is currently disabled due to maintenance.");
+            throw JSONRPCError(RPC_WALLET_ERROR, "zDASHD is currently disabled due to maintenance.");
 
     const Consensus::Params& consensus = Params().GetConsensus();
 
