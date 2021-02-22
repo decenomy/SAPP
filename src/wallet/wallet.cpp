@@ -2522,7 +2522,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend,
                 if (nChange > 0) {
                     // Fill a vout to ourself
                     // TODO: pass in scriptChange instead of reservekey so
-                    // change transaction isn't always pay-to-sapphire-address
+                    // change transaction isn't always pay-to-dashdiamond-address
                     bool combineChange = false;
 
                     // coin control: send change to custom address
@@ -3778,10 +3778,10 @@ CWallet* CWallet::CreateWalletFromFile(const std::string walletFile)
             UIWarning(strprintf(_("Warning: error reading %s! All keys read correctly, but transaction data"
                          " or address book entries might be missing or incorrect."), walletFile));
         } else if (nLoadWalletRet == DB_TOO_NEW) {
-            UIError(strprintf(_("Error loading %s: Wallet requires newer version of Sapphire Core"), walletFile));
+            UIError(strprintf(_("Error loading %s: Wallet requires newer version of Dash Diamond Core"), walletFile));
             return nullptr;
         } else if (nLoadWalletRet == DB_NEED_REWRITE) {
-            UIError(_("Wallet needed to be rewritten: restart Sapphire Core to complete"));
+            UIError(_("Wallet needed to be rewritten: restart Dash Diamond Core to complete"));
             return nullptr;
         } else {
             UIError(strprintf(_("Error loading %s\n"), walletFile));
