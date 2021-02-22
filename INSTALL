@@ -1,4 +1,4 @@
-Building Sapphire
+Building Dash Diamond
 
 Use the autogen script to prepare the build environment.
 
@@ -8,6 +8,6 @@ Use the autogen script to prepare the build environment.
 
 Always verify the signatures and checksums.
 
-See doc/build-*.md for instructions on building sapphired,
+See doc/build-*.md for instructions on building dashdiamondd,
 the intended-for-services, no-graphical-interface, reference
-implementation of Sapphire.
+implementation of Dash Diamond.

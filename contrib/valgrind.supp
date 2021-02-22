@@ -1,4 +1,4 @@
-# Valgrind suppressions file for Sapphire.
+# Valgrind suppressions file for Dash Diamond.
 #
 # Includes known Valgrind warnings in our dependencies that cannot be fixed
 # in-tree.

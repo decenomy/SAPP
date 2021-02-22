@@ -458,7 +458,7 @@ CPPFLAGS="$CPPFLAGS -DHAVE_BUILD_INFO -D__STDC_FORMAT_MACROS"
 
 AC_ARG_WITH([utils],
   [AS_HELP_STRING([--with-utils],
-  [build sapphire-cli sapphire-tx (default=yes)])],
+  [build dashdiamond-cli dashdiamond-tx (default=yes)])],
   [build_bitcoin_utils=$withval],
   [build_bitcoin_utils=yes])
 
@@ -470,7 +470,7 @@ AC_ARG_WITH([libs],
 
 AC_ARG_WITH([daemon],
   [AS_HELP_STRING([--with-daemon],
-  [build sapphired daemon (default=yes)])],
+  [build dashdiamondd daemon (default=yes)])],
   [build_bitcoind=$withval],
   [build_bitcoind=yes])
 
@@ -1218,11 +1218,11 @@ AX_CHECK_COMPILE_FLAG([-Wno-builtin-declaration-mismatch],[CXXFLAGS="$CXXFLAGS -
 
 LIBZCASH_LIBS="$BOOST_SYSTEM_LIB $CRYPTO_LIBS $SODIUM_LIBS $RUST_LIBS"
 
-AC_MSG_CHECKING([whether to build sapphired])
+AC_MSG_CHECKING([whether to build dashdiamondd])
 AM_CONDITIONAL([BUILD_BITCOIND], [test x$build_bitcoind = xyes])
 AC_MSG_RESULT($build_bitcoind)
 
-AC_MSG_CHECKING([whether to build utils (sapphire-cli sapphire-tx)])
+AC_MSG_CHECKING([whether to build utils (dashdiamond-cli dashdiamond-tx)])
 AM_CONDITIONAL([BUILD_BITCOIN_UTILS], [test x$build_bitcoin_utils = xyes])
 AC_MSG_RESULT($build_bitcoin_utils)
 
@@ -1350,7 +1350,7 @@ if test x$bitcoin_enable_qt != xno; then
     AC_MSG_WARN("xgettext is required to update qt translations")
   fi
 
-  AC_MSG_CHECKING([whether to build test_sapphire-qt])
+  AC_MSG_CHECKING([whether to build test_dashdiamond-qt])
   if test x$use_gui_tests$bitcoin_enable_qt_test = xyesyes; then
     AC_MSG_RESULT([yes])
     BUILD_TEST_QT="yes"
@@ -1377,7 +1377,7 @@ esac
 AM_CONDITIONAL([USE_NUM_GMP], [test "x$set_bignum" = "xgmp"])
 AM_CONDITIONAL([USE_NUM_OPENSSL], [test "x$set_bignum" = "xopenssl"])
 
-AC_MSG_CHECKING([whether to build test_sapphire])
+AC_MSG_CHECKING([whether to build test_dashdiamond])
 if test x$use_tests = xyes; then
   AC_MSG_RESULT([yes])
   BUILD_TEST="yes"

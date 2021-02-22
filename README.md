@@ -1,4 +1,4 @@
-Sapphire Coin Core integration/staging repository
+Dash Diamond Coin Core integration/staging repository
 =================================================================
 
 
@@ -13,9 +13,9 @@ Sapphire Coin Core integration/staging repository
 • Prefix: SAPP adresses start with the capital letter "S"  
 • Ports: 45328 (p2p) / 45329 (rpc)
 
-• Explorer http://sappexplorer.com
+• Explorer https://chains.trittium.cc/DASHD/blocks
 
-• Website [sappcoin.com](http://www.sappcoin.com)
+• Website [dashdiamond.net/](https://dashdiamond.net/)
 
 ### Rewards Breakdown
 <table border=0 cellpadding=0 cellspacing=0 width=701 class=xl6553517252
