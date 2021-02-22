@@ -129,7 +129,7 @@ public:
 };
 
 /**
- * Sapphire RPC command dispatcher.
+ * Dash Diamond RPC command dispatcher.
  */
 class CRPCTable
 {
