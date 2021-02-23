@@ -35,6 +35,7 @@ std::vector<CSporkDef> sporkDefs = {
 	//TODO: Needed to be removed in the future when the old nodes cut from the network.
 	// Prevents error messages in debug logs due to v1 wallets
     MAKE_SPORK_DEF(SPORK_7_NOOP,                            4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_10_NOOP,                           4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_11_NOOP,                           4070908800ULL), // OFF
 	MAKE_SPORK_DEF(SPORK_15_NOOP,                           4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_17_NOOP,                           4070908800ULL), // OFF

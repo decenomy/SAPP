@@ -141,12 +141,12 @@ public:
         consensus.nTime_RejectOldSporkKey = 1612483200;     // 02/05/2021 @ 12:00am (UTC)
 
         // height-based activations
-        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFF;
-        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFF;
-        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFF;
-        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFF;
-        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFF;
-        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFF;
+        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFE;
+        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFE;
+        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFE;
+        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFE;
+        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFE;
+        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFE;
 
         // Zerocoin-related params
         consensus.ZC_Modulus = "c95577b6dce0049b0a20c779af38079355abadde1a1d80c353f6cb697a7ae5a087bad39caa5798478551d0f9d91e626771"
@@ -284,12 +284,12 @@ public:
         //consensus.nTime_RejectOldSporkKey = 1556165178;     //!> September 26, 2019 11:00:00 PM GMT
 
         // height based activations
-        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFF;
-        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFF; 
-        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFF; 
-        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFF; 
-        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFF;
-        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFF;
+        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFE;
+        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFE; 
+        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFE; 
+        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFE; 
+        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFE;
+        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFE;
 
         // Zerocoin-related params
         consensus.ZC_Modulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -429,12 +429,12 @@ public:
         consensus.nTime_RejectOldSporkKey = 0;
 
         // height based activations
-        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFF; //310     // no checkpoints on regtest
-        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFF; //-1
-        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFF; //999999999
-        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFF; //999999999
-        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFF; //300
-        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFF; //999999999
+        consensus.height_last_ZC_AccumCheckpoint    = 0x7FFFFFFE; //310     // no checkpoints on regtest
+        consensus.height_last_ZC_WrappedSerials     = 0x7FFFFFFE; //-1
+        consensus.height_start_InvalidUTXOsCheck    = 0x7FFFFFFE; //999999999
+        consensus.height_start_ZC_InvalidSerials    = 0x7FFFFFFE; //999999999
+        consensus.height_start_ZC_SerialRangeCheck  = 0x7FFFFFFE; //300
+        consensus.height_ZC_RecalcAccumulators      = 0x7FFFFFFE; //999999999
 
         // Zerocoin-related params
         consensus.ZC_Modulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"

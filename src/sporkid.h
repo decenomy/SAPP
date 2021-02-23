@@ -35,6 +35,7 @@ enum SporkId : int32_t {
 	//TODO needed to be removed in the future when the old nodes cut from the network.
     // Prevents error messages in debug logs due to v1 wallets
     SPORK_7_NOOP                                = 10006,
+    SPORK_10_NOOP                               = 10009,
     SPORK_11_NOOP                               = 10010,
     SPORK_15_NOOP                               = 10014,
     SPORK_17_NOOP                               = 10016,
