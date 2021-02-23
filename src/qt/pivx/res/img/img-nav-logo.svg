@@ -5,10 +5,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   id="Layer_1"
-   data-name="Layer 1"
+   version="1.1"
    viewBox="0 0 109 93"
-   version="1.1">
+   data-name="Layer 1"
+   id="Layer_1">
   <metadata
      id="metadata21">
     <rdf:RDF>
@@ -27,31 +27,31 @@
        id="style2">.cls-1{fill:none;}.cls-2{fill:#2ea1ff;}</style>
   </defs>
   <rect
-     class="cls-1"
-     width="109"
+     id="rect6"
      height="93"
-     id="rect6" />
+     width="109"
+     class="cls-1" />
   <g
      id="g841">
     <path
-       class="cls-2"
+       id="path8"
        d="M32.13,23.73l-8.29-.15-20.65,21L49.87,86.46s0,0,0,0L18,45"
-       id="path8" />
+       class="cls-2" />
     <path
-       class="cls-2"
+       id="path10"
        d="M78.94,26.14l8.16.5,18.71,20.69-49,34.53s0,0,0,0l34.4-35.24"
-       id="path10" />
+       class="cls-2" />
     <path
-       class="cls-2"
+       id="path12"
        d="M30.66,48.75,24.8,42.21l-.61-31,59.7,8.58s0,0,0,0l-49.13,3"
-       id="path12" />
+       class="cls-2" />
     <path
-       class="cls-2"
+       id="path14"
        d="M57.73,33.9H48.08l-.8,5.49,8.71,0c4.29,0,5.56,1.91,5.52,5.08a27.7,27.7,0,0,1-.84,5.27c-.66,2.37-2,5.08-7.11,5.07H45.09l-.8,5.49h9.63c3.4,0,4.84-.48,6.37-1.35,3.4-1.93,5.42-6,6.23-11.4,1.2-8-.3-13.67-8.79-13.67"
-       id="path14" />
+       class="cls-2" />
   </g>
   <path
-     class="cls-2"
+     id="path16"
      d="M44.16,44.86c-2.53,0-2.89,2-3.13,3.24-.31,1.6-.41,2.25-.41,2.25H50.5c2.53,0,2.89-2,3.13-3.24.31-1.6.42-2.25.42-2.25Z"
-     id="path16" />
+     class="cls-2" />
 </svg>
