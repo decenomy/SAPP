@@ -60,10 +60,10 @@ git config --global user.email "MY_NAME@example.com"
 Fetching the Build Script
 --------------------------
 
-The build script we'll be using is contained in the Sapphire github repository ([contrib/gitian-build.py](https://github.com/sappcoin-com/sapp/blob/master/contrib/gitian-build.py)). Since this is a completely fresh environment, we haven't yet cloned the Sapphire repository and will need to fetch this script with the following commands:
+The build script we'll be using is contained in the Dash Diamond github repository ([contrib/gitian-build.py](https://github.com/Dash-Diamond/DASHD/blob/master/contrib/gitian-build.py)). Since this is a completely fresh environment, we haven't yet cloned the Dash Diamond repository and will need to fetch this script with the following commands:
 
 ```bash
-curl -L -O https://raw.githubusercontent.com/sappcoin-com/sapp/master/contrib/gitian-build.py
+curl -L -O https://github.com/Dash-Diamond/DASHD/blob/master/contrib/gitian-build.py
 chmod +x gitian-build.py
 ```
 
@@ -77,7 +77,7 @@ Initial Gitian Setup
 Now that the script has been downloaded to your home directory, its time to run it in setup mode. This will perform the following actions:
 
 - Install the necessary system packages for gitian (namely Docker and it's related cli tools).
-- Clone the gitian-builder, gitian.sigs, pivx-detached-sigs, and Sapphire GitHub repos.
+- Clone the gitian-builder, gitian.sigs, pivx-detached-sigs, and Dash Diamond GitHub repos.
 - Configure proper user/group permissions for running gitian with Docker
 - Create a base Docker image.
 
