@@ -1,16 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-    <defs>
-        <style type="text/css">
-            .cls-1{opacity:.7}.cls-2{fill:#fff}.cls-3{fill:none}
-        </style>
-    </defs>
-    <g id="ic-transaction-sent" class="cls-1">
-        <g id="Group_8832" data-name="Group 8832">
-            <path id="Path_18891" d="M22.2 1.8L1.8 9.782l6.37 3.43-.1-.1 1.445-1.445-2.964-1.597 12.122-4.744-4.743 12.123-1.593-2.958-1.445 1.445-.1-.1 3.43 6.37z" class="cls-2" data-name="Path 18891"/>
-            <g id="Group_8831" data-name="Group 8831">
-                <path id="Rectangle_4411" d="M0 0h7v2H0z" class="cls-2" data-name="Rectangle 4411" transform="rotate(-45 21.062 -3.68)"/>
-            </g>
-        </g>
-        <path id="Rectangle_4412" d="M0 0h24v24H0z" class="cls-3" data-name="Rectangle 4412"/>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#2EA1FF;}
+</style>
+<rect class="st0" width="24" height="24"/>
+<path class="st1" d="M23.8,12L23.8,12c0-0.5-0.3-1-0.8-1.2L2.2,1.7C1.7,1.5,1.1,1.7,0.7,2.1c-0.4,0.5-0.4,1.1,0,1.6L7,12
+	c0,0,0,0,0,0.1l-6.3,8.3c-0.4,0.5-0.4,1.1,0,1.6l0.1,0.1c0.4,0.4,0.9,0.5,1.4,0.3L23,13.2C23.5,13,23.8,12.5,23.8,12z M1.7,3
+	C1.7,3,1.7,3,1.7,3C1.7,2.9,1.7,3,1.7,3l19.5,8.4H8.1C8.1,11.4,1.7,3,1.7,3z M1.7,21.2C1.7,21.2,1.7,21.2,1.7,21.2
+	C1.6,21.2,1.7,21.2,1.7,21.2c0,0,6.3-8.4,6.4-8.4h13.1L1.7,21.2z"/>
 </svg>
