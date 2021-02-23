@@ -100,6 +100,9 @@ public:
 
     CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
 
+    int64_t TargetTimespan(int nHeight) const { return TargetSpacing(nHeight) * (consensus.IsTimeProtocolV2(nHeight) ? consensus.nTargetTimespanV2 : consensus.nTargetTimespan); }
+    int64_t TargetSpacing(int nHeight) const { return nHeight >= consensus.vUpgrades[Consensus::UPGRADE_NEW_TARGET_SPACING].nActivationHeight ? consensus.nTargetSpacingV2 : consensus.nTargetSpacing; }
+
 protected:
     CChainParams() {}
 

@@ -2709,7 +2709,7 @@ bool CWallet::CreateCoinStake(
     pStakerStatus->SetLastCoins((int) availableCoins->size());
 
     // P2PKH block signatures were not accepted before v5 update.
-    bool onlyP2PK = !consensus.NetworkUpgradeActive(pindexPrev->nHeight + 1, Consensus::UPGRADE_V5_DUMMY);
+    bool onlyP2PK = !consensus.NetworkUpgradeActive(pindexPrev->nHeight + 1, Consensus::UPGRADE_V2_DUMMY);
 
     // Kernel Search
     CAmount nCredit;

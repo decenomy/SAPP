@@ -4119,7 +4119,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
     // For now, we need the tip to know whether p2pkh block signatures are accepted or not.
     // After 5.0, this can be removed and replaced by the enforcement block time.
     const int newHeight = chainActive.Height() + 1;
-    const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_V5_DUMMY);
+    const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_V2_DUMMY);
     if (!CheckBlockSignature(*pblock, enableP2PKH))
         return error("%s : bad proof-of-stake block signature", __func__);
 

@@ -34,9 +34,10 @@ enum UpgradeIndex : uint32_t {
     UPGRADE_ZC_PUBLIC,
     UPGRADE_V3_4,
     UPGRADE_V4_0,
-    UPGRADE_V5_DUMMY,
-    UPGRADE_STAKE_MIN_DEPTH_V2,
+    UPGRADE_V2_DUMMY,
     UPGRADE_TESTDUMMY,
+    UPGRADE_STAKE_MIN_DEPTH_V2,
+    UPGRADE_NEW_TARGET_SPACING,
     // NOTE: Also add new upgrades to NetworkUpgradeInfo in upgrades.cpp
     MAX_NETWORK_UPGRADES
 };
@@ -107,6 +108,7 @@ struct Params {
     int64_t nTargetTimespan;
     int64_t nTargetTimespanV2;
     int64_t nTargetSpacing;
+    int64_t nTargetSpacingV2;
     int nTimeSlotLength;
 
     // spork keys
@@ -130,7 +132,6 @@ struct Params {
     // Map with network updates
     NetworkUpgrade vUpgrades[MAX_NETWORK_UPGRADES];
 
-    int64_t TargetTimespan(const bool fV2 = true) const { return fV2 ? nTargetTimespanV2 : nTargetTimespan; }
     uint256 ProofOfStakeLimit(const bool fV2) const { return fV2 ? posLimitV2 : posLimitV1; }
     bool MoneyRange(const CAmount& nValue) const { return (nValue >= 0 && nValue <= nMaxMoneyOut); }
     bool IsTimeProtocolV2(const int nHeight) const { return NetworkUpgradeActive(nHeight, UPGRADE_V4_0); }

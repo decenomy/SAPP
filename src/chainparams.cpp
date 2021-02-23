@@ -128,9 +128,10 @@ public:
         consensus.nStakeMinAge = 1 * 150 * 60;
         consensus.nStakeMinDepth = 60;
         consensus.nStakeMinDepthV2 = 600;
-        consensus.nTargetTimespan = 40 * 150;
-        consensus.nTargetTimespanV2 = 40 * 60;
+        consensus.nTargetTimespan = 40;
+        consensus.nTargetTimespanV2 = 30;
         consensus.nTargetSpacing = 1 * 150;
+        consensus.nTargetSpacingV2 = 1 * 60;
         consensus.nTimeSlotLength = 15;
 
         // spork keys
@@ -172,8 +173,9 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].nActivationHeight             = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_V3_4].nActivationHeight                  = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; 
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].nActivationHeight                  = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; 
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight              = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; 
-        consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;  
+        consensus.vUpgrades[Consensus::UPGRADE_V2_DUMMY].nActivationHeight              = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; 
+        consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; 
+        consensus.vUpgrades[Consensus::UPGRADE_NEW_TARGET_SPACING].nActivationHeight    = 292001;   
 
         consensus.vUpgrades[Consensus::UPGRADE_ZC].hashActivationBlock                  = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_ZC_V2].hashActivationBlock               = uint256S("0x0");
@@ -181,8 +183,9 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].hashActivationBlock           = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_V3_4].hashActivationBlock                = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].hashActivationBlock                = uint256S("0x0");
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].hashActivationBlock            = uint256S("0x0");
+        consensus.vUpgrades[Consensus::UPGRADE_V2_DUMMY].hashActivationBlock            = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].hashActivationBlock  = uint256S("0x0");
+        consensus.vUpgrades[Consensus::UPGRADE_NEW_TARGET_SPACING].hashActivationBlock  = uint256S("0x0");
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -316,7 +319,7 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].nActivationHeight             = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_V3_4].nActivationHeight                  = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //878651;
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].nActivationHeight                  = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //878671;
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight              = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //878691;
+        consensus.vUpgrades[Consensus::UPGRADE_V2_DUMMY].nActivationHeight              = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //878691;
         consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //1000001;
 
         consensus.vUpgrades[Consensus::UPGRADE_ZC].hashActivationBlock                  = uint256S("0x0");
@@ -325,7 +328,7 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_ZC_PUBLIC].hashActivationBlock           = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_V3_4].hashActivationBlock                = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].hashActivationBlock                = uint256S("0x0");
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].hashActivationBlock            = uint256S("0x0");
+        consensus.vUpgrades[Consensus::UPGRADE_V2_DUMMY].hashActivationBlock            = uint256S("0x0");
         consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].hashActivationBlock  = uint256S("0x0");
         
         /**
@@ -465,7 +468,7 @@ public:
         consensus.vUpgrades[Consensus::UPGRADE_V3_4].nActivationHeight          = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //251;
         consensus.vUpgrades[Consensus::UPGRADE_V4_0].nActivationHeight          =
                 Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
-        consensus.vUpgrades[Consensus::UPGRADE_V5_DUMMY].nActivationHeight       = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //300;
+        consensus.vUpgrades[Consensus::UPGRADE_V2_DUMMY].nActivationHeight       = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //300;
         consensus.vUpgrades[Consensus::UPGRADE_STAKE_MIN_DEPTH_V2].nActivationHeight    = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT; //1001;
 
         /**
