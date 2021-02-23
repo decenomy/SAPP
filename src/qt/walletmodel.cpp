@@ -340,7 +340,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                 return InvalidAmount;
             }
             total += subtotal;
-        } else { // User-entered sapphire address / amount:
+        } else { // User-entered dashdiamond address / amount:
             if (!validateAddress(rcp.address, rcp.isP2CS)) {
                 return InvalidAddress;
             }
@@ -476,7 +476,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
                 std::string value;
                 rcp.paymentRequest.SerializeToString(&value);
                 newTx->vOrderForm.push_back(std::make_pair(key, value));
-            } else if (!rcp.message.isEmpty()) // Message from normal sapphire:URI (sapphire:XyZ...?message=example)
+            } else if (!rcp.message.isEmpty()) // Message from normal dashdiamond:URI (dashdiamond:XyZ...?message=example)
             {
                 newTx->vOrderForm.push_back(std::make_pair("Message", rcp.message.toStdString()));
             }
