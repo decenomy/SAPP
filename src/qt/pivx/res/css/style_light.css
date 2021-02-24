@@ -1771,12 +1771,12 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 }
 
 *[cssClass="square-chart-zpiv"] {
-  background-color: #43b3ff;
+  background-color: #8bd1ff;
   border: none;
 }
 
 *[cssClass="square-chart-piv"] {
-  background-color: #43b3ff;
+  background-color: #8bd1ff;
   border: none;
 }
 
@@ -3134,12 +3134,12 @@ HH        SNACK BAR
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="container-snackbar"] {
-  background-color: #000000;
-  border-top: 3px solid #0094f9;
+  background-color: #262626;
+  border-top: 3px solid #4eb8ff;
 }
 
 *[cssClass="text-snackbar"] {
-  color: #ffffff;
+  color: #0094f9;
   font-size: 24px;
 }
 
