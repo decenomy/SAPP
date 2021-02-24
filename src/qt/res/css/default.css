@@ -121,7 +121,7 @@ padding-right:0px;
 }
 
 QProgressBar::chunk {
-background-color:#7c4c4c;
+background-color:#4c5d7c;
 width: 20px;
 }
 
@@ -151,7 +151,7 @@ background-color:#dedbe5;
 }
 
 QWidget {
-selection-background-color:#7c4c4c; /* Object highlight color */
+selection-background-color:#4c5e7c; /* Object highlight color */
 selection-color:#fff;
 outline:0; /* Remove Annoying Focus Rectangle */
 }
@@ -223,12 +223,12 @@ background-color:#f2f2f2;
 /***************************** Global Qt Objects ***********************************************************/
 
 QPushButton { /* Global Button Style */
-background-color: #ff0606;
+background-color: #88cfff;
 border-width: 1px;
 border-style: outset;
-border-color: #d11826;
+border-color: #88cfff;
 border-radius: 2px;
-color:#ffffff;
+color:#262626;
 font-size:12px;
 font-weight:bold;
 padding-left:25px;
@@ -240,7 +240,7 @@ margin: 2px;
 }
 
 QPushButton:hover {
-background-color: qlineargradient(y1:0, y2: 1, stop: 0 #ffffff, stop: 0.1 #ffffff, stop: 0.101 #d11826, stop: 0.9 #d11826, stop: 0.901 #ffffff, stop: 1 #ffffff);
+background-color: qlineargradient(y1:0, y2: 1, stop: 0 #88cfff, stop: 0.1 #43b3ff, stop: 0.101 #43b3ff, stop: 0.9 #43b3ff, stop: 0.901 #43b3ff, stop: 1 #88cfff);
 }
 
 QPushButton:focus {
@@ -249,9 +249,9 @@ QPushButton:focus {
 }
 
 QPushButton:pressed {
-background-color: #ff0606;
-border:1px solid #d11826;
-background-color: qlineargradient(y1:0, y2: 1, stop: 0 #00ff00, stop: 0.1 #00ff00, stop: 0.101 #d11826, stop: 0.9 #d11826, stop: 0.901 #00ff00, stop: 1 #00ff00);
+background-color: #0094f9;
+border:1px solid #0094f9;
+background-color: qlineargradient(y1:0, y2: 1, stop: 0 #88cfff, stop: 0.1 #43b3ff, stop: 0.101 #43b3ff, stop: 0.9 #43b3ff, stop: 0.901 #43b3ff, stop: 1 #88cfff);
 }
 
 /* Special handling for statusbar-icons (which are partly QPushButtons) */
@@ -276,7 +276,7 @@ background-color: #f2f2f2;
 }
 
 QComboBox { /* Dropdown Menus */
-border:1px solid #d11826;
+border:1px solid #0094f9;
 padding: 3px 5px 3px 5px;
 background:#fcfcfc;
 min-height:25px;
@@ -569,22 +569,22 @@ border-radius: 4px;
 }
 
 QSlider::sub-page:horizontal {
-background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #ff0606, stop: 1 #d11826);
-border: 1px solid #d11826;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #0094f9, stop: 1 #0094f9);
+border: 1px solid #0094f9;
 height: 10px;
 border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #ff0606, stop: 1 #d11826);
-border: 1px solid #d11826;
+background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #0094f9, stop: 1 #0094f9);
+border: 1px solid #0094f9;
 height: 10px;
 border-radius: 4px;
 }
 
 QSlider::handle:horizontal {
 background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #f8f6f6);
-border: 1px solid #d11826;
+border: 1px solid #0094f9;
 width: 18px;
 height: 18px;
 margin-top: -6px;
@@ -593,8 +593,8 @@ border-radius: 9px;
 }
 
 QSlider::handle:horizontal:hover {
-background-color: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 0.7, stop: 0 #f95858, stop: 0.7 #ffffff);
-border: 2px solid #d11826;
+background-color: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 0.7, stop: 0 #43b3ff, stop: 0.7 #ffffff);
+border: 2px solid #0094f9;
 width: 16px;
 height: 16px;
 margin-top: -6px;
@@ -1689,7 +1689,7 @@ font-weight:bold;
 }
 
 QCalendarWidget QAbstractItemView { /* Calendar widget days */
-alternate-background-color:#dedbe5;
+alternate-background-color:#dbdfe5;
 background-color:#fff;
 }
 
