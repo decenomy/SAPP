@@ -57,11 +57,11 @@ HH       NAVIGATION
 HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="container-nav"] {
-    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #080808, stop: 1 #1a1a1a);
+    background-color: qlineargradient(y1:0, y2:1, stop: 0 #080808, stop: 1 #1a1a1a);
 }
 
 QPushButton[cssClass="img-nav-logo"] {
-    qproperty-icon: url("://img-nav-logo");
+    qproperty-icon: url("://img-nav-logo-png");
     qproperty-iconSize: 96px 96px;
 }
 
@@ -1744,7 +1744,7 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 *[cssClass="img-splash-logo"] {
     qproperty-icon: url("://img-logo-pivx-png");
-    qproperty-iconSize: 210px 149px;
+    qproperty-iconSize: 395px 273px;
     border:0;
     background-color:transparent;
 	margin-top: 75px;
@@ -3234,7 +3234,7 @@ HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH*/
 
 
 *[cssClass="btn-options-indicator"]{
-    border:0px ;
+    border: 0px;
     background: #88cfff;
     border-radius: 5px;
 }

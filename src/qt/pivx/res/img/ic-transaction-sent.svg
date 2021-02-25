@@ -5,16 +5,39 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="Layer_1"
    x="0px"
    y="0px"
    viewBox="0 0 24 24"
    style="enable-background:new 0 0 24 24;"
-   xml:space="preserve"><metadata
+   xml:space="preserve"
+   sodipodi:docname="ic-transaction-sent.svg"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="3840"
+   inkscape:window-height="2066"
+   id="namedview8"
+   showgrid="false"
+   inkscape:zoom="30.625"
+   inkscape:cx="12"
+   inkscape:cy="12"
+   inkscape:window-x="3829"
+   inkscape:window-y="-11"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" /><metadata
    id="metadata13"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
    id="defs11" />
 <style
    type="text/css"
@@ -29,7 +52,7 @@
    id="rect4" />
 <path
    class="st1"
-   d="M23.8,12L23.8,12c0-0.5-0.3-1-0.8-1.2L2.2,1.7C1.7,1.5,1.1,1.7,0.7,2.1c-0.4,0.5-0.4,1.1,0,1.6L7,12  c0,0,0,0,0,0.1l-6.3,8.3c-0.4,0.5-0.4,1.1,0,1.6l0.1,0.1c0.4,0.4,0.9,0.5,1.4,0.3L23,13.2C23.5,13,23.8,12.5,23.8,12z M1.7,3  C1.7,3,1.7,3,1.7,3C1.7,2.9,1.7,3,1.7,3l19.5,8.4H8.1C8.1,11.4,1.7,3,1.7,3z M1.7,21.2C1.7,21.2,1.7,21.2,1.7,21.2  C1.6,21.2,1.7,21.2,1.7,21.2c0,0,6.3-8.4,6.4-8.4h13.1L1.7,21.2z"
+   d="m 23.734694,12 v 0 c 0,-0.5 -0.3,-1 -0.8,-1.2 L 2.1346939,1.7 c -0.5,-0.2 -1.1,0 -1.50000002,0.4 -0.4,0.5 -0.4,1.1 0,1.6 L 6.9346939,12 c 0,0 0,0 0,0.1 l -6.30000002,8.3 c -0.4,0.5 -0.4,1.1 0,1.6 l 0.1,0.1 C 1.1346939,22.5 1.6346939,22.6 2.1346939,22.4 L 22.934694,13.2 c 0.5,-0.2 0.8,-0.7 0.8,-1.2 z M 1.6346939,3 c 0,0 0,0 0,0 0,-0.1 0,0 0,0 L 21.134694,11.4 H 8.0346939 c 0,0 -6.4,-8.4 -6.4,-8.4 z m 0,18.2 c 0,0 0,0 0,0 -0.1,0 0,0 0,0 0,0 6.3,-8.4 6.4,-8.4 H 21.134694 Z"
    id="path6"
    style="fill:#ff5959;fill-opacity:1" />
 </svg>
