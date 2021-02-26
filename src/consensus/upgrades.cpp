@@ -1,6 +1,6 @@
 // Copyright (c) 2018 The Zcash developers
 // Copyright (c) 2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,7 +16,7 @@
 const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         {
                 /*.strName =*/ "Base",
-                /*.strInfo =*/ "Dash Diamond network",
+                /*.strInfo =*/ "Sapphire network",
         },
         {
                 /*.strName =*/ "PoS",
@@ -52,19 +52,11 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         },
         {
                 /*.strName =*/ "v2_dummy",
-                /*.strInfo =*/ "Placeholder for future Dash Diamond version 2.0 upgrade",
+                /*.strInfo =*/ "Placeholder for future Sapphire version 2.0 upgrade",
         },
         {
                 /*.strName =*/ "Test_dummy",
                 /*.strInfo =*/ "Test dummy info",
-        },
-        {
-                /*.strName =*/ "stake_min_depth_v2",
-                /*.strInfo =*/ "new stake min depth",
-        },
-        {
-                /*.strName =*/ "new_target_spacing",
-                /*.strInfo =*/ "new target spacing",
         },
 };
 

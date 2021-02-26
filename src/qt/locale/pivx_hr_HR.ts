@@ -122,12 +122,12 @@
         <translation>Adrese za primanje</translation>
     </message>
     <message>
-        <source>These are your DashDiamond addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>To su vaše DashDiamond adrese za slanje plaćanja. Uvijek provjerite iznos i adresu primatelja prije slanja novca.</translation>
+        <source>These are your Sapphire addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>To su vaše Sapphire adrese za slanje plaćanja. Uvijek provjerite iznos i adresu primatelja prije slanja novca.</translation>
     </message>
     <message>
-        <source>These are your DashDiamond addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>To su vaše DashDiamond adrese za primanje uplata. Preporuča se upotreba nove adrese primatelja za svaku transakciju.</translation>
+        <source>These are your Sapphire addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>To su vaše Sapphire adrese za primanje uplata. Preporuča se upotreba nove adrese primatelja za svaku transakciju.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -360,8 +360,8 @@ za staking</translation>
         <translation>PONIŠTI</translation>
     </message>
     <message>
-        <source>DashDiamond will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your DASHDs from being stolen by malware infecting your computer.</source>
-        <translation>DashDiamond će se sada zatvoriti kako bi se dovršio proces šifriranja. Ne zaboravite da šifriranje Vašeg novčanika ne može u potpunosti zaštititi vaše DASHD od krađje zlonamjernog softvera koji zarazi vaše računalo.</translation>
+        <source>Sapphire will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your SAPPs from being stolen by malware infecting your computer.</source>
+        <translation>Sapphire će se sada zatvoriti kako bi se dovršio proces šifriranja. Ne zaboravite da šifriranje Vašeg novčanika ne može u potpunosti zaštititi vaše SAPP od krađje zlonamjernog softvera koji zarazi vaše računalo.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -442,8 +442,8 @@ za staking</translation>
         <translation>Ušteđjevina</translation>
     </message>
     <message>
-        <source>0,00 DASHD</source>
-        <translation>0,00 DASHD</translation>
+        <source>0,00 SAPP</source>
+        <translation>0,00 SAPP</translation>
     </message>
     <message>
         <source>address</source>
@@ -484,8 +484,8 @@ za staking</translation>
         <translation>Odabir novčića</translation>
     </message>
     <message>
-        <source>Select DASHD Outputs to Spend</source>
-        <translation>Odaberi DASHD za potrošiti</translation>
+        <source>Select SAPP Outputs to Spend</source>
+        <translation>Odaberi SAPP za potrošiti</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -512,8 +512,8 @@ za staking</translation>
         <translation>Iznos</translation>
     </message>
     <message>
-        <source>0.00 DASHD</source>
-        <translation>0.00 DASHD</translation>
+        <source>0.00 SAPP</source>
+        <translation>0.00 SAPP</translation>
     </message>
     <message>
         <source>0</source>
@@ -763,17 +763,17 @@ za staking</translation>
         <translation>Greška pri učitavanju delegacija: %1</translation>
     </message>
     <message>
-        <source>You can delegate your DASHDs, letting a hot node (24/7 online node)
+        <source>You can delegate your SAPPs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</source>
-        <translation>Možete delegirati svoje DASHD-ove, dopuštajući hot node-u (24/7 online node) da stake-a za Vas, dok su Vaši ključevi offline na sigurnom.</translation>
+        <translation>Možete delegirati svoje SAPP-ove, dopuštajući hot node-u (24/7 online node) da stake-a za Vas, dok su Vaši ključevi offline na sigurnom.</translation>
     </message>
     <message>
         <source>Enter owner address</source>
         <translation>Unesi adresu vlasnika</translation>
     </message>
     <message>
-        <source>Accept DASHD delegation / Delegate DASHD</source>
-        <translation>Prihvati DASHD delegaciju / Delegiraj DASHD</translation>
+        <source>Accept SAPP delegation / Delegate SAPP</source>
+        <translation>Prihvati SAPP delegaciju / Delegiraj SAPP</translation>
     </message>
     <message>
         <source>Cold Staking address</source>
@@ -959,8 +959,8 @@ vlasnika</translation>
         <translation>Statistika stakinga</translation>
     </message>
     <message>
-        <source>How to get DASHD</source>
-        <translation>Kako dobiti DASHD</translation>
+        <source>How to get SAPP</source>
+        <translation>Kako dobiti SAPP</translation>
     </message>
     <message>
         <source>Sort by</source>
@@ -983,8 +983,8 @@ vlasnika</translation>
         <translation>Filtriraj prema</translation>
     </message>
     <message>
-        <source>Amount of DASHD and zDASHD staked.</source>
-        <translation>Iznos DASHD i zDASHD koji se stakea.</translation>
+        <source>Amount of SAPP and zSAPP staked.</source>
+        <translation>Iznos SAPP i zSAPP koji se stakea.</translation>
     </message>
     <message>
         <source>Please wait until the wallet is fully synced to see your correct balance</source>
@@ -1079,8 +1079,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Uredi adresu pošiljatelja</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid DashDiamond address.</source>
-        <translation>Unesena adresa "%1" nije ispravna DashDiamond adresa.</translation>
+        <source>The entered address "%1" is not a valid Sapphire address.</source>
+        <translation>Unesena adresa "%1" nije ispravna Sapphire adresa.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1132,16 +1132,16 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>verzija</translation>
     </message>
     <message>
-        <source>DashDiamond Core</source>
-        <translation>DashDiamond Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About DashDiamond Core</source>
-        <translation>O DashDiamond Core-u</translation>
+        <source>About Sapphire Core</source>
+        <translation>O Sapphire Core-u</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1195,16 +1195,16 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Dobrodošli</translation>
     </message>
     <message>
-        <source>Welcome to DashDiamond Core.</source>
-        <translation>Dobrodošli u DashDiamond Core.</translation>
+        <source>Welcome to Sapphire Core.</source>
+        <translation>Dobrodošli u Sapphire Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where DashDiamond Core will store its data.</source>
-        <translation>Budući da je prvi put pokrenut program, možete odabrati gdje će DashDiamond Core pohraniti svoje podatke.</translation>
+        <source>As this is the first time the program is launched, you can choose where Sapphire Core will store its data.</source>
+        <translation>Budući da je prvi put pokrenut program, možete odabrati gdje će Sapphire Core pohraniti svoje podatke.</translation>
     </message>
     <message>
-        <source>DashDiamond Core will download and store a copy of the DashDiamond block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>DashDiamond Core preuzima i pohranjuje kopiju DashDiamond blok-lanca. Barem će %1GB podataka biti pohranjeno u ovom direktoriju i to će s vremenom rasti. Novčanik će također biti pohranjena u ovom direktoriju.</translation>
+        <source>Sapphire Core will download and store a copy of the Sapphire block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Sapphire Core preuzima i pohranjuje kopiju Sapphire blok-lanca. Barem će %1GB podataka biti pohranjeno u ovom direktoriju i to će s vremenom rasti. Novčanik će također biti pohranjena u ovom direktoriju.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1223,8 +1223,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>OK</translation>
     </message>
     <message>
-        <source>DashDiamond Core</source>
-        <translation>DashDiamond Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1327,8 +1327,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Stvori novi Masternode Controller</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a DashDiamond Masternode you must dedicate 200,000 DASHD (the unit of DashDiamond) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Da biste stvoriti DashDiamond Masternode, morate odvojiti 200,000 DASHD (jedinica DashDiamond-a) prema mreži (međjutim, ti novčići su i dalje vaši i nikad neće napustiti vaše vlasništvo). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt; Možete isključiti node i otključati novčiće u bilo kojem trenutku.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To create a Sapphire Masternode you must dedicate 200,000 SAPP (the unit of Sapphire) to the network (however, these coins are still yours and will never leave your possession). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;You can deactivate the node and unlock the coins at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Da biste stvoriti Sapphire Masternode, morate odvojiti 200,000 SAPP (jedinica Sapphire-a) prema mreži (međjutim, ti novčići su i dalje vaši i nikad neće napustiti vaše vlasništvo). &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt; Možete isključiti node i otključati novčiće u bilo kojem trenutku.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Set Masternode Name</source>
@@ -1347,8 +1347,8 @@ Automatski će se pokrenuti čim novčanik dobije dovoljno potvrda o neiskorišt
         <translation>Obavezno imajte tu količinu novčića.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 DASHD will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transakcija od 200,000 DASHD će biti napravljena&lt;/p&gt;&lt;p&gt;u novu praznu adresu u Vašem novčaniku.&lt;/p&gt;&lt;p&gt;Adresa je označena pod imenom Masternode-a.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A transaction of 200,000 SAPP will be made&lt;/p&gt;&lt;p&gt;to a new empty address in your wallet.&lt;/p&gt;&lt;p&gt;The Address is labeled under the master node's name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transakcija od 200,000 SAPP će biti napravljena&lt;/p&gt;&lt;p&gt;u novu praznu adresu u Vašem novčaniku.&lt;/p&gt;&lt;p&gt;Adresa je označena pod imenom Masternode-a.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Address of the node that must always be online running the actual master node.</source>
@@ -1538,7 +1538,7 @@ Molimo pričekajte nekoliko minuta (zalog za Masternode zahtjeva %1 potvrda).</t
 on a remote server to your clipboard.
 
 
-You will only have to paste the data in the dashdiamond.conf file
+You will only have to paste the data in the sapphire.conf file
 of your remote server and start it, then start the Masternode using
 this controller wallet (select the Masternode in the list and press "start").
 </source>
@@ -1546,7 +1546,7 @@ this controller wallet (select the Masternode in the list and press "start").
 na udaljenom poslužitelju u medjuspremnik.
 
 
-Podatke ćete morati zalijepiti u datoteku dashdiamond.conf
+Podatke ćete morati zalijepiti u datoteku sapphire.conf
 na udaljenom poslužitelju i pokrenuti ga, a zatim pokrenite Masternode
 koristeći ovaj controller novčanik (na popisu odaberite Masternode i pritisnite "start").
 </translation>
@@ -1732,8 +1732,8 @@ STAKING</translation>
         <translation>Parsirani podaci preveliki</translation>
     </message>
     <message>
-        <source>Invalid URI, not starting with "dashdiamond" prefix</source>
-        <translation>Nevažeći URI, ne počinje "dashdiamond" prefiksom</translation>
+        <source>Invalid URI, not starting with "sapphire" prefix</source>
+        <translation>Nevažeći URI, ne počinje "sapphire" prefiksom</translation>
     </message>
 </context>
 <context>
@@ -1778,8 +1778,8 @@ STAKING</translation>
         <translation>Ako onemogućite potrošnju nepotvrđjenog ostatka, ostatak od transakcije &lt;br/&gt;ne može se koristiti dok ta transakcija nema barem jednu potvrdu. &lt;br/&gt;Ovo takođjer utječe na izračun vašeg salda.</translation>
     </message>
     <message>
-        <source>Automatically open the DashDiamond client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Automatski otvorite DashDiamond klijentski ulaz na ruteru. To funkcionira samo kada vaš ruter podržava UPnP i omogućen je.</translation>
+        <source>Automatically open the Sapphire client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Automatski otvorite Sapphire klijentski ulaz na ruteru. To funkcionira samo kada vaš ruter podržava UPnP i omogućen je.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1798,12 +1798,12 @@ STAKING</translation>
         <translation>Stručnjak</translation>
     </message>
     <message>
-        <source>Automatically start DashDiamond after logging in to the system.</source>
-        <translation>Automatski pokrenite DashDiamond nakon prijave u sustav.</translation>
+        <source>Automatically start Sapphire after logging in to the system.</source>
+        <translation>Automatski pokrenite Sapphire nakon prijave u sustav.</translation>
     </message>
     <message>
-        <source>&amp;Start DashDiamond on system login</source>
-        <translation>&amp;Pokrenite DashDiamond pri pokretanju sustava</translation>
+        <source>&amp;Start Sapphire on system login</source>
+        <translation>&amp;Pokrenite Sapphire pri pokretanju sustava</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1830,8 +1830,8 @@ STAKING</translation>
         <translation>&amp;Mreža</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting DashDiamond.</source>
-        <translation>Jezik korisničkog sučelja možete postaviti ovdje. Postavke će stupiti na snagu nakon ponovnog pokretanja DashDiamond novčanika.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Sapphire.</source>
+        <translation>Jezik korisničkog sučelja možete postaviti ovdje. Postavke će stupiti na snagu nakon ponovnog pokretanja Sapphire novčanika.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -1844,44 +1844,44 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Mapiranje porta koristeći &amp;UPnP</translation>
     </message>
     <message>
-        <source>Enable automatic minting of DASHD units to zDASHD</source>
-        <translation>Omogući automatsko stvaranje DASHD jedinica na zDASHD</translation>
+        <source>Enable automatic minting of SAPP units to zSAPP</source>
+        <translation>Omogući automatsko stvaranje SAPP jedinica na zSAPP</translation>
     </message>
     <message>
-        <source>Enable zDASHD Automint</source>
-        <translation>Omogući automatsko stvaranje zDASHD-a</translation>
+        <source>Enable zSAPP Automint</source>
+        <translation>Omogući automatsko stvaranje zSAPP-a</translation>
     </message>
     <message>
-        <source>Enable automatic zDASHD minting from specific addresses</source>
-        <translation>Omogući automatsko stvaranje zDASHD-a s određjenih adresa</translation>
+        <source>Enable automatic zSAPP minting from specific addresses</source>
+        <translation>Omogući automatsko stvaranje zSAPP-a s određjenih adresa</translation>
     </message>
     <message>
         <source>Enable Automint Addresses</source>
         <translation>Omogući Automint adrese</translation>
     </message>
     <message>
-        <source>Percentage of incoming DASHD which get automatically converted to zDASHD via Zerocoin Protocol (min: 10%)</source>
-        <translation>Postotak dolaznih DASHD koji se automatski pretvara u zDASHD putem Zerocoin Protokola (min: 10%)</translation>
+        <source>Percentage of incoming SAPP which get automatically converted to zSAPP via Zerocoin Protocol (min: 10%)</source>
+        <translation>Postotak dolaznih SAPP koji se automatski pretvara u zSAPP putem Zerocoin Protokola (min: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zDASHD</source>
-        <translation>Postotak automatski stvorenog zDASHD-a</translation>
+        <source>Percentage of autominted zSAPP</source>
+        <translation>Postotak automatski stvorenog zSAPP-a</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough DASHD for this denomination is available</source>
-        <translation>Pričekajte s automatskom pretvorbom u Zerocoin dok ne bude dostupno dovoljno DASHD-a za ovu denominaciju</translation>
+        <source>Wait with automatic conversion to Zerocoin until enough SAPP for this denomination is available</source>
+        <translation>Pričekajte s automatskom pretvorbom u Zerocoin dok ne bude dostupno dovoljno SAPP-a za ovu denominaciju</translation>
     </message>
     <message>
-        <source>Preferred Automint zDASHD Denomination</source>
-        <translation>Preferirana denominacija za automatsko stvaranje zDASHD-a</translation>
+        <source>Preferred Automint zSAPP Denomination</source>
+        <translation>Preferirana denominacija za automatsko stvaranje zSAPP-a</translation>
     </message>
     <message>
         <source>Stake split threshold:</source>
         <translation>Prag razdvajanja Stake-a:</translation>
     </message>
     <message>
-        <source>Connect to the DashDiamond network through a SOCKS5 proxy.</source>
-        <translation>Povežite se s DashDiamond mrežom putem SOCKS5 proxy poslužitelja.</translation>
+        <source>Connect to the Sapphire network through a SOCKS5 proxy.</source>
+        <translation>Povežite se s Sapphire mrežom putem SOCKS5 proxy poslužitelja.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2027,8 +2027,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
 <context>
     <name>PIVXGUI</name>
     <message>
-        <source>DashDiamond Core</source>
-        <translation>DashDiamond Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -2055,8 +2055,8 @@ https://www.transifex.com/pivx-project/pivx-project-translations</translation>
         <translation>Napusti aplikaciju</translation>
     </message>
     <message>
-        <source>DashDiamond Core client</source>
-        <translation>DashDiamond Core Klijent</translation>
+        <source>Sapphire Core client</source>
+        <translation>Sapphire Core Klijent</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2122,12 +2122,12 @@ Adresa: %4
         <translation>Nevažeća adresa za plaćanje %1</translation>
     </message>
     <message>
-        <source>Cannot start DashDiamond: click-to-pay handler</source>
-        <translation>Ne može se pokrenuti DashDiamond: clik-to-pay handler</translation>
+        <source>Cannot start Sapphire: click-to-pay handler</source>
+        <translation>Ne može se pokrenuti Sapphire: clik-to-pay handler</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid DashDiamond address or malformed URI parameters.</source>
-        <translation>URI se ne može analizirati! To može biti uzrokovana nevažećom DashDiamond adresom ili nepravilnim URI parametrima.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid Sapphire address or malformed URI parameters.</source>
+        <translation>URI se ne može analizirati! To može biti uzrokovana nevažećom Sapphire adresom ili nepravilnim URI parametrima.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2216,8 +2216,8 @@ Adresa: %4
         <translation>Iznos</translation>
     </message>
     <message>
-        <source>Enter DashDiamond address (e.g. %1)</source>
-        <translation>Upišite DashDiamond adresu (npr. %1)</translation>
+        <source>Enter Sapphire address (e.g. %1)</source>
+        <translation>Upišite Sapphire adresu (npr. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2260,12 +2260,12 @@ Adresa: %4
         <translation>%1 ms</translation>
     </message>
     <message>
-        <source>A fatal error occurred. DashDiamond can no longer continue safely and will quit.</source>
-        <translation>Dogodila se fatalna pogreška. DashDiamond ne može sigurno nastaviti i izaći će.</translation>
+        <source>A fatal error occurred. Sapphire can no longer continue safely and will quit.</source>
+        <translation>Dogodila se fatalna pogreška. Sapphire ne može sigurno nastaviti i izaći će.</translation>
     </message>
     <message>
-        <source>DashDiamond Core</source>
-        <translation>DashDiamond Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" does not exist.</source>
@@ -2284,8 +2284,8 @@ Adresa: %4
         <translation>Greška pri čitanju masternode konfiguracijske datoteke: %1</translation>
     </message>
     <message>
-        <source>DashDiamond Core didn't yet exit safely...</source>
-        <translation>DashDiamond Core nije ugašen sigurno...</translation>
+        <source>Sapphire Core didn't yet exit safely...</source>
+        <translation>Sapphire Core nije ugašen sigurno...</translation>
     </message>
     <message>
         <source>Contact</source>
@@ -2519,8 +2519,8 @@ Adresa: %4
         <translation>Block chain</translation>
     </message>
     <message>
-        <source>Open the DashDiamond debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Otvorite DashDiamond debug log datoteku iz aktualnog direktorija podataka. To može potrajati nekoliko sekundi za velike datoteke zapisnika.</translation>
+        <source>Open the Sapphire debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Otvorite Sapphire debug log datoteku iz aktualnog direktorija podataka. To može potrajati nekoliko sekundi za velike datoteke zapisnika.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -2663,8 +2663,8 @@ Adresa: %4
         <translation>Put prilagođenog sigurnosnog kopiranja:</translation>
     </message>
     <message>
-        <source>Custom zDASHD Backup Path:</source>
-        <translation>Prilagođeni put zDASHD sigurnosne kopije:</translation>
+        <source>Custom zSAPP Backup Path:</source>
+        <translation>Prilagođeni put zSAPP sigurnosne kopije:</translation>
     </message>
     <message>
         <source>Custom Backups Threshold:</source>
@@ -2743,8 +2743,8 @@ Adresa: %4
         <translation>Iz:</translation>
     </message>
     <message>
-        <source>Welcome to the DashDiamond RPC console.</source>
-        <translation>Dobrodošli na DashDiamond RPC konzolu.</translation>
+        <source>Welcome to the Sapphire RPC console.</source>
+        <translation>Dobrodošli na Sapphire RPC konzolu.</translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
@@ -3007,8 +3007,8 @@ Adresa: %4
         <translation>Iznos</translation>
     </message>
     <message>
-        <source>DASHD</source>
-        <translation>DASHD</translation>
+        <source>SAPP</source>
+        <translation>SAPP</translation>
     </message>
     <message>
         <source>D7VFR83SQbiezrW72hjcWJtcfip5krte2Z </source>
@@ -3094,8 +3094,8 @@ Adresa: %4
         <translation>Prilagođjena adresa za ostatak</translation>
     </message>
     <message>
-        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" DashDiamond address</source>
-        <translation>Ostatak vrijednosti koja proizlazi iz ulaza umanjen za izlaznu vrijednost ide na DashDiamond adresu za "ostatak"</translation>
+        <source>The remainder of the value resultant from the inputs minus the outputs value goes to the "change" Sapphire address</source>
+        <translation>Ostatak vrijednosti koja proizlazi iz ulaza umanjen za izlaznu vrijednost ide na Sapphire adresu za "ostatak"</translation>
     </message>
     <message>
         <source>SAVE</source>
@@ -3121,8 +3121,8 @@ Adresa: %4
         <translation>Preporučeno</translation>
     </message>
     <message>
-        <source>DASHD/kilobyte</source>
-        <translation>DASHD/kilobajt</translation>
+        <source>SAPP/kilobyte</source>
+        <translation>SAPP/kilobajt</translation>
     </message>
     <message>
         <source>0.00 KB</source>
@@ -3417,8 +3417,8 @@ Ovi novčići više neće biti cold-stakeani.</translation>
         <translation>DEŠIFRIRAJ KLJUČ</translation>
     </message>
     <message>
-        <source>DashDiamond address</source>
-        <translation>DashDiamond adresa</translation>
+        <source>Sapphire address</source>
+        <translation>Sapphire adresa</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -3550,8 +3550,8 @@ Verify that you have installed a predetermined text editor.</source>
 Provjerite jeste li instalirali unaprijed određjeni uređjivač teksta.</translation>
     </message>
     <message>
-        <source>Welcome to the DashDiamond RPC console.</source>
-        <translation>Dobrodošli na DashDiamond RPC konzolu.</translation>
+        <source>Welcome to the Sapphire RPC console.</source>
+        <translation>Dobrodošli na Sapphire RPC konzolu.</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
@@ -3660,12 +3660,12 @@ Provjerite jeste li instalirali unaprijed određjeni uređjivač teksta.</transl
         <translation>Izvezi popis adresa</translation>
     </message>
     <message>
-        <source>dashdiamond_tx_csv_export(*.csv)</source>
-        <translation>dashdiamond_transakcije_csv_izvoz(*.csv)</translation>
+        <source>Sapphire_tx_csv_export(*.csv)</source>
+        <translation>Sapphire_transakcije_csv_izvoz(*.csv)</translation>
     </message>
     <message>
-        <source>dashdiamond_addresses_csv_export(*.csv)</source>
-        <translation>dashdiamond_adrese_csv_izvoz(*.csv)</translation>
+        <source>Sapphire_addresses_csv_export(*.csv)</source>
+        <translation>Sapphire_adrese_csv_izvoz(*.csv)</translation>
     </message>
     <message>
         <source>Please select a folder to export the csv file first.</source>
@@ -3735,12 +3735,12 @@ Došlo je do greške prilikom spremanja popisa adresa u %1. Molimo pokušajte po
         <translation>Obrazac</translation>
     </message>
     <message>
-        <source>1) What is DashDiamond?</source>
-        <translation>1) Što je DashDiamond?</translation>
+        <source>1) What is Sapphire?</source>
+        <translation>1) Što je Sapphire?</translation>
     </message>
     <message>
-        <source>2) Why are my DASHD unspendable?</source>
-        <translation>2) Zašto se moji DASHD ne mogu potrošiti?</translation>
+        <source>2) Why are my SAPP unspendable?</source>
+        <translation>2) Zašto se moji SAPP ne mogu potrošiti?</translation>
     </message>
     <message>
         <source>https://sappcoin.com/</source>
@@ -3751,34 +3751,34 @@ Došlo je do greške prilikom spremanja popisa adresa u %1. Molimo pokušajte po
         <translation>1</translation>
     </message>
     <message>
-        <source>What is DashDiamond?</source>
-        <translation>Što je DashDiamond?</translation>
+        <source>What is Sapphire?</source>
+        <translation>Što je Sapphire?</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           DashDiamond is a form of digital online money using blockchain technology
+                           Sapphire is a form of digital online money using blockchain technology
                            that can be easily transferred globally, instantly, and with near
-                           zero fees.  DashDiamond incorporates market leading security &amp;
+                           zero fees.  Sapphire incorporates market leading security &amp;
                            privacy and is also the first PoS (Proof of Stake) Cryptocurrency
-                           to implement ZeroCoin(zDASHD) and Zerocoin staking.
+                           to implement ZeroCoin(zSAPP) and Zerocoin staking.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           DashDiamond utilizes a Proof of Stake (PoS) consensus system algorithm,
-                           allowing all owners of DashDiamond to participate in earning block rewards
+                           Sapphire utilizes a Proof of Stake (PoS) consensus system algorithm,
+                           allowing all owners of Sapphire to participate in earning block rewards
                            while securing the network with full node wallets, as well as to
                            run Masternodes to create and vote on proposals.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-DashDiamond je oblik digitalnog online novca koji koristi blockchain tehnologiju
+Sapphire je oblik digitalnog online novca koji koristi blockchain tehnologiju
 koji se lako može slati i primati globalno, trenutno, i gotovo bez naknade.
-DashDiamond uključuje vodeću sigurnost  i privatnost na tržištu
+Sapphire uključuje vodeću sigurnost  i privatnost na tržištu
 i takođjer je prva PoS (Proof of Stake) kriptovaluta
-koja je implementirala ZeroCoin (zDASHD) i Zerocoin staking.
+koja je implementirala ZeroCoin (zSAPP) i Zerocoin staking.
 &lt;/p&gt;&lt;p align="justify"&gt;
-DashDiamond koristi algoritam konsenzusa Proof of Stake (PoS),
-omogućujući svim vlasnicima DashDiamond-a sudjelovanje u zarađi blokovih nagrada
+Sapphire koristi algoritam konsenzusa Proof of Stake (PoS),
+omogućujući svim vlasnicima Sapphire-a sudjelovanje u zarađi blokovih nagrada
 dok osiguravaju mrežu full node novčanicima, kao i
 vodjenje Masternode-ova za stvaranje i glasanje o prijedlozima.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
@@ -3789,25 +3789,25 @@ vodjenje Masternode-ova za stvaranje i glasanje o prijedlozima.
         <translation>2</translation>
     </message>
     <message>
-        <source>Why are my DASHD unspendable?</source>
-        <translation>Zašto se moji DASHD ne mogu potrošiti?</translation>
+        <source>Why are my SAPP unspendable?</source>
+        <translation>Zašto se moji SAPP ne mogu potrošiti?</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           Newly received DashDiamond requires 6 confirmations on the network
+                           Newly received Sapphire requires 6 confirmations on the network
                            to become eligible for spending which can take ~6 minutes.
                            &lt;/p&gt;&lt;p align="justify"&gt;
-                           Your DashDiamond wallet also needs to be completely synchronized
+                           Your Sapphire wallet also needs to be completely synchronized
                            to see and spend balances on the network.
                            &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-Novoprimljeni DashDiamond zahtjeva 6 potvrda na mreži
+Novoprimljeni Sapphire zahtjeva 6 potvrda na mreži
 da bi se mogao potrošiti što može potrajati ~6 minuta.
 &lt;/p&gt;&lt;p align="justify"&gt;
-Vaš DashDiamond novčanik takođjer treba biti u potpunosti sinkroniziran
+Vaš Sapphire novčanik takođjer treba biti u potpunosti sinkroniziran
 da biste vidjeli i mogli potrošiti sredstva na mreži.
 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </translation>
@@ -3817,8 +3817,8 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
         <translation>3</translation>
     </message>
     <message>
-        <source>How do I stake DASHD?</source>
-        <translation>Kako stakeat DASHD?</translation>
+        <source>How do I stake SAPP?</source>
+        <translation>Kako stakeat SAPP?</translation>
     </message>
     <message>
         <source>4</source>
@@ -3845,14 +3845,14 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
         <translation>Što je Masternode Controller?</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 DASHD collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Masternode Controller novčanik je mjesto gdje zalog od 200,000 DASHD može stajati tijekom Controller-Remote podešavanja masternode-a. To je novčanik koji može aktivirati Remote masternode novčanik(e) i omogućiti Vam držanje zaloga novčića offline dok Remote masternode novčanik ostaje online.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;A Masternode Controller wallet is where the 200,000 SAPP collateral can reside during a Controller-Remote masternode setup. It is a wallet that can activate the remote masternode wallet(s) and allows you to keep your collateral coins offline while the remote masternode remains online. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;Masternode Controller novčanik je mjesto gdje zalog od 200,000 SAPP može stajati tijekom Controller-Remote podešavanja masternode-a. To je novčanik koji može aktivirati Remote masternode novčanik(e) i omogućiti Vam držanje zaloga novčića offline dok Remote masternode novčanik ostaje online.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>
                            &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-                           A masternode is a computer running a full node DashDiamond core wallet with a
-                           requirement of 200,000 DASHD secured collateral to provide extra services
+                           A masternode is a computer running a full node Sapphire core wallet with a
+                           requirement of 200,000 SAPP secured collateral to provide extra services
                            to the network and in return, receive a portion of the block reward
                            regularly.  These services include:
                            &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3874,17 +3874,17 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
                            Masternode Perks:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;Participate in DashDiamond Governance&lt;/li&gt;
+                           &lt;li&gt;Participate in Sapphire Governance&lt;/li&gt;
                            &lt;li&gt;Earn Masternode Rewards&lt;/li&gt;
                            &lt;li&gt;Commodity option for future sale&lt;/li&gt;
-                           &lt;li&gt;Help secure the DashDiamond network&lt;/li&gt;
+                           &lt;li&gt;Help secure the Sapphire network&lt;/li&gt;
                            &lt;/ul&gt;
                            &lt;/p&gt;&lt;p align="justify"&gt;
 
                            Requirements:
                            &lt;/p&gt;&lt;p align="justify"&gt;
                            &lt;ul&gt;
-                           &lt;li&gt;200,000 DASHD per single Masternode instance&lt;/li&gt;
+                           &lt;li&gt;200,000 SAPP per single Masternode instance&lt;/li&gt;
                            &lt;li&gt;Must be stored in a core wallet&lt;/li&gt;
                            &lt;li&gt;Need dedicated IP address&lt;/li&gt;
                            &lt;li&gt;Masternode wallet to remain online&lt;/li&gt;
@@ -3893,8 +3893,8 @@ da biste vidjeli i mogli potrošiti sredstva na mreži.
                          </source>
         <translation>
 &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align="justify"&gt;
-Masternode je računalo koje pokreće full node DashDiamond Core novčanik sa
-zahtjevanih 200,000 DASHD-a osiguranog zaloga da pruži dodatne usluge
+Masternode je računalo koje pokreće full node Sapphire Core novčanik sa
+zahtjevanih 200,000 SAPP-a osiguranog zaloga da pruži dodatne usluge
 mreži, i zauzvrat redovito primi dio nagrade blokova.
 Te usluge uključuju:
 &lt;/p&gt;&lt;p align="justify"&gt;
@@ -3916,17 +3916,17 @@ vlasnicima masternode-ova umanjeno za troškove održavanja.
 Povlastice masternode-ova:
 &lt;/p&gt;&lt;p align="justify"&gt;
 &lt;ul&gt;
-&lt;li&gt;Sudjelovanje u upravljanju DashDiamond-a&lt;/li&gt;
+&lt;li&gt;Sudjelovanje u upravljanju Sapphire-a&lt;/li&gt;
 &lt;li&gt;Zaradjivanje Masternode nagrada&lt;/li&gt;
 &lt;li&gt;Robna opcija za buduću prodaju&lt;/li&gt;
-&lt;li&gt;Pomaže u osiguravanju DashDiamond mreže&lt;/li&gt;
+&lt;li&gt;Pomaže u osiguravanju Sapphire mreže&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/p&gt;&lt;p align="justify"&gt;
 
 Zahtjevi:
 &lt;/p&gt;&lt;p align="justify"&gt;
 &lt;ul&gt;
-&lt;li&gt;200,000 DASHD po svakom Masternode-u&lt;/li&gt;
+&lt;li&gt;200,000 SAPP po svakom Masternode-u&lt;/li&gt;
 &lt;li&gt;Mora biti pohranjem u Core novčaniku&lt;/li&gt;
 &lt;li&gt;Mora biti jedinstvena IP adresa&lt;/li&gt;
 &lt;li&gt;Masternode novčanik treba ostati online&lt;/li&gt;
@@ -4046,8 +4046,8 @@ Zahtjevi:
         <translation>Ne može se otvoriti mapa sigurnosne kopije</translation>
     </message>
     <message>
-        <source>Unable to open dashdiamond.conf with default application</source>
-        <translation>Nije moguće otvoriti dashdiamond.conf sa zadanom aplikacijom</translation>
+        <source>Unable to open sapphire.conf with default application</source>
+        <translation>Nije moguće otvoriti sapphire.conf sa zadanom aplikacijom</translation>
     </message>
     <message>
         <source>In:</source>
@@ -4101,8 +4101,8 @@ Zahtjevi:
         <translation>Number of script verification threads</translation>
     </message>
     <message>
-        <source>Start DashDiamond on system login</source>
-        <translation>Pokrenite DashDiamond pri pokretanju računala</translation>
+        <source>Start Sapphire on system login</source>
+        <translation>Pokrenite Sapphire pri pokretanju računala</translation>
     </message>
     <message>
         <source>Minimize to the tray instead of the taskbar</source>
@@ -4189,8 +4189,8 @@ Jeste li sigurni?
         <translation>PotvrdniOkvir</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other DashDiamond addresses after it matures.</source>
-        <translation>MultiSend vam omogućuje da automatski pošaljete do 100% svog uloga ili nagrade masternode na popis drugih DashDiamond adresa nakon što sazriju.</translation>
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Sapphire addresses after it matures.</source>
+        <translation>MultiSend vam omogućuje da automatski pošaljete do 100% svog uloga ili nagrade masternode na popis drugih Sapphire adresa nakon što sazriju.</translation>
     </message>
     <message>
         <source>Active</source>
@@ -4312,8 +4312,8 @@ Označite jedan ili oba polja za potvrdu da biste poslali staking i/ili masterno
         <translation>Poruka</translation>
     </message>
     <message>
-        <source>DashDiamond address or contact label</source>
-        <translation>DashDiamond adresa ili naziv kontakta</translation>
+        <source>Sapphire address or contact label</source>
+        <translation>Sapphire adresa ili naziv kontakta</translation>
     </message>
     <message>
         <source>Enter address</source>
@@ -4597,8 +4597,8 @@ Označite jedan ili oba polja za potvrdu da biste poslali staking i/ili masterno
         <translation>Najčešće postavljena pitanja</translation>
     </message>
     <message>
-        <source>About DashDiamond</source>
-        <translation>O DashDiamond-u</translation>
+        <source>About Sapphire</source>
+        <translation>O Sapphire-u</translation>
     </message>
     <message>
         <source>Settings</source>
@@ -4664,8 +4664,8 @@ Jeste li sigurni?
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>DashDiamond Core is shutting down...</source>
-        <translation>DashDiamond Core se zatvara...</translation>
+        <source>Sapphire Core is shutting down...</source>
+        <translation>Sapphire Core se zatvara...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4694,8 +4694,8 @@ Jeste li sigurni?
         <translation>Učitavanje...</translation>
     </message>
     <message>
-        <source>DashDiamond Core</source>
-        <translation>DashDiamond Core</translation>
+        <source>Sapphire Core</source>
+        <translation>Sapphire Core</translation>
     </message>
 </context>
 <context>
@@ -5216,25 +5216,25 @@ se nova sigurnosna kopija.
     </message>
     <message>
         <source>Welcome to
-		DashDiamond Core Wallet</source>
+		Sapphire Core Wallet</source>
         <translation>Dobrodošli u
-		DashDiamond temeljni novčanik</translation>
+		Sapphire temeljni novčanik</translation>
     </message>
     <message>
-        <source>DashDiamond is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
-        <translation>DashDiamond je najinovativnija blockchain tehnologija na svijetu bazirana na Proof of Stake tehnologiji. Razvijena je od strane vrlo iskusnih programera i kriptografa.</translation>
+        <source>Sapphire is the world’s most innovative Proof of Stake blockchain based technology. Developed by a team of highly experienced developers and cryptographers.</source>
+        <translation>Sapphire je najinovativnija blockchain tehnologija na svijetu bazirana na Proof of Stake tehnologiji. Razvijena je od strane vrlo iskusnih programera i kriptografa.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - DashDiamond believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kao što kaže naš manifest: Privatnost je temeljno ljudsko pravo o kojemu se ne pregovara; korisnicima daje slobodu dijeljenja svojih podataka kad god i s kim god žele - DashDiamond vjeruje u suverenitet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As our manifesto says: Privacy is a non-negotiable basic human right; it grants users the freedom to share their data whenever and with whomever they want - Sapphire believes in self sovereignty.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kao što kaže naš manifest: Privatnost je temeljno ljudsko pravo o kojemu se ne pregovara; korisnicima daje slobodu dijeljenja svojih podataka kad god i s kim god žele - Sapphire vjeruje u suverenitet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>The masternode network is DashDiamond's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
-        <translation>Masternode mreža je mreža drugog sloja DashDiamond-a na vrhu blockchaina koja omogućuje našem DAO-u pružanje decentraliziranog upravljanja i riznice.</translation>
+        <source>The masternode network is Sapphire's second layer network on top of the blockchain that enables our DAO to provide decentralized governance and a treasury.</source>
+        <translation>Masternode mreža je mreža drugog sloja Sapphire-a na vrhu blockchaina koja omogućuje našem DAO-u pružanje decentraliziranog upravljanja i riznice.</translation>
     </message>
     <message>
-        <source>How DashDiamond respects your privacy?</source>
-        <translation>Kako DashDiamond poštuje Vašu privatnost?</translation>
+        <source>How Sapphire respects your privacy?</source>
+        <translation>Kako Sapphire poštuje Vašu privatnost?</translation>
     </message>
     <message>
         <source>What is a Masternode?</source>
@@ -5268,8 +5268,8 @@ se nova sigurnosna kopija.
         <translation>Pridržavajte se na navedenu adresu da biste slušali veze JSON-RPC. Koristite [host]: port notation za IPv6. Ova se opcija može odrediti više puta (zadano: vezati se na sva sučelja)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. DashDiamond Core is probably already running.</source>
-        <translation>Nije moguće dobiti zaključavanje na direktoriju podataka %s. DashDiamond Core vjerojatno već radi.</translation>
+        <source>Cannot obtain a lock on data directory %s. Sapphire Core is probably already running.</source>
+        <translation>Nije moguće dobiti zaključavanje na direktoriju podataka %s. Sapphire Core vjerojatno već radi.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -5432,8 +5432,8 @@ se nova sigurnosna kopija.
         <translation>Ukupna duljina teksta mrežne verzije (%i) prelazi maksimalnu duljinu (%i). Smanjite broj ili veličinu uacommentsa.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. DashDiamond Core is probably already running.</source>
-        <translation>Nije moguće vezati se na %s na ovom računalu. DashDiamond Core vjerojatno već radi.</translation>
+        <source>Unable to bind to %s on this computer. Sapphire Core is probably already running.</source>
+        <translation>Nije moguće vezati se na %s na ovom računalu. Sapphire Core vjerojatno već radi.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5448,8 +5448,8 @@ se nova sigurnosna kopija.
         <translation>Upozorenje: -paytxfee je vrlo visoka! To je transakcijska naknada koju ćete platiti ako šaljete transakciju.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong DashDiamond Core will not work properly.</source>
-        <translation>Upozorenje: Provjerite jesu li datum i vrijeme vašeg računala točni! Ako je vaš sat pogrešan, DashDiamond Core neće raditi ispravno.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <translation>Upozorenje: Provjerite jesu li datum i vrijeme vašeg računala točni! Ako je vaš sat pogrešan, Sapphire Core neće raditi ispravno.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5530,10 +5530,6 @@ se nova sigurnosna kopija.
     <message>
         <source>Copyright (C) 2020-%i Sapphire Core Developers</source>
         <translation>Autorska prava (C) 2020-%i Sapphire Core Developers</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2021-%i The DECENOMY Core Developers</source>
-        <translation>Autorska prava (C) 2021-%i The DECENOMY Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5673,8 +5669,8 @@ se nova sigurnosna kopija.
         <translation>Informacije</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. DashDiamond Core is shutting down.</source>
-        <translation>Provjera ispravnosti inicijalizacije nije uspjela. DashDiamond Core se zatvara.</translation>
+        <source>Initialization sanity check failed. Sapphire Core is shutting down.</source>
+        <translation>Provjera ispravnosti inicijalizacije nije uspjela. Sapphire Core se zatvara.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5705,8 +5701,8 @@ se nova sigurnosna kopija.
         <translation>Nevažeća mrežna maska specificirana u kategoriji -whitelist: '%s'</translation>
     </message>
     <message>
-        <source>Recalculating DASHD supply...</source>
-        <translation>Preračunavanje DASHD-a u optjecaju...</translation>
+        <source>Recalculating SAPP supply...</source>
+        <translation>Preračunavanje SAPP-a u optjecaju...</translation>
     </message>
     <message>
         <source>Reindexing zerocoin database...</source>
@@ -5729,8 +5725,8 @@ se nova sigurnosna kopija.
         <translation>Ovo je priprema za testiranje prije puštanja - upotrebljavajte na vlastiti rizik - nemojte ga koristiti za staking ili trgovinske aplikacije!</translation>
     </message>
     <message>
-        <source>Disable all DashDiamond specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>Onemogući sve specifične funkcije DashDiamond (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, zadano: %u)</translation>
+        <source>Disable all Sapphire specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Onemogući sve specifične funkcije Sapphire (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, zadano: %u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -5973,8 +5969,8 @@ se nova sigurnosna kopija.
         <translation>Priprema za resinkronizaciju...</translation>
     </message>
     <message>
-        <source>Please check that your computer's date and time are correct! If your clock is wrong DashDiamond Core will not work properly.</source>
-        <translation>Provjerite jesu li datum i vrijeme vašeg računala točni! Ako je vaš sat pogrešan, DashDiamond Core neće raditi ispravno.</translation>
+        <source>Please check that your computer's date and time are correct! If your clock is wrong Sapphire Core will not work properly.</source>
+        <translation>Provjerite jesu li datum i vrijeme vašeg računala točni! Ako je vaš sat pogrešan, Sapphire Core neće raditi ispravno.</translation>
     </message>
     <message>
         <source>Specify location of debug log file: this can be an absolute path or a path relative to the data directory (default: %s)</source>
@@ -6179,8 +6175,8 @@ se nova sigurnosna kopija.
         <translation>Sinkronizacija sporkova...</translation>
     </message>
     <message>
-        <source>Syncing zDASHD wallet...</source>
-        <translation>Sinkronizacija zDASHD novčanika...</translation>
+        <source>Syncing zSAPP wallet...</source>
+        <translation>Sinkronizacija zSAPP novčanika...</translation>
     </message>
     <message>
         <source>This help message</source>
@@ -6291,8 +6287,8 @@ se nova sigurnosna kopija.
         <translation>Korisničko ime za JSON-RPC veze</translation>
     </message>
     <message>
-        <source>Value is below the smallest available denomination (= 1) of zDASHD</source>
-        <translation>Vrijednost je niža od najmanje dostupne denominacije (= 1) zDASHD-a</translation>
+        <source>Value is below the smallest available denomination (= 1) of zSAPP</source>
+        <translation>Vrijednost je niža od najmanje dostupne denominacije (= 1) zSAPP-a</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6307,8 +6303,8 @@ se nova sigurnosna kopija.
         <translation>Novčanik %s nalazi se izvan direktorija podataka %s</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart DashDiamond Core to complete</source>
-        <translation>Potrebno je prepisati novčanik: ponovo pokrenite DashDiamond Core</translation>
+        <source>Wallet needed to be rewritten: restart Sapphire Core to complete</source>
+        <translation>Potrebno je prepisati novčanik: ponovo pokrenite Sapphire Core</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6374,12 +6370,12 @@ se nova sigurnosna kopija.
         <translation>Pošalji</translation>
     </message>
     <message>
-        <source>Send public coins (DASHD)</source>
-        <translation>Pošalji javne novčiće (DASHD)</translation>
+        <source>Send public coins (SAPP)</source>
+        <translation>Pošalji javne novčiće (SAPP)</translation>
     </message>
     <message>
-        <source>DashDiamond address or contact label</source>
-        <translation>DashDiamond adresa ili naziv kontakta</translation>
+        <source>Sapphire address or contact label</source>
+        <translation>Sapphire adresa ili naziv kontakta</translation>
     </message>
     <message>
         <source>Amount</source>

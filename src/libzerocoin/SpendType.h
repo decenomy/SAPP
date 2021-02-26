@@ -1,5 +1,5 @@
 // Copyright (c) 2018 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,9 +10,9 @@
 
 namespace libzerocoin {
     enum SpendType : uint8_t {
-        SPEND, // Used for a typical spend transaction, zDASHD should be unusable after
+        SPEND, // Used for a typical spend transaction, zSAPP should be unusable after
         STAKE, // Used for a spend that occurs as a stake
-        MN_COLLATERAL, // Used when proving ownership of zDASHD that will be used for masternodes (future)
+        MN_COLLATERAL, // Used when proving ownership of zSAPP that will be used for masternodes (future)
         SIGN_MESSAGE // Used to sign messages that do not belong above (future)
     };
 }

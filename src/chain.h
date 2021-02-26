@@ -4,7 +4,7 @@
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -273,9 +273,9 @@ public:
 
 /** Used to marshal pointers into hashes for db storage. */
 
-// New serialization introduced with 2.0
-static const int DBI_OLD_SER_VERSION = 2000000;
-static const int DBI_SER_VERSION_NO_ZC = 2000000;   // removes mapZerocoinSupply, nMoneySupply
+// New serialization introduced with 1.4.0.0
+static const int DBI_OLD_SER_VERSION = 1004000;
+static const int DBI_SER_VERSION_NO_ZC = 1004000;   // removes mapZerocoinSupply, nMoneySupply
 
 class CDiskBlockIndex : public CBlockIndex
 {

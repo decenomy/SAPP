@@ -1,5 +1,5 @@
 // Copyright (c) 2019-2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -224,7 +224,7 @@ void DashboardWidget::loadWalletModel()
         connect(walletModel->getOptionsModel(), &OptionsModel::hideChartsChanged, this, &DashboardWidget::onHideChartsChanged);
 #endif
     }
-    // update the display unit, to not use the default ("DASHD")
+    // update the display unit, to not use the default ("SAPP")
     updateDisplayUnit();
 }
 
@@ -522,7 +522,7 @@ void DashboardWidget::updateStakeFilter()
     }
 }
 
-// pair DASHD, zDASHD
+// pair PIV, zSAPP
 const QMap<int, std::pair<qint64, qint64>> DashboardWidget::getAmountBy()
 {
     updateStakeFilter();
@@ -578,7 +578,7 @@ bool DashboardWidget::loadChartData(bool withMonthNames)
     }
 
     chartData = new ChartData();
-    chartData->amountsByCache = getAmountBy(); // pair DASHD, zDASHD
+    chartData->amountsByCache = getAmountBy(); // pair PIV, zSAPP
 
     std::pair<int,int> range = getChartRange(chartData->amountsByCache);
     if (range.first == 0 && range.second == 0) {
@@ -665,8 +665,8 @@ void DashboardWidget::onChartRefreshed()
     // init sets
     set0 = new QBarSet(CURRENCY_UNIT.c_str());
     set1 = new QBarSet("z" + QString(CURRENCY_UNIT.c_str()));
-    set0->setColor(QColor(136,207,255));
-    set1->setColor(QColor(136,207,255));
+    set0->setColor(QColor(92,75,125));
+    set1->setColor(QColor(176,136,255));
 
     if (!series) {
         series = new QBarSeries();

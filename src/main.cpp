@@ -5,7 +5,7 @@
 // Copyright (c) 2013-2014 The NovaCoin Developers
 // Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2019-2020 The PIVX Developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -61,7 +61,7 @@
 #include <set>
 
 #if defined(NDEBUG)
-#error "DASHD cannot be compiled without assertions."
+#error "SAPP cannot be compiled without assertions."
 #endif
 
 /**
@@ -886,7 +886,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
 
     // Check transaction
     int chainHeight = chainActive.Height();
-    bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_19_COLDSTAKING_ENFORCEMENT);
+    bool fColdStakingActive = sporkManager.IsSporkActive(SPORK_18_COLDSTAKING_ENFORCEMENT);
     if (!CheckTransaction(tx, consensus.NetworkUpgradeActive(chainHeight, Consensus::UPGRADE_ZC),
             true, state, isBlockBetweenFakeSerialAttackRange(chainHeight), fColdStakingActive))
         return error("%s : transaction checks for %s failed with %s", __func__, tx.GetHash().ToString(), FormatStateMessage(state));
@@ -1000,9 +1000,9 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
                     return state.Invalid(false, REJECT_INVALID, "bad-txns-invalid-inputs");
             }
 
-            // Reject legacy zDASHD mints
+            // Reject legacy zSAPP mints
             if (!Params().IsRegTestNet() && tx.HasZerocoinMintOutputs())
-                return state.Invalid(error("%s : tried to include zDASHD mint output in tx %s",
+                return state.Invalid(error("%s : tried to include zSAPP mint output in tx %s",
                                          __func__, tx.GetHash().GetHex()),
                     REJECT_INVALID, "bad-zc-spend-mint");
 
@@ -2066,9 +2066,9 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
         return DISCONNECT_FAILED;
     }
 
-    //Track zDASHD money supply
+    //Track zSAPP money supply
     if (!UpdateZPIVSupplyDisconnect(block, pindex)) {
-        error("%s: Failed to calculate new zDASHD supply", __func__);
+        error("%s: Failed to calculate new zSAPP supply", __func__);
         return DISCONNECT_FAILED;
     }
 
@@ -2164,7 +2164,7 @@ static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck()
 {
-    util::ThreadRename("dashdiamond-scriptch");
+    util::ThreadRename("sapphire-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -2409,7 +2409,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         setDirtyBlockIndex.insert(pindex);
     }
 
-    //Record zDASHD serials
+    //Record zSAPP serials
     if (pwalletMain) {
         std::set<uint256> setAddedTx;
         for (const std::pair<libzerocoin::CoinSpend, uint256>& pSpend : vSpends) {
@@ -2454,12 +2454,12 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // add this block to the view's block chain
     view.SetBestBlock(pindex->GetBlockHash());
 
-    // Update zDASHD money supply map
+    // Update zSAPP money supply map
     if (!UpdateZPIVSupplyConnect(block, pindex, fJustCheck)) {
-        return state.DoS(100, error("%s: Failed to calculate new zDASHD supply for block=%s height=%d", __func__, block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
+        return state.DoS(100, error("%s: Failed to calculate new zSAPP supply for block=%s height=%d", __func__, block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
     }
 
-    // A one-time event where the zDASHD supply was off (due to serial duplication off-chain on main net)
+    // A one-time event where the zSAPP supply was off (due to serial duplication off-chain on main net)
     if (Params().NetworkID() == CBaseChainParams::MAIN && pindex->nHeight == consensus.height_last_ZC_WrappedSerials + 1 && GetZerocoinSupply() != consensus.ZC_WrappedSerialsSupply + GetWrapppedSerialInflationAmount()) {
         RecalculatePIVSupply(consensus.vUpgrades[Consensus::UPGRADE_ZC].nActivationHeight, false);
     }
@@ -3491,7 +3491,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                 nHeight = (*mi).second->nHeight + 1;
         }
 
-        // DASHD
+        // SAPP
         // It is entierly possible that we don't have enough data and this could fail
         // (i.e. the block could indeed be valid). Store the block for later consideration
         // but issue an initial reject message.
@@ -3505,7 +3505,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             }
 
             // set Cold Staking Spork
-            fColdStakingActive = sporkManager.IsSporkActive(SPORK_19_COLDSTAKING_ENFORCEMENT);
+            fColdStakingActive = sporkManager.IsSporkActive(SPORK_18_COLDSTAKING_ENFORCEMENT);
 
             // check masternode/budget payment
             if (!IsBlockPayeeValid(block, nHeight)) {
@@ -3532,7 +3532,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                 strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
 
-        // double check that there are no double spent zDASHD spends in this block
+        // double check that there are no double spent zSAPP spends in this block
         if (tx.HasZerocoinSpendInputs()) {
             for (const CTxIn& txIn : tx.vin) {
                 bool isPublicSpend = txIn.IsZerocoinPublicSpend();
@@ -3553,7 +3553,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                         spend = TxInToZerocoinSpend(txIn);
                     }
                     if (std::count(vBlockSerials.begin(), vBlockSerials.end(), spend.getCoinSerialNumber()))
-                        return state.DoS(100, error("%s : Double spending of zDASHD serial %s in block\n Block: %s",
+                        return state.DoS(100, error("%s : Double spending of zSAPP serial %s in block\n Block: %s",
                                                   __func__, spend.getCoinSerialNumber().GetHex(), block.ToString()));
                     vBlockSerials.emplace_back(spend.getCoinSerialNumber());
                 }
@@ -3578,14 +3578,15 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
 bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
 {
-    if (pindexPrev == NULL) {
+    if (pindexPrev == NULL)
         return error("%s : null pindexPrev for block %s", __func__, block.GetHash().GetHex());
-    }
 
-    unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block);
+    if(Params().GetConsensus().NetworkUpgradeActive(pindexPrev->nHeight + 1, Consensus::UPGRADE_CHECK_WORK_V2)) {
+        unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block);
 
-    if (block.nBits != nBitsRequired) {
-        return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+        if (block.nBits != nBitsRequired) {
+            return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+        }
     }
 
     return true;
@@ -3990,7 +3991,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, CBlockIndex** ppi
             // Split height
             splitHeight = prev->nHeight;
 
-            // Now that this loop if completed. Check if we have zDASHD inputs.
+            // Now that this loop if completed. Check if we have zSAPP inputs.
             if (hasZPIVInputs) {
                 for (const CTxIn& zPivInput : zPIVInputs) {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(zPivInput);
@@ -4121,7 +4122,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
     // For now, we need the tip to know whether p2pkh block signatures are accepted or not.
     // After 5.0, this can be removed and replaced by the enforcement block time.
     const int newHeight = chainActive.Height() + 1;
-    const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_V2_DUMMY);
+    const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_V5_DUMMY);
     if (!CheckBlockSignature(*pblock, enableP2PKH))
         return error("%s : bad proof-of-stake block signature", __func__);
 
@@ -5340,13 +5341,14 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             pfrom->fDisconnect = true;
         }
 
-        // DASHD: We use certain sporks during IBD, so check to see if they are
+        // SAPP: We use certain sporks during IBD, so check to see if they are
         // available. If not, ask the first peer connected for them.
         // TODO: Move this to an instant broadcast of the sporks.
-        bool fMissingSporks = !pSporkDB->SporkExists(SPORK_14_MIN_PROTOCOL_ACCEPTED) ||
+        bool fMissingSporks = !pSporkDB->SporkExists(SPORK_14_NEW_PROTOCOL_ENFORCEMENT) ||
+                              !pSporkDB->SporkExists(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2) ||
                               !pSporkDB->SporkExists(SPORK_16_ZEROCOIN_MAINTENANCE_MODE) ||
-                              !pSporkDB->SporkExists(SPORK_19_COLDSTAKING_ENFORCEMENT) ||
-                              !pSporkDB->SporkExists(SPORK_20_ZEROCOIN_PUBLICSPEND_V4);
+                              !pSporkDB->SporkExists(SPORK_18_COLDSTAKING_ENFORCEMENT) ||
+                              !pSporkDB->SporkExists(SPORK_19_ZEROCOIN_PUBLICSPEND_V4);
 
         if (fMissingSporks || !fRequestedSporksIDB) {
             LogPrintf("asking peer for sporks\n");
@@ -6028,7 +6030,15 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 //       it was the one which was commented out
 int ActiveProtocol()
 {
-    return std::min(PROTOCOL_VERSION, (int)sporkManager.GetSporkValue(SPORK_14_MIN_PROTOCOL_ACCEPTED));
+    // SPORK_14 is used for 70919 (v4.1.1)
+    // if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT))
+    //     return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
+
+    // SPORK_15 was used for 70918 (v4.0, v4.1.0), commented out now.
+    if (sporkManager.IsSporkActive(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2))
+        return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
+
+    return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
 }
 
 bool ProcessMessages(CNode* pfrom, CConnman& connman, std::atomic<bool>& interruptMsgProc)

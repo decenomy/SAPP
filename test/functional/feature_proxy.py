@@ -5,10 +5,10 @@
 """Test bitcoind with different proxy configuration.
 
 Test plan:
-- Start dashdiamondd's with different proxy configurations
+- Start sapphired's with different proxy configurations
 - Use addnode to initiate connections
 - Verify that proxies are connected to, and the right connection command is given
-- Proxy configurations to test on dashdiamondd side:
+- Proxy configurations to test on sapphired side:
     - `-proxy` (proxy everything)
     - `-onion` (proxy just onions)
     - `-proxyrandomize` Circuit randomization
@@ -18,8 +18,8 @@ Test plan:
     - proxy on IPv6
 
 - Create various proxies (as threads)
-- Create dashdiamondds that connect to them
-- Manipulate the dashdiamondds using addnode (onetry) an observe effects
+- Create sapphireds that connect to them
+- Manipulate the sapphireds using addnode (onetry) an observe effects
 
 addnode connect to IPv4
 addnode connect to IPv6

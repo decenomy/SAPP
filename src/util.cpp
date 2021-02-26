@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -86,12 +86,12 @@
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
 
-const char * const PIVX_CONF_FILENAME = "dashdiamond.conf";
-const char * const PIVX_PID_FILENAME = "dashdiamond.pid";
+const char * const PIVX_CONF_FILENAME = "sapphire.conf";
+const char * const PIVX_PID_FILENAME = "sapphire.pid";
 const char * const PIVX_MASTERNODE_CONF_FILENAME = "masternode.conf";
 
 
-// Dash Diamond only features
+// Sapphire only features
 // Masternode
 bool fMasterNode = false;
 std::string strMasterNodePrivKey = "";
@@ -271,7 +271,7 @@ static std::string FormatException(const std::exception* pex, const char* pszThr
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "dashdiamond";
+    const char* pszModule = "sapphire";
 #endif
     if (pex)
         return strprintf(
@@ -291,13 +291,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 
 fs::path GetDefaultDataDir()
 {
-// Windows < Vista: C:\Documents and Settings\Username\Application Data\DashDiamond
-// Windows >= Vista: C:\Users\Username\AppData\Roaming\DashDiamond
-// Mac: ~/Library/Application Support/DashDiamond
-// Unix: ~/.dashdiamond
+// Windows < Vista: C:\Documents and Settings\Username\Application Data\Sapphire
+// Windows >= Vista: C:\Users\Username\AppData\Roaming\Sapphire
+// Mac: ~/Library/Application Support/Sapphire
+// Unix: ~/.sapphire
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "DashDiamond";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Sapphire";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -309,10 +309,10 @@ fs::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "DashDiamond";
+    return pathRet / "Sapphire";
 #else
     // Unix
-    return pathRet / ".dashdiamond";
+    return pathRet / ".sapphire";
 #endif
 #endif
 }
@@ -325,13 +325,13 @@ static RecursiveMutex csPathCached;
 static fs::path ZC_GetBaseParamsDir()
 {
     // Copied from GetDefaultDataDir and adapter for zcash params.
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\DashDiamondParams
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\DashDiamondParams
-    // Mac: ~/Library/Application Support/DashDiamondParams
-    // Unix: ~/.dashdiamond-params
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\SapphireParams
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\SapphireParams
+    // Mac: ~/Library/Application Support/SapphireParams
+    // Unix: ~/.sapphire-params
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "DashDiamondParams";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "SapphireParams";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -343,10 +343,10 @@ static fs::path ZC_GetBaseParamsDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "DashDiamondParams";
+    return pathRet / "SapphireParams";
 #else
     // Unix
-    return pathRet / ".dashdiamond-params";
+    return pathRet / ".sapphire-params";
 #endif
 #endif
 }
@@ -468,7 +468,7 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
 {
     fs::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good()) {
-        // Create empty dashdiamond.conf if it does not exist
+        // Create empty sapphire.conf if it does not exist
         FILE* configFile = fsbridge::fopen(GetConfigFile(), "a");
         if (configFile != NULL)
             fclose(configFile);
@@ -479,7 +479,7 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet,
     setOptions.insert("*");
 
     for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
-        // Don't overwrite existing settings so command line settings override dashdiamond.conf
+        // Don't overwrite existing settings so command line settings override sapphire.conf
         std::string strKey = std::string("-") + it->string_key;
         std::string strValue = it->value[0];
         InterpretNegativeSetting(strKey, strValue);

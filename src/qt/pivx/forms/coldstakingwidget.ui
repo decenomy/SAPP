@@ -111,7 +111,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>You can delegate your DASHDs, letting a hot node (24/7 online node)
+                  <string>You can delegate your SAPPs, letting a hot node (24/7 online node)
 stake on your behalf, while you keep the keys securely offline.</string>
                  </property>
                 </widget>
@@ -235,7 +235,7 @@ stake on your behalf, while you keep the keys securely offline.</string>
                 <item alignment="Qt::AlignTop">
                  <widget class="QLabel" name="labelSubtitle2">
                   <property name="text">
-                   <string>Accept DASHD delegation / Delegate DASHD</string>
+                   <string>Accept SAPP delegation / Delegate SAPP</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

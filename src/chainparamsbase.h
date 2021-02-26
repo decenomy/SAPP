@@ -1,6 +1,6 @@
 // Copyright (c) 2014 The Bitcoin developers
 // Copyright (c) 2017-2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,8 +11,8 @@
 #include <vector>
 
 /**
- * CBaseChainParams defines the base parameters (shared between dashdiamond-cli and dashdiamondd)
- * of a given instance of the Dash Diamond system.
+ * CBaseChainParams defines the base parameters (shared between sapphire-cli and sapphired)
+ * of a given instance of the Sapphire system.
  */
 class CBaseChainParams
 {

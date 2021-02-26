@@ -1,5 +1,5 @@
 // Copyright (c) 2019-2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core developers
+// Copyright (c) 2020-2021 The Sapphire Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -215,17 +215,17 @@ QColor getRowColor(bool isLightTheme, bool isHovered, bool isSelected)
 {
     if (isLightTheme) {
         if (isSelected) {
-            return QColor("#f9f9f9");
+            return QColor("#25b088ff");
         } else if (isHovered) {
-            return QColor("#f9f9f9");
+            return QColor("#25bababa");
         } else {
             return QColor("#ffffff");
         }
     } else {
         if (isSelected) {
-            return QColor("#212121");
+            return QColor("#25b088ff");
         } else if (isHovered) {
-            return QColor("#212121");
+            return QColor("#25bababa");
         } else {
             return QColor("#0f0b16");
         }

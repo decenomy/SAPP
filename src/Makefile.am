@@ -117,11 +117,11 @@ TESTS =
 BENCHMARKS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += dashdiamondd
+  bin_PROGRAMS += sapphired
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += dashdiamond-cli dashdiamond-tx
+  bin_PROGRAMS += sapphire-cli sapphire-tx
 endif
 
 LIBSAPLING_H = \
@@ -137,7 +137,7 @@ LIBSAPLING_H = \
   sapling/saplingscriptpubkeyman.h
 
 .PHONY: FORCE cargo-build check-symbols check-security
-# dashdiamond core #
+# sapphire core #
 BITCOIN_CORE_H = \
   activemasternode.h \
   addrdb.h \
@@ -291,7 +291,7 @@ obj/build.h: FORCE
 	  "$(abs_top_srcdir)"
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: shared between dashdiamondd and dashdiamond-qt
+# server: shared between sapphired and sapphire-qt
 libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
@@ -347,7 +347,7 @@ libbitcoin_zmq_a_SOURCES = \
   zmq/zmqpublishnotifier.cpp
 endif
 
-# wallet: shared between dashdiamondd and dashdiamond-qt, but only linked
+# wallet: shared between sapphired and sapphire-qt, but only linked
 # when wallet enabled
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -411,19 +411,6 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/jh.c \
   crypto/keccak.c \
   crypto/skein.c \
-  crypto/luffa.c \
-  crypto/cubehash.c \
-  crypto/shavite.c \
-  crypto/simd.c \
-  crypto/echo.c \
-  crypto/hamsi.c \
-  crypto/fugue.c \
-  crypto/shabal.c \
-  crypto/whirlpool.c \
-  crypto/sha2.c \
-  crypto/haval.c \
-  crypto/sph_md_helper.c \
-  crypto/sph_sha2big.c \
   crypto/common.h \
   crypto/sha256.h \
   crypto/sha512.h \
@@ -439,19 +426,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sph_jh.h \
   crypto/sph_keccak.h \
   crypto/sph_skein.h \
-  crypto/sph_luffa.h \
-  crypto/sph_shavite.h \
-  crypto/sph_hamsi.h \
-  crypto/sph_cubehash.h \
-  crypto/sph_skein.h \
-  crypto/sph_simd.h \
-  crypto/sph_fugue.h \
-  crypto/sph_echo.h \
-  crypto/sph_shabal.h \
-  crypto/sph_whirlpool.h \
-  crypto/sph_sha2.h \
-  crypto/sph_haval.h \
-  crypto/sph_types.h 
+  crypto/sph_types.h
 
 # libzerocoin library
 libzerocoin_libbitcoin_zerocoin_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
@@ -483,7 +458,7 @@ if USE_NUM_OPENSSL
   libzerocoin_libbitcoin_zerocoin_a_SOURCES += libzerocoin/bignum_openssl.cpp
 endif
 
-# common: shared between dashdiamondd, and dashdiamond-qt and non-server tools
+# common: shared between sapphired, and sapphire-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
@@ -576,7 +551,7 @@ libsapling_a_SOURCES += compat/glibc_compat.cpp
 AM_LDFLAGS += $(COMPAT_LDFLAGS)
 endif
 
-# cli: shared between dashdiamond-cli and dashdiamond-qt
+# cli: shared between sapphire-cli and sapphire-qt
 libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_cli_a_SOURCES = \
@@ -587,16 +562,16 @@ libbitcoin_cli_a_SOURCES = \
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# dashdiamondd binary #
-dashdiamondd_SOURCES = pivxd.cpp
-dashdiamondd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dashdiamondd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dashdiamondd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# sapphired binary #
+sapphired_SOURCES = pivxd.cpp
+sapphired_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+sapphired_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+sapphired_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dashdiamondd_SOURCES += pivxd-res.rc
+sapphired_SOURCES += pivxd-res.rc
 endif
-dashdiamondd_LDADD = \
+sapphired_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_COMMON) \
@@ -613,19 +588,19 @@ dashdiamondd_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dashdiamondd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+sapphired_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
-# dashdiamond-cli binary #
-dashdiamond_cli_SOURCES = pivx-cli.cpp
-dashdiamond_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-dashdiamond_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dashdiamond_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# sapphire-cli binary #
+sapphire_cli_SOURCES = pivx-cli.cpp
+sapphire_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+sapphire_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+sapphire_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dashdiamond_cli_SOURCES += pivx-cli-res.rc
+sapphire_cli_SOURCES += pivx-cli-res.rc
 endif
 
-dashdiamond_cli_LDADD = \
+sapphire_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
@@ -634,20 +609,20 @@ dashdiamond_cli_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dashdiamond_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+sapphire_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# dashdiamond-tx binary #
-dashdiamond_tx_SOURCES = pivx-tx.cpp
-dashdiamond_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dashdiamond_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dashdiamond_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# sapphire-tx binary #
+sapphire_tx_SOURCES = pivx-tx.cpp
+sapphire_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+sapphire_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+sapphire_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dashdiamond_tx_SOURCES += pivx-tx-res.rc
+sapphire_tx_SOURCES += pivx-tx-res.rc
 endif
 
-dashdiamond_tx_LDADD = \
+sapphire_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_ZEROCOIN) \
@@ -658,7 +633,7 @@ dashdiamond_tx_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dashdiamond_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+sapphire_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # bitcoinconsensus library #
