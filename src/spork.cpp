@@ -1,6 +1,6 @@
 // Copyright (c) 2014-2016 The Dash developers
 // Copyright (c) 2016-2020 The PIVX developers
-// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2021 The DECENOMY Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,12 +21,10 @@ std::vector<CSporkDef> sporkDefs = {
     MAKE_SPORK_DEF(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT,  4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_9_MASTERNODE_BUDGET_ENFORCEMENT,   4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_13_ENABLE_SUPERBLOCKS,             4070908800ULL), // OFF
-    MAKE_SPORK_DEF(SPORK_14_NEW_PROTOCOL_ENFORCEMENT,       4070908800ULL), // OFF
-    MAKE_SPORK_DEF(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2,     4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_14_MIN_PROTOCOL_ACCEPTED,          70016),         // Allows the use of previous versions
     MAKE_SPORK_DEF(SPORK_16_ZEROCOIN_MAINTENANCE_MODE,      4070908800ULL), // OFF
-    MAKE_SPORK_DEF(SPORK_18_COLDSTAKING_ENFORCEMENT,        4070908800ULL), // OFF
-    MAKE_SPORK_DEF(SPORK_19_ZEROCOIN_PUBLICSPEND_V4,        4070908800ULL), // OFF
-    MAKE_SPORK_DEF(SPORK_20_UPGRADE_CYCLE_FACTOR,           4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_19_COLDSTAKING_ENFORCEMENT,        4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_20_ZEROCOIN_PUBLICSPEND_V4,        4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_101_SERVICES_ENFORCEMENT,          4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_102_FORCE_ENABLED_MASTERNODE,      4070908800ULL), // OFF
     MAKE_SPORK_DEF(SPORK_103_PING_MESSAGE_SALT,             0),             // OFF
@@ -35,9 +33,15 @@ std::vector<CSporkDef> sporkDefs = {
 
 	// Unused dummy sporks.
 	//TODO: Needed to be removed in the future when the old nodes cut from the network.
-	MAKE_SPORK_DEF(SPORK_17_NOOP,          4070908800ULL), // OFF, // Prevents error messages in debug logs due to v1.3.3.x wallets
-	MAKE_SPORK_DEF(SPORK_21_NOOP,          4070908800ULL), // OFF, // Prevents error messages in debug logs due to v1.3.3.x wallets
-	MAKE_SPORK_DEF(SPORK_23_NOOP,          4070908800ULL), // OFF, // Prevents error messages in debug logs due to v1.3.3.x wallets
+	// Prevents error messages in debug logs due to v1 wallets
+    MAKE_SPORK_DEF(SPORK_7_NOOP,                            4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_10_NOOP,                           4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_11_NOOP,                           4070908800ULL), // OFF
+	MAKE_SPORK_DEF(SPORK_15_NOOP,                           4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_17_NOOP,                           4070908800ULL), // OFF
+	MAKE_SPORK_DEF(SPORK_18_NOOP,                           4070908800ULL), // OFF
+	MAKE_SPORK_DEF(SPORK_22_NOOP,                           4070908800ULL), // OFF
+    MAKE_SPORK_DEF(SPORK_24_NOOP,                           4070908800ULL), // OFF
 };
 
 CSporkManager sporkManager;
@@ -57,7 +61,7 @@ void CSporkManager::Clear()
     mapSporksActive.clear();
 }
 
-// SAPP: on startup load spork values from previous session if they exist in the sporkDB
+// DASHD: on startup load spork values from previous session if they exist in the sporkDB
 void CSporkManager::LoadSporksFromDB()
 {
     for (const auto& sporkDef : sporkDefs) {
@@ -106,7 +110,8 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
         }
 
         // reject old signature version
-        if (spork.nMessVersion != MessageVersion::MESS_VER_HASH) {
+        if (Params().GetConsensus().NetworkUpgradeActive(chainActive.Tip()->nHeight, Consensus::UPGRADE_V4_0) &&
+            spork.nMessVersion != MessageVersion::MESS_VER_HASH) {
             LogPrintf("%s : nMessVersion=%d not accepted anymore\n", __func__, spork.nMessVersion);
             return;
         }
@@ -162,7 +167,7 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
         }
         spork.Relay();
 
-        // SAPP: add to spork database.
+        // DASHD: add to spork database.
         pSporkDB->WriteSpork(spork.nSporkID, spork);
     }
     if (strCommand == NetMsgType::GETSPORKS) {

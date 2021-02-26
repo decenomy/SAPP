@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>Sapphire-Qt</string>
+  <string>DashDiamond-Qt</string>
 
   <key>CFBundleName</key>
-  <string>Sapphire-Qt</string>
+  <string>DashDiamond-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>io.sapphire.Sapphire-Qt</string>
+  <string>io.dashdiamond.DashDiamond-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -46,10 +46,10 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>io.sapphire.SapphirePayment</string>
+      <string>io.dashdiamond.DashDiamondPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>sapphire</string>
+        <string>dashdiamond</string>
       </array>
     </dict>
   </array>
@@ -58,9 +58,9 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>io.sapphire.paymentrequest</string>
+      <string>io.dashdiamond.paymentrequest</string>
       <key>UTTypeDescription</key>
-      <string>Sapphire payment request</string>
+      <string>DashDiamond payment request</string>
       <key>UTTypeConformsTo</key>
       <array>
         <string>public.data</string>
@@ -68,10 +68,10 @@
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.mime-type</key>
-        <string>application/x-sapphire-payment-request</string>
+        <string>application/x-dashdiamond-payment-request</string>
         <key>public.filename-extension</key>
         <array>
-          <string>sapphirepaymentrequest</string>
+          <string>dashdiamondpaymentrequest</string>
         </array>
       </dict>
     </dict>
@@ -84,7 +84,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>io.sapphire.paymentrequest</string>
+        <string>io.dashdiamond.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>

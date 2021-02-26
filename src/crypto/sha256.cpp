@@ -1,5 +1,5 @@
 // Copyright (c) 2014 The Bitcoin developers
-// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2021 The DECENOMY Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -174,6 +174,19 @@ void CSHA256::Finalize(unsigned char hash[OUTPUT_SIZE])
     Write(pad, 1 + ((119 - (bytes % 64)) % 64));
     Write(sizedesc, 8);
     FinalizeNoPadding(hash, false);
+    /*static const unsigned char pad[64] = {0x80};
+    unsigned char sizedesc[8];
+    WriteBE64(sizedesc, bytes << 3);
+    Write(pad, 1 + ((119 - (bytes % 64)) % 64));
+    Write(sizedesc, 8);
+    WriteBE32(hash, s[0]);
+    WriteBE32(hash + 4, s[1]);
+    WriteBE32(hash + 8, s[2]);
+    WriteBE32(hash + 12, s[3]);
+    WriteBE32(hash + 16, s[4]);
+    WriteBE32(hash + 20, s[5]);
+    WriteBE32(hash + 24, s[6]);
+    WriteBE32(hash + 28, s[7]);*/
 }
 
 void CSHA256::FinalizeNoPadding(unsigned char hash[OUTPUT_SIZE], bool enforce_compression)

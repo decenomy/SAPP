@@ -1,6 +1,6 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
-// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2021 The DECENOMY Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -331,45 +331,18 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
 
 CAmount CMasternode::GetMasternodeCollateral(int nHeight)
 {
-    if (nHeight <= 2000 && nHeight > 500) {
-        return 10 * COIN;
-    } else if (nHeight <= 20000 && nHeight > 2000) {
-        return 50 * COIN;
-    } else if (nHeight <= 30000 && nHeight > 20000) {
-        return 500 * COIN;
-    } else if (nHeight <= 40000 && nHeight > 30000) {
-        return 750 * COIN;
-    } else if (nHeight <= 50000 && nHeight > 40000) {
+    if(nHeight <= 500000)
         return 1000 * COIN;
-    } else if (nHeight <= 60000 && nHeight > 50000) {
-        return 1250 * COIN;
-    } else if (nHeight <= 100000 && nHeight > 60000) {
-        return 2500 * COIN;
-    } else if (nHeight <= 130000 && nHeight > 100000) {
+    else if(nHeight <= 600000 && nHeight > 500000)
+        return 2000 * COIN;
+    else if(nHeight <= 700000 && nHeight > 600000)
+        return 3000 * COIN;
+    else if(nHeight <= 800000 && nHeight > 700000)
         return 5000 * COIN;
-    } else if (nHeight <= 150000 && nHeight > 130000) {
+    else if(nHeight <= 900000 && nHeight > 800000)
+        return 7000 * COIN;
+    else
         return 10000 * COIN;
-    } else if (nHeight <= 175000 && nHeight > 150000) {
-        return 20000 * COIN;
-    } else if (nHeight <= 200000 && nHeight > 175000) {
-        return 30000 * COIN;
-    } else if (nHeight <= 250000 && nHeight > 200000) {
-        return 40000 * COIN;
-    } else if (nHeight <= 400000 && nHeight > 250000) {
-        return 50000 * COIN;
-    } else if (nHeight <= 450000 && nHeight > 400000) {
-        return 75000 * COIN;
-    } else if (nHeight <= 500000 && nHeight > 450000) {
-        return 100000 * COIN;
-    } else if (nHeight <= 550000 && nHeight > 500000) {
-        return 125000 * COIN;
-    } else if (nHeight <= 600000 && nHeight > 550000) {
-        return 150000 * COIN;
-    } else if (nHeight <= 650000 && nHeight > 600000) {
-        return 175000 * COIN;
-    } else if (nHeight > 650000) {
-        return 200000 * COIN;
-    }
 }
 
 /**
@@ -378,6 +351,8 @@ CAmount CMasternode::GetMasternodeCollateral(int nHeight)
 
 CAmount CMasternode::GetBlockValue(int nHeight)
 {
+    int prevHeight = nHeight - 1; // In the original DASHD the nHeight refers to the previous block  
+
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight < 200 && nHeight > 0)
             return 250000 * COIN;
@@ -388,78 +363,55 @@ CAmount CMasternode::GetBlockValue(int nHeight)
             return 250 * COIN;
     }
 
-    //Create a fork to ensure all old wallets update
-    if (nHeight == 574010) {
-        return 801 * COIN;
-    }
+    int64_t nSubsidy = 0;
 
-    if (nHeight == 585330) {
-        return 801 * COIN;
-    }
-
-    if (nHeight == 586594) { // to be set at phase 2 compile
-        return 801 * COIN;
-    }
-
-    CAmount nSubsidy = 0;
-    if (nHeight == 1)
-        nSubsidy = 300000 * COIN;
-    else if (nHeight <= 500)
-        nSubsidy = 1 * COIN;
-    else if (nHeight <= 2000 && nHeight > 500)
-        nSubsidy = 1 * COIN;
-    else if (nHeight <= 20000 && nHeight > 2000)
-        nSubsidy = 2 * COIN;
-    else if (nHeight <= 30000 && nHeight > 20000)
-        nSubsidy = 10 * COIN;
-    else if (nHeight <= 40000 && nHeight > 30000)
-        nSubsidy = 15 * COIN;
-    else if (nHeight <= 50000 && nHeight > 40000)
-        nSubsidy = 20 * COIN;
-    else if (nHeight <= 60000 && nHeight > 50000)
+    if (nHeight == 0) {
+        nSubsidy = 180000 * COIN;
+    } else if (prevHeight <= 210240 && prevHeight > 0) {
+        nSubsidy = 5 * COIN;
+    } else if (prevHeight <= 350000 && prevHeight > 210240) {
+        nSubsidy = 4.5 * COIN;
+    } else if (nHeight <= 500000 && prevHeight > 350000) {
         nSubsidy = 25 * COIN;
-    else if (nHeight <= 100000 && nHeight > 60000)
-        nSubsidy = 50 * COIN;
-    else if (nHeight <= 130000 && nHeight > 100000)
+    } else if (nHeight <= 600000 && nHeight > 500000) {
+        nSubsidy = 60 * COIN;
+    } else if (nHeight <= 700000 && nHeight > 600000) {
         nSubsidy = 100 * COIN;
-    else if (nHeight <= 150000 && nHeight > 130000)
-        nSubsidy = 150 * COIN;
-    else if (nHeight <= 175000 && nHeight > 150000)
+    } else if (nHeight <= 800000 && nHeight > 700000) {
+        nSubsidy = 200 * COIN;
+    } else if (nHeight <= 900000 && nHeight > 800000) {
+        nSubsidy = 300 * COIN;
+    } else if (nHeight <= 1000000 && nHeight > 900000) {
+        nSubsidy = 450 * COIN;
+    } else if (nHeight <= 1100000 && nHeight > 1000000) {
+        nSubsidy = 400 * COIN;
+    } else if (nHeight <= 1200000 && nHeight > 1100000) {
+        nSubsidy = 300 * COIN;
+    } else if (nHeight <= 1300000 && nHeight > 1200000) {
         nSubsidy = 250 * COIN;
-    else if (nHeight <= 200000 && nHeight > 175000)
-        nSubsidy = 400 * COIN;
-    else if (nHeight <= 250000 && nHeight > 200000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 300000 && nHeight > 250000)
-        nSubsidy = 450 * COIN;
-    else if (nHeight <= 400000 && nHeight > 300000)
-        nSubsidy = 400 * COIN;
-    else if (nHeight <= 450000 && nHeight > 400000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 500000 && nHeight > 450000)
-        nSubsidy = 600 * COIN;
-    else if (nHeight <= 550000 && nHeight > 500000)
-        nSubsidy = 700 * COIN;
-    else if (nHeight <= 600000 && nHeight > 550000)
-        nSubsidy = 800 * COIN;
-    else if (nHeight <= 650000 && nHeight > 600000)
-        nSubsidy = 900 * COIN;
-    else if (nHeight <= 700000 && nHeight > 650000)
-        nSubsidy = 1000 * COIN;
-    else if (nHeight <= 750000 && nHeight > 700000)
-        nSubsidy = 900 * COIN;
-    else if (nHeight <= 800000 && nHeight > 750000)
-        nSubsidy = 800 * COIN;
-    else if (nHeight <= 850000 && nHeight > 800000)
-        nSubsidy = 700 * COIN;
-    else if (nHeight <= 900000 && nHeight > 850000)
-        nSubsidy = 600 * COIN;
-    else if (nHeight <= 950000 && nHeight > 900000)
-        nSubsidy = 500 * COIN;
-    else if (nHeight <= 1000000 && nHeight > 950000)
-        nSubsidy = 450 * COIN;
-    else
-        nSubsidy = 400 * COIN;
+    } else if (nHeight <= 1400000 && nHeight > 1300000) {
+        nSubsidy = 200 * COIN;
+    } else if (nHeight <= 1500000 && nHeight > 1400000) {
+        nSubsidy = 150 * COIN;
+    } else if (nHeight <= 1600000 && nHeight > 1500000) {
+        nSubsidy = 100 * COIN;
+    } else if (nHeight <= 1700000 && nHeight > 1600000) {
+        nSubsidy = 80 * COIN;
+    } else {
+        nSubsidy = 50 * COIN;
+    }
+
+    if(Params().IsLiquiMiningBlock(prevHeight + 1)) {
+        nSubsidy += Params().GetLiquiMiningValue(prevHeight + 1);
+    }
+
+    // Check if we reached the coin max supply.
+
+    if (nMoneySupply + nSubsidy >= Params().MaxMoneyOut())
+        nSubsidy = Params().MaxMoneyOut() - nMoneySupply;
+
+    if (nMoneySupply >= Params().MaxMoneyOut())
+        nSubsidy = 0;
 
     return nSubsidy;
 }
@@ -469,7 +421,15 @@ CAmount CMasternode::GetBlockValue(int nHeight)
  */
 CAmount CMasternode::GetMasternodePayment()
 {
-    return (95 * CMasternode::GetBlockValue(chainActive.Height())) / 100; // 95% of the block reward
+    int64_t ret = 0;
+
+	if (chainActive.Height() <= 200) {
+		ret = GetBlockValue(chainActive.Height())  / 100 * 0;
+	} else {
+		ret = GetBlockValue(chainActive.Height())  / 100 * 80;
+	}
+
+    return ret;
 }
 
 CMasternodeBroadcast::CMasternodeBroadcast() : CMasternode()
@@ -776,13 +736,13 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
     }
 
     // verify that sig time is legit in past
-    // should be at least not earlier than block when 1000 SAPP tx got MASTERNODE_MIN_CONFIRMATIONS
+    // should be at least not earlier than block when 1000 DASHD tx got MASTERNODE_MIN_CONFIRMATIONS
     uint256 hashBlock = UINT256_ZERO;
     CTransaction tx2;
     GetTransaction(vin.prevout.hash, tx2, hashBlock, true);
     BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
     if (mi != mapBlockIndex.end() && (*mi).second) {
-        CBlockIndex* pMNIndex = (*mi).second;                                                        // block for 1000 SAPP tx -> 1 confirmation
+        CBlockIndex* pMNIndex = (*mi).second;                                                        // block for 1000 DASHD tx -> 1 confirmation
         CBlockIndex* pConfIndex = chainActive[pMNIndex->nHeight + MASTERNODE_MIN_CONFIRMATIONS - 1]; // block where tx got MASTERNODE_MIN_CONFIRMATIONS
         if (pConfIndex->GetBlockTime() > sigTime) {
             LogPrint(BCLog::MASTERNODE, "mnb - Bad sigTime %d for Masternode %s (%i conf block is at %d)\n",

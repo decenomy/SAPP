@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2015 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
-// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2021 The DECENOMY Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,7 +31,7 @@ struct SeedSpec6 {
 
 /**
  * CChainParams defines various tweakable parameters of a given instance of the
- * Sapphire system. There are three: the main network on which people trade goods
+ * Dash Diamond system. There are three: the main network on which people trade goods
  * and services, the public test network which gets reset from time to time and
  * a regression test mode which is intended for private networks only. It has
  * minimal difficulty to ensure that blocks can be found instantly.
@@ -86,6 +86,22 @@ public:
     bool IsTestNet() const { return NetworkID() == CBaseChainParams::TESTNET; }
 	bool IsMainNet() const { return NetworkID() == CBaseChainParams::MAIN; }
 
+    CScript GetLiquiMiningScriptAtHeight(int nHeight) const;
+
+    bool IsLiquiMiningBlock(int nHeight) const { 
+        return 
+            nHeight > nLiquiMiningStartHeight && 
+            nHeight <= (nLiquiMiningStartHeight + 500); 
+    }
+
+    CAmount GetLiquiMiningValue(int nHeight) const {
+        return nLiquiMiningValue;
+    }
+
+    CAmount MaxMoneyOut() const { return consensus.nMaxMoneyOut; }
+
+    int64_t TargetTimespan(int nHeight) const { return TargetSpacing(nHeight) * (consensus.IsTimeProtocolV2(nHeight) ? consensus.nTargetTimespanV2 : consensus.nTargetTimespan); }
+    int64_t TargetSpacing(int nHeight) const { return nHeight >= consensus.vUpgrades[Consensus::UPGRADE_NEW_TARGET_SPACING].nActivationHeight ? consensus.nTargetSpacingV2 : consensus.nTargetSpacing; }
 
 protected:
     CChainParams() {}
@@ -100,6 +116,10 @@ protected:
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string bech32HRPs[MAX_BECH32_TYPES];
     std::vector<SeedSpec6> vFixedSeeds;
+
+    // liquiMining
+    int nLiquiMiningStartHeight;
+    CAmount nLiquiMiningValue;
 };
 
 /**

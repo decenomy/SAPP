@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2020 The PIVX developers
-// Copyright (c) 2020-2021 The Sapphire Core Developers
+// Copyright (c) 2021 The DECENOMY Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -266,11 +266,11 @@ UniValue stop(const JSONRPCRequest& jsonRequest)
     if (jsonRequest.fHelp || jsonRequest.params.size() > 1)
         throw std::runtime_error(
             "stop\n"
-            "\nStop Sapphire server.");
+            "\nStop Dash Diamond server.");
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
-    return "Sapphire server stopping";
+    return "Dash Diamond server stopping";
 }
 
 
@@ -360,32 +360,32 @@ static const CRPCCommand vRPCCommands[] =
         { "hidden",             "waitforblock",           &waitforblock,           true },
         { "hidden",             "waitforblockheight",     &waitforblockheight,     true },
 
-        /* Sapphire features */
-        {"sapphire", "listmasternodes", &listmasternodes, true },
-        {"sapphire", "getmasternodecount", &getmasternodecount, true },
-        {"sapphire", "createmasternodebroadcast", &createmasternodebroadcast, true },
-        {"sapphire", "decodemasternodebroadcast", &decodemasternodebroadcast, true },
-        {"sapphire", "relaymasternodebroadcast", &relaymasternodebroadcast, true },
-        {"sapphire", "masternodecurrent", &masternodecurrent, true },
-        {"sapphire", "startmasternode", &startmasternode, true },
-        {"sapphire", "createmasternodekey", &createmasternodekey, true },
-        {"sapphire", "getmasternodeoutputs", &getmasternodeoutputs, true },
-        {"sapphire", "listmasternodeconf", &listmasternodeconf, true },
-        {"sapphire", "getmasternodestatus", &getmasternodestatus, true },
-        {"sapphire", "getmasternodewinners", &getmasternodewinners, true },
-        {"sapphire", "getmasternodescores", &getmasternodescores, true },
-        {"sapphire", "preparebudget", &preparebudget, true },
-        {"sapphire", "submitbudget", &submitbudget, true },
-        {"sapphire", "mnbudgetvote", &mnbudgetvote, true },
-        {"sapphire", "getbudgetvotes", &getbudgetvotes, true },
-        {"sapphire", "getnextsuperblock", &getnextsuperblock, true },
-        {"sapphire", "getbudgetprojection", &getbudgetprojection, true },
-        {"sapphire", "getbudgetinfo", &getbudgetinfo, true },
-        {"sapphire", "mnbudgetrawvote", &mnbudgetrawvote, true },
-        {"sapphire", "mnfinalbudget", &mnfinalbudget, true },
-        {"sapphire", "checkbudgets", &checkbudgets, true },
-        {"sapphire", "mnsync", &mnsync, true },
-        {"sapphire", "spork", &spork, true },
+        /* Dash Diamond features */
+        {"dashdiamond", "listmasternodes", &listmasternodes, true },
+        {"dashdiamond", "getmasternodecount", &getmasternodecount, true },
+        {"dashdiamond", "createmasternodebroadcast", &createmasternodebroadcast, true },
+        {"dashdiamond", "decodemasternodebroadcast", &decodemasternodebroadcast, true },
+        {"dashdiamond", "relaymasternodebroadcast", &relaymasternodebroadcast, true },
+        {"dashdiamond", "masternodecurrent", &masternodecurrent, true },
+        {"dashdiamond", "startmasternode", &startmasternode, true },
+        {"dashdiamond", "createmasternodekey", &createmasternodekey, true },
+        {"dashdiamond", "getmasternodeoutputs", &getmasternodeoutputs, true },
+        {"dashdiamond", "listmasternodeconf", &listmasternodeconf, true },
+        {"dashdiamond", "getmasternodestatus", &getmasternodestatus, true },
+        {"dashdiamond", "getmasternodewinners", &getmasternodewinners, true },
+        {"dashdiamond", "getmasternodescores", &getmasternodescores, true },
+        {"dashdiamond", "preparebudget", &preparebudget, true },
+        {"dashdiamond", "submitbudget", &submitbudget, true },
+        {"dashdiamond", "mnbudgetvote", &mnbudgetvote, true },
+        {"dashdiamond", "getbudgetvotes", &getbudgetvotes, true },
+        {"dashdiamond", "getnextsuperblock", &getnextsuperblock, true },
+        {"dashdiamond", "getbudgetprojection", &getbudgetprojection, true },
+        {"dashdiamond", "getbudgetinfo", &getbudgetinfo, true },
+        {"dashdiamond", "mnbudgetrawvote", &mnbudgetrawvote, true },
+        {"dashdiamond", "mnfinalbudget", &mnfinalbudget, true },
+        {"dashdiamond", "checkbudgets", &checkbudgets, true },
+        {"dashdiamond", "mnsync", &mnsync, true },
+        {"dashdiamond", "spork", &spork, true },
 
 #ifdef ENABLE_WALLET
         /* Wallet */
@@ -598,7 +598,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(std::string methodname, std::string args)
 {
-    return "> sapphire-cli " + methodname + " " + args + "\n";
+    return "> dashdiamond-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(std::string methodname, std::string args)

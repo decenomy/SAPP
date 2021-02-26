@@ -1,9 +1,9 @@
 Gitian building
 ================
 
-*Setup instructions for a gitian build of Sapphire Core using a VM or physical system.*
+*Setup instructions for a gitian build of Dash Diamond Core using a VM or physical system.*
 
-Gitian is the deterministic build process that is used to build the Sapphire
+Gitian is the deterministic build process that is used to build the Dash Diamond
 Core executables. It provides a way to be reasonably sure that the
 executables are really built from source on GitHub. It also makes sure that
 the same, tested dependencies are used and statically built into the executable.
@@ -11,7 +11,7 @@ the same, tested dependencies are used and statically built into the executable.
 Multiple developers build the source code by following a specific descriptor
 ("recipe"), cryptographically sign the result, and upload the resulting signature.
 These results are compared and only if they match, the build is accepted and uploaded
-to the Sapphire GitHub release page.
+to the Dash Diamond GitHub release page.
 
 More independent gitian builders are needed, which is why this guide exists.
 It is preferred to follow these steps yourself instead of using someone else's
@@ -23,7 +23,7 @@ Table of Contents
 - [Preparing the Gitian builder host](#preparing-the-gitian-builder-host)
   - [macOS Builds](#macos-builds)
 - [Initial Gitian Setup](#initial-gitian-setup)
-- [Building Sapphire Core](#building-sapphire-core)
+- [Building Dash Diamond Core](#building-dashdiamond-core)
 - [Signing externally](#signing-externally)
 - [Uploading signatures](#uploading-signatures)
 
@@ -63,7 +63,7 @@ Initial Gitian Setup
 
 The `gitian-build.py` script is designed to checkout different release tags, commits, branches, or pull requests. The linked guides above cover the process of obtaining the script and doing the basic initial setup.
 
-Building Sapphire Core
+Building Dash Diamond Core
 --------------------
 
 The script allows you to build tags, commits, branches, and even pull requests. Below are some examples:
