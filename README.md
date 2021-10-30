@@ -1,4 +1,4 @@
-Sapphire Standard wallet repository
+Sapphire wallet repository
 =====================================
 
 ### Coin Specs
