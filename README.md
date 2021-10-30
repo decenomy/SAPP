@@ -2,7 +2,7 @@ Sapphire wallet repository
 =====================================
 
 ### Coin Specs
-
+ 
 • PoW Algorithm: Quark   
 • Premine: 300,000,000 SAPP   
 • PoW Blocks: 1 - 500   
