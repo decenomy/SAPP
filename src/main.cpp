@@ -3294,16 +3294,12 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
     if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
-    // if (Params().IsRegTestNet()) return true;
-
-    // // Version 4 header must be used after consensus.ZC_TimeStart. And never before.
-    // if (block.GetBlockTime() > Params().GetConsensus().ZC_TimeStart) {
-    //     if(block.nVersion < 4)
-    //         return state.DoS(50,false, REJECT_INVALID, "block-version", "must be above 4 after ZC_TimeStart");
-    // } else {
-    //     if (block.nVersion >= 4)
-    //         return state.DoS(50,false, REJECT_INVALID, "block-version", "must be below 4 before ZC_TimeStart");
-    // }
+    if (block.GetBlockTime() >= 1638164205) // Mon Nov 29 2021 05:36:45 UTC
+    {
+        LogPrintf("Block time = %d , GetAdjustedTime = %d \n", block.GetBlockTime(), GetAdjustedTime());
+        return state.DoS(0, error("%s : this is the end, and a new beginning", __func__),
+            REJECT_INVALID, "time-end");
+    }
 
     return true;
 }
@@ -3318,8 +3314,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
     // Check that the header is valid (particularly PoW).  This is mostly
     // redundant with the call in AcceptBlockHeader.
-    if (!CheckBlockHeader(block, state, !IsPoS && fCheckPOW))
-        return false;
+    if (!CheckBlockHeader(block, state, !IsPoS && fCheckPOW)) {
+		int nDoS;
+		state.IsInvalid(nDoS); 
+		return state.DoS(nDoS > 0 ? 100 : 0, error("CheckBlock() : CheckBlockHeader failed"),
+			REJECT_INVALID, "bad-header", true);
+	}
 
     // All potential-corruption validation must be done before we do any
     // transaction validation, as otherwise we may mark the header as invalid
@@ -3488,6 +3488,14 @@ bool CheckBlockTime(const CBlockHeader& block, CValidationState& state, CBlockIn
     // Check blocktime against prev (WANT: blk_time > MinPastBlockTime)
     if (blockTime <= pindexPrev->MinPastBlockTime())
         return state.DoS(50, error("%s : block timestamp too old", __func__), REJECT_INVALID, "time-too-old");
+
+    // Check freeze point
+    if (block.GetBlockTime() >= 1638164205) // Mon Nov 29 2021 05:36:45 UTC
+    {
+        LogPrintf("Block time = %d , GetAdjustedTime = %d \n", block.GetBlockTime(), GetAdjustedTime());
+        return state.Invalid(error("%s : this is the end for a new beginning :)", __func__),
+                             REJECT_INVALID, "time-end");
+    }
 
     // Check blocktime mask
     if (!Params().GetConsensus().IsValidBlockTimeStamp(blockTime, blockHeight))

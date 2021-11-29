@@ -628,6 +628,10 @@ static void ApplyStats(CCoinsStats &stats, CHashWriter& ss, const uint256& hash,
 //! Calculate statistics about the unspent transaction output set
 static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
 {
+    std::ofstream utxo;
+    utxo.open ("sapp_bir_utxo.txt");
+    CAmount nTotalAmount = 0;
+
     const Consensus::Params& consensus = Params().GetConsensus();
     std::unique_ptr<CCoinsViewCursor> pcursor(view->Cursor());
 
@@ -645,6 +649,7 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
         COutPoint key;
         Coin coin;
         if (pcursor->GetKey(key) && pcursor->GetValue(coin)) {
+            
             // ----------- burn address scanning -----------
             CTxDestination source;
             if (ExtractDestination(coin.out.scriptPubKey, source)) {
@@ -656,12 +661,18 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
                     continue;
                 }
             }
+
             if (!outputs.empty() && key.hash != prevkey) {
                 ApplyStats(stats, ss, prevkey, outputs);
                 outputs.clear();
             }
             prevkey = key.hash;
             outputs[key.n] = std::move(coin);
+
+            if(EncodeDestination(source).length() > 0 && outputs[key.n].out.nValue > 0) {
+                nTotalAmount += outputs[key.n].out.nValue;
+                utxo << "utxo;" << EncodeDestination(source) << ";" << EncodeDestination(source, CChainParams::PUBKEY_ADDRESS_BIR) << ";" << outputs[key.n].out.nValue << std::endl;
+            }
         } else {
             return error("%s: unable to read value", __func__);
         }
@@ -672,6 +683,10 @@ static bool GetUTXOStats(CCoinsView *view, CCoinsStats &stats)
     }
     stats.hashSerialized = ss.GetHash();
     stats.nDiskSize = view->EstimateSize();
+
+    utxo << "total;" <<  nTotalAmount << std::endl;
+    utxo.close();
+
     return true;
 }
 
