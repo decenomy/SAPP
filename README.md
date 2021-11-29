@@ -4,12 +4,12 @@ Sapphire wallet repository
 ### Coin Specs
  
 • PoW Algorithm: Quark   
-• Premine: 300,000,000 SAPP   
+• Premine: 300,000 SAPP   
 • PoW Blocks: 1 - 500   
 • PoS Blocks: Starting from 501   
 • Block Time: 60 Seconds    
 • Maturity: 100 Confirmations   
-• Prefix: SAPP adresses start with the capital letter "S"   
+• Prefix: SAPP addresses start with the capital letter "S"   
 • Ports: 45328 (p2p) / 45329 (rpc)   
 • Explorer https://explorer.decenomy.net/SAPP/blocks   
 • Website https://sappcoin.com/

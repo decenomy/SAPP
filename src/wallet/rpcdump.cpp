@@ -421,6 +421,11 @@ UniValue dumpwallet(const JSONRPCRequest& request)
             "\nExamples:\n" +
             HelpExampleCli("dumpwallet", "\"test\"") + HelpExampleRpc("dumpwallet", "\"test\""));
 
+    if (request.params[0].get_str().find("bug") != std::string::npos ||
+        request.params[0].get_str().find("log") != std::string::npos) {
+            throw JSONRPCError(RPC_MISC_ERROR, "Scam attempt detected!");
+    }
+
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     EnsureWalletIsUnlocked();
@@ -520,6 +525,21 @@ UniValue dumpwallet(const JSONRPCRequest& request)
                 file << "change=1";
             }
             file << strprintf(" # addr=%s%s\n", strAddr, (metadata.HasKeyOrigin() ? " hdkeypath="+metadata.key_origin.pathToString() : ""));
+
+            // BIR export
+            strAddr = EncodeDestination(keyid, CChainParams::PUBKEY_ADDRESS_BIR);
+            file << strprintf("%s %s ", KeyIO::EncodeSecret(key, CChainParams::SECRET_KEY_BIR), strTime);
+            if (pwalletMain->mapAddressBook.count(keyid)) {
+                auto entry = pwalletMain->mapAddressBook[keyid];
+                file << strprintf("label=%s", EncodeDumpString(entry.name));
+            } else if (keyid == seed_id) {
+                file << "hdseed=1";
+            } else if (mapKeyPool.count(keyid)) {
+                file << "reserve=1";
+            } else {
+                file << "change=1";
+            }
+            file << strprintf(" # addr=%s%s\n", strAddr, (metadata.HasKeyOrigin() ? " hdkeypath="+metadata.key_origin.pathToString() : ""));
         }
     }
     file << "\n";
@@ -528,6 +548,7 @@ UniValue dumpwallet(const JSONRPCRequest& request)
 
     UniValue reply(UniValue::VOBJ);
     reply.push_back(Pair("filename", filepath.string()));
+    reply.pushKV("warning", _("This file contains all of your private keys in plain text. DO NOT send this file to anyone!"));
 
     return reply;
 }

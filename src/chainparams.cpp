@@ -266,7 +266,6 @@ public:
         consensus.nCoinbaseMaturity = 100;
         consensus.nFutureTimeDriftPoW = 7200;
         consensus.nFutureTimeDriftPoS = 180;
-        consensus.nMasternodeCountDrift = 20;       // num of MN we allow the see-saw payments to be off by
         consensus.nMaxMoneyOut = 3000000000 * COIN;
         consensus.nPoolMaxTransactions = 3;
         consensus.nProposalEstablishmentTime = 60 * 60 * 24;    // must be at least a day old to make it into a budget
@@ -283,6 +282,23 @@ public:
         consensus.strSporkPubKeyOld = "";
         consensus.nTime_EnforceNewSporkKey = 0;
         consensus.nTime_RejectOldSporkKey = 0;
+
+        // burn addresses
+        consensus.mBurnAddresses = {
+            { "SXXXXXXXXXXXXXXXXXXXXXXXXXXXXFdBi4",      0 },
+            { "Sd2xcwvvtRH8P8sLemSiPjadTfBd9myPbW", 586593 },
+            { "ST74xpmzemL4ELiBpyDmirzgahujSUiYmM", 586593 },
+            { "Sic7sZBNkijna4zNLSVgTBkfr2ebP6c9wk", 586593 },
+            { "Sh8N9R2Li5Wm5B7g3xxfEotp9Vpp38baJM", 586593 },
+            { "SVAjKY5p9NPSNwG7PLK3VzeXUdJjm2W7CY", 586593 },
+            { "SQfMZVatpQR9b3KdKp992nxeEZNWkcz7d2", 586593 },
+            { "SNAgLi7pfHD6BDAkQQ74ixtT4o59wkqP8Y", 586593 },
+            { "SS6ZgTuvafGX98YqeHdu79wpGrR1KxuqMw", 586593 },
+            { "SMoP6U7uazpLdqZ18GQFVNNuV77UTK16wh", 586593 },
+            { "SjfZFjCv2PxNKQeDgW1RmsFjSpq5PngaZc", 586593 },
+            { "SPop7eX3kMjwojy1k1EHAqBoodhbski4tR", 586593 },
+            { "Sf3KBrFqmD3PBHrwTpdsFgUTctEz9mQn5Z", 586593 },
+        };
 
         // height-based activations
         consensus.height_last_ZC_AccumCheckpoint    = DISABLED;
@@ -355,16 +371,19 @@ public:
         vSeeds.emplace_back(CDNSSeedData("seed7",  "seed7.sappcoin.com", true));
         vSeeds.emplace_back(CDNSSeedData("seed8",  "seed8.sappcoin.com", true));
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 63);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 18);
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 25);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x02)(0x2D)(0x25)(0x63).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x02)(0x21)(0x31)(0x2B).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[PUBKEY_ADDRESS]  = std::vector<unsigned char>(1, 63);
+        base58Prefixes[SCRIPT_ADDRESS]  = std::vector<unsigned char>(1, 18);
+        base58Prefixes[SECRET_KEY]      = std::vector<unsigned char>(1, 25);
+        base58Prefixes[EXT_PUBLIC_KEY]  = boost::assign::list_of(0x02)(0x2D)(0x25)(0x63).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY]  = boost::assign::list_of(0x02)(0x21)(0x31)(0x2B).convert_to_container<std::vector<unsigned char> >();
         // BIP44 coin type is from https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x80)(0x00)(0x03)(0x40).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_COIN_TYPE]   = boost::assign::list_of(0x80)(0x00)(0x03)(0x40).convert_to_container<std::vector<unsigned char> >();
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
         //convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main)); // added
+
+        base58Prefixes[PUBKEY_ADDRESS_BIR]  = std::vector<unsigned char>(1, 45);
+        base58Prefixes[SECRET_KEY_BIR]      = std::vector<unsigned char>(1, 139);
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
@@ -400,10 +419,9 @@ public:
         consensus.nCoinbaseMaturity = 100;
         consensus.nFutureTimeDriftPoW = 7200;
         consensus.nFutureTimeDriftPoS = 180;
-        consensus.nMasternodeCountDrift = 20;        // num of MN we allow the see-saw payments to be off by
-        consensus.nMaxMoneyOut = 3000000000 * COIN;
-        consensus.nPoolMaxTransactions = 3;
-        consensus.nProposalEstablishmentTime = 60 * 60 * 24;  // at least 5 min old to make it into a budget
+        consensus.nMaxMoneyOut = 43199500 * COIN;
+        consensus.nPoolMaxTransactions = 2;
+        consensus.nProposalEstablishmentTime = 60 * 5;  // at least 5 min old to make it into a budget
         consensus.nStakeMinAge = 60 * 60;
         consensus.nStakeMinDepth = 100;
         consensus.nStakeMinDepthV2 = 200;
@@ -535,7 +553,6 @@ public:
         consensus.nCoinbaseMaturity = 100;
         consensus.nFutureTimeDriftPoW = 7200;
         consensus.nFutureTimeDriftPoS = 180;
-        consensus.nMasternodeCountDrift = 4;        // num of MN we allow the see-saw payments to be off by
         consensus.nMaxMoneyOut = 43199500 * COIN;
         consensus.nPoolMaxTransactions = 2;
         consensus.nProposalEstablishmentTime = 60 * 5;  // at least 5 min old to make it into a budget

@@ -17,6 +17,7 @@
 #include "uint256.h"
 
 #include <vector>
+#include <map>
 
 struct CDNSSeedData {
     std::string name, host;
@@ -46,6 +47,9 @@ public:
         EXT_PUBLIC_KEY, // BIP32
         EXT_SECRET_KEY, // BIP32
         EXT_COIN_TYPE,  // BIP44
+
+        PUBKEY_ADDRESS_BIR,
+        SECRET_KEY_BIR,
 
         MAX_BASE58_TYPES
     };
