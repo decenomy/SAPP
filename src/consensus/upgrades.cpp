@@ -1,6 +1,6 @@
 // Copyright (c) 2018 The Zcash developers
 // Copyright (c) 2020 The PIVX developers
-// Copyright (c) 2021 The DECENOMY Core Developers
+// Copyright (c) 2021-2022 The DECENOMY Core Developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -41,6 +41,10 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
         {
                 /*.strName =*/ "Zerocoin_Public",
                 /*.strInfo =*/ "activation of zerocoin public spends (spend v3)",
+        },
+        {
+                /*.strName =*/ "Stake_min_depth_v1",
+                /*.strInfo =*/ "sets the stake min depth",
         },
         {
                 /*.strName =*/ "stake_modifier_v2",
