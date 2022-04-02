@@ -339,6 +339,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/hmac_sha512.cpp \
   crypto/scrypt.cpp \
   crypto/ripemd160.cpp \
+  crypto/sph_md_helper.c \
   crypto/aes_helper.c \
   crypto/blake.c \
   crypto/bmw.c \
@@ -359,7 +360,9 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/ripemd160.h \
   crypto/sph_blake.h \
   crypto/sph_bmw.h \
+  crypto/sph_fugue.h \
   crypto/sph_groestl.h \
+  crypto/sph_hamsi.h \
   crypto/sph_jh.h \
   crypto/sph_keccak.h \
   crypto/sph_skein.h \
@@ -369,11 +372,15 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/luffa.c \
   crypto/sph_cubehash.h \
   crypto/cubehash.c \
-  crypto/sph_shavite \
+  crypto/sph_shavite.h \
+  crypto/sph_sha2.h \
+  crypto/sph_shabal.h \
   crypto/shavite.c \
   crypto/sph_simd.h \
+  crypto/sph_skein.h \
   crypto/simd.c \
-  crypto/sph_echo \
+  crypto/sph_echo.h \
+  crypto/sph_whirlpool.h \
   crypto/echo.c \
   crypto/shabal.c \
   crypto/whirlpool.c \
@@ -620,8 +627,11 @@ CTAES_DIST += crypto/ctaes/ctaes.h
 CTAES_DIST += crypto/ctaes/README.md
 CTAES_DIST += crypto/ctaes/test.c
 
-EXTRA_DIST = $(CTAES_DIST)
-
+EXTRA_DIST =         \
+  $(CTAES_DIST)      \
+  crypto/md_helper.c \
+  crypto/hamsi_helper.c \
+  crypto/haval_helper.c
 
 config/pivx-config.h: config/stamp-h1
 	@$(MAKE) -C $(top_builddir) $(subdir)/$(@)
