@@ -8,7 +8,7 @@ on:
 jobs:
   build-and-extract-files-linux-x64:
     runs-on: ubuntu-latest
-    if: ${{ false }}  # Set condition to false to make the workflow inactive
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
 
     steps:
       - name: Checkout Repository
@@ -42,7 +42,7 @@ jobs:
           path: release_files
   build-and-extract-files-linux-arm64:
     runs-on: ubuntu-latest
-    if: ${{ false }}  # Set condition to false to make the workflow inactive
+    # if: ${{ false }}  # Set condition to false to make the workflow inactive
 
     steps:
       - name: Checkout Repository
