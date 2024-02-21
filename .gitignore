@@ -355,3 +355,5 @@ __decenomy__d-new-gui.*
 
 .vscode/*
 null.d
+
+!build_docker.sh
