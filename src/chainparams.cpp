@@ -16,6 +16,7 @@
 #include <boost/assign/list_of.hpp>
 
 #include <assert.h>
+#include "timedata.h"
 
 #define DISABLED 0x7FFFFFFE;
 
@@ -273,7 +274,7 @@ public:
         consensus.nTargetTimespanV2 = 30 * 60;
         consensus.nTargetSpacing = 1 * 60;
         consensus.nTimeSlotLength = 15;
-        consensus.nRewardAdjustmentInterval = 7 * 1440;
+        consensus.nRewardAdjustmentInterval = 7 * DAY_IN_SECONDS / consensus.nTargetSpacing;
 
         // spork keys
         consensus.strSporkPubKey = "04d45416e4a64b1b051e2a2ebd80ced5efe148cf5fbcb70e56860957675a2da1a21fd522c42c1ed18a1ec42641589a09cf3f58678d213825dc21798183a005a984";
