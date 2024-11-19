@@ -40,8 +40,8 @@ jobs:
             --no-cache \
             --build-arg CPU_CORES=$(nproc) \
             --build-arg TICKER=$REPO_NAME \
-            --build-arg NAME=__Decenomy__ \
-            --build-arg BASE_NAME=__decenomy__ \
+            --build-arg NAME=Sapphire \
+            --build-arg BASE_NAME=sapphire \
             --build-arg TARGET=$SHORT_REF \
             --build-arg GITHUB_USER=$ACCOUNT_NAME \
             -t ${IMAGE_NAME} \
@@ -103,8 +103,8 @@ jobs:
             --no-cache \
             --build-arg CPU_CORES=$(nproc) \
             --build-arg TICKER=$REPO_NAME \
-            --build-arg NAME=__Decenomy__ \
-            --build-arg BASE_NAME=__decenomy__ \
+            --build-arg NAME=Sapphire \
+            --build-arg BASE_NAME=sapphire \
             --build-arg TARGET=$SHORT_REF \
             --build-arg GITHUB_USER=$ACCOUNT_NAME \
             -t ${IMAGE_NAME} \
@@ -166,8 +166,8 @@ jobs:
             --no-cache \
             --build-arg CPU_CORES=$(nproc) \
             --build-arg TICKER=$REPO_NAME \
-            --build-arg NAME=__Decenomy__ \
-            --build-arg BASE_NAME=__decenomy__ \
+            --build-arg NAME=Sapphire \
+            --build-arg BASE_NAME=sapphire \
             --build-arg TARGET=$SHORT_REF \
             --build-arg GITHUB_USER=$ACCOUNT_NAME \
             -t ${IMAGE_NAME} \
@@ -229,8 +229,8 @@ jobs:
             --no-cache \
             --build-arg CPU_CORES=$(nproc) \
             --build-arg TICKER=$REPO_NAME \
-            --build-arg NAME=__Decenomy__ \
-            --build-arg BASE_NAME=__decenomy__ \
+            --build-arg NAME=Sapphire \
+            --build-arg BASE_NAME=sapphire \
             --build-arg TARGET=$SHORT_REF \
             --build-arg GITHUB_USER=$ACCOUNT_NAME \
             -t ${IMAGE_NAME} \
