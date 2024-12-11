@@ -5057,7 +5057,9 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             pfrom->nStartingHeight, addrMe.ToString(), pfrom->id,
             remoteAddr);
 
-        int64_t nTimeOffset = nTime - GetTime();
+// receive queue time offset fix
+//        int64_t nTimeOffset = nTime - GetTime();
+        int64_t nTimeOffset = nTime - (nTimeReceived/1000000);
         pfrom->nTimeOffset = nTimeOffset;
         const int nTimeSlotLength = Params().GetConsensus().nTimeSlotLength;
         if (abs64(nTimeOffset) < 2 * nTimeSlotLength) {
