@@ -376,8 +376,6 @@ static const CRPCCommand vRPCCommands[] =
         {"sapphire", "listmasternodeconf", &listmasternodeconf, true },
         {"sapphire", "getactivemasternodecount", &getactivemasternodecount, true },
         {"sapphire", "getmasternodestatus", &getmasternodestatus, true },
-        {"sapphire", "getmasternodewinners", &getmasternodewinners, true },
-        {"sapphire", "getmasternodescores", &getmasternodescores, true },
         {"sapphire", "mnsync", &mnsync, true },
         {"sapphire", "spork", &spork, true },
         {"sapphire", "mnping", &mnping, true },
