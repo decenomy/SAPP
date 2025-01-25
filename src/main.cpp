@@ -56,7 +56,7 @@
 
 
 #if defined(NDEBUG)
-#error "Sapphire cannot be compiled without assertions."
+#error "The wallet cannot be compiled without assertions."
 #endif
 
 /**
@@ -97,7 +97,7 @@ size_t nCoinCacheUsage = 5000 * 300;
 /* If the tip is older than this (in seconds), the node is considered to be in initial block download. */
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 
-/** Fees smaller than this (in uSAPP) are considered zero fee (for relaying, mining and transaction creation)
+/** Fees smaller than this (in uCOIN) are considered zero fee (for relaying, mining and transaction creation)
  * We are ~100 times smaller then bitcoin now (2015-06-23), set minRelayTxFee only 10 times higher
  * so it's still 10 times lower comparing to bitcoin.
  */
@@ -1449,12 +1449,10 @@ bool IsInitialBlockDownload()
     if (latchToFalse.load(std::memory_order_relaxed))
         return false;
 
-    LOCK(cs_main);
-    if (latchToFalse.load(std::memory_order_relaxed))
-         return false;
     const int chainHeight = chainActive.Height();
     if (fImporting || fReindex || fVerifyingBlocks || chainHeight < Checkpoints::GetTotalBlocksEstimate())
         return true;
+    LOCK(cs_main);
     bool state = (chainHeight < pindexBestHeader->nHeight - 24 * 6 ||
             pindexBestHeader->GetBlockTime() < GetTime() - nMaxTipAge);
     if (!state)
@@ -1961,19 +1959,13 @@ DisconnectResult DisconnectBlock(CBlock& block, CBlockIndex* pindex, CCoinsViewC
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 
-    // Clean lastPaid
-    auto amount = CMasternode::GetMasternodePayment(pindex->nHeight);
-    auto paidPayee = block.GetPaidPayee(amount);
-    if(!paidPayee.empty()) {
-        auto pmn = mnodeman.Find(paidPayee);
+    if(!IsInitialBlockDownload()) {
+        // Dynamic rewards management
+        if(!CRewards::DisconnectBlock(pindex)) return DISCONNECT_UNCLEAN;
 
-        if(pmn) {
-            pmn->lastPaid = INT64_MAX;
-        }
+        // Masternode management
+        if(!mnodeman.DisconnectBlock(pindex, block)) return DISCONNECT_UNCLEAN;
     }
-
-    // Dynamic rewards management
-    if(!CRewards::DisconnectBlock(pindex)) return DISCONNECT_UNCLEAN;
 
     return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
 }
@@ -2240,7 +2232,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
     }
 
-    // Update SAPP money supply
+    // Update money supply
     pindex->nMoneySupply = pindex->pprev->nMoneySupply.get() + (nValueOut - nValueIn - nUnspendableValue);
 
     int64_t nTime3 = GetTimeMicros();
@@ -2256,19 +2248,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     nTimeCallbacks += nTime4 - nTime3;
     LogPrint(BCLog::BENCH, "    - Callbacks: %.2fms [%.2fs]\n", 0.001 * (nTime4 - nTime3), nTimeCallbacks * 0.000001);
 
-    // Fill lastPaid
-    auto amount = CMasternode::GetMasternodePayment(pindex->nHeight);
-    auto paidPayee = block.GetPaidPayee(amount);
-    if(!paidPayee.empty()) {
-        auto pmn = mnodeman.Find(paidPayee);
+    if(!IsInitialBlockDownload()) {
+        // Dynamic rewards management
+        if(!CRewards::ConnectBlock(pindex, nMint)) return false;
 
-        if(pmn) {
-            pmn->lastPaid = pindex->GetBlockTime();
-        }
+        // Masternode management
+        if(!mnodeman.ConnectBlock(pindex, block)) return false;
     }
-
-    // Dynamic rewards management
-    if(!CRewards::ConnectBlock(pindex, nMint, view)) return false;
 
     return true;
 }
@@ -3104,6 +3090,8 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
 
 bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig)
 {
+    AssertLockHeld(cs_main);
+
     if (block.fChecked)
         return true;
 
@@ -3161,33 +3149,29 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // masternode payments / budgets
     CBlockIndex* pindexPrev = chainActive.Tip();
     int nHeight = 0;
-    if (pindexPrev != NULL) {
-        if (pindexPrev->GetBlockHash() == block.hashPrevBlock) {
-            nHeight = pindexPrev->nHeight + 1;
-        } else { // Out of order, blocks arrives in order, so if prev block is not the tip then we are on a fork.
-            BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
-            if (mi != mapBlockIndex.end() && (*mi).second) {
-                nHeight = (*mi).second->nHeight + 1;
+    if (pindexPrev != nullptr && block.hashPrevBlock != UINT256_ZERO) {
+        if (pindexPrev->GetBlockHash() != block.hashPrevBlock) {
+            //out of order
+            pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+            if (!pindexPrev) {
+                return state.Error("blk-out-of-order");
             }
         }
+        nHeight = pindexPrev->nHeight + 1;
 
-        // Sapphire
         // It is entirely possible that we don't have enough data and this could fail
         // (i.e. the block could indeed be valid). Store the block for later consideration
         // but issue an initial reject message.
         // The case also exists that the sending peer could not have enough data to see
         // that this block is invalid, so don't issue an outright ban.
-        if (nHeight != 0 && 
-            !IsInitialBlockDownload() &&
-            GetAdjustedTime() - block.GetBlockTime() < DEFAULT_BLOCK_PAYEE_VERIFICATION_TIMEOUT)
-        {
+        if (!IsInitialBlockDownload()) {
             // check masternode payment
-            if (!IsBlockPayeeValid(block, nHeight)) {
+            if (!IsBlockPayeeValid(block, pindexPrev)) {
                 mapRejectedBlocks.insert(std::make_pair(block.GetHash(), GetTime()));
                 return state.DoS(0, false, REJECT_INVALID, "bad-cb-payee", false, "Couldn't find masternode payment");
             }
         } else {
-            LogPrintf("%s: Masternode payment checks skipped on sync and second layer verification timeout\n", __func__);
+            LogPrintf("%s: Masternode/Budget payment checks skipped on sync\n", __func__);
         }
     }
 
@@ -3713,31 +3697,35 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
 {
     AssertLockNotHeld(cs_main);
 
-    // Preliminary checks
+    bool checked = false;
+    CBlockIndex* pindex = nullptr;
     int64_t nStartTime = GetTimeMillis();
-    const Consensus::Params& consensus = Params().GetConsensus();
-
-    // check block
-    bool checked = CheckBlock(*pblock, state);
-
-    // For now, we need the tip to know whether p2pkh block signatures are accepted or not.
-    // After 5.0, this can be removed and replaced by the enforcement block time.
-    const int newHeight = chainActive.Height() + 1;
-    const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_P2PKH_BLOCK_SIGNATURES);
-    if (!CheckBlockSignature(*pblock, enableP2PKH))
-        return error("%s : bad proof-of-stake block signature", __func__);
-
-    if (pblock->GetHash() != consensus.hashGenesisBlock && pfrom != NULL) {
-        //if we get this far, check if the prev block is our prev block, if not then request sync and return false
-        BlockMap::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
-        if (mi == mapBlockIndex.end()) {
-            g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), UINT256_ZERO));
-            return false;
-        }
-    }
+    int newHeight = 0;
 
     {
         LOCK(cs_main);
+
+        const auto& params = Params();
+        const auto& consensus = params.GetConsensus();
+
+        // check block
+        checked = CheckBlock(*pblock, state);
+
+        // For now, we need the tip to know whether p2pkh block signatures are accepted or not.
+        // After 5.0, this can be removed and replaced by the enforcement block time.
+        newHeight = chainActive.Height() + 1;
+        const bool enableP2PKH = consensus.NetworkUpgradeActive(newHeight, Consensus::UPGRADE_P2PKH_BLOCK_SIGNATURES);
+        if (!CheckBlockSignature(*pblock, enableP2PKH))
+            return error("%s : bad proof-of-stake block signature", __func__);
+
+        if (pblock->GetHash() != consensus.hashGenesisBlock && pfrom != NULL) {
+            //if we get this far, check if the prev block is our prev block, if not then request sync and return false
+            BlockMap::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
+            if (mi == mapBlockIndex.end()) {
+                g_connman->PushMessage(pfrom, CNetMsgMaker(pfrom->GetSendVersion()).Make(NetMsgType::GETBLOCKS, chainActive.GetLocator(), UINT256_ZERO));
+                return false;
+            }
+        }
 
         MarkBlockAsReceived(pblock->GetHash());
         if (!checked) {
@@ -3745,7 +3733,6 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
         }
 
         // Store to disk
-        CBlockIndex* pindex = nullptr;
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp, checked);
         if (pindex && pfrom) {
             mapBlockSource[pindex->GetBlockHash ()] = pfrom->GetId ();
@@ -3762,8 +3749,9 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
                     nodeStatus = nodestate->nodeBlocks.updateState(state, nodeStatus);
                     int nDoS = 0;
                     if (state.IsInvalid(nDoS)) {
-                        if (nDoS > 0)
+                        if (nDoS > 0) {
                             Misbehaving(pfrom->GetId(), nDoS);
+                        }
                         nodeStatus = false;
                     }
                     if (!nodeStatus)
@@ -3777,27 +3765,15 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, const CBlock* pblock
     if (!ActivateBestChain(state, pblock, checked, connman))
         return error("%s : ActivateBestChain failed", __func__);
 
-    if (!fLiteMode) {
-        if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
-            masternodePayments.ProcessBlock(newHeight + 10);
-        }
-    }
-
-    if (pwalletMain) {
-        /* disable multisend
-        // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
-        if (pwalletMain->isMultiSendEnabled())
-            pwalletMain->MultiSend();
-        */
-
-        // If turned on Auto Combine will scan wallet for dust to combine
-        // Combine dust every 30 blocks
-        if (pwalletMain->fCombineDust && newHeight % 30 == 0)
-            pwalletMain->AutoCombineDust(connman);
-    }
-
     LogPrintf("%s : ACCEPTED Block %ld in %ld milliseconds with size=%d\n", __func__, newHeight, GetTimeMillis() - nStartTime,
               GetSerializeSize(*pblock, SER_DISK, CLIENT_VERSION));
+
+    if (pwalletMain) {
+        // If turned on Auto Combine will scan wallet for dust to combine
+        // Combine dust every 10 blocks
+        if (pwalletMain->fCombineDust && pindex->nHeight % 10 == 0)
+            pwalletMain->AutoCombineDust(connman);
+    }
 
     return true;
 }
@@ -4674,12 +4650,6 @@ bool static AlreadyHave(const CInv& inv) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
         return mapBlockIndex.count(inv.hash);
     case MSG_SPORK:
         return mapSporks.count(inv.hash);
-    case MSG_MASTERNODE_WINNER:
-        if (masternodePayments.mapMasternodePayeeVotes.count(inv.hash)) {
-            masternodeSync.AddedMasternodeWinner(inv.hash);
-            return true;
-        }
-        return false;
     case MSG_MASTERNODE_ANNOUNCE:
         if (mnodeman.mapSeenMasternodeBroadcast.count(inv.hash)) {
             masternodeSync.AddedMasternodeList(inv.hash);
@@ -4843,16 +4813,6 @@ void static ProcessGetData(CNode* pfrom, CConnman& connman, std::atomic<bool>& i
                         pushed = true;
                     }
                 }
-                if (!pushed && inv.type == MSG_MASTERNODE_WINNER) {
-                    if (masternodePayments.mapMasternodePayeeVotes.count(inv.hash)) {
-                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        ss.reserve(1000);
-                        ss << masternodePayments.mapMasternodePayeeVotes[inv.hash];
-                        connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::MNWINNER, ss));
-                        pushed = true;
-                    }
-                }
-
                 if (!pushed && inv.type == MSG_MASTERNODE_ANNOUNCE) {
                     if (mnodeman.mapSeenMasternodeBroadcast.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
@@ -4910,8 +4870,9 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         // Each connection can only send one version message
         if (pfrom->nVersion != 0) {
             connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_DUPLICATE, std::string("Duplicate version message")));
-            LOCK(cs_main);
-            Misbehaving(pfrom->GetId(), 1);
+            // Just ignore
+            // LOCK(cs_main);
+            // Misbehaving(pfrom->GetId(), 1);
             return false;
         }
 
@@ -4940,7 +4901,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             return false;
         }
 
-        if (nServices == NODE_NONE && sporkManager.IsSporkActive(SPORK_101_SERVICES_ENFORCEMENT)) {
+        if (nServices == NODE_NONE) {
             LOCK(cs_main);
             Misbehaving(pfrom->GetId(), 100);
             return error("No services on version message");
@@ -5075,7 +5036,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             pfrom->fDisconnect = true;
         }
 
-        // Sapphire: We use certain sporks during IBD, so check to see if they are
+        // We use certain sporks during IBD, so check to see if they are
         // available. If not, ask the first peer connected for them.
         // TODO: Move this to an instant broadcast of the sporks.
         bool fMissingSporks = !pSporkDB->SporkExists(SPORK_14_MIN_PROTOCOL_ACCEPTED);
@@ -5091,9 +5052,10 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 
 
     else if (pfrom->nVersion == 0) {
-        // Must have a version message before anything else
-        LOCK(cs_main);
-        Misbehaving(pfrom->GetId(), 1);
+        // Just ignore
+        // // Must have a version message before anything else
+        // LOCK(cs_main);
+        // Misbehaving(pfrom->GetId(), 1);
         return false;
     }
 
@@ -5315,70 +5277,77 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         CInv inv(MSG_TX, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
 
-        LOCK(cs_main);
+        WITH_LOCK(cs_main, mapAlreadyAskedFor.erase(inv));
 
         bool fMissingInputs = false;
         CValidationState state;
 
-        mapAlreadyAskedFor.erase(inv);
-
-        if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs, false, ignoreFees)) {
-            mempool.check(pcoinsTip);
+        if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs, false, ignoreFees)) 
+        {
+            WITH_LOCK(cs_main, mempool.check(pcoinsTip)); 
+            
             RelayTransaction(tx, connman);
-            vWorkQueue.push_back(inv.hash);
 
-            LogPrint(BCLog::MEMPOOL, "%s : peer=%d %s : accepted %s (poolsz %u txn, %u kB)\n",
-                __func__, pfrom->id, pfrom->cleanSubVer, tx.GetHash().ToString(),
-                mempool.size(), mempool.DynamicMemoryUsage() / 1000);
+            {
+                LOCK(cs_main);
 
-            // Recursively process any orphan transactions that depended on this one
-            std::set<NodeId> setMisbehaving;
-            for (unsigned int i = 0; i < vWorkQueue.size(); i++) {
-                std::map<uint256, std::set<uint256> >::iterator itByPrev = mapOrphanTransactionsByPrev.find(vWorkQueue[i]);
-                if (itByPrev == mapOrphanTransactionsByPrev.end())
-                    continue;
-                for (std::set<uint256>::iterator mi = itByPrev->second.begin();
-                     mi != itByPrev->second.end();
-                     ++mi) {
-                    const uint256& orphanHash = *mi;
-                    const CTransaction& orphanTx = mapOrphanTransactions[orphanHash].tx;
-                    NodeId fromPeer = mapOrphanTransactions[orphanHash].fromPeer;
-                    bool fMissingInputs2 = false;
-                    // Use a dummy CValidationState so someone can't setup nodes to counter-DoS based on orphan
-                    // resolution (that is, feeding people an invalid transaction based on LegitTxX in order to get
-                    // anyone relaying LegitTxX banned)
-                    CValidationState stateDummy;
+                vWorkQueue.push_back(inv.hash);
 
+                LogPrint(BCLog::MEMPOOL, "%s : peer=%d %s : accepted %s (poolsz %u txn, %u kB)\n",
+                    __func__, pfrom->id, pfrom->cleanSubVer, tx.GetHash().ToString(),
+                    mempool.size(), mempool.DynamicMemoryUsage() / 1000);
 
-                    if (setMisbehaving.count(fromPeer))
+                // Recursively process any orphan transactions that depended on this one
+                std::set<NodeId> setMisbehaving;
+                for (unsigned int i = 0; i < vWorkQueue.size(); i++) {
+                    std::map<uint256, std::set<uint256> >::iterator itByPrev = mapOrphanTransactionsByPrev.find(vWorkQueue[i]);
+                    if (itByPrev == mapOrphanTransactionsByPrev.end())
                         continue;
-                    if (AcceptToMemoryPool(mempool, stateDummy, orphanTx, true, &fMissingInputs2)) {
-                        LogPrint(BCLog::MEMPOOL, "   accepted orphan tx %s\n", orphanHash.ToString());
-                        RelayTransaction(orphanTx, connman);
-                        vWorkQueue.push_back(orphanHash);
-                        vEraseQueue.push_back(orphanHash);
-                    } else if (!fMissingInputs2) {
-                        int nDos = 0;
-                        if (stateDummy.IsInvalid(nDos) && nDos > 0) {
-                            // Punish peer that gave us an invalid orphan tx
-                            Misbehaving(fromPeer, nDos);
-                            setMisbehaving.insert(fromPeer);
-                            LogPrint(BCLog::MEMPOOL, "   invalid orphan tx %s\n", orphanHash.ToString());
-                        }
-                        // Has inputs but not accepted to mempool
-                        // Probably non-standard or insufficient fee/priority
-                        LogPrint(BCLog::MEMPOOL, "   removed orphan tx %s\n", orphanHash.ToString());
-                        vEraseQueue.push_back(orphanHash);
-                        assert(recentRejects);
-                        recentRejects->insert(orphanHash);
-                    }
-                    mempool.check(pcoinsTip);
-                }
-            }
+                    for (std::set<uint256>::iterator mi = itByPrev->second.begin();
+                        mi != itByPrev->second.end();
+                        ++mi) {
+                        const uint256& orphanHash = *mi;
+                        const CTransaction& orphanTx = mapOrphanTransactions[orphanHash].tx;
+                        NodeId fromPeer = mapOrphanTransactions[orphanHash].fromPeer;
+                        bool fMissingInputs2 = false;
+                        // Use a dummy CValidationState so someone can't setup nodes to counter-DoS based on orphan
+                        // resolution (that is, feeding people an invalid transaction based on LegitTxX in order to get
+                        // anyone relaying LegitTxX banned)
+                        CValidationState stateDummy;
 
-            for (uint256 hash : vEraseQueue)
-                EraseOrphanTx(hash);
+
+                        if (setMisbehaving.count(fromPeer))
+                            continue;
+                        if (AcceptToMemoryPool(mempool, stateDummy, orphanTx, true, &fMissingInputs2)) {
+                            LogPrint(BCLog::MEMPOOL, "   accepted orphan tx %s\n", orphanHash.ToString());
+                            RelayTransaction(orphanTx, connman);
+                            vWorkQueue.push_back(orphanHash);
+                            vEraseQueue.push_back(orphanHash);
+                        } else if (!fMissingInputs2) {
+                            int nDos = 0;
+                            if (stateDummy.IsInvalid(nDos) && nDos > 0) {
+                                // Punish peer that gave us an invalid orphan tx
+                                Misbehaving(fromPeer, nDos);
+                                setMisbehaving.insert(fromPeer);
+                                LogPrint(BCLog::MEMPOOL, "   invalid orphan tx %s\n", orphanHash.ToString());
+                            }
+                            // Has inputs but not accepted to mempool
+                            // Probably non-standard or insufficient fee/priority
+                            LogPrint(BCLog::MEMPOOL, "   removed orphan tx %s\n", orphanHash.ToString());
+                            vEraseQueue.push_back(orphanHash);
+                            assert(recentRejects);
+                            recentRejects->insert(orphanHash);
+                        }
+                        mempool.check(pcoinsTip);
+                    }
+                }
+
+                for (uint256 hash : vEraseQueue)
+                    EraseOrphanTx(hash);
+            }
         } else if (fMissingInputs) {
+            LOCK(cs_main);
+
             AddOrphanTx(tx, pfrom->GetId());
 
             // DoS prevention: do not allow mapOrphanTransactions to grow unbounded
@@ -5387,6 +5356,8 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (nEvicted > 0)
                 LogPrint(BCLog::MEMPOOL, "mapOrphan overflow, removed %u tx\n", nEvicted);
         } else {
+            LOCK(cs_main);
+
             // AcceptToMemoryPool() returned false, possibly because the tx is
             // already in the mempool; if the tx isn't in the mempool that
             // means it was rejected and we shouldn't ask for it again.
@@ -5406,6 +5377,8 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             }
         }
 
+        LOCK(cs_main);
+
         int nDoS = 0;
         if (state.IsInvalid(nDoS)) {
             LogPrint(BCLog::MEMPOOLREJ, "%s from peer=%d %s was not accepted into the memory pool: %s\n", tx.GetHash().ToString(),
@@ -5414,8 +5387,9 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (state.GetRejectCode() < REJECT_INTERNAL) // Never send AcceptToMemoryPool's internal codes over P2P
                 connman.PushMessage(pfrom, msgMaker.Make(NetMsgType::REJECT, strCommand, state.GetRejectCode(),
                                                state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), inv.hash));
-            if (nDoS > 0)
+            if (nDoS > 0) {
                 Misbehaving(pfrom->GetId(), nDoS);
+            }
         }
         FlushStateToDisk(state, FLUSH_STATE_PERIODIC);
     }
@@ -5458,8 +5432,9 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             if (!AcceptBlockHeader((CBlock)header, state, &pindexLast)) {
                 int nDoS;
                 if (state.IsInvalid(nDoS)) {
-                    if (nDoS > 0)
+                    if (nDoS > 0) {
                         Misbehaving(pfrom->GetId(), nDoS);
+                    }
                     std::string strError = "invalid header received " + header.GetHash().ToString();
                     return error(strError.c_str());
                 }
@@ -5729,7 +5704,6 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
         if (found) {
             //probably one the extensions
             mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
-            masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
             sporkManager.ProcessSpork(pfrom, strCommand, vRecv);
             masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
         } else {
